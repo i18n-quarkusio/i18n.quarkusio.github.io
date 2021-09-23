@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+
+
+
+
+
+<head>
+  <title>Quarkus - Quarkus 1.8 released - Multiple Persistence Units, Micrometer, jbang, GraalVM 20.2</title>
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/blog/quarkus-1-8-0-final-released/" />
+  <meta property="og:title" content="Quarkus 1.8 released - Multiple Persistence Units, Micrometer, jbang, GraalVM 20.2" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/blog/quarkus-1-8-0-final-released/">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/goan.js" type="text/javascript"></script>
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+</head>
+
+<body class="post">
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NJWS5L"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+  <div class="container">
+    <div class="logo-wrapper">
+      
+        <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+      
+    </div>
+    <label class="nav-toggle" for="checkbox">
+      <i class="fa fa-bars"></i>
+    </label>
+    <div id="menu" class="menu">
+      <span>
+        <a href="/get-started/" class="">はじめに</a>
+      </span>
+      <span>
+        <a href="/guides/" class="">ガイド</a>
+      </span>
+      <span>
+        <a href="/community/" class="">コミュニティ</a>
+      </span>
+      <span>
+        <a href="/support/" class="">サポート</a>
+      </span>
+      <span>
+        <a href="/blog/" class="active">ブログ</a>
+      </span>
+      <span>
+        <a href="https://code.quarkus.io" class="button-cta secondary white">コーディングを開始</a>
+      </span>
+    </div>
+  </div>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    <div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+    <div class="grid-wrapper">
+      <div class="width-12-12">
+        <p>
+          <a href="/blog"><i class="fas fa-angle-left"></i> Back to all posts</a>
+        </p>
+      </div>
+      <div class="width-12-12">
+        <div class="post-date">
+          September 15, 2020 
+          
+            <span class="tags"><a href="/blog/tag/release">#release</a></span>
+          
+        </div>
+        <h1 class="post-title">Quarkus 1.8 released - Multiple Persistence Units, Micrometer, jbang, GraalVM 20.2</h1>
+        <div class="grid-wrapper">
+          <div class="width-8-12 width-12-12-m byline-wrapper">
+            
+            
+              <img class="headshot" src="https://www.gravatar.com/avatar/ec96387a1a8295b6fd6dffb68f80c352">
+            
+            <p class="byline">By Guillaume Smet</p>
+          </div>
+          <div class="width-12-12">
+              <div class="paragraph">
+<p>夏の間、Quarkus1.8を作り上げるために頑張ってきました。</p>
+</div>
+<div class="paragraph">
+<p>それはいくつかのピカピカの新機能が付属していますが、中でも以下のような機能があります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Hibernate ORMエクステンションのための複数の永続化ユニットのサポート</p>
+</li>
+<li>
+<p>新しいMicrometerエクステンション</p>
+</li>
+<li>
+<p>jbangを統合して簡単にQuarkusベースのスクリプティングを実現</p>
+</li>
+<li>
+<p>GraalVM 20.2へのアップデート</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>いつものように、バグ修正や使い勝手の改善、ドキュメントの改善なども行われています。</p>
+</div>
+<div class="sect1">
+<h2 id="移行ガイド"><a class="anchor" href="#移行ガイド"></a>移行ガイド</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>既存のアプリケーションの移行をお考えですか?
+<a href="https://github.com/quarkusio/quarkus/wiki/Migration-Guide-1.8">1.8の移行ガイドは</a>
+こちらです。</p>
+</div>
+<div class="paragraph">
+<p>Java 11に対応したGraalVM 20.2が推奨バージョンです。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="変更点"><a class="anchor" href="#変更点"></a>変更点</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="複数の永続性ユニット"><a class="anchor" href="#複数の永続性ユニット"></a>複数の永続性ユニット</h3>
+<div class="paragraph">
+<p>これまで、Quarkusの標準的な設定では、Hibernate ORMエクステンションは単一の永続化ユニットしかサポートしていませんでした。
+<code>persistence.xml</code> を使用することでこの制限を回避できましたが、せいぜい実用的ではありませんでした。</p>
+</div>
+<div class="paragraph">
+<p>1.8 では、Hibernate ORM
+エクステンションに複数の永続化ユニットのサポートが導入されています。この機能はまだ実験的なもので、不安定だからというわけではありません。ですから、もしこの機能を使っているのであれば、Zulip
+や <code>quarkus-dev</code> メーリングリストでフィードバックをお願いします。</p>
+</div>
+<div class="paragraph">
+<p>この新機能の詳細とアプリケーションでの使用方法については、 <a href="/guides/hibernate-orm">Hibernate ORM
+エクステンションガイド</a> を参照してください。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>標準のHibernate
+ORMエンティティは複数の永続化ユニットに所属できますが、Panacheエンティティは1つの永続化ユニットにしか所属できません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="micrometerエクステンション"><a class="anchor" href="#micrometerエクステンション"></a>Micrometerエクステンション</h3>
+<div class="paragraph">
+<p>Microrometer はアプリケーションからメトリクスを収集するために広く使われているライブラリです。既存の MicroProfile
+Metrics の実装と比較した場合の大きな利点は、通常のモニターリングツールに多くのダッシュボードが用意されていることです。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus 1.8では、 <code>quarkus-micrometer</code>
+と呼ばれるMicrometerのための新しいエクステンションが導入されました。詳細については、
+<a href="/guides/micrometer">このガイドを</a> 参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jbangを使ったスクリプト"><a class="anchor" href="#jbangを使ったスクリプト"></a>jbangを使ったスクリプト</h3>
+<div class="paragraph">
+<p>Quarkus 1.8は <a href="https://jbang.dev">jbang</a>
+との統合を提供します。これにより、MavenやGradleを実行する必要のないJavaのスクリプトやアプリケーションを書けます。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusスタックを使用したクイックスクリプトの作成が簡単になりました。詳細については、
+<a href="/guides/scripting">jbangを使ったスクリプト作成ガイド</a> を参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="graalvm-20-2"><a class="anchor" href="#graalvm-20-2"></a>GraalVM 20.2</h3>
+<div class="paragraph">
+<p>Quarkusのアプリケーションからネイティブの実行ファイルをビルドしている場合は、今から推奨バージョンであるGraalVM
+20.2にアップデートする時期になっています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="smallrye-openapi"><a class="anchor" href="#smallrye-openapi"></a>SmallRye OpenAPI</h3>
+<div class="paragraph">
+<p>SmallRye OpenAPIのユーザーは、生成されたAPIドキュメントを保存する機能をしばしば要求します。</p>
+</div>
+<div class="paragraph">
+<p>新しい <code>quarkus.smallrye-openapi.store-schema-directory</code>
+プロパティーを使用すると、まさにそれが可能になります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="quartz"><a class="anchor" href="#quartz"></a>Quartz</h3>
+<div class="paragraph">
+<p><code>quarkus.quartz.instance-name</code> 設定プロパティーを設定することで、Quartzの設定が可能になりました。</p>
+</div>
+<div class="paragraph">
+<p>1.8からは、QuartzジョブでCDIインジェクションを使用できるようになりました。</p>
+</div>
+<div class="paragraph">
+<p>拡張ポイント(トリガーリスナー、ジョブリスナー、プラグイン)の設定が変更されていますので、この機能をご利用の方は、
+<a href="/guides/quartz#quartz-configuration-reference">更新されたドキュメントを</a>
+参照して設定を移行してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="mongodb-with-panacheのkotlinサポート"><a class="anchor" href="#mongodb-with-panacheのkotlinサポート"></a>MongoDB with PanacheのKotlinサポート</h3>
+<div class="paragraph">
+<p>私たちのエクステンションの中には、Kotlin を適切にサポートするためにいくつかの追加を必要とするものがあります。これは MongoDB with
+Panache エクステンションがそうです。</p>
+</div>
+<div class="paragraph">
+<p>MongoDBをPanacheとKotlinで使用している場合は、 <code>quarkus-mongodb-panache-kotlin</code>
+のエクステンションをプロジェクトに追加してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="完全な変更履歴"><a class="anchor" href="#完全な変更履歴"></a>完全な変更履歴</h3>
+<div class="paragraph">
+<p><a href="https://github.com/quarkusio/quarkus/releases/tag/1.8.0.CR1">1.8.0.CR1</a>
+と
+<a href="https://github.com/quarkusio/quarkus/releases/tag/1.8.0.Final">1.8.0.Final</a>
+の完全な変更ログは GitHub で取得できます。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="adopters-md"><a class="anchor" href="#adopters-md"></a>ADOPTERS.md</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusの使用方法についてのストーリーを共有するために、リポジトリのルートに
+<a href="https://github.com/quarkusio/quarkus/blob/master/ADOPTERS.md"><code>ADOPTERS.md</code></a>
+ファイルを追加しました。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusをご利用の方で、ブログで取材を受けたい方や、このファイルに単純に追加したい方は、ご連絡いただければ、喜んでお受けいたします。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="貢献者"><a class="anchor" href="#貢献者"></a>貢献者</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusコミュニティは成長を続けており、現在
+<a href="https://github.com/quarkusio/quarkus/graphs/contributors">356人の貢献者</a>
+がいます。一人ひとりの貢献者に多くの感謝の意を表します。</p>
+</div>
+<div class="paragraph">
+<p>特に1.8 リリースでは、Aaron Coburn, Alex Soto, Alexey Loubyansky, Andreas Eberle,
+Andrej Petras, Andy Damevin, Antonio Goncalves, antonwiens, Bill Burke,
+Bobby Alex Philip, Charlie Powicki, Clement Escoffier, Daniel Platz, Dmitry
+Shohov, Enercido Alcantara, Erin Schnabel, Fabian Stäber, Falko Modler,
+Foivos Zakkak, Galder Zamarreño, Garima Monga, Gautier de Saint Martin
+Lacaze, George Gastaldi, Georgios Andrianakis, ghokun, Guillaume Le Floch,
+Guillaume Smet, Gunnar Morling, Gwenneg Lepage, Gytis Trikleris, Jaikiran
+Pai, Jan Martiška, Juri Berlanda, Justin Lee, Katia Aresti, kdnakt, Ken
+Finnigan, ketoketo, Kevin Viet, Knut Wannheden, Ladislav Thon, Laurent
+Broudoux, Luca Burgazzoli, Leandro, Loïc Hermann, Loïc Mathieu, Manyanda
+Chitimbo, MarceloArraes, Martin Kouba, Martin Schoene, Matej Novotny,
+Matthias Harter, Max Rydahl Andersen, Michael Simons, Michał Górniewski,
+Michał Szynkiewicz, Moncef, Moritz Becker, noelo, Pasquale Congiusti, Paul
+Carter-Brown, Phillip Kruger, Radim Vansa, Rafael T. C. Soares (A.K.A
+Tuelho), Raffael Hertle, Ramiz Ismailov, Roberto Cortez, Rohan Maity, Romain
+Quinio, Rostislav Svoboda, Sanne Grinovero, Sebastian Daschner, Sergey
+Beryozkin, Steffen Vinther Sørensen, Stuart Douglas, Stéphane Épardaud,
+Thomas Segismont, TNM Technologies, tomekl007, Yashar Imanlou そして Yoann
+Rodièreのおかげです。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="参加のお誘い"><a class="anchor" href="#参加のお誘い"></a>参加のお誘い</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>私達は皆様からのフィードバックに重きを置いています。バグ報告、改善要望を是非お願いします。一緒に素晴らしいものを作り上げていきましょう！</p>
+</div>
+<div class="paragraph">
+<p>Quarkusユーザーの場合でも、単に興味を持っているだけの場合でも、恥ずかしがらずにコミュニティに参加して下さい！:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/quarkusio/quarkus/issues">GitHub</a> でフィードバック</p>
+</li>
+<li>
+<p>コードを作成し、 <a href="https://github.com/quarkusio/quarkus/pulls">プルリクエスト</a> を送信</p>
+</li>
+<li>
+<p><a href="https://quarkusio.zulipchat.com/">Zulip</a> や
+<a href="https://groups.google.com/d/forum/quarkus-dev">メーリングリスト</a> でディスカッションに参加</p>
+</li>
+<li>
+<p><a href="https://stackoverflow.com/questions/tagged/quarkus">Stack Overflow</a> で質問</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+              
+          </div>
+          <div class="width-12-12"><div class="share-page">
+  <a class="share-linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=https://quarkus.io/blog/quarkus-1-8-0-final-released/&title=Quarkus 1.8 released - Multiple Persistence Units, Micrometer, jbang, GraalVM 20.2" rel="nofollow" target="_blank" title="Share on LinkedIn">
+    <img src="/assets/images/share-page/icons_social-linkedin.png"/>
+  </a>
+  <a class="share-twitter" href="https://twitter.com/intent/tweet?text=Quarkus 1.8 released - Multiple Persistence Units, Micrometer, jbang, GraalVM 20.2&url=https://quarkus.io/blog/quarkus-1-8-0-final-released/&via=quarkusio&related=quarkusio" rel="nofollow" target="_blank" title="Share on Twitter">
+    <img src="/assets/images/share-page/icons_social-twitter.png"/>
+  </a>
+  <a class="share-facebook" href="https://facebook.com/sharer.php?u=https://quarkus.io/blog/quarkus-1-8-0-final-released/" rel="nofollow" target="_blank" title="Share on Facebook">
+    <img src="/assets/images/share-page/icons_social-facebook.png"/>
+  </a>
+  <a class="share-reddit" href="http://www.reddit.com/submit?url=https://quarkus.io/blog/quarkus-1-8-0-final-released/" onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;" title="Share on Reddit" >
+    <img src="/assets/images/share-page/icons_social-reddit.png"/>
+  </a>
+  <a class="share-email" href="mailto:?subject=Quarkus 1.8 released - Multiple Persistence Units, Micrometer, jbang, GraalVM 20.2&amp;body=Quarkus 1.8 released - Multiple Persistence Units, Micrometer, jbang, GraalVM 20.2 https://quarkus.io/blog/quarkus-1-8-0-final-released/" title="Share via Email" >
+    <img src="/assets/images/share-page/icons_social-email.png"/>
+  </a>
+</div>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkus はオープンです。このプロジェクトの全ての依存関係は<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a>または互換性のあるライセンスの元で利用出来ます。<br /><br />このウェブサイトは <a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築されており、<a href='https://pages.github.com/' target='_blank'>Github Pages</a>にホストされており、完全にオープンソースです。改善したい場合、 <a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォークし</a>、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+            <li><a href="/">ホーム</a></li>
+          
+            <li><a href="/guides">ガイド</a></li>
+          
+            <li><a href="/community/#contributing">貢献</a></li>
+          
+            <li><a href="/faq">FAQ</a></li>
+          
+            <li><a href="/get-started">はじめに</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>貢献</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://twitter.com/quarkusio">フォロー</a></li>
+          
+            <li><a href="https://github.com/quarkusio">GitHub</a></li>
+          
+            <li><a href="/security">セキュリティポリシー</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>サポート</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus">Stack Overflow</a></li>
+          
+            <li><a href="https://quarkusio.zulipchat.com">チャットルーム</a></li>
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev">フォーラム</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています：</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a href="https://hibernate.org" target="_blank">Hibernate</a></li>
+          
+            <li><a href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a href="https://code.quarkus.io/" target="_blank">等々...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/search-filter.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+</body>
+
+</html>

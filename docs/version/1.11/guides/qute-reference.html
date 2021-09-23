@@ -1,0 +1,3200 @@
+<!DOCTYPE html>
+<html>
+
+
+
+
+
+<head>
+  <title>Quarkus - Qute Reference Guide - 1.11</title>
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/1.11/guides/qute-reference" />
+  <meta property="og:title" content="Quarkus - Qute Reference Guide - 1.11" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/qute-reference">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/goan.js" type="text/javascript"></script>
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+</head>
+
+<body class="guides">
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NJWS5L"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+  <div class="container">
+    <div class="logo-wrapper">
+      
+        <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+      
+    </div>
+    <label class="nav-toggle" for="checkbox">
+      <i class="fa fa-bars"></i>
+    </label>
+    <div id="menu" class="menu">
+      <span>
+        <a href="/get-started/" class="">はじめに</a>
+      </span>
+      <span>
+        <a href="/guides/" class="active">ガイド</a>
+      </span>
+      <span>
+        <a href="/community/" class="">コミュニティ</a>
+      </span>
+      <span>
+        <a href="/support/" class="">サポート</a>
+      </span>
+      <span>
+        <a href="/blog/" class="">ブログ</a>
+      </span>
+      <span>
+        <a href="https://code.quarkus.io" class="button-cta secondary white">コーディングを開始</a>
+      </span>
+    </div>
+  </div>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+<div class="grid-wrapper guide">
+  <div class="grid__item width-9-12 width-12-12-mobile">
+    <h1 class="text-caps">Quarkus - Qute Reference Guide </h1>
+  </div>
+  <div class="grid__item width-3-12 align-self-center text-right hide-mobile">
+    <label id="guide-version-label">Select Guide Version</label>
+    <select id="guide-version-dropdown">
+      
+        
+        
+        
+        
+          <option value="main" >Main - SNAPSHOT</option>
+        
+      
+        
+        
+        
+        
+          <option value="latest" >2.2 - Latest</option>
+        
+      
+        
+        
+        
+        
+          <option value="1.11" selected>1.11</option>
+        
+      
+        
+        
+        
+        
+          <option value="1.7" >1.7</option>
+        
+      
+    </select>
+  </div>
+  <div class="width-12-12">
+    <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#hello_world_example">1. ハローワールドの例</a></li>
+<li><a href="#core_features">2. コア機能</a>
+<ul class="sectlevel2">
+<li><a href="#基本的なビルディングブロック">2.1. 基本的なビルディングブロック</a></li>
+<li><a href="#identifiers">2.2. 識別子とタグ</a></li>
+<li><a href="#テンプレートから独立した行を削除する">2.3. テンプレートから独立した行を削除する</a></li>
+<li><a href="#expressions">2.4. 式</a></li>
+<li><a href="#sections">2.5. セクション</a></li>
+<li><a href="#レンダリング出力">2.6. レンダリング出力</a></li>
+<li><a href="#エンジン設定">2.7. エンジン設定</a></li>
+</ul>
+</li>
+<li><a href="#quarkus_integration">3. Quarkus Integration</a>
+<ul class="sectlevel2">
+<li><a href="#テンプレートバリアント">3.1. テンプレートバリアント</a></li>
+<li><a href="#テンプレートに直接beansを注入">3.2. テンプレートに直接Beansを注入</a></li>
+<li><a href="#typesafe_expressions">3.3. 型安全な式</a></li>
+<li><a href="#typesafe_templates">3.4. タイプセーフテンプレート</a></li>
+<li><a href="#template_extension_methods">3.5. テンプレート拡張メソッド</a></li>
+<li><a href="#template_data">3.6. @TemplateData</a></li>
+<li><a href="#resteasy_integration">3.7. RESTEasy Integration</a></li>
+<li><a href="#開発モード">3.8. 開発モード</a></li>
+<li><a href="#タイプセーフメッセージバンドル">3.9. タイプセーフメッセージバンドル</a></li>
+<li><a href="#設定リファレンス">3.10. 設定リファレンス</a></li>
+</ul>
+</li>
+</ul></div>
+    <div>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>この技術は、experimentalと考えられています。</p>
+</div>
+<div class="paragraph">
+<p>とりうるエクステンションステータスの完全なリストについては、
+<a href="https://quarkus.io/faq/#extension-status">FAQの項目を</a> 参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Quteは、Quarkusのニーズを満たすために特別に設計されたテンプレートエンジンです。ネイティブイメージのサイズを小さくするために、リフレクションの使用は最小限に抑えられています。APIは、命令型と非ブロッキング反応型のコーディングの両方のスタイルを組み合わせています。開発モードでは、
+<code>src/main/resources/templates</code>
+フォルダーにあるすべてのファイルが変更されているかどうかが監視され、変更があった場合はすぐにアプリケーションに反映されます。さらに、Quteはビルド時にテンプレートの問題のほとんどを検出しようとし、早期に失敗します。このガイドでは、
+<a href="#hello_world_example">導入例</a> 、 <a href="#core_features">コア機能</a> の説明、
+<a href="#quarkus_integration">Quarkusの統合</a> の詳細について説明しています。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="hello_world_example"><a class="anchor" href="#hello_world_example"></a>1. ハローワールドの例</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>この例では、Quteのテンプレートを扱う際の基本的なワークフローをデモしたいと思います。まず、簡単なhello worldの例から始めましょう。
+<strong>テンプレートの内容</strong> は必ず必要になります。</p>
+</div>
+<div class="listingblock">
+<div class="title">hello.html</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;html&gt;
+  &lt;p&gt;Hello {name}! <i class="conum" data-value="1"></i><b>(1)</b>
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>{name}</code> は、テンプレートがレンダリングされたときに評価される値の式です。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>そして、その内容を <strong>テンプレート定義</strong> Javaオブジェクトにパースする必要があります。テンプレート定義は、
+<code>io.quarkus.qute.Template</code> のインスタンスです。</p>
+</div>
+<div class="paragraph">
+<p>Quteを"スタンドアロン"で使用する場合は、まず <code>io.quarkus.qute.Engine</code> のインスタンスを作成する必要があります。
+<code>Engine</code> は、専用の設定でテンプレートを管理するための一元的なポイントを表しています。便利なビルダーを使ってみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Engine engine = Engine.builder().addDefaults().build();</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Quarkusでは、あらかじめ設定された <code>Engine</code> がインジェクション用に利用可能です -
+<a href="#quarkus_integration">quarkus_integration</a> を参照してください。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>Engine</code> のインスタンスがあれば、テンプレートの内容を解析することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Template helloTemplate = engine.parse(helloHtmlContent);</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Quarkusでは、テンプレートの定義を単純に注入することができます。テンプレートは自動的に解析され、キャッシュされます -
+<a href="#quarkus_integration">quarkus_integration</a> を参照してください。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>最後に <strong>テンプレートインスタンス</strong> を作成し、データをセットして出力をレンダリングします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Renders &lt;html&gt;&lt;p&gt;Hello Jim!&lt;/p&gt;&lt;/html&gt;
+helloTemplate.data("name", "Jim").render(); <i class="conum" data-value="1"></i><b>(1)</b> <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>Template.data(String, Object)</code>
+は、ワンステップでテンプレートのインスタンスを作成してデータを設定する便利なメソッドです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>TemplateInstance.render()</code>
+は同期レンダリングをトリガーします。つまり、レンダリングが終了するまで現在のスレッドはブロックされます。しかし、レンダリングをトリガーして結果を消費する非同期のメソッドもあります。
+例えば、 <code>CompletionStage&lt;String&gt;</code> を返す <code>TemplateInstance.renderAsync()</code>
+メソッドや、Mutiny の <code>Multi&lt;String&gt;</code> を返す <code>TemplateInstance.createMulti()</code> です。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>なので、ワークフローはシンプルです。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>テンプレートコンテンツを作成する ( <code>hello.html</code> )、</p>
+</li>
+<li>
+<p>テンプレートの定義を解析する ( <code>io.quarkus.qute.Template</code> )、</p>
+</li>
+<li>
+<p>テンプレートインスタンスを作成する ( <code>io.quarkus.qute.TemplateInstance</code> )、</p>
+</li>
+<li>
+<p>出力をレンダリングする</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<code>Engine</code> は定義をキャッシュすることができるので、何度も内容をパースする必要がありません。Quarkusでは、キャッシュは自動的に行われます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="core_features"><a class="anchor" href="#core_features"></a>2. コア機能</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="基本的なビルディングブロック"><a class="anchor" href="#基本的なビルディングブロック"></a>2.1. 基本的なビルディングブロック</h3>
+<div class="paragraph">
+<p>テンプレートの動的な部分には、コメント、式、セクション、パースされていない文字データなどがあります。</p>
+</div>
+<div class="sect3">
+<h4 id="コメント"><a class="anchor" href="#コメント"></a>2.1.1. コメント</h4>
+<div class="paragraph">
+<p>コメントは <code>{!</code> で始まり <code>!}</code> で終わる。例： <code>{! This is a comment !}</code>
+。コメントは複数行で、式やセクションを含むことができます: <code>{! {#if true} !}</code> 。もちろん、コメントの内容は完全に無視されます。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="blocks_expressions"><a class="anchor" href="#blocks_expressions"></a>2.1.2. 式</h4>
+<div class="paragraph">
+<p><a href="#expressions">式</a> は評価された値を出力します。式は 1
+つ以上の部分から構成されています。部分は単純なプロパティーを表すことができます: <code>{foo}</code> , <code>{item.name}</code>
+または仮想メソッドを表すことができます: <code>{item.get(name)}</code> , <code>{name ?: 'John'}</code>
+.式は、名前空間で始まることがあります: <code>{inject:colors}</code> .</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="blocks_sections"><a class="anchor" href="#blocks_sections"></a>2.1.3. セクション</h4>
+<div class="paragraph">
+<p>1 つの <a href="#sections">セ ク シ ョン</a> はテキス ト ・ 式 ・ 入れ子に し たセ ク シ ョ ン を含む こ と がで き ます
+: <code>{#if foo}{foo.name}{/if}</code> .クロージングタグの名前はオプションです: <code>{#if active}ACTIVE!{/}</code>
+.空にすることもできます: <code>{#myTag image=true /}</code> .セクションは、入れ子になったセクションブロックを宣言することができます:
+<code>{#if item.valid} Valid. {#else} Invalid. {/if}</code> そして、どのブロックをレンダリングするかを決定します。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="パース対象外文字データ"><a class="anchor" href="#パース対象外文字データ"></a>2.1.4. パース対象外文字データ</h4>
+<div class="paragraph">
+<p>これは、レンダリングされるべきだがパースされないコンテンツをマークするために使用されます。 <code>{|</code> で始まり <code>|}</code> で終わります、 : <code>{|
+&lt;script&gt;if(true){alert('Qute is cute!')};&lt;/script&gt; |}</code> 、複数行も可能です。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+以前は、パース対象外文字データは <code>{[</code> で始まり <code>]}</code>
+で終わる必要がありました。この構文はまだサポートされていますが、他の言語の構文とのよくある衝突を避けるために、新しい構文に切り替えることをお勧めします。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="identifiers"><a class="anchor" href="#identifiers"></a>2.2. 識別子とタグ</h3>
+<div class="paragraph">
+<p>識別子は、式やセクションタグで使用されます。有効な識別子は、空白文字以外の文字列です。ただし、式の中では有効な Java
+識別子のみを使用することが推奨されます。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+ドットを含む識別子を指定する必要がある場合は、大括弧表記を使用することができます。例：<code>{map['my.key']}</code>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>テンプレート文書を解析する際、パーサはすべての <em>タグ</em> を識別します。タグは中括弧で始まり、中括弧で終わります。例: <code>{foo}</code>
+タグの内容は次から始まる必要があります:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>a digit, or</p>
+</li>
+<li>
+<p>an alphabet character, or</p>
+</li>
+<li>
+<p>underscore, or</p>
+</li>
+<li>
+<p>組み込みコマンド: <code>#</code> , <code>!</code> , <code>@</code> , <code>/</code> .</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>上記のいずれかで始まらない場合は、パーサによって無視されます。</p>
+</div>
+<div class="listingblock">
+<div class="title">タグの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;html&gt;
+   &lt;body&gt;
+   {_foo.bar}   <i class="conum" data-value="1"></i><b>(1)</b>
+   {! comment !}<i class="conum" data-value="2"></i><b>(2)</b>
+   {  foo}      <i class="conum" data-value="3"></i><b>(3)</b>
+   {{foo}}      <i class="conum" data-value="4"></i><b>(4)</b>
+   {"foo":true} <i class="conum" data-value="5"></i><b>(5)</b>
+   &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>パース対象: アンダースコアで始まる式</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>パース対象: コメント</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>無視対象: 空白で開始</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>無視対象: <code>{</code> で開始</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>無視対象: <code>"</code> で開始</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+エスケープシーケンス <code>\{</code> や <code>\}</code> を使ってテキストにデリミタを挿入することも可能です。
+実際には、エスケープシーケンスは通常、開始デリミタのためにのみ必要とされます。すなわち、<code>\{foo}`は `{foo}</code>
+として描画されます（パース、評価は行われません）。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="テンプレートから独立した行を削除する"><a class="anchor" href="#テンプレートから独立した行を削除する"></a>2.3. テンプレートから独立した行を削除する</h3>
+<div class="paragraph">
+<p>デフォルトでは、パーサはテンプレート出力からスタンドアロン行を削除します。スタンドアロン <strong>行</strong> とは、少なくとも1つのセクションタグ(例:
+<code>{#each}</code> や <code>{/each}</code> )、パラメーター宣言(例: <code>{@org.acme.Foo foo}</code>
+)、コメントを含むが、式を含まず、空白以外の文字を含まない行のことです。言い換えれば、セクションタグやパラメーター宣言を含まない行は、独立した行ではあり
+<strong>ません</strong> 。同様に、 <em>式</em> や <em>空白以外の文字</em> を含む行もスタンドアロン行ではあり <strong>ません</strong> 。</p>
+</div>
+<div class="listingblock">
+<div class="title">テンプレート例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;html&gt;
+  &lt;body&gt;
+     &lt;ul&gt;
+     {#for item in items} <i class="conum" data-value="1"></i><b>(1)</b>
+       &lt;li&gt;{item.name} {#if item.active}{item.price}{/if}&lt;/li&gt;  <i class="conum" data-value="2"></i><b>(2)</b>
+                          <i class="conum" data-value="3"></i><b>(3)</b>
+     {/for}               <i class="conum" data-value="4"></i><b>(4)</b>
+     &lt;/ul&gt;
+   &lt;body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>これはスタンドアロン行なので削除されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>スタンドアロン行ではない - 式と非空白文字を含む</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>スタンドアロン行ではない - セクションタグ/パラメーター宣言を含まない</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>これはスタンドアロン行です。</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">デフォルト出力</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;html&gt;
+  &lt;body&gt;
+     &lt;ul&gt;
+       &lt;li&gt;Foo 100&lt;/li&gt;
+
+     &lt;/ul&gt;
+   &lt;body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Quarkusでは、プロパティー( <code>quarkus.qute.remove-standalone-lines</code> )を <code>false</code>
+に設定することで、デフォルトの動作を無効にすることができます。この場合、スタンドアロン行のすべての空白文字が出力されます。
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title"><code>quarkus.qute.remove-standalone-lines=false</code> での出力</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;html&gt;
+  &lt;body&gt;
+     &lt;ul&gt;
+
+       &lt;li&gt;Foo 100&lt;/li&gt;
+
+
+     &lt;/ul&gt;
+   &lt;body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="expressions"><a class="anchor" href="#expressions"></a>2.4. 式</h3>
+<div class="paragraph">
+<p>式は値を出力します。これは、ドット(ドット表記)または角括弧(カッコ表記)で区切られた1つ以上の部分から構成されています。
+<code>object.property</code> (ドット表記) 構文では、 <code>property</code> は <a href="#identifiers">有効な識別子</a>
+である必要があります。 <code>object[property_name]</code> (括弧表記) 構文では、 <code>property_name</code> は非 null
+<a href="#literals">リテラル</a> 値である必要があります。式は、コロン ( <code>:</code>
+)が後ろについた名前空間で始まることができます（オプション）。</p>
+</div>
+<div class="listingblock">
+<div class="title">式の例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">{name} <i class="conum" data-value="1"></i><b>(1)</b>
+{item.name} <i class="conum" data-value="2"></i><b>(2)</b>
+{item['name']} <i class="conum" data-value="3"></i><b>(3)</b>
+{global:colors} <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>no namespace, one part: <code>name</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>名前空間なし、2つの部分: <code>item</code> . <code>name</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>{item.name}</code> と同等ですが、括弧表記を使用しています。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>namespace <code>global</code> , 1つの部分: <code>colors</code></td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>式のパーツは <em>仮想メソッド</em>
+である可能性があり、その場合は名前の後に括弧内のコンマで区切られたパラメーターのリストを付けることができます。仮想メソッドのパラメーターは、入れ子になった式か
+<a href="#literals">リテラル</a> 値のどちらかになります。これを「仮想」と呼ぶのは、実際のJavaメソッドに裏打ちされている必要がないからです。</p>
+</div>
+<div class="listingblock">
+<div class="title">仮想メソッドの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">{item.getLabels(1)} <i class="conum" data-value="1"></i><b>(1)</b>
+{name or 'John'} <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>名前空間なし、2つのパーツ - <code>item</code> , <code>getLabels(1)</code> 、2番目のパーツは、名前 <code>getLabels</code> と パラメーター
+`1`を持つ仮想メソッドです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>name.or('John')</code> に翻訳される、単一のパラメーターを持つ仮想メソッドに使用できる 中置 (infix) 記法。名前空間なし、2
+つのパーツ - <code>name</code> . <code>or('John')</code></td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="literals"><a class="anchor" href="#literals"></a>2.4.1. サポートされているリテラル</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">リテラル</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">サンプル</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code>, <code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>null</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>'value'</code>, <code>"string"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1</code>, <code>-5</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1l</code>, <code>-5L</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">double</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1D</code>, <code>-5d</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">float</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1f</code>, <code>-5F</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="解決"><a class="anchor" href="#解決"></a>2.4.2. 解決</h4>
+<div class="paragraph">
+<p>式の最初の部分は、常に <a href="#current_context_object">カレントコンテキストオブジェクト</a>
+に対して解決されます。最初の部分の結果が見つからない場合は、(利用可能な場合)
+親コンテキストオブジェクトに対して解決されます。名前空間で始まる式の場合、カレントコンテキストオブジェクトは、利用可能なすべての
+<code>NamespaceResolver</code> を使用して検出されます。名前空間で始まらない式の場合、現在のコンテキストオブジェクトはタグの <strong>位置から派生し</strong>
+ます。式の他のすべての部分は、前の解決結果に対してすべての <code>ValueResolver</code> を使用して解決されます。</p>
+</div>
+<div class="paragraph">
+<p>例えば、式 <code>{name}</code> には名前空間がなく、単一のパーツ - <code>name</code>
+です。"name"は、カレントコンテキストオブジェクトに対して利用可能なすべての値リゾルバを使用して解決されます。しかし、式
+<code>{global:colors}</code> には、名前空間 <code>global</code> と単一パーツ - <code>colors</code>
+があります。まず、現在のコンテキストオブジェクトを見つけるために、利用可能なすべての <code>NamespaceResolver</code> s
+が使用されます。その後、見つかったコンテキストオブジェクトに対して"colors"を解決するために値リゾルバが使用されます。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>テンプレート・インスタンスに渡されたデータは、常に <code>data</code>
+名前空間を使用してアクセスできます。これは、キーがオーバーライドされているデータにアクセスするのに便利かもしれません。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;html&gt;
+{item.name} <i class="conum" data-value="1"></i><b>(1)</b>
+&lt;ul&gt;
+{#for item in item.getDerivedItems()} <i class="conum" data-value="2"></i><b>(2)</b>
+  &lt;li&gt;
+  {item.name} <i class="conum" data-value="3"></i><b>(3)</b>
+  is derived from
+  {data:item.name} <i class="conum" data-value="4"></i><b>(4)</b>
+  &lt;/li&gt;
+{/for}
+&lt;/ul&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>item</code> はデータオブジェクトとしてテンプレートインスタンスに渡されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>派生アイテムのリストを繰り返し処理します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>item</code> は反復要素のエイリアスです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>data</code> 名前空間を使用して、 <code>item</code> データ・オブジェクトにアクセスします。</td>
+</tr>
+</table>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="current_context_object"><a class="anchor" href="#current_context_object"></a>2.4.3. カレントコンテキスト</h4>
+<div class="paragraph">
+<p>式で名前空間が指定されていない場合、_カレントコンテキストオブジェクト_はタグの位置から派生します。デフォルトでは、カレントコンテキストオブジェクトはテンプレート・インスタンスに渡されたデータを表します。しかし、セクションは現在のコンテキストオブジェクトを変更することができます。典型的な例は
+<code>with</code> セクションで、テンプレート構造を単純化するためにカレントコンテキストオブジェクトを設定するために使用することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">{#with item}
+  &lt;h1&gt;{name}&lt;/h1&gt;  <i class="conum" data-value="1"></i><b>(1)</b>
+  &lt;p&gt;{description}&lt;/p&gt;
+{/with}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>name</code> は <code>item</code> に対して解決されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>現在のコンテキストオブジェクトを変更する別の組み込みセクションは、 <code>let</code> / <code>set</code> です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">{#let myParent=order.item.parent myPrice=order.price} <i class="conum" data-value="1"></i><b>(1)</b>
+  &lt;h1&gt;{myParent.name}&lt;/h1&gt;
+  &lt;p&gt;Price: {myPrice}&lt;/p&gt;
+{/let}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>セクション内の現在のコンテキストオブジェクトは、解決されたパラメーターのマップです。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+現在のコンテキストは、暗黙のバインディング <code>this</code> を通してアクセスできます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="built-in-operators"><a class="anchor" href="#built-in-operators"></a>2.4.4. Built-in Operators</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">オペレーター</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">説明</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">サンプル</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Elvis</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">前の部分が解決できなかったり、 <code>null</code> に解決された場合のデフォルト値を出力します。</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{person.name ?: 'John'}</code>, <code>{person.name or 'John'}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ternary</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">if-then-else文の省略形。 <a href="#if_section">if_section</a>] とは異なり、入れ子になった演算子はサポートされていません。</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{item.isActive ? item.name : 'Inactive item'}</code> は、 <code>item.isActive</code> が <code>true</code> に解決した場合に <code>item.name</code> の値を出力します。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logical AND</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#if_section">[if_section]</a> で説明したように、両方のパーツが <code>falsy</code> でない場合に <code>true</code> を出力します。このパラメーターは必要な場合にのみ評価されます。</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{person.isActive &amp;&amp; person.hasStyle}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Logical OR</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#if_section">if_section</a>] で説明したように、いずれかのパーツが <code>falsy</code> でない場合に <code>true</code> を出力します。このパラメーターは必要な場合のみ評価されます。</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{person.isActive || person.hasStyle}</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+三項演算子の条件は、 <a href="#if_section">[if_section</a>] で説明したように、値が <code>falsy</code> とみなされない場合は
+<code>true</code> と評価されます。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+In fact, the operators are implemented as "virtual methods" that consume one
+parameter and can be used with infix notation, i.e. <code>{person.name or
+'John'}</code> is translated to <code>{person.name.or('John')}</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="文字エスケープ"><a class="anchor" href="#文字エスケープ"></a>2.4.5. 文字エスケープ</h4>
+<div class="paragraph">
+<p>HTML と XML テンプレートの場合、 <code>'</code> , <code>"</code> , <code>&lt;</code> , <code>&gt;</code> , <code>&amp;</code>
+の文字は、テンプレートバリアントが設定されている場合はデフォルトでエスケープされます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Quarkusでは、 <code>src/main/resources/templates</code>
+にあるテンプレートに対してバリアントが自動的に設定されます。デフォルトでは、テンプレートファイルのコンテンツタイプを決定するために
+<code>java.net.URLConnection#getFileNameMap()</code> が使用されます。コンテンツタイプへのサフィックスの追加マップは、
+<code>quarkus.qute.content-types</code> を通じて設定できます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>エスケープされていない値をレンダリングする必要がある場合:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>java.lang.Object</code> の拡張メソッドとして実装されている <code>raw</code> または <code>safe</code> プロパティーを使用します。</p>
+</li>
+<li>
+<p><code>String</code> の値を <code>io.quarkus.qute.RawString</code> でラップします。</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;html&gt;
+&lt;h1&gt;{title}&lt;/h1&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+{paragraph.raw} <i class="conum" data-value="2"></i><b>(2)</b>
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>title</code> が <code>Expressions &amp; Escapes</code> に解決した場合は、 <code>Expressions &amp; Escapes</code>
+としてレンダリングされます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>paragraph</code> が <code>&lt;p&gt;My text!&lt;/p&gt;</code> に解決された場合は、 <code>&lt;p&gt;My text!&lt;/p&gt;</code> としてレンダリングされます。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="仮想メソッド"><a class="anchor" href="#仮想メソッド"></a>2.4.6. 仮想メソッド</h4>
+<div class="paragraph">
+<p>仮想メソッドとは、通常のJavaメソッド呼び出しのように見える <strong>式のパーツ</strong>
+です。Javaクラスの実際のメソッドと一致する必要がないため、「仮想」と呼ばれています。実際には、通常のプロパティーと同様に、仮想メソッドも値リゾルバによって処理されます。唯一の違いは、仮想メソッドの場合、値リゾルバが式でもあるパラメーターを消費することです。</p>
+</div>
+<div class="listingblock">
+<div class="title">仮想メソッドの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;html&gt;
+&lt;h1&gt;{item.buildName(item.name,5)}&lt;/h1&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>buildName(item.name,5)</code> は、名前 <code>buildName</code> と 2 つのパラメーター <code>item.name</code> と <code>5</code> を持つ仮想メソッドを表します。この仮想メソッドは、以下の Java クラスに対して生成された値リゾルバによって評価されます。
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class Item {
+   String buildName(String name, int age) {
+      return name + ":" + age;
+   }
+}</code></pre>
+</div>
+</div></td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+仮想メソッドは通常、 <a href="#template_extension_methods">@TemplateExtension methods</a> 、
+<a href="#template_data">@TemplateData</a> 、または <a href="#typesafe_expressions">parameter
+declarations</a>
+で使用されるクラスのために生成された値リゾルバによって評価されます。しかし、Javaのクラス/メソッドに基づかないカスタムの値リゾルバも登録できます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>単一のパラメーターを持つ仮想メソッドは 中置記法を使用して呼び出すことができます。</p>
+</div>
+<div class="listingblock">
+<div class="title">インフィックス表記例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;html&gt;
+&lt;p&gt;{item.price or 5}&lt;/p&gt;  <i class="conum" data-value="1"></i><b>(1)</b>
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>item.price or 5</code> は <code>item.price.or(5)</code> に翻訳されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>仮想メソッドのパラメーターは、「入れ子」仮想メソッドの呼び出しにすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="title">入れ子になった仮想メソッドの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;html&gt;
+&lt;p&gt;{item.subtractPrice(item.calculateDiscount(10))}&lt;/p&gt;  <i class="conum" data-value="1"></i><b>(1)</b>
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>item.calculateDiscount(10)</code> が最初に評価され、その後 <code>item.subtractPrice()</code>
+への引数として渡されます。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="completionstage-と-uni-オブジェクトの評価"><a class="anchor" href="#completionstage-と-uni-オブジェクトの評価"></a>2.4.7. <code>CompletionStage</code> と <code>Uni</code> オブジェクトの評価</h4>
+<div class="paragraph">
+<p><code>java.util.concurrent.CompletionStage</code> および <code>io.smallrye.mutiny.Uni</code>
+を実装したオブジェクトは、特別な方法で評価されます。式の一部が <code>CompletionStage</code>
+に解決された場合、このステージが完了すると解決が継続され、式の次の部分(もしあれば)が完了したステージの結果に対して評価されます。たとえば、式
+<code>{foo.size}</code> があり、 <code>foo</code> が <code>CompletionStage&lt;List&lt;String&gt;&gt;</code> に解決された場合、 <code>size</code>
+は完了した結果、すなわち <code>List&lt;String&gt;</code> に対して解決されます。式の一部が <code>Uni</code> に解決される場合、
+<code>CompletionStage</code> が <code>Uni#subscribeAsCompletionStage()</code> を使用して <code>Uni</code>
+から最初に作成され、その後上記のように評価されます。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="sections"><a class="anchor" href="#sections"></a>2.5. セクション</h3>
+<div class="paragraph">
+<p>セクションは:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>has a start tag</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>#</code> で始まり、 <code>{#if}</code> や <code>{#each}</code> などのセクションの名前が続きます。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>may be empty</p>
+<div class="ulist">
+<ul>
+<li>
+<p>タグは <code>/</code> で終わります。例: <code>{#emptySection /}</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>他の表現、セクションなどを含む場合があります。</p>
+<div class="ulist">
+<ul>
+<li>
+<p>終了タグは <code>/</code> で始まり、セクションの名前(オプション)を含みます: <code>{#if foo}Foo!{/if}</code> または <code>{#if
+foo}Foo!{/}</code> .</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>startタグはパラメーターを定義することもできます。パラメーターにはオプションの名前を付けます。1つのセクションには、いくつかのコンテンツ
+<strong>ブロック</strong> を含めることができます。"main" ブロックは常に存在します。追加/入れ子になったブロックも <code>#</code>
+で始まり、パラメーターを持つことができます - <code>{#else if item.isActive}</code>
+。セクションのロジックを定義するセクションヘルパーは、任意のブロックを「実行」し、パラメーターを評価することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">{#if item.name is 'sword'}
+  It's a sword!
+{#else if item.name is 'shield'}
+  It's a shield!
+{#else}
+  Item is neither a sword nor a shield.
+{/if}</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="ループセクション"><a class="anchor" href="#ループセクション"></a>2.5.1. ループセクション</h4>
+<div class="paragraph">
+<p>The loop section makes it possible to iterate over an instance of
+<code>Iterable</code>, <code>Map</code> 's entry set, <code>Stream</code> and an Integer.  It has two
+flavors.  The first one is using the <code>each</code> name alias.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">{#each items}
+  {it.name} <i class="conum" data-value="1"></i><b>(1)</b>
+{/each}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>it</code> は暗黙のエイリアスです。 <code>name</code> は現在の反復要素に対して解決されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>もう一つの形式は、 <code>for</code> 名前エイリアスを使用しており、反復要素を参照するために使用されるエイリアスを指定することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">{#for item in items}
+  {item.name}
+{/for}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ループ内の反復メタデータにアクセスすることも可能です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">{#each items}
+  {count}. {it.name} <i class="conum" data-value="1"></i><b>(1)</b>
+{/each}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>count</code> represents one-based index. Metadata also include zero-based
+<code>index</code>, <code>hasNext</code>, <code>odd</code>, <code>even</code>.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>for</code> 文は、1 から始まる整数でも動作します。 以下の例では、 <code>total = 3</code> .</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">{#for i in total}
+  {i}:
+{/for}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>出力は</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">1:2:3:</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="if_section"><a class="anchor" href="#if_section"></a>2.5.2. If Section</h4>
+<div class="paragraph">
+<p><code>if</code> セクションは、基本的な制御フローセクションを表しています。最も単純なバージョンでは、単一のパラメーターを受け取り、条件が <code>true</code>
+と評価された場合にコンテンツをレンダリングします。演算子なしの条件は値が <code>falsy</code> (つまり、<code>null</code> 、 <code>false</code>
+、空のコレクション、空のマップ、空の配列、空の文字列/文字列シーケンス、またはゼロに等しい数) ではない場合、 <code>true</code> と評価されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">{#if item.active}
+  This item is active.
+{/if}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>条件では、以下の演算子を使うこともできます:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">オペレーター</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">エイリアス</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">優先順位 (大優先)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">logical complement</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>!</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">greater than</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>gt</code>, <code>&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">greater than or equal to</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ge</code>, <code>&gt;=</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">less than</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>lt</code>, <code>&lt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">less than or equal to</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>le</code>, <code>&lt;=</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">equals</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>eq</code>, <code>==</code>, <code>is</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">not equals</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ne</code>, <code>!=</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">logical AND (short-circuiting)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>&amp;&amp;</code>, <code>and</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">logical OR (short-circuiting)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>||</code>, <code>or</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="title">簡単な演算子の例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">{#if item.age &gt; 10}
+  This item is very old.
+{/if}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>複数の条件にも対応しています。</p>
+</div>
+<div class="listingblock">
+<div class="title">複数条件の例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">{#if item.age &gt; 10 &amp;&amp; item.price &gt; 500}
+  This item is very old and expensive.
+{/if}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>優先順位の規則は、カッコで上書きすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="title">括弧の例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">{#if (item.age &gt; 10 || item.price &gt; 500) &amp;&amp; user.loggedIn}
+  User must be logged in and item age must be &gt; 10 or price must be &gt; 500.
+{/if}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>また、 <code>else</code> ブロックを何個でも追加することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">{#if item.age &gt; 10}
+  This item is very old.
+{#else if item.age &gt; 5}
+  This item is quite old.
+{#else if item.age &gt; 2}
+  This item is old.
+{#else}
+  This item is not old at all!
+{/if}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="when_section"><a class="anchor" href="#when_section"></a>2.5.3. When/Switch Section</h4>
+<div class="paragraph">
+<p>このセクションは、Java の <code>switch</code> や Kotlin の <code>when</code> に似ています。条件が満たされるまで、 <em>テストされた値</em>
+をすべてのブロックに対して順次マッチさせます。最初にマッチしたブロックが実行されます。他のすべてのブロックは無視されます(この動作は、 <code>break</code>
+文が必要な Java <code>switch</code> とは異なります)。</p>
+</div>
+<div class="listingblock">
+<div class="title"><code>when</code> / <code>is</code> の名前のエイリアスを使用した例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">{#when items.size}
+  {#is 1} <i class="conum" data-value="1"></i><b>(1)</b>
+    There is exactly one item!
+  {#is &gt; 10} <i class="conum" data-value="2"></i><b>(2)</b>
+    There are more than 10 items!
+  {#else} <i class="conum" data-value="3"></i><b>(3)</b>
+    There are 2 -10 items!
+{/when}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>パラメーターが1つだけの場合、それは等価かがテストされます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><a href="#when_operators">演算子</a> を使ってマッチングロジックを指定することができます。 <a href="#if_section">[if_section]</a>
+とは異なり、入れ子になった演算子はサポートされていません。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>else</code> は、他のブロックが値に一致しない場合に実行されます。</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title"><code>switch</code> / <code>case</code> の名前エイリアスを使用した例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">{#switch person.name}
+  {#case 'John'} <i class="conum" data-value="1"></i><b>(1)</b>
+    Hey John!
+  {#case 'Mary'}
+    Hey Mary!
+{/switch}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>case</code> は <code>is</code> の別名です。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>enum に解決されるテスト値は特別な扱いを受けます。 <code>is</code> / <code>case</code>
+ブロックのパラメーターは式として評価されるのではなく、テストされた値に対して <code>toString()</code> を呼び出した結果と比較されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">{#when machine.status}
+  {#is ON}
+    It's running. <i class="conum" data-value="1"></i><b>(1)</b>
+  {#is in OFF BROKEN}
+    It's broken or OFF. <i class="conum" data-value="2"></i><b>(2)</b>
+{/when}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>このブロックは <code>machine.status.toString().equals("ON")</code> の場合に実行されます</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>このブロックは、 <code>machine.status.toString().equals("OFF")</code> または
+<code>machine.status.toString().equals("BROKEN")</code> の場合に実行されます</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+列挙型定数は、テストされた値が利用可能な型情報を持ち、列挙型に解決された場合に検証されます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>is</code> / <code>case</code> ブロック条件では、以下の演算子がサポートされています。</p>
+</div>
+<table id="when_operators" class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">オペレーター</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">エイリアス</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">例</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">not equal</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>!=</code>, <code>not</code>, <code>ne</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{#is not 10}</code>,<code>{#case != 10}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">greater than</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>gt</code>, <code>&gt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{#case le 10}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">greater than or equal to</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ge</code>, <code>&gt;=</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{#is &gt;= 10}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">less than</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>lt</code>, <code>&lt;</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{#is &lt; 10}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">less than or equal to</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>le</code>, <code>&lt;=</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{#case le 10}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">in</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>in</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{#is in 'foo' 'bar' 'baz'}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">not in</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ni</code>,<code>!in</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{#is !in 1 2 3}</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="with_section"><a class="anchor" href="#with_section"></a>2.5.4. With Section</h4>
+<div class="paragraph">
+<p>このセクションは、現在のコンテキストオブジェクトを設定するために使用することができます。これはテンプレート構造を単純化するのに便利かもしれません。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">{#with item.parent}
+  &lt;h1&gt;{name}&lt;/h1&gt;  <i class="conum" data-value="1"></i><b>(1)</b>
+  &lt;p&gt;{description}&lt;/p&gt; <i class="conum" data-value="2"></i><b>(2)</b>
+{/with}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>name</code> は <code>item.parent</code> に対して解決されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>description</code> も <code>item.parent</code> に対して解決されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>このセクションは、複数の高価な呼び出しを避けたいときにも便利かもしれません。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">{#with item.callExpensiveLogicToGetTheValue(1,'foo',bazinga)}
+  {#if this is "fun"} <i class="conum" data-value="1"></i><b>(1)</b>
+    &lt;h1&gt;Yay!&lt;/h1&gt;
+  {#else}
+    &lt;h1&gt;{this} is not fun at all!&lt;/h1&gt;
+  {/if}
+{/with}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>this</code> は <code>item.callExpensiveLogicToGetTheValue(1,'foo',bazinga)</code>
+の結果です。結果が複数の式で使用されても、このメソッドは一度しか呼び出されません。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="letset-section"><a class="anchor" href="#letset-section"></a>2.5.5. Let/Set Section</h4>
+<div class="paragraph">
+<p>このセクションでは、名前付きローカル変数を定義することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">{#let myParent=order.item.parent}
+  &lt;h1&gt;{myParent.name}&lt;/h1&gt;
+{/let}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>セクションタグも <code>set</code> のエイリアスで登録されています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">{#set myParent=item.parent price=item.price}
+  &lt;h1&gt;{myParent.name}&lt;/h1&gt;
+  &lt;p&gt;Price: {price}
+{/set}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="include_helper"><a class="anchor" href="#include_helper"></a>2.5.6. Include Section</h4>
+<div class="paragraph">
+<p>このセクションでは、別のテンプレートをインクルードしたり、テンプレートの一部をオーバーライドすることができます(テンプレートの継承)。</p>
+</div>
+<div class="listingblock">
+<div class="title">簡単な例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;title&gt;Simple Include&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  {#include foo limit=10 /} <i class="conum" data-value="1"></i><b>(1)</b><i class="conum" data-value="2"></i><b>(2)</b>
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>id <code>foo</code> でテンプレートをインクルードします。インクルードされたテンプレートは、現在のコンテキストからデータを参照することができます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>また、インクルードされたテンプレートで使用できるオプションのパラメーターを定義することも可能です。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>テンプレート継承により、テンプレートレイアウトの再利用が可能になります。</p>
+</div>
+<div class="listingblock">
+<div class="title">テンプレート「ベース」</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;title&gt;{#insert title}Default Title{/}&lt;/title&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+&lt;/head&gt;
+&lt;body&gt;
+  {#insert body}No body!{/} <i class="conum" data-value="2"></i><b>(2)</b>
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>insert</code> セクションは、指定されたテンプレートをインクルードするテンプレートでオーバーライドできる部分を指定するために使われます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>insert</code> セクションは、オーバーライドされない場合にレンダリングされるデフォルトのコンテンツを定義することができます。</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">テンプレート「詳細」</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">{#include base} <i class="conum" data-value="1"></i><b>(1)</b>
+  {#title}My Title{/title} <i class="conum" data-value="2"></i><b>(2)</b>
+  {#body}
+    &lt;div&gt;
+      My body.
+    &lt;/div&gt;
+  {/body}
+{/include}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>include</code> セクションは、拡張テンプレートを指定するために使用されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>入れ子になったブロックは、オーバーライドする部分を指定するために使用されます。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+セクションブロックはオプションのエンドタグを定義することもできます - <code>{/title}</code> .
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="user_tags"><a class="anchor" href="#user_tags"></a>2.5.7. ユーザー定義タグ</h4>
+<div class="paragraph">
+<p>ユーザー定義タグは、テンプレートをインクルードし、オプションでいくつかのパラメーターを渡すために使用することができます。
+<code>itemDetail.html</code> というテンプレートがあるとします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">{#if showImage} <i class="conum" data-value="1"></i><b>(1)</b>
+  {it.image} <i class="conum" data-value="2"></i><b>(2)</b>
+  {nested-content} <i class="conum" data-value="3"></i><b>(3)</b>
+{/if}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>showImage</code> は名前付きパラメーターです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>it</code> は、タグの最初の名前のないパラメーターに置き換えられる特別なキーです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>(オプション) <code>nested-content</code> は、タグの内容に置き換えられる特別なキーです。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>さて、このテンプレートを <code>itemDetail.html</code> という名前で登録し、エンジンに <code>UserTagSectionHelper</code>
+を追加した場合:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Engine engine = Engine.builder()
+                   .addSectionHelper(new UserTagSectionHelper.Factory("itemDetail","itemDetail.html"))
+                   .build();</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Quarkusでは、 <code>src/main/resources/templates/tags</code> からのファイルはすべて登録され、自動的に監視されます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>こんな感じでタグをインクルードしていきます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;ul&gt;
+{#for item in items}
+  &lt;li&gt;
+  {#itemDetail item showImage=true} <i class="conum" data-value="1"></i><b>(1)</b>
+    = &lt;b&gt;{item.name}&lt;/b&gt; <i class="conum" data-value="2"></i><b>(2)</b>
+  {/itemDetail}
+  &lt;/li&gt;
+{/for}
+&lt;/ul&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>item</code> は反復要素に解決され、タグテンプレートで <code>it</code> キーを使用して参照することができます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>タグテンプレートで <code>nested-content</code> キーを使用して注入されたタグコンテンツ。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="レンダリング出力"><a class="anchor" href="#レンダリング出力"></a>2.6. レンダリング出力</h3>
+<div class="paragraph">
+<p><code>TemplateInstance</code> は、レンダリングをトリガーして結果を消費するためのいくつかの方法を提供しています。最も簡単な方法は
+<code>TemplateInstance.render()</code>
+です。このメソッドは同期レンダリングをトリガーし、レンダリングが終了するまで現在のスレッドをブロックして出力を返します。対照的に、
+<code>TemplateInstance.renderAsync()</code> は <code>CompletionStage&lt;String&gt;</code>
+を返し、レンダリングが終了すると完了します。</p>
+</div>
+<div class="listingblock">
+<div class="title"><code>TemplateInstance.renderAsync()</code> Example</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">template.data(foo).renderAsync().whenComplete((result, failure) -&gt; { <i class="conum" data-value="1"></i><b>(1)</b>
+   if (failure == null) {
+      // consume the output...
+   } else {
+      // process failure...
+   }
+};</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>レンダリング終了後に実行されるコールバックを登録します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>また、 <a href="https://smallrye.io/smallrye-mutiny/">Mutiny</a> 型を返す2つのメソッドがあります。
+<code>TemplateInstance.createUni()</code> は新しい <code>Uni&lt;String&gt;</code> オブジェクトを返します。 <code>createUni()</code>
+を呼び出しても、テンプレートはすぐにレンダリングされません。その代わり、 <code>Uni.subscribe()</code>
+が呼び出されるたびに、テンプレートの新しいレンダリングがトリガーされます。</p>
+</div>
+<div class="listingblock">
+<div class="title"><code>TemplateInstance.createUni()</code> Example</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">template.data(foo).createUni().subscribe().with(System.out::println);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>TemplateInstance.createMulti()</code> は新しい <code>Multi&lt;String&gt;</code>
+オブジェクトを返します。各アイテムはレンダリングされたテンプレートの一部/チャンクを表します。繰り返しになりますが、 <code>createMulti()</code>
+はレンダリングをトリガしません。代わりに、サブスクライバによって実行がトリガされるたびに、テンプレートが再びレンダリングされます。</p>
+</div>
+<div class="listingblock">
+<div class="title"><code>TemplateInstance.createMulti()</code> Example</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">template.data(foo).createMulti().subscribe().with(buffer:append,buffer::flush);</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+テンプレートのレンダリングは2つのフェーズに分かれています。最初のフェーズ(非同期)では、テンプレート内のすべての式が解決され、 <em>結果ツリー</em>
+が構築されます。同期的な第2フェーズでは、結果ツリーが <em>マテリアライズされ</em>
+、結果ノードが1つずつ、特定のコンシューマによって消費/バッファリングされるチャンクを出力します。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="エンジン設定"><a class="anchor" href="#エンジン設定"></a>2.7. エンジン設定</h3>
+<div class="sect3">
+<h4 id="テンプレートロケーター"><a class="anchor" href="#テンプレートロケーター"></a>2.7.1. テンプレートロケーター</h4>
+<div class="paragraph">
+<p>手動登録が便利な場合もありますが、 <code>EngineBuilder.addLocator(Function&lt;String,
+Optional&lt;Reader&gt;&gt;)</code> を使用してテンプレートロケータを登録することも可能です。このロケータは、
+<code>Engine.getTemplate()</code> メソッドが呼び出され、エンジンがキャッシュに保存されている指定された id
+のテンプレートを持っていない場合に使用されます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Quarkusでは、 <code>src/main/resources/templates</code> のテンプレートはすべて自動的に配置されます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="quarkus_integration"><a class="anchor" href="#quarkus_integration"></a>3. Quarkus Integration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>QuarkusアプリケーションでQuteを使用する場合は、以下の依存関係をプロジェクトに追加してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-qute&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Quarkusでは、事前に設定されたエンジンインスタンスが提供され、インジェクションに利用できます。<code>@ApplicationScoped</code>
+スコープのBean、 <code>io.quarkus.qute.Engine</code> 型のBean、 <code>@Default</code> 修飾子が自動的に登録されます。さらに、
+<code>src/main/resources/templates</code>
+ディレクトリーにあるすべてのテンプレートが検証され、簡単にインジェクションすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.qute.Engine;
+import io.quarkus.qute.Template;
+import io.quarkus.qute.api.ResourcePath;
+
+class MyBean {
+
+    @Inject
+    Template items; <i class="conum" data-value="1"></i><b>(1)</b>
+
+    @ResourcePath("detail/items2_v1.html") <i class="conum" data-value="2"></i><b>(2)</b>
+    Template items2;
+
+    @Inject
+    Engine engine; <i class="conum" data-value="3"></i><b>(3)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>If there is no <code>ResourcePath</code> qualifier provided, the field name is used to
+locate the template. In this particular case, the container will attempt to
+locate a template with path <code>src/main/resources/templates/items.html</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The <code>ResourcePath</code> qualifier instructs the container to inject a template
+from a path relative from <code>src/main/resources/templates</code>. In this case, the
+full path is <code>src/main/resources/templates/detail/items2_v1.html</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>設定された <code>Engine</code> インスタンスを注入します。</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="テンプレートバリアント"><a class="anchor" href="#テンプレートバリアント"></a>3.1. テンプレートバリアント</h3>
+<div class="paragraph">
+<p>コンテンツネゴシエーションに基づいてテンプレートの特定のバリアントをレンダリングすることが有用な場合があります。これは
+<code>TemplateInstance.setAttribute()</code> を通じて特別な属性を設定することで行うことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class MyService {
+
+    @Inject
+    Template items; <i class="conum" data-value="1"></i><b>(1)</b>
+
+    @Inject
+    ItemManager manager;
+
+    String renderItems() {
+       return items.data("items",manager.findItems()).setAttribute(TemplateInstance.SELECTED_VARIANT, new Variant(Locale.getDefault(),"text/html","UTF-8")).render();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>quarkus-resteasy-qute</code> を使用している場合、コンテンツネゴシエーションは自動的に行われます。
+<a href="#resteasy_integration">resteasy_integration</a>] を参照してください。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="テンプレートに直接beansを注入"><a class="anchor" href="#テンプレートに直接beansを注入"></a>3.2. テンプレートに直接Beansを注入</h3>
+<div class="paragraph">
+<p><code>@Named</code> でアノテーションされた CDI Beanは、 <code>inject</code> 名前空間を通して、どのテンプレートでも参照することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">{inject:foo.price} <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>まず、 <code>foo</code> という名前のBeanを見つけ、それをベースオブジェクトとして使用します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>inject</code> 名前空間を使用するすべての式は、ビルド時に検証されます。式 <code>inject:foo.price</code>
+については、注入されたBeanの実装クラスに <code>price</code> プロパティー ( <code>getPrice()</code> メソッドなど) があるか、一致する
+<a href="#template_extension_methods">テンプレート拡張メソッド</a> が存在していなければなりません。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>@Named</code> でアノテーションされたすべてのBeanに対して <code>ValueResolver</code>
+も生成され、そのプロパティーにリフレクションなしでアクセスできるようになります。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="typesafe_expressions"><a class="anchor" href="#typesafe_expressions"></a>3.3. 型安全な式</h3>
+<div class="paragraph">
+<p>テンプレート式は、オプションでタイプセーフにすることができます。これは、式が既存のJavaの型とテンプレート拡張メソッドに対して検証されることを意味します。無効な/不正確な式が見つかった場合、ビルドは失敗します。</p>
+</div>
+<div class="paragraph">
+<p>例えば、 <code>item.name</code> という式があり、 <code>item</code> が <code>org.acme.Item</code> にマップされている場合、 <code>Item</code> には
+<code>name</code> というプロパティーがあるか、一致するテンプレート拡張メソッドが存在しなければなりません。</p>
+</div>
+<div class="paragraph">
+<p>オプションの <em>パラメーター宣言</em> は、最初のパートがパラメーター名と一致する式に Java
+型をバインドするために使用されます。パラメーター宣言はテンプレートで直接指定します。</p>
+</div>
+<div class="listingblock">
+<div class="title">パラメーター宣言の例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">{@org.acme.Foo foo} <i class="conum" data-value="1"></i><b>(1)</b>
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;title&gt;Qute Hello&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;{title}&lt;/h1&gt; <i class="conum" data-value="2"></i><b>(2)</b>
+  Hello {foo.message.toLowerCase}! <i class="conum" data-value="3"></i><b>(3)</b> <i class="conum" data-value="4"></i><b>(4)</b>
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>パラメーター宣言 - <code>foo</code> を <code>org.acme.Foo</code> にマップします。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>検証されていません - パラメーター宣言にマッチしません。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>この式は検証されています。<code>org.acme.Foo</code> はプロパティー <code>message</code>
+を持つか、一致するテンプレート拡張メソッドが存在しなければなりません。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>同様に、 <code>foo.message</code> から解決されたオブジェクトの Java 型は、プロパティー <code>toLowerCase</code>
+を持つか、一致するテンプレート拡張メソッドが存在しなければなりません。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+パラメーター宣言で使用されるすべての型に対して値リゾルバが自動的に生成され、そのプロパティーにリフレクションなしでアクセスできるようになります。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<a href="#typesafe_templates">type-safe templates</a> のメソッドパラメーターは、自動的にパラメーター宣言に変換されます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>セクションは、パラメーター宣言にマッチする名前をオーバーライドできることに注意してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">{@org.acme.Foo foo}
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;title&gt;Qute Hello&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;{foo.message}&lt;/h1&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+  {#for foo in baz.foos}
+    &lt;p&gt;Hello {foo.message}!&lt;/p&gt; <i class="conum" data-value="2"></i><b>(2)</b>
+  {/for}
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>org.acme.Foo</code> に対して検証されています。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>検証されていません - <code>foo</code> はループセクションでオーバーライドされています。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="typesafe_templates"><a class="anchor" href="#typesafe_templates"></a>3.4. タイプセーフテンプレート</h3>
+<div class="paragraph">
+<p>また、Java コードでテンプレートを宣言することもできます。
+<a href="#resteasy_integration">JAX-RSリソースでテンプレート</a> を使用する場合は、以下の規約に従うことができます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>テンプレートファイルを <code>/src/main/resources/templates</code> ディレクトリーに整理し、リソースクラスごとに 1
+つのディレクトリーにグループ化します。つまり、 <code>ItemResource</code> クラスが <code>hello</code> と <code>goodbye</code> の 2
+つのテンプレートを参照している場合は、 <code>/src/main/resources/templates/ItemResource/hello.txt</code> と
+<code>/src/main/resources/templates/ItemResource/goodbye.txt</code>
+に配置します。リソースクラスごとにテンプレートをグループ化することで、テンプレートへのナビゲートが容易になります。</p>
+</li>
+<li>
+<p>各リソースクラスで、リソースクラス内で <code>@CheckedTemplate static class Template {}</code> クラスを宣言します。</p>
+</li>
+<li>
+<p>リ ソ ース のテ ン プ レー ト フ ァ イ ルごとに <code>public static native TemplateInstance
+method();</code> を 1 つずつ宣言 し ます。</p>
+</li>
+<li>
+<p>テンプレートインスタンスを構築するには、これらの静的メソッドを使用します。</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="title">ItemResource.java</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.quarkus.sample;
+
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+import io.quarkus.qute.TemplateInstance;
+import io.quarkus.qute.Template;
+import io.quarkus.qute.api.CheckedTemplate;
+
+@Path("item")
+public class ItemResource {
+
+    @CheckedTemplate
+    public static class Templates {
+        public static native TemplateInstance item(Item item); <i class="conum" data-value="1"></i><b>(1)</b> <i class="conum" data-value="2"></i><b>(2)</b>
+    }
+
+    @GET
+    @Path("{id}")
+    @Produces(MediaType.TEXT_HTML)
+    public TemplateInstance get(@PathParam("id") Integer id) {
+        return Templates.item(service.findItem(id)); <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>templates/ItemResource/item.html</code> に対して <code>TemplateInstance</code> を与えるメソッドを宣言し、その
+<code>Item item</code> パラメーターを宣言することで、テンプレートを検証することができます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>item</code> パラメーターは自動的に <a href="#typesafe_expressions">parameter declaration</a>
+に変換されるので、この名前を参照するすべての式が検証されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>テンプレート内で <code>Item</code> オブジェクトにアクセスできるようにします。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>また、 <code>@CheckedTemplate</code> でアノテーションされたトップレベルの Java クラスを宣言することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="title">トップレベルチェック済テンプレート</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.quarkus.sample;
+
+import io.quarkus.qute.TemplateInstance;
+import io.quarkus.qute.Template;
+import io.quarkus.qute.api.CheckedTemplate;
+
+@CheckedTemplate
+public class Templates {
+    public static native TemplateInstance hello(String name); <i class="conum" data-value="1"></i><b>(1)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>これは、パス <code>templates/hello.txt</code> を持つテンプレートを宣言します。 <code>name</code> パラメーターは自動的に
+<a href="#typesafe_expressions">パラメーター宣言</a> に変換されるので、この名前を参照するすべての式が検証されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>そして、テンプレートファイルごとに <code>public static native TemplateInstance method();</code>
+を宣言します。これらの静的メソッドを使用してテンプレートインスタンスを構築します。</p>
+</div>
+<div class="listingblock">
+<div class="title">HelloResource.java</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.quarkus.sample;
+
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+import io.quarkus.qute.TemplateInstance;
+
+@Path("hello")
+public class HelloResource {
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public TemplateInstance get(@QueryParam("name") String name) {
+        return Templates.hello(name);
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="template_extension_methods"><a class="anchor" href="#template_extension_methods"></a>3.5. テンプレート拡張メソッド</h3>
+<div class="paragraph">
+<p>拡張メソッドは、データクラスを新しい機能で拡張するため(アクセス可能なプロパティーとメソッドのセットを拡張するため)、または特定の
+<a href="#namespace_extension_methods">名前空間</a> のための式を解決するために使用することができます。例えば、
+<em>計算されたプロパティー</em> や <em>仮想メソッド</em> を追加することができます。</p>
+</div>
+<div class="paragraph">
+<p>値リゾルバは、 <code>@TemplateExtension</code> でアノテーションされたメソッドに対して自動的に生成されます。クラスが
+<code>@TemplateExtension</code> でアノテーションされている場合、そのクラスで宣言されている <em>プライベートではないスタティック・メソッド</em>
+ごとに値リゾルバが生成されます。メソッドレベルのアノテーションは、クラスで定義された動作をオーバーライドします。以下の要件を満たさないメソッドは無視されます。</p>
+</div>
+<div class="paragraph">
+<p>テンプレート拡張メソッド:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>private</code> であってはなりません</p>
+</li>
+<li>
+<p><code>static</code> でなければなりません</p>
+</li>
+<li>
+<p>must not return <code>void</code>,</p>
+</li>
+<li>
+<p>must accept at least one parameter, unless the namespace is specified.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The class of the first parameter is used to match the base object unless the
+namespace is specified.  In such case, the namespace is used to match an
+expression.</p>
+</div>
+<div class="paragraph">
+<p>The method name is used to match the property name by default.  However, it
+is possible to specify the matching name with
+<code>TemplateExtension#matchName()</code>.  A special constant -
+<code>TemplateExtension#ANY</code> - may be used to specify that the extension method
+matches any name.  It is also possible to match the name against a regular
+expression specified in <code>TemplateExtension#matchRegex()</code>.  In both cases, a
+string method parameter is used to pass the property name.  If both
+<code>matchName()</code> and <code>matchRegex()</code> are set the regular expression is used for
+matching.</p>
+</div>
+<div class="paragraph">
+<p>If a namespace is specified the method must declare at least one parameter
+and the first parameter must be a string.  If no namespace is specified the
+method must declare at least two parameters and the second parameter must be
+a string.</p>
+</div>
+<div class="listingblock">
+<div class="title">拡張メソッドの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+class Item {
+
+    public final BigDecimal price;
+
+    public Item(BigDecimal price) {
+        this.price = price;
+    }
+}
+
+@TemplateExtension
+class MyExtensions {
+
+    static BigDecimal discountedPrice(Item item) { <i class="conum" data-value="1"></i><b>(1)</b>
+        return item.getPrice().multiply(new BigDecimal("0.9"));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>このメソッドは、 <code>Item.class</code> 型のベース・オブジェクトと <code>discountedPrice</code> プロパティー名を持つ式にマッチします。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>このテンプレート拡張メソッドを使うと、以下のテンプレートをレンダリングすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">{item.discountedPrice} <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>item</code> は <code>org.acme.Item</code> のインスタンスに解決されます。</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="メソッドパラメーター"><a class="anchor" href="#メソッドパラメーター"></a>3.5.1. メソッドパラメーター</h4>
+<div class="paragraph">
+<p>An extension method may accept multiple parameters.  If no namespace is
+specified the first parameter is always used to pass the base object,
+i.e. <code>org.acme.Item</code> in the first example.  Other parameters are resolved
+when rendering the template and passed to the extension method.</p>
+</div>
+<div class="listingblock">
+<div class="title">複数のパラメーターの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@TemplateExtension
+class BigDecimalExtensions {
+
+    static BigDecimal scale(BigDecimal val, int scale, RoundingMode mode) { <i class="conum" data-value="1"></i><b>(1)</b>
+        return val.setScale(scale, mode);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>このメソッドは、 <code>BigDecimal.class</code> 型の基底オブジェクトと、 <code>scale</code> の仮想メソッド名と 2
+つの仮想メソッドパラメーターを持つ式にマッチします。</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">{item.discountedPrice.scale(2,mode)} <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>item.discountedPrice</code> は <code>BigDecimal</code> のインスタンスに解決されます。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="namespace_extension_methods"><a class="anchor" href="#namespace_extension_methods"></a>3.5.2. 名前空間拡張メソッド</h4>
+<div class="paragraph">
+<p><code>TemplateExtension#namespace()</code> が指定された場合、拡張メソッドが、指定された
+<a href="#expressions">namespace</a> を持つ式を解決するために使用されます。同じ名前空間を共有するテンプレート拡張メソッドは、
+<code>TemplateExtension#priority()</code> で順に 1
+つのリゾルバにグループ化されます。最初にマッチする拡張メソッドが式の解決に使用されます。</p>
+</div>
+<div class="listingblock">
+<div class="title">名前空間拡張メソッド例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@TemplateExtension(namespace = "str")
+public static class StringExtensions {
+
+   static String format(String fmt, Object... args) {
+      return String.format(fmt, args);
+   }
+
+   static String reverse(String val) {
+      return new StringBuilder(val).reverse().toString();
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これらの拡張メソッドは、以下のように使用することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">{str:format('%s %s!','Hello', 'world')} <i class="conum" data-value="1"></i><b>(1)</b>
+{str:reverse('hello')} <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>出力は <code>Hello world!</code> です</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>出力は <code>olleh</code> です</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="組み込みテンプレートエクステンション"><a class="anchor" href="#組み込みテンプレートエクステンション"></a>3.5.3. 組み込みテンプレートエクステンション</h4>
+<div class="paragraph">
+<p>Quarkusは、組み込みの拡張メソッドのセットを提供しています。</p>
+</div>
+<div class="sect4">
+<h5 id="マップ"><a class="anchor" href="#マップ"></a>3.5.3.1. マップ</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><code>keys</code> または <code>keySet</code> : マップに含まれるキーのセットビューを返します。</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>{#for key in map.keySet}</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>values</code> : マップに含まれる値のコレクションビューを返します。</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>{#for value in map.values}</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>size</code> : マップ内のキーと値の対応付けの個数を返します。</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>{map.size}</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>isEmpty</code> : マップにキーと値のマッピングが含まれていない場合に true を返します。</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>{#if map.isEmpty}</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>get(key)</code> : 指定したキーがマッピングされた値を返します。</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>{map.get('foo')}</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+マップ値は、直接アクセスすることもできます : <code>{map.myKey}</code> 。正規の識別子ではないキーには大括弧表記を使用します: <code>{map['my
+key']}</code> 。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="collections"><a class="anchor" href="#collections"></a>3.5.3.2. Collections</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><code>get(index)</code> : リストの指定した位置の要素を返す</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>{list.get(0)}</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+list 要素に直接アクセスすることができます: <code>{list.10}</code> または <code>{list[10]}</code> .
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="数値"><a class="anchor" href="#数値"></a>3.5.3.3. 数値</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><code>mod</code> : モデューロ演算</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>{#if counter.mod(5) == 0}</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="設定"><a class="anchor" href="#設定"></a>3.5.3.4. 設定</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><code>config:&lt;name&gt;</code> 又は <code>config:[&lt;name&gt;]</code> : 指定したプロパティー名の設定値を返します。</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>{config:foo}</code> or <code>{config:['property.with.dot.in.name']}</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>config:property(name)</code> : 指定したプロパティー名の設定値を返します。名前は式で動的に取得することが可能です。</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>{config:property('quarkus.foo')}</code> or
+<code>{config:property(foo.getPropertyName())}</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="時間"><a class="anchor" href="#時間"></a>3.5.3.5. 時間</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><code>format(pattern)</code> : <code>java.time</code> パッケージの一時オブジェクトをフォーマットします。</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>{dateTime.format('d MMM uuuu')}</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>format(pattern,locale)</code> : <code>java.time</code> パッケージの一時オブジェクトをフォーマットします。</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>{dateTime.format('d MMM uuuu',myLocale)}</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>format(pattern,locale,timeZone)</code> : <code>java.time</code> パッケージの一時オブジェクトをフォーマットします。</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>{dateTime.format('d MMM uuuu',myLocale,myTimeZoneId)}</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>time:format(dateTime,pattern)</code> : <code>java.time</code> パッケージ、 <code>java.util.Date</code> 、
+<code>java.util.Calendar</code> 、 <code>java.lang.Number</code> の一時オブジェクトをフォーマットします。</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>{time:format(myDate,'d MMM uuuu')}</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>time:format(dateTime,pattern,locale)</code> : <code>java.time</code> パッケージ、 <code>java.util.Date</code>
+、 <code>java.util.Calendar</code> 、 `java.lang.Number`の一時オブジェクトをフォーマットします。</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>{time:format(myDate,'d MMM uuuu', myLocale)}</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>time:format(dateTime,pattern,locale,timeZone)</code> : <code>java.time</code> パッケージ、
+<code>java.util.Date</code> 、 <code>java.util.Calendar</code> 、 <code>java.lang.Number</code>
+の一時オブジェクトをフォーマットします。</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>{time:format(myDate,'d MMM uuuu',myTimeZoneId)}</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="template_data"><a class="anchor" href="#template_data"></a>3.6. @TemplateData</h3>
+<div class="paragraph">
+<p>値リゾルバは、 <code>@TemplateData</code>
+でアノテーションされた型に対して自動的に生成されます。これにより、Quarkusでは、実行時にデータにアクセスするためのリフレクションの使用を避けることができます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+非publicのメンバー、コンストラクタ、静的イニシャライザ、静的メソッド、合成メソッド、ボイドメソッドは常に無視されます。
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+@TemplateData
+class Item {
+
+    public final BigDecimal price;
+
+    public Item(BigDecimal price) {
+        this.price = price;
+    }
+
+    public BigDecimal getDiscountedPrice() {
+        return price.multiply(new BigDecimal("0.9"));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Item</code> の任意のインスタンスをテンプレート内で直接使用することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">{#each items} <i class="conum" data-value="1"></i><b>(1)</b>
+  {it.price} / {it.discountedPrice}
+{/each}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>items</code> は <code>org.acme.Item</code> インスタンスのリストに解決されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>さらに、 <code>@TemplateData.properties()</code> と <code>@TemplateData.ignore()</code>
+を使用して、生成されるリゾルバを微調整することができます。最後に、アノテーションの「ターゲット」を指定することも可能です。これは、アプリケーションによって管理されないサードパーティーのクラスに便利です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@TemplateData(target = BigDecimal.class)
+@TemplateData
+class Item {
+
+    public final BigDecimal price;
+
+    public Item(BigDecimal price) {
+        this.price = price;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">{#each items} <i class="conum" data-value="1"></i><b>(1)</b>
+  {it.price.setScale(2, rounding)} <i class="conum" data-value="1"></i><b>(1)</b>
+{/each}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>生成された値リゾルバは、 <code>BigDecimal.setScale()</code> メソッドを呼び出す方法を知っています。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="resteasy_integration"><a class="anchor" href="#resteasy_integration"></a>3.7. RESTEasy Integration</h3>
+<div class="paragraph">
+<p>JAX-RSアプリケーションでQuteを使用したい場合、使用しているJAX-RSスタックによっては、まず適切なエクステンションを登録する必要があります。トラディショナルな
+<code>quakus-resteasy</code> のエクステンションを使用している場合は、 以下を <code>pom.xml</code> ファイルに追加してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-resteasy-qute&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>代わりに <code>quarkus-resteasy-reactive</code> エクステンションを介して RESTEasy Reactive を使用している場合は、
+次を <code>pom.xml</code> ファイルに追加してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-resteasy-reactive-qute&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これらのエクステンションはどちらも、リソースメソッドが <code>TemplateInstance</code> を返すことを可能にする特別な
+<code>ContainerResponseFilter</code> 実装を登録しています。そのため、ユーザーは必要なすべての内部ステップを処理する必要がなくなります。</p>
+</div>
+<div class="paragraph">
+<p>最終的には、JAX-RSリソース内でQuteを使用すると、次のようにシンプルに見えるかもしれません。</p>
+</div>
+<div class="listingblock">
+<div class="title">HelloResource.java</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.quarkus.sample;
+
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+
+import io.quarkus.qute.TemplateInstance;
+import io.quarkus.qute.Template;
+
+@Path("hello")
+public class HelloResource {
+
+    @Inject
+    Template hello; <i class="conum" data-value="1"></i><b>(1)</b>
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public TemplateInstance get(@QueryParam("name") String name) {
+        return hello.data("name", name); <i class="conum" data-value="2"></i><b>(2)</b> <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@ResourcePath</code>
+の修飾子が指定されていない場合は、フィールド名がテンプレートの場所を特定するために使用されます。この特定のケースでは、パスが
+<code>templates/hello.txt</code> であるテンプレートを注入しています。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>Template.data()</code>
+は、実際のレンダリングがトリガーされる前にカスタマイズできる新しいテンプレートインスタンスを返します。この場合、名前の値をキー <code>name</code>
+の下に置きます。データマップはレンダリング中にアクセス可能です。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>レンダリングをトリガーしないことに注意してください - これは特別な <code>ContainerResponseFilter</code>
+の実装によって自動的に行われます。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+ユーザーは、特定のJAX-RSリソースのテンプレートを整理し、自動的に <a href="#typesafe_expressions">タイプセーフ表現</a>
+を有効にするのに役立つ <a href="#typesafe_templates">タイプセーフテンプレート</a> を使用することが推奨されます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>コンテンツネゴシエーションは自動的に実行されます。結果の出力はクライアントから受け取った <code>Accept</code> ヘッダーに依存します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Path("/detail")
+class DetailResource {
+
+    @Inject
+    Template item; <i class="conum" data-value="1"></i><b>(1)</b>
+
+    @GET
+    @Produces({ MediaType.TEXT_HTML, MediaType.TEXT_PLAIN })
+    public TemplateInstance item() {
+        return item.data("myItem", new Item("Alpha", 1000)); <i class="conum" data-value="2"></i><b>(2)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>注入されたフィールドから派生したベースパスを持つバリアントテンプレートを注入します -
+<code>src/main/resources/templates/item</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>text/plain</code> では <code>src/main/resources/templates/item.txt</code> のテンプレートが使用されます。
+<code>text/html</code> では <code>META-INF/resources/templates/item.html</code> のテンプレートが使用されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>RestTemplate</code> utilクラスは、JAX-RSリソースメソッドのボディからテンプレートインスタンスを取得するために使用することができます。</p>
+</div>
+<div class="listingblock">
+<div class="title">RestTemplate Example</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Path("/detail")
+class DetailResource {
+
+    @GET
+    @Produces({ MediaType.TEXT_HTML, MediaType.TEXT_PLAIN })
+    public TemplateInstance item() {
+        return RestTemplate.data("myItem", new Item("Alpha", 1000)); <i class="conum" data-value="1"></i><b>(1)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>テンプレートの名前は、リソースクラスとメソッド名から派生しています。このケースでは、<code>DetailResource/item</code> です。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<code>@Inject</code> とは異なり、 <code>RestTemplate</code>
+経由で取得したテンプレートは検証されません。即ち、テンプレートが存在しなくてもビルドは失敗しません。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="開発モード"><a class="anchor" href="#開発モード"></a>3.8. 開発モード</h3>
+<div class="paragraph">
+<p>開発モードでは、 <code>src/main/resources/templates</code> にあるすべてのファイルの変更が監視され、変更はすぐに表示されます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="タイプセーフメッセージバンドル"><a class="anchor" href="#タイプセーフメッセージバンドル"></a>3.9. タイプセーフメッセージバンドル</h3>
+<div class="sect3">
+<h4 id="基本概念"><a class="anchor" href="#基本概念"></a>3.9.1. 基本概念</h4>
+<div class="paragraph">
+<p>基本的な考え方は、すべてのメッセージは潜在的に非常にシンプルなテンプレートであるということです。型エラーを防ぐために、メッセージは
+<strong>メッセージバンドルインターフェース</strong> のアノテーションメソッドとして定義されます。Quarkusは、ビルド時に <strong>メッセージバンドルの実装を</strong>
+生成します。そのため、実行時にバンドルを使用することができます。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>io.quarkus.qute.i18n.MessageBundles#get()</code> を経由し、直接コードの中で使用。例:
+<code>MessageBundles.get(AppMessages.class).hello_name("Lucie")</code></p>
+</li>
+<li>
+<p><code>@Inject</code> であなたのBeanに注入されます。 例: <code>@Inject AppMessages</code></p>
+</li>
+<li>
+<p>メッセージ・バンドル名前空間を介してテンプレート内で参照。</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html"> {msg:hello_name('Lucie')} <i class="conum" data-value="1"></i><b>(1)</b> <i class="conum" data-value="2"></i><b>(2)</b> <i class="conum" data-value="3"></i><b>(3)</b>
+ {msg:message(myKey,'Lu')} <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>msg</code> がデフォルトの名前空間です。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>hello_name</code> がメッセージキーです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>Lucie</code> はメッセージバンドルインターフェースメソッドのパラメーターです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>また、予約されたキー <code>message</code>
+を使用して、実行時に解決されたキーのローカライズされたメッセージを取得することも可能である。この場合、検証はスキップされます。</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="title">Message Bundle Interface Example</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.qute.i18n.Message;
+import io.quarkus.qute.i18n.MessageBundle;
+
+@MessageBundle <i class="conum" data-value="1"></i><b>(1)</b>
+public interface AppMessages {
+
+    @Message("Hello {name}!") <i class="conum" data-value="2"></i><b>(2)</b>
+    String hello_name(String name); <i class="conum" data-value="3"></i><b>(3)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>メッセージバンドルインターフェイスを表します。 バンドル名のデフォルトは <code>msg</code> で、テンプレート式の名前空間として使用されます。例:
+<code>{msg:hello_name}</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>各メソッドは <code>@Message</code> でアノテーションする必要があります。値は qute テンプレートです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>メソッドのパラメーターはテンプレートで使用することができます。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="バンドル名とメッセージキー"><a class="anchor" href="#バンドル名とメッセージキー"></a>3.9.2. バンドル名とメッセージキー</h4>
+<div class="paragraph">
+<p>キーはテンプレート内で直接使用されます。バンドル名はテンプレート式の名前空間として使用されます。 <code>@MessageBundle</code>
+は、メソッド名からメッセージキーを生成するために使用されるデフォルトのストラテジーを定義するために使用することができます。しかし、 <code>@Message</code>
+はこのストラテジーをオーバーライドし、カスタム・キーを定義することもできます。デフォルトでは、アノテーションされた要素の名前がそのまま使用されます。他の可能性としては、以下のようなものがあります。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>キャメルケースを止め、ハイフン化したもの。 例: <code>helloName()</code> &#8594; <code>hello-name</code></p>
+</li>
+<li>
+<p>キャメルケースを止め、パーツをアンダースコア区切りとしたもの。例: <code>helloName()</code> &#8594; <code>hello_name</code></p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="バリデーション"><a class="anchor" href="#バリデーション"></a>3.9.3. バリデーション</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>すべてのメッセージバンドルテンプレートは検証されます。</p>
+<div class="ulist">
+<ul>
+<li>
+<p>名前空間を持たない全ての式はパラメーターにマッピングする必要があります。例: <code>Hello {foo}</code> の場合、メソッドは <code>foo</code>
+という名前のパラメータを持つ必要があります。</p>
+</li>
+<li>
+<p>すべての式はパラメーターの型に対して検証されます。例: <code>Hello {foo.bar}</code> で、パラメーター <code>foo</code> の型が
+<code>org.acme.Foo</code> の場合、 <code>org.acme.Foo</code> は <code>bar</code> という名前のプロパティーを持つ必要があります。</p>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<em>未使用の</em> パラメーターごとに警告メッセージが記録されます。
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>{msg:hello(item.name)}</code> のようなメッセージバンドルメソッドを参照する式も検証されます。</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="ローカライゼーション"><a class="anchor" href="#ローカライゼーション"></a>3.9.4. ローカライゼーション</h4>
+<div class="paragraph">
+<p><strong>アプリケーションのビルド</strong> に使用する Java 仮想マシンのデフォルトのロケールは、デフォルトでは <code>@MessageBundle</code>
+インターフェイスに使用されます。ただし、 <code>io.quarkus.qute.i18n.MessageBundle#locale()</code>
+を使用してカスタムロケールを指定することができます。さらに、ローカライズされたバンドルを定義するには、2 つの方法があります。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>@Localized</code> でアノテーションされたデフォルトのインターフェイスを拡張するインターフェイスを作成します。</p>
+</li>
+<li>
+<p><code>src/main/resources/messages</code> に UTF-8 エンコードされたファイルを作成します。例:
+<code>msg_de.properties</code></p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+ローカライズされたインターフェイスは、主にリファクタリングの容易性から、好ましい解決策です。
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">ローカライズされたインターフェースの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.qute.i18n.Localized;
+import io.quarkus.qute.i18n.Message;
+
+@Localized("de") <i class="conum" data-value="1"></i><b>(1)</b>
+public interface GermanAppMessages extends AppMessages {
+
+    @Override
+    @Message("Hallo {name}!") <i class="conum" data-value="2"></i><b>(2)</b>
+    String hello_name(String name);
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>値はロケールタグ文字列(IETF)です。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>値はローカライズされたテンプレートです。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>メッセージバンドルファイルはUTF-8でエンコードされている必要があります。ファイル名は、関連するバンドル名(例: <code>msg</code>
+)とアンダースコア、続くロケートタグ(IETF)から構成されます。フ ァ イ
+ル形式は非常に単純です。各行は、キーと値のペアを表すもので、等号をセパレータとして使用するか、コメント(行頭が <code>#</code>
+で始まる)を使用します。キーは、対応するメッセージ・バンドル・インターフェースのメソッド名にマッピングされています。値は、通常
+<code>io.quarkus.qute.i18n.Message#value()</code> で定義されているテンプレートを表します。この例では
+<code>.properties</code> サフィックスを使用しています。これは、ほとんどの IDE やテキスト・エディタが <code>.properties</code>
+ファイルのシンタックス・ハイライトをサポートしているからです。しかし、実際には、サフィックスは何でも構いません。</p>
+</div>
+<div class="listingblock">
+<div class="title">ローカライズされたファイルの例 - <code>msg_de.properties</code></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">hello_name=Hallo {name}! <i class="conum" data-value="1"></i><b>(1)</b> <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>ローカライズされたファイルの各行は、メッセージテンプレートを表します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>キーと値は等号で区切られています。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="設定リファレンス"><a class="anchor" href="#設定リファレンス"></a>3.10. 設定リファレンス</h3>
+<div class="paragraph configuration-legend">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> Configuration property fixed at build
+time - All other configuration properties are overridable at runtime</p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference searchable">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-qute_configuration"></a><a href="#quarkus-qute_configuration">Configuration property</a></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-qute_quarkus.qute.suffixes"></a><code><a href="#quarkus-qute_quarkus.qute.suffixes">quarkus.qute.suffixes</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The set of suffixes used when attempting to locate a template file.</p>
+</div>
+<div class="paragraph">
+<p>By default, <code>engine.getTemplate("foo")</code> would result in several lookups: <code>foo</code>, <code>foo.html</code>, <code>foo.txt</code>, etc.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>qute.html,qute.txt,html,txt</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-qute_quarkus.qute.property-not-found-strategy"></a><code><a href="#quarkus-qute_quarkus.qute.property-not-found-strategy">quarkus.qute.property-not-found-strategy</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The strategy used if a property is not found when evaluating a standalone expression at runtime.
+ This strategy is not used when evaluating an expression that is used in a section parameter, e.g. <code>{#if foo.name}</code>. In such case, it&#8217;s the responsibility of the section to handle this situation appropriately.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>default</code>, <code>noop</code>, <code>throw-exception</code>, <code>output-original</code></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>default</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-qute_quarkus.qute.remove-standalone-lines"></a><code><a href="#quarkus-qute_quarkus.qute.remove-standalone-lines">quarkus.qute.remove-standalone-lines</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Specify whether the parser should remove standalone lines from the output. A standalone line is a line that contains at least one section tag, parameter declaration, or comment but no expression and no non-whitespace character.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-qute_quarkus.qute.content-types-content-types"></a><code><a href="#quarkus-qute_quarkus.qute.content-types-content-types">quarkus.qute.content-types</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The additional map of suffixes to content types. This map is used when working with template variants. By default, the <code>java.net.URLConnection#getFileNameMap()</code> is used to determine the content type of a template file.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>Map&lt;String,String&gt;</code></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+    </div>
+  </div>
+</div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkus はオープンです。このプロジェクトの全ての依存関係は<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a>または互換性のあるライセンスの元で利用出来ます。<br /><br />このウェブサイトは <a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築されており、<a href='https://pages.github.com/' target='_blank'>Github Pages</a>にホストされており、完全にオープンソースです。改善したい場合、 <a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォークし</a>、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+            <li><a href="/">ホーム</a></li>
+          
+            <li><a href="/guides">ガイド</a></li>
+          
+            <li><a href="/community/#contributing">貢献</a></li>
+          
+            <li><a href="/faq">FAQ</a></li>
+          
+            <li><a href="/get-started">はじめに</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>貢献</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://twitter.com/quarkusio">フォロー</a></li>
+          
+            <li><a href="https://github.com/quarkusio">GitHub</a></li>
+          
+            <li><a href="/security">セキュリティポリシー</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>サポート</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus">Stack Overflow</a></li>
+          
+            <li><a href="https://quarkusio.zulipchat.com">チャットルーム</a></li>
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev">フォーラム</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています：</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a href="https://hibernate.org" target="_blank">Hibernate</a></li>
+          
+            <li><a href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a href="https://code.quarkus.io/" target="_blank">等々...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/search-filter.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+</body>
+
+</html>

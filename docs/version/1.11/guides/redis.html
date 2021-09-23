@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html>
+
+
+
+
+
+<head>
+  <title>Quarkus - Using the Redis Client - 1.11</title>
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/1.11/guides/redis" />
+  <meta property="og:title" content="Quarkus - Using the Redis Client - 1.11" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/redis">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/goan.js" type="text/javascript"></script>
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+</head>
+
+<body class="guides">
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NJWS5L"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+  <div class="container">
+    <div class="logo-wrapper">
+      
+        <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+      
+    </div>
+    <label class="nav-toggle" for="checkbox">
+      <i class="fa fa-bars"></i>
+    </label>
+    <div id="menu" class="menu">
+      <span>
+        <a href="/get-started/" class="">はじめに</a>
+      </span>
+      <span>
+        <a href="/guides/" class="active">ガイド</a>
+      </span>
+      <span>
+        <a href="/community/" class="">コミュニティ</a>
+      </span>
+      <span>
+        <a href="/support/" class="">サポート</a>
+      </span>
+      <span>
+        <a href="/blog/" class="">ブログ</a>
+      </span>
+      <span>
+        <a href="https://code.quarkus.io" class="button-cta secondary white">コーディングを開始</a>
+      </span>
+    </div>
+  </div>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+<div class="grid-wrapper guide">
+  <div class="grid__item width-9-12 width-12-12-mobile">
+    <h1 class="text-caps">Quarkus - Using the Redis Client </h1>
+  </div>
+  <div class="grid__item width-3-12 align-self-center text-right hide-mobile">
+    <label id="guide-version-label">Select Guide Version</label>
+    <select id="guide-version-dropdown">
+      
+        
+        
+        
+        
+          <option value="main" >Main - SNAPSHOT</option>
+        
+      
+        
+        
+        
+        
+          <option value="latest" >2.2 - Latest</option>
+        
+      
+        
+        
+        
+        
+          <option value="1.11" selected>1.11</option>
+        
+      
+        
+        
+        
+        
+          <option value="1.7" >1.7</option>
+        
+      
+    </select>
+  </div>
+  <div class="width-12-12">
+    <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#前提条件">前提条件</a></li>
+<li><a href="#アーキテクチャ">アーキテクチャ</a></li>
+<li><a href="#ソリューション">ソリューション</a></li>
+<li><a href="#creating-the-maven-project">Creating the Maven Project</a></li>
+<li><a href="#starting-the-redis-server">Starting the Redis server</a></li>
+<li><a href="#configuring-redis-properties">Configuring Redis properties</a></li>
+<li><a href="#インクリメントpojoの作成">インクリメントPOJOの作成</a></li>
+<li><a href="#インクリメントサービスの作成">インクリメントサービスの作成</a></li>
+<li><a href="#インクリメントリソースの作成">インクリメントリソースの作成</a></li>
+<li><a href="#テストクラスの変更">テストクラスの変更</a></li>
+<li><a href="#実行">実行</a></li>
+<li><a href="#アプリケーションとの相互作用">アプリケーションとの相互作用</a>
+<ul class="sectlevel2">
+<li><a href="#新しいインクリメントの作成">新しいインクリメントの作成</a></li>
+<li><a href="#現在のインクリメントキーの確認">現在のインクリメントキーの確認</a></li>
+<li><a href="#新しいインクリメントの取得">新しいインクリメントの取得</a></li>
+<li><a href="#キーが与えられた値をインクリメントします">キーが与えられた値をインクリメントします。</a></li>
+<li><a href="#キーの削除">キーの削除</a></li>
+</ul>
+</li>
+<li><a href="#packaging-and-running-in-jvm-mode">Packaging and running in JVM mode</a></li>
+<li><a href="#ネイティブ実行">ネイティブ実行</a></li>
+<li><a href="#接続のヘルスチェック">接続のヘルスチェック</a></li>
+<li><a href="#複数の-redis-クライアント">複数の Redis クライアント</a>
+<ul class="sectlevel2">
+<li><a href="#名前付きredisクライアントのインジェクション">名前付きRedisクライアントのインジェクション</a></li>
+</ul>
+</li>
+<li><a href="#設定リファレンス">設定リファレンス</a></li>
+</ul></div>
+    <div>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、QuarkusアプリケーションがRedisクライアントエクステンションを使用してRedisサーバーに接続する方法を説明します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>この技術は、previewと考えられています。</p>
+</div>
+<div class="paragraph">
+<p>とりうるエクステンションステータスの完全なリストについては、
+<a href="https://quarkus.io/faq/#extension-status">FAQの項目を</a> 参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="前提条件"><a class="anchor" href="#前提条件"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>less than 15 minutes</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 1.8+ がインストールされ、 <code>JAVA_HOME</code>  が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.5.3+</p>
+</li>
+<li>
+<p>実行中のRedisサーバー、または1つ起動するためのDocker Compose</p>
+</li>
+<li>
+<p>ネイティブモードで実行する場合は、GraalVM がインストールされていること</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="アーキテクチャ"><a class="anchor" href="#アーキテクチャ"></a>アーキテクチャ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、 <a href="https://redis.io/commands/incrby"><code>INCRBY</code></a>
+コマンドを使用して、数値をインクリメントするシンプルな Rest API を公開します。また、 <code>GET</code> 、 <code>SET</code> 、 <code>DEL</code> 、 、
+<code>KEYS</code> のような他の Redis コマンドの使い方も見ていきましょう。</p>
+</div>
+<div class="paragraph">
+<p>今回は、Quarkus Redis Clientエクステンションを使用して、Redisサーバーに接続します。このエクステンションは
+<a href="https://vertx.io/docs/vertx-redis-client/java/">Vert.x Redis Client</a>
+の上に実装されており、非同期かつノンブロッキングでRedisに接続する方法を提供します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ソリューション"><a class="anchor" href="#ソリューション"></a>ソリューション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次の章で紹介する手順に沿って、ステップを踏んでアプリを作成することをお勧めします。ただし、完成した例にそのまま進んでも構いません。</p>
+</div>
+<div class="paragraph">
+<p>Gitレポジトリをクローンするか <code>git clone <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code> 、
+<a href="https://github.com/quarkusio/quarkus-quickstarts/archive/main.zip">アーカイブ</a> をダウンロードします。</p>
+</div>
+<div class="paragraph">
+<p>ソリューションは <code>redis-quickstart</code>
+<a href="https://github.com/quarkusio/quarkus-quickstarts/tree/main/redis-quickstart">directory</a> にあります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-maven-project"><a class="anchor" href="#creating-the-maven-project"></a>Creating the Maven Project</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、新しいプロジェクトが必要です。以下のコマンドで新規プロジェクトを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus:quarkus-maven-plugin:1.11.7.Final:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=redis-quickstart \
+    -Dextensions="redis-client,resteasy-jackson,resteasy-mutiny" \
+    -DnoExamples
+cd redis-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このコマンドは、RedisエクステンションをインポートしてMavenプロジェクトを生成します。</p>
+</div>
+<div class="paragraph">
+<p>すでにQuarkusプロジェクトが設定されている場合は、プロジェクトのベースディレクトリーで以下のコマンドを実行することで、プロジェクトに
+<code>redis-client</code> エクステンションを追加することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:add-extension -Dextensions="redis-client"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、 <code>pom.xml</code> に以下が追加されます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-redis-client&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="starting-the-redis-server"><a class="anchor" href="#starting-the-redis-server"></a>Starting the Redis server</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次に、以下のコマンドを使用してRedisインスタンスを起動する必要があります(すでにインスタンスを持っていない場合)。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker run --ulimit memlock=-1:-1 -it --rm=true --memory-swappiness=0 --name redis_quarkus_test -p 6379:6379 redis:5.0.6</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-redis-properties"><a class="anchor" href="#configuring-redis-properties"></a>Configuring Redis properties</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Redis サーバーを起動したら、Redis 接続のプロパティーを設定する必要があります。これは <code>application.properties</code>
+の設定ファイルで行います。以下の内容に編集してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.redis.hosts=redis://localhost:6379 <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>接続先のRedisホストを設定します。ここでは、前のセクションで開始したRedisサーバーに接続します。</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="インクリメントpojoの作成"><a class="anchor" href="#インクリメントpojoの作成"></a>インクリメントPOJOの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>Increment</code> POJO を使用してインクリメントをモデル化します。
+<code>src/main/java/org/acme/redis/Increment.java</code> ファイルを作成し、以下の内容で作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.redis;
+
+public class Increment {
+    public String key; <i class="conum" data-value="1"></i><b>(1)</b>
+    public int value; <i class="conum" data-value="2"></i><b>(2)</b>
+
+    public Increment(String key, int value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    public Increment() {
+    }
+}</code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The key that will be used as the Redis key</p>
+</li>
+<li>
+<p>The value held by the Redis key</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="インクリメントサービスの作成"><a class="anchor" href="#インクリメントサービスの作成"></a>インクリメントサービスの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Redis クライアントの役割を果たす <code>IncrementService</code> クラスを作成します。このクラスで、 <code>SET</code> 、 <code>GET</code> 、
+<code>DELET</code> 、 <code>KEYS</code> 、 <code>INCRBY</code> Redis コマンドを実行できるようになります。</p>
+</div>
+<div class="paragraph">
+<p>以下の内容の <code>src/main/java/org/acme/redis/IncrementService.java</code> ファイルを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.redis;
+
+import io.quarkus.redis.client.RedisClient;
+import io.quarkus.redis.client.reactive.ReactiveRedisClient;
+import io.smallrye.mutiny.Uni;
+
+import io.vertx.mutiny.redis.client.Response;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
+class IncrementService {
+
+    @Inject
+    RedisClient redisClient; <i class="conum" data-value="1"></i><b>(1)</b>
+
+    @Inject
+    ReactiveRedisClient reactiveRedisClient; <i class="conum" data-value="2"></i><b>(2)</b>
+
+    Uni&lt;Void&gt; del(String key) {
+        return reactiveRedisClient.del(Arrays.asList(key))
+                .map(response -&gt; null);
+    }
+
+    String get(String key) {
+        return redisClient.get(key).toString();
+    }
+
+    void set(String key, Integer value) {
+        redisClient.set(Arrays.asList(key, value.toString()));
+    }
+
+    void increment(String key, Integer incrementBy) {
+        redisClient.incrby(key, incrementBy.toString());
+    }
+
+    Uni&lt;List&lt;String&gt;&gt; keys() {
+        return reactiveRedisClient
+                .keys("*")
+                .map(response -&gt; {
+                    List&lt;String&gt; result = new ArrayList&lt;&gt;();
+                    for (Response r : response) {
+                        result.add(r.toString());
+                    }
+                    return result;
+                });
+    }
+}</code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Inject the Redis synchronous client</p>
+</li>
+<li>
+<p>Inject the Reactive Redis client</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="インクリメントリソースの作成"><a class="anchor" href="#インクリメントリソースの作成"></a>インクリメントリソースの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>以下の内容の <code>src/main/java/org/acme/redis/IncrementResource.java</code> ファイルを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.redis;
+
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.POST;
+import javax.ws.rs.DELETE;
+import java.util.List;
+
+import io.smallrye.mutiny.Uni;
+
+@Path("/increments")
+public class IncrementResource {
+
+    @Inject
+    IncrementService service;
+
+    @GET
+    public Uni&lt;List&lt;String&gt;&gt; keys() {
+        return service.keys();
+    }
+
+    @POST
+    public Increment create(Increment increment) {
+        service.set(increment.key, increment.value);
+        return increment;
+    }
+
+    @GET
+    @Path("/{key}")
+    public Increment get(@PathParam("key") String key) {
+        return new Increment(key, Integer.valueOf(service.get(key)));
+    }
+
+    @PUT
+    @Path("/{key}")
+    public void increment(@PathParam("key") String key, Integer value) {
+        service.increment(key, value);
+    }
+
+    @DELETE
+    @Path("/{key}")
+    public Uni&lt;Void&gt; delete(@PathParam("key") String key) {
+        return service.del(key);
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="テストクラスの変更"><a class="anchor" href="#テストクラスの変更"></a>テストクラスの変更</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>src/test/java/org/acme/redis/IncrementResourceTest.java</code>
+ファイルを以下の内容に編集してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.redis;
+
+import static org.hamcrest.Matchers.is;
+
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.test.junit.QuarkusTest;
+
+import static io.restassured.RestAssured.given;
+
+import io.restassured.http.ContentType;
+
+@QuarkusTest
+public class IncrementResourceTest {
+
+    @Test
+    public void testRedisOperations() {
+        // verify that we have nothing
+        given()
+                .accept(ContentType.JSON)
+                .when()
+                .get("/increments")
+                .then()
+                .statusCode(200)
+                .body("size()", is(0));
+
+        // create a first increment key with an initial value of 0
+        given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .body("{\"key\":\"first-key\",\"value\":0}")
+                .when()
+                .post("/increments")
+                .then()
+                .statusCode(200)
+                .body("key", is("first-key"))
+                .body("value", is(0));
+
+        // create a second increment key with an initial value of 10
+        given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .body("{\"key\":\"second-key\",\"value\":10}")
+                .when()
+                .post("/increments")
+                .then()
+                .statusCode(200)
+                .body("key", is("second-key"))
+                .body("value", is(10));
+
+        // increment first key by 1
+        given()
+                .contentType(ContentType.JSON)
+                .body("1")
+                .when()
+                .put("/increments/first-key")
+                .then()
+                .statusCode(204);
+
+        // verify that key has been incremented
+        given()
+                .accept(ContentType.JSON)
+                .when()
+                .get("/increments/first-key")
+                .then()
+                .statusCode(200)
+                .body("key", is("first-key"))
+                .body("value", is(1));
+
+        // increment second key by 1000
+        given()
+                .contentType(ContentType.JSON)
+                .body("1000")
+                .when()
+                .put("/increments/second-key")
+                .then()
+                .statusCode(204);
+
+        // verify that key has been incremented
+        given()
+                .accept(ContentType.JSON)
+                .when()
+                .get("/increments/second-key")
+                .then()
+                .statusCode(200)
+                .body("key", is("second-key"))
+                .body("value", is(1010));
+
+        // verify that we have two keys in registered
+        given()
+                .accept(ContentType.JSON)
+                .when()
+                .get("/increments")
+                .then()
+                .statusCode(200)
+                .body("size()", is(2));
+
+        // delete first key
+        given()
+                .accept(ContentType.JSON)
+                .when()
+                .delete("/increments/first-key")
+                .then()
+                .statusCode(204);
+
+        // verify that we have one key left after deletion
+        given()
+                .accept(ContentType.JSON)
+                .when()
+                .get("/increments")
+                .then()
+                .statusCode(200)
+                .body("size()", is(1));
+
+        // delete second key
+        given()
+                .accept(ContentType.JSON)
+                .when()
+                .delete("/increments/second-key")
+                .then()
+                .statusCode(204);
+
+        // verify that there is no key left
+        given()
+                .accept(ContentType.JSON)
+                .when()
+                .get("/increments")
+                .then()
+                .statusCode(200)
+                .body("size()", is(0));
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="実行"><a class="anchor" href="#実行"></a>実行</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>指示に従えば、Redisサーバーが起動しているはずです。あとは、アプリケーションを使って実行するだけです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>別のターミナルを開いて <code>curl <a href="http://localhost:8080/increments" class="bare">http://localhost:8080/increments</a></code> コマンドを実行します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="アプリケーションとの相互作用"><a class="anchor" href="#アプリケーションとの相互作用"></a>アプリケーションとの相互作用</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>上で見たように、APIは5つのRestエンドポイントを公開しています。このセクションでは、インクリメントを初期化する方法、現在のインクリメントのリストを見る方法、キーを指定して値をインクリメントする方法、インクリメントの現在の値を取得する方法、そして最後にキーを削除する方法を見ていきます。</p>
+</div>
+<div class="sect2">
+<h3 id="新しいインクリメントの作成"><a class="anchor" href="#新しいインクリメントの作成"></a>新しいインクリメントの作成</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST -H "Content-Type: application/json" -d '{"key":"first","value":10}' http://localhost:8080/increments <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>最初のインクリメントを作成し、キーは <code>first</code> 、初期値は <code>10</code> .</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>上記のコマンドを実行すると、以下のような結果が返ってくるはずです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "key": "first",
+  "value": 10
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="現在のインクリメントキーの確認"><a class="anchor" href="#現在のインクリメントキーの確認"></a>現在のインクリメントキーの確認</h3>
+<div class="paragraph">
+<p>現在のインクリメントキーのリストを表示するには、以下のコマンドを実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:8080/increments</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上記のコマンドは <code>["first"]</code> を返し、これまでのところインクリメントが 1 つしかないことを示しているはずです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="新しいインクリメントの取得"><a class="anchor" href="#新しいインクリメントの取得"></a>新しいインクリメントの取得</h3>
+<div class="paragraph">
+<p>キーを使ってインクリメントを取得するには、以下のコマンドを実行する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:8080/increments/first <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>このコマンドを実行すると、以下のような結果が返ってくるはずです。</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "key": "first",
+  "value": 10
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="キーが与えられた値をインクリメントします"><a class="anchor" href="#キーが与えられた値をインクリメントします"></a>キーが与えられた値をインクリメントします。</h3>
+<div class="paragraph">
+<p>値をインクリメントするには、以下のコマンドを実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X PUT -H "Content-Type: application/json" -d '27' http://localhost:8080/increments/first <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>first</code> の値を 27 増やします。</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>さて、コマンドを実行すると <code>curl <a href="http://localhost:8080/increments/first" class="bare">http://localhost:8080/increments/first</a></code> は次のような結果を返します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "key": "first",
+  "value": 37 <i class="conum" data-value="1"></i><b>(1)</b>
+}</code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>first</code> キーの値が <code>37</code> になっていることがわかりますが、これはまさに簡単な計算である <code>10 + 27</code> の結果と同じです。</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="キーの削除"><a class="anchor" href="#キーの削除"></a>キーの削除</h3>
+<div class="paragraph">
+<p>インクリメントのキーを指定して削除するには、以下のコマンドを使用します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X DELETE  http://localhost:8080/increments/first <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>first</code> のインクリメントを削除します。</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>さて、コマンドを実行すると <code>curl <a href="http://localhost:8080/increments" class="bare">http://localhost:8080/increments</a></code> は空のリスト <code>[]</code> を返します。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="packaging-and-running-in-jvm-mode"><a class="anchor" href="#packaging-and-running-in-jvm-mode"></a>Packaging and running in JVM mode</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>従来の jar ファイルとしてアプリケーションを実行することができます。</p>
+</div>
+<div class="paragraph">
+<p>まず、パッケージ化します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw package</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+このコマンドはテストを実行するためにRedisインスタンスを起動します。そのため、Redis コンテナーを停止する必要があります。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>次に、以下を実行してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">java -jar ./target/redis-quickstart-1.0.0-SNAPSHOT-runner.jar</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ネイティブ実行"><a class="anchor" href="#ネイティブ実行"></a>ネイティブ実行</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ソースコードを変更することなく、このアプリケーションからネイティブ実行ファイルを作成することもできます。ネイティブ実行ファイルは、JVMへの依存を取り除きます。ターゲットプラットフォーム上でアプリケーションを実行するために必要なすべてのものが実行ファイルに含まれているため、アプリケーションを最小限のリソースオーバーヘッドで実行することができます。</p>
+</div>
+<div class="paragraph">
+<p>GraalVMは、不要なコードパスを削除するために追加のステップを実行するため、ネイティブ実行ファイルのコンパイルには少し時間がかかります。
+<code>native</code> プロファイルを使用して、ネイティブ実行ファイルをコンパイルしてください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw package -Pnative</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ビルドが完了したら、実行ファイルを次のように実行することが出来ます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./target/redis-quickstart-1.0.0-SNAPSHOT-runner</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="接続のヘルスチェック"><a class="anchor" href="#接続のヘルスチェック"></a>接続のヘルスチェック</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>quarkus-smallrye-health</code> エクステンションを使用している場合、 <code>quarkus-vertx-redis</code> は、Redis
+サーバーへの接続を検証するためのreadiness ヘルスチェックを自動的に追加します。</p>
+</div>
+<div class="paragraph">
+<p>そのため、アプリケーションの <code>/q/health/ready</code> エンドポイントにアクセスすると、接続の検証状況に関する情報が表示されます。</p>
+</div>
+<div class="paragraph">
+<p>この動作は、 <code>application.properties</code> の <code>quarkus.redis.health.enabled</code> プロパティーを
+<code>false</code> に設定することで無効にできます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="複数の-redis-クライアント"><a class="anchor" href="#複数の-redis-クライアント"></a>複数の Redis クライアント</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Redis
+エクステンションを使用すると、複数のクライアントを設定することができます。複数のクライアントを使用しても、単一のクライアントを持つのと同じように動作します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.redis.hosts=redis://localhost:6379
+quarkus.redis.second.hosts=redis://localhost:6379</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>キー ( <code>second</code> セグメント) に余分なビットがあることに注意してください。構文は次の通りです:
+<code>quarkus.redis.[optional name.][redis configuration property]</code>
+.名前を省略した場合、デフォルトのクライアントを設定します。</p>
+</div>
+<div class="sect2">
+<h3 id="名前付きredisクライアントのインジェクション"><a class="anchor" href="#名前付きredisクライアントのインジェクション"></a>名前付きRedisクライアントのインジェクション</h3>
+<div class="paragraph">
+<p>複数のクライアントを使用する場合は、 <code>io.quarkus.redis.client.RedisClientName</code>
+の修飾子を使用して注入するクライアントを選択することができます。上記のプロパティーを使って3つの異なるクライアントを設定すると、以下のようにそれぞれにインジェクションすることもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject
+RedisClient defaultRedisClient;
+
+@Inject
+@RedisClientName("second")
+RedisClient redisClient2;
+
+@Inject
+@RedisClientName("second")
+ReactiveRedisClient reactiveClient2;</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="設定リファレンス"><a class="anchor" href="#設定リファレンス"></a>設定リファレンス</h2>
+<div class="sectionbody">
+<div class="paragraph configuration-legend">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> Configuration property fixed at build
+time - All other configuration properties are overridable at runtime</p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference searchable">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-redis-client_configuration"></a><a href="#quarkus-redis-client_configuration">Configuration property</a></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus.redis.health.enabled"></a><code><a href="#quarkus-redis-client_quarkus.redis.health.enabled">quarkus.redis.health.enabled</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Whether or not an health check is published in case the smallrye-health extension is present.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.hosts"></a><code><a href="#quarkus-redis-client_quarkus.redis.hosts">quarkus.redis.hosts</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The redis hosts to use while connecting to the redis server. Only the cluster mode will consider more than 1 element.
+ The URI provided uses the following schema <code>redis://[username:password@][host][:port][/database]</code></p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of <a href="https://docs.oracle.com/javase/8/docs/api/java/net/URI.html">URI</a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>redis://localhost:6379</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.timeout"></a><code><a href="#quarkus-redis-client_quarkus.redis.timeout">quarkus.redis.timeout</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The maximum delay to wait before a blocking command to redis server times out</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor" title="More information about the Duration format"><span class="icon"><i class="fa fa-question-circle"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>10s</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.client-type"></a><code><a href="#quarkus-redis-client_quarkus.redis.client-type">quarkus.redis.client-type</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The redis client type</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>standalone</code>, <code>sentinel</code>, <code>cluster</code></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>standalone</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.master-name"></a><code><a href="#quarkus-redis-client_quarkus.redis.master-name">quarkus.redis.master-name</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The master name (only considered in HA mode).</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>mymaster</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.role"></a><code><a href="#quarkus-redis-client_quarkus.redis.role">quarkus.redis.role</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The role name (only considered in HA mode).</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>master</code>, <code>slave</code>, <code>sentinel</code></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>master</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.slaves"></a><code><a href="#quarkus-redis-client_quarkus.redis.slaves">quarkus.redis.slaves</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Whether or not to use slave nodes (only considered in Cluster mode).</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>never</code>, <code>share</code>, <code>always</code></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>never</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.max-pool-size"></a><code><a href="#quarkus-redis-client_quarkus.redis.max-pool-size">quarkus.redis.max-pool-size</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The maximum size of the connection pool. When working with cluster or sentinel.
+ This value should be at least the total number of cluster member (or number of sentinels &#43; 1)</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>6</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.max-pool-waiting"></a><code><a href="#quarkus-redis-client_quarkus.redis.max-pool-waiting">quarkus.redis.max-pool-waiting</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The maximum waiting requests for a connection from the pool.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>24</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.pool-cleaner-interval"></a><code><a href="#quarkus-redis-client_quarkus.redis.pool-cleaner-interval">quarkus.redis.pool-cleaner-interval</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The duration indicating how often should the connection pool cleaner executes.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor" title="More information about the Duration format"><span class="icon"><i class="fa fa-question-circle"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.pool-recycle-timeout"></a><code><a href="#quarkus-redis-client_quarkus.redis.pool-recycle-timeout">quarkus.redis.pool-recycle-timeout</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The timeout for a connection recycling.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor" title="More information about the Duration format"><span class="icon"><i class="fa fa-question-circle"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>15S</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.max-waiting-handlers"></a><code><a href="#quarkus-redis-client_quarkus.redis.max-waiting-handlers">quarkus.redis.max-waiting-handlers</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Sets how much handlers is the client willing to queue.
+ The client will always work on pipeline mode, this means that messages can start queueing. Using this configuration option, you can control how much backlog you&#8217;re willing to accept.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>2048</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.max-nested-arrays"></a><code><a href="#quarkus-redis-client_quarkus.redis.max-nested-arrays">quarkus.redis.max-nested-arrays</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Tune how much nested arrays are allowed on a redis response. This affects the parser performance.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>32</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.-additional-redis-clients-.hosts"></a><code><a href="#quarkus-redis-client_quarkus.redis.-additional-redis-clients-.hosts">quarkus.redis."additional-redis-clients".hosts</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The redis hosts to use while connecting to the redis server. Only the cluster mode will consider more than 1 element.
+ The URI provided uses the following schema <code>redis://[username:password@][host][:port][/database]</code></p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of <a href="https://docs.oracle.com/javase/8/docs/api/java/net/URI.html">URI</a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>redis://localhost:6379</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.-additional-redis-clients-.timeout"></a><code><a href="#quarkus-redis-client_quarkus.redis.-additional-redis-clients-.timeout">quarkus.redis."additional-redis-clients".timeout</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The maximum delay to wait before a blocking command to redis server times out</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor" title="More information about the Duration format"><span class="icon"><i class="fa fa-question-circle"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>10s</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.-additional-redis-clients-.client-type"></a><code><a href="#quarkus-redis-client_quarkus.redis.-additional-redis-clients-.client-type">quarkus.redis."additional-redis-clients".client-type</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The redis client type</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>standalone</code>, <code>sentinel</code>, <code>cluster</code></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>standalone</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.-additional-redis-clients-.master-name"></a><code><a href="#quarkus-redis-client_quarkus.redis.-additional-redis-clients-.master-name">quarkus.redis."additional-redis-clients".master-name</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The master name (only considered in HA mode).</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>mymaster</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.-additional-redis-clients-.role"></a><code><a href="#quarkus-redis-client_quarkus.redis.-additional-redis-clients-.role">quarkus.redis."additional-redis-clients".role</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The role name (only considered in HA mode).</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>master</code>, <code>slave</code>, <code>sentinel</code></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>master</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.-additional-redis-clients-.slaves"></a><code><a href="#quarkus-redis-client_quarkus.redis.-additional-redis-clients-.slaves">quarkus.redis."additional-redis-clients".slaves</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Whether or not to use slave nodes (only considered in Cluster mode).</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>never</code>, <code>share</code>, <code>always</code></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>never</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.-additional-redis-clients-.max-pool-size"></a><code><a href="#quarkus-redis-client_quarkus.redis.-additional-redis-clients-.max-pool-size">quarkus.redis."additional-redis-clients".max-pool-size</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The maximum size of the connection pool. When working with cluster or sentinel.
+ This value should be at least the total number of cluster member (or number of sentinels &#43; 1)</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>6</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.-additional-redis-clients-.max-pool-waiting"></a><code><a href="#quarkus-redis-client_quarkus.redis.-additional-redis-clients-.max-pool-waiting">quarkus.redis."additional-redis-clients".max-pool-waiting</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The maximum waiting requests for a connection from the pool.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>24</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.-additional-redis-clients-.pool-cleaner-interval"></a><code><a href="#quarkus-redis-client_quarkus.redis.-additional-redis-clients-.pool-cleaner-interval">quarkus.redis."additional-redis-clients".pool-cleaner-interval</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The duration indicating how often should the connection pool cleaner executes.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor" title="More information about the Duration format"><span class="icon"><i class="fa fa-question-circle"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.-additional-redis-clients-.pool-recycle-timeout"></a><code><a href="#quarkus-redis-client_quarkus.redis.-additional-redis-clients-.pool-recycle-timeout">quarkus.redis."additional-redis-clients".pool-recycle-timeout</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The timeout for a connection recycling.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor" title="More information about the Duration format"><span class="icon"><i class="fa fa-question-circle"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>15S</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.-additional-redis-clients-.max-waiting-handlers"></a><code><a href="#quarkus-redis-client_quarkus.redis.-additional-redis-clients-.max-waiting-handlers">quarkus.redis."additional-redis-clients".max-waiting-handlers</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Sets how much handlers is the client willing to queue.
+ The client will always work on pipeline mode, this means that messages can start queueing. Using this configuration option, you can control how much backlog you&#8217;re willing to accept.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>2048</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-redis-client_quarkus.redis.-additional-redis-clients-.max-nested-arrays"></a><code><a href="#quarkus-redis-client_quarkus.redis.-additional-redis-clients-.max-nested-arrays">quarkus.redis."additional-redis-clients".max-nested-arrays</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Tune how much nested arrays are allowed on a redis response. This affects the parser performance.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>32</code></p></td>
+</tr>
+</tbody>
+</table>
+<div id="duration-note-anchor" class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">About the Duration format</div>
+<div class="paragraph">
+<p>期間のフォーマットは標準の <code>java.time.Duration</code> フォーマットを使用します。詳細は
+<a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html#parse-java.lang.CharSequence-">Duration#parse()
+javadoc</a> を参照してください。</p>
+</div>
+<div class="paragraph">
+<p>数値で始まる期間の値を指定することもできます。この場合、値が数値のみで構成されている場合、コンバーターは値を秒として扱います。そうでない場合は、
+<code>PT</code> が暗黙的に値の前に付加され、標準の <code>java.time.Duration</code> 形式が得られます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+    </div>
+  </div>
+</div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkus はオープンです。このプロジェクトの全ての依存関係は<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a>または互換性のあるライセンスの元で利用出来ます。<br /><br />このウェブサイトは <a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築されており、<a href='https://pages.github.com/' target='_blank'>Github Pages</a>にホストされており、完全にオープンソースです。改善したい場合、 <a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォークし</a>、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+            <li><a href="/">ホーム</a></li>
+          
+            <li><a href="/guides">ガイド</a></li>
+          
+            <li><a href="/community/#contributing">貢献</a></li>
+          
+            <li><a href="/faq">FAQ</a></li>
+          
+            <li><a href="/get-started">はじめに</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>貢献</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://twitter.com/quarkusio">フォロー</a></li>
+          
+            <li><a href="https://github.com/quarkusio">GitHub</a></li>
+          
+            <li><a href="/security">セキュリティポリシー</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>サポート</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus">Stack Overflow</a></li>
+          
+            <li><a href="https://quarkusio.zulipchat.com">チャットルーム</a></li>
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev">フォーラム</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています：</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a href="https://hibernate.org" target="_blank">Hibernate</a></li>
+          
+            <li><a href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a href="https://code.quarkus.io/" target="_blank">等々...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/search-filter.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+</body>
+
+</html>

@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html>
+
+
+
+
+
+<head>
+  <title>Quarkus - Configuring Your Application - 1.11</title>
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/1.11/guides/config" />
+  <meta property="og:title" content="Quarkus - Configuring Your Application - 1.11" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/config">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/goan.js" type="text/javascript"></script>
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+</head>
+
+<body class="guides">
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NJWS5L"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+  <div class="container">
+    <div class="logo-wrapper">
+      
+        <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+      
+    </div>
+    <label class="nav-toggle" for="checkbox">
+      <i class="fa fa-bars"></i>
+    </label>
+    <div id="menu" class="menu">
+      <span>
+        <a href="/get-started/" class="">はじめに</a>
+      </span>
+      <span>
+        <a href="/guides/" class="active">ガイド</a>
+      </span>
+      <span>
+        <a href="/community/" class="">コミュニティ</a>
+      </span>
+      <span>
+        <a href="/support/" class="">サポート</a>
+      </span>
+      <span>
+        <a href="/blog/" class="">ブログ</a>
+      </span>
+      <span>
+        <a href="https://code.quarkus.io" class="button-cta secondary white">コーディングを開始</a>
+      </span>
+    </div>
+  </div>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+<div class="grid-wrapper guide">
+  <div class="grid__item width-9-12 width-12-12-mobile">
+    <h1 class="text-caps">Quarkus - Configuring Your Application </h1>
+  </div>
+  <div class="grid__item width-3-12 align-self-center text-right hide-mobile">
+    <label id="guide-version-label">Select Guide Version</label>
+    <select id="guide-version-dropdown">
+      
+        
+        
+        
+        
+          <option value="main" >Main - SNAPSHOT</option>
+        
+      
+        
+        
+        
+        
+          <option value="latest" >2.2 - Latest</option>
+        
+      
+        
+        
+        
+        
+          <option value="1.11" selected>1.11</option>
+        
+      
+        
+        
+        
+        
+          <option value="1.7" >1.7</option>
+        
+      
+    </select>
+  </div>
+  <div class="width-12-12">
+    <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#前提条件">前提条件</a></li>
+<li><a href="#ソリューション">ソリューション</a></li>
+<li><a href="#creating-the-maven-project">Creating the Maven project</a></li>
+<li><a href="#コンフィグレーションの作成">コンフィグレーションの作成</a></li>
+<li><a href="#設定プロパティーの注入">設定プロパティーの注入</a></li>
+<li><a href="#テストの更新">テストの更新</a></li>
+<li><a href="#アプリケーションをパッケージ化して実行する">アプリケーションをパッケージ化して実行する</a></li>
+<li><a href="#設定にプログラムでアクセス">設定にプログラムでアクセス</a></li>
+<li><a href="#設定プロファイル">設定プロファイル</a></li>
+<li><a href="#configuring-quarkus">Configuring Quarkus</a></li>
+</ul></div>
+    <div>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>コードの中にハードコードされた値を使うことは <em>できません</em> (たとえ誰もがどこかの時点でそうしていたとしてもです
+;-)。このガイドでは、アプリケーションを設定する方法を学びます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="前提条件"><a class="anchor" href="#前提条件"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>between 5 and 10 minutes</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 1.8+ がインストールされ、 <code>JAVA_HOME</code>  が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.6.2+</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ソリューション"><a class="anchor" href="#ソリューション"></a>ソリューション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次の章で紹介する手順に沿って、ステップを踏んでアプリを作成することをお勧めします。ただし、完成した例にそのまま進んでも構いません。</p>
+</div>
+<div class="paragraph">
+<p>Gitレポジトリをクローンするか <code>git clone <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code> 、
+<a href="https://github.com/quarkusio/quarkus-quickstarts/archive/main.zip">アーカイブ</a> をダウンロードします。</p>
+</div>
+<div class="paragraph">
+<p>ソリューションは <code>config-quickstart</code>
+<a href="https://github.com/quarkusio/quarkus-quickstarts/tree/main/config-quickstart">directory</a> にあります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-maven-project"><a class="anchor" href="#creating-the-maven-project"></a>Creating the Maven project</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、新しいプロジェクトが必要です。以下のコマンドで新規プロジェクトを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus:quarkus-maven-plugin:1.11.7.Final:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=config-quickstart \
+    -DclassName="org.acme.config.GreetingResource" \
+    -Dpath="/greeting"
+cd config-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>以下が生成されます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Mavenの構造</p>
+</li>
+<li>
+<p>ランディングページは次のURLでアクセス可能です: <code><a href="http://localhost:8080" class="bare">http://localhost:8080</a></code></p>
+</li>
+<li>
+<p><code>native</code>  と <code>jvm</code>  の両方のモードに対応した <code>Dockerfile</code>  ファイルの例</p>
+</li>
+<li>
+<p>the application configuration file</p>
+</li>
+<li>
+<p><code>org.acme.config.GreetingResource</code> リソース</p>
+</li>
+<li>
+<p>an associated test</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="コンフィグレーションの作成"><a class="anchor" href="#コンフィグレーションの作成"></a>コンフィグレーションの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>デフォルトでは、Quarkus は <a href="config-reference.html#configuration_sources">複数のソース</a>
+から設定プロパティーを読み取ります。このガイドでは、 <code>src/main/resources/application.properties</code>
+にあるアプリケーション設定ファイルを使用します。以下の内容でファイルを編集します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># Your configuration properties
+greeting.message = hello
+greeting.name = quarkus</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="設定プロパティーの注入"><a class="anchor" href="#設定プロパティーの注入"></a>設定プロパティーの注入</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus では、
+<a href="https://microprofile.io/project/eclipse/microprofile-config">MicroProfile
+Config</a> アノテーションを使用して、アプリケーションに設定プロパティーを注入しています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ConfigProperty(name = "greeting.message") <i class="conum" data-value="1"></i><b>(1)</b>
+String message;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@Inject @ConfigProperty</code> を使用することも、 <code>@ConfigProperty</code> だけを使用することもできます。
+<code>@Inject</code> アノテーションは、 <code>@ConfigProperty</code> でアノテーションされたメンバーには必要ありません。この動作は
+<a href="https://microprofile.io/project/eclipse/microprofile-config">MicroProfile
+Config</a> とは異なります。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+アプリケーションが設定されていない設定プロパティーを注入しようとすると、エラーがスローされます。そのため、設定が完了したときにすぐに知ることができます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>org.acme.config.GreetingResource</code> を編集し、以下の設定プロパティーを導入します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ConfigProperty(name = "greeting.message") <i class="conum" data-value="1"></i><b>(1)</b>
+String message;
+
+@ConfigProperty(name = "greeting.suffix", defaultValue="!") <i class="conum" data-value="2"></i><b>(2)</b>
+String suffix;
+
+@ConfigProperty(name = "greeting.name")
+Optional&lt;String&gt; name; <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>このプロパティーに値を指定しないと、アプリケーションの起動は
+<code>javax.enterprise.inject.spi.DeploymentException: No config value of type
+[class java.lang.String] exists for: greeting.message</code> エラーで失敗します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>デフォルト値は、設定が <code>greeting.suffix</code> の値を提供していない場合に注入されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>このプロパティーはオプションです - 設定が <code>greeting.name</code> の値を提供していない場合は、空の <code>Optional</code> が注入されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>ここで、 <code>hello</code> メソッドを修正して、注入されたプロパティーを使用します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@GET
+@Produces(MediaType.TEXT_PLAIN)
+public String hello() {
+    return message + " " + name.orElse("world") + suffix;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>設定したら、アプリケーションを使って確認します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ curl http://localhost:8080/greeting
+hello quarkus!</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+複数の関連する設定値を注入する代わりに、 <code>@io.quarkus.arc.config.ConfigProperties</code>
+アノテーションを使用して、これらのプロパティーをまとめてグループ化することもできます。詳細については、『
+<a href="config-reference.html#using_configproperties">設定リファレンスガイド</a> 』を参照してください。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="テストの更新"><a class="anchor" href="#テストの更新"></a>テストの更新</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>また、エンドポイントに加えられた変更を反映させるために、機能テストを更新する必要があります。
+<code>src/test/java/org/acme/config/GreetingResourceTest.java</code> ファイルを編集し、
+<code>testHelloEndpoint</code> メソッドの内容を変更します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.config;
+
+import io.quarkus.test.junit.QuarkusTest;
+import org.junit.jupiter.api.Test;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.is;
+
+@QuarkusTest
+public class GreetingResourceTest {
+
+    @Test
+    public void testHelloEndpoint() {
+        given()
+          .when().get("/greeting")
+          .then()
+             .statusCode(200)
+             .body(is("hello quarkus!")); // Modified line
+    }
+
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="アプリケーションをパッケージ化して実行する"><a class="anchor" href="#アプリケーションをパッケージ化して実行する"></a>アプリケーションをパッケージ化して実行する</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>アプリケーションを実行するには、次の手順を実行します: <code>./mvnw compile quarkus:dev</code> 。ブラウザで
+<a href="http://localhost:8080/greeting" class="bare">http://localhost:8080/greeting</a> を開きます。</p>
+</div>
+<div class="paragraph">
+<p>設定ファイルの変更はすぐに反映されます。 <code>greeting.suffix</code> の追加、他のプロパティーの削除、値の変更などが可能です。</p>
+</div>
+<div class="paragraph">
+<p>As usual, the application can be packaged using <code>./mvnw clean package</code> and
+executed using the <code>-runner.jar</code> file.  You can also generate the native
+executable with <code>./mvnw clean package -Pnative</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="設定にプログラムでアクセス"><a class="anchor" href="#設定にプログラムでアクセス"></a>設定にプログラムでアクセス</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>プログラムで設定にアクセスすることもできます。動的なルックアップを実現したり、CDI Bean でも JAX-RS
+リソースでもないクラスから設定値を取得したりするのに便利です。</p>
+</div>
+<div class="paragraph">
+<p>以下のように <code>org.eclipse.microprofile.config.ConfigProvider.getConfig()</code>
+を使用してプログラムで設定にアクセスすることも出来ます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">String databaseName = ConfigProvider.getConfig().getValue("database.name", String.class);
+Optional&lt;String&gt; maybeDatabaseName = ConfigProvider.getConfig().getOptionalValue("database.name", String.class);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="設定プロファイル"><a class="anchor" href="#設定プロファイル"></a>設定プロファイル</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus
+では、設定プロファイルという概念をサポートしています。これにより、同じファイル内に複数の設定値を持つことができ、プロファイル名を使用してそれらの間で選択することができます。</p>
+</div>
+<div class="paragraph">
+<p>このための構文は <code>%{profile}.config.key=value</code> です。例えば、以下のような場合:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.port=9090
+%dev.quarkus.http.port=8181</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>個の場合、Quarkus の HTTP ポートは9090になります。 <code>dev</code> プロファイルがアクティブでない場合は8181になります。</p>
+</div>
+<div class="paragraph">
+<p>設定プロファイルの詳細については、
+<a href="config-reference.html#configuration_profiles">設定リファレンスガイド</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-quarkus"><a class="anchor" href="#configuring-quarkus"></a>Configuring Quarkus</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus 自体は、アプリケーションと同じメカニズムで設定されます。Quarkus は、独自の設定のために <code>quarkus.</code>
+ネームスペースを予約します。たとえば、HTTPサーバーのポートを設定するには、 <code>application.properties</code> で
+<code>quarkus.http.port</code> を設定します。Quarkusの設定プロパティーはすべて
+<a href="all-config">文書化されており、検索可能です</a> 。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>上述したように、 <code>quarkus.</code> で始まるプロパティーは、Quarkus
+自体を設定するために実質的に予約されているため、アプリケーション固有のプロパティーのプレフィックスとして <code>quarkus.</code> を使用してはいけ
+<strong>ません</strong> 。</p>
+</div>
+<div class="paragraph">
+<p>前の例では、 <code>greeting.message</code> の代わりに <code>quarkus.message</code> を使用すると、予期せぬ動作をすることになります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Quarkus
+は、その設定とブートストラップの多くをビルド時に行い、いくつかの設定プロパティーはビルド中に読み込まれて使用されます。これらのプロパティーは
+<em>ビルド時に固定され</em>
+ており、実行時に変更することはできません。このようなプロパティーの変更を反映させるには、常にアプリケーションをリパッケージする必要があります。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+ビルド時に固定されたプロパティーは、 <a href="all-config">すべての設定オプションのリスト</a>
+でロックアイコン([lock])でマークされます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>しかし、いくつかのエクステンションは <em>実行時にオーバーライド可能な</em> プロパティーを定義しています。定型的な例としては、データベースの
+URL、ユーザー名とパスワードがありますが、これはターゲット環境でしか知られていません。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>システムプロパティー</p>
+</li>
+<li>
+<p>環境変数</p>
+</li>
+<li>
+<p>現在の作業ディレクトリーに配置された <code>.env</code> という名前の環境ファイル</p>
+</li>
+<li>
+<p><code>$PWD/config/application.properties</code> に配置された設定ファイル</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>詳細については、 <a href="config-reference.html#configuring_quarkus">設定リファレンスガイド</a>
+を参照してください。</p>
+</div>
+</div>
+</div>
+    </div>
+  </div>
+</div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkus はオープンです。このプロジェクトの全ての依存関係は<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a>または互換性のあるライセンスの元で利用出来ます。<br /><br />このウェブサイトは <a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築されており、<a href='https://pages.github.com/' target='_blank'>Github Pages</a>にホストされており、完全にオープンソースです。改善したい場合、 <a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォークし</a>、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+            <li><a href="/">ホーム</a></li>
+          
+            <li><a href="/guides">ガイド</a></li>
+          
+            <li><a href="/community/#contributing">貢献</a></li>
+          
+            <li><a href="/faq">FAQ</a></li>
+          
+            <li><a href="/get-started">はじめに</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>貢献</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://twitter.com/quarkusio">フォロー</a></li>
+          
+            <li><a href="https://github.com/quarkusio">GitHub</a></li>
+          
+            <li><a href="/security">セキュリティポリシー</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>サポート</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus">Stack Overflow</a></li>
+          
+            <li><a href="https://quarkusio.zulipchat.com">チャットルーム</a></li>
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev">フォーラム</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています：</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a href="https://hibernate.org" target="_blank">Hibernate</a></li>
+          
+            <li><a href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a href="https://code.quarkus.io/" target="_blank">等々...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/search-filter.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+</body>
+
+</html>

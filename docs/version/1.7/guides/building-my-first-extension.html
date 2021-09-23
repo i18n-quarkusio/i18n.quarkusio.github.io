@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html>
+
+
+
+
+
+<head>
+  <title>Quarkus - Building my first extension - 1.7</title>
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/1.7/guides/building-my-first-extension" />
+  <meta property="og:title" content="Quarkus - Building my first extension - 1.7" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/building-my-first-extension">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/goan.js" type="text/javascript"></script>
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+</head>
+
+<body class="guides">
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NJWS5L"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+  <div class="container">
+    <div class="logo-wrapper">
+      
+        <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+      
+    </div>
+    <label class="nav-toggle" for="checkbox">
+      <i class="fa fa-bars"></i>
+    </label>
+    <div id="menu" class="menu">
+      <span>
+        <a href="/get-started/" class="">はじめに</a>
+      </span>
+      <span>
+        <a href="/guides/" class="active">ガイド</a>
+      </span>
+      <span>
+        <a href="/community/" class="">コミュニティ</a>
+      </span>
+      <span>
+        <a href="/support/" class="">サポート</a>
+      </span>
+      <span>
+        <a href="/blog/" class="">ブログ</a>
+      </span>
+      <span>
+        <a href="https://code.quarkus.io" class="button-cta secondary white">コーディングを開始</a>
+      </span>
+    </div>
+  </div>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+<div class="grid-wrapper guide">
+  <div class="grid__item width-9-12 width-12-12-mobile">
+    <h1 class="text-caps">Quarkus - Building my first extension </h1>
+  </div>
+  <div class="grid__item width-3-12 align-self-center text-right hide-mobile">
+    <label id="guide-version-label">Select Guide Version</label>
+    <select id="guide-version-dropdown">
+      
+        
+        
+        
+        
+          <option value="main" >Main - SNAPSHOT</option>
+        
+      
+        
+        
+        
+        
+          <option value="latest" >2.2 - Latest</option>
+        
+      
+        
+        
+        
+        
+          <option value="1.11" >1.11</option>
+        
+      
+        
+        
+        
+        
+          <option value="1.7" selected>1.7</option>
+        
+      
+    </select>
+  </div>
+  <div class="width-12-12">
+    <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#前提条件">前提条件</a></li>
+<li><a href="#ソリューション">ソリューション</a></li>
+<li><a href="#基本概念">基本概念</a></li>
+<li><a href="#description-of-a-quarkus-extension">Description of a Quarkus extension</a></li>
+<li><a href="#quarkus-application-bootstrap">Quarkus Application Bootstrap</a></li>
+<li><a href="#maven-setup">Maven setup</a>
+<ul class="sectlevel2">
+<li><a href="#親-pom-xml">親 pom.xml</a></li>
+<li><a href="#the-deployment-module">The Deployment module</a></li>
+<li><a href="#ランタイムモジュール">ランタイムモジュール</a></li>
+</ul>
+</li>
+<li><a href="#サンプル-greeting-エクステンションの基本バージョン">サンプル Greeting エクステンションの基本バージョン</a>
+<ul class="sectlevel2">
+<li><a href="#implementing-the-greeting-feature">Implementing the Greeting feature</a></li>
+<li><a href="#deploying-the-greeting-feature">Deploying the Greeting feature</a></li>
+<li><a href="#testing-the-greeting-feature">Testing the Greeting feature</a></li>
+<li><a href="#エクステンションのデバッグ">エクステンションのデバッグ</a></li>
+<li><a href="#extension-publication">Extension publication</a></li>
+</ul>
+</li>
+<li><a href="#まとめ">まとめ</a></li>
+</ul></div>
+    <div>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus のエクステンションは、プロジェクトの依存関係がそうであるように、アプリケーションを強化します。エクステンションの役割は、Quarkus
+のパラダイムを活用して、ライブラリを Quarkus
+アーキテクチャにシームレスに統合することです。たとえば、ビルド時に、より多くのことを行います。これが、実績のあるエコシステムを利用して、Quarkus
+のパフォーマンスとネイティブコンパイルを活用することができる仕組みです。https://code.quarkus.io/[code.quarkus.io]
+にアクセスして、サポートされているエクステンションのリストを入手してください。</p>
+</div>
+<div class="paragraph">
+<p>このガイドでは、<strong>サンプル Greeting エクステンション</strong> を開発します。このエクステンションは、ビジターに挨拶をするだけのカスタマイズ可能な
+HTTP エンドポイントを公開します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">免責事項</div>
+To be sure it&#8217;s extra clear you don&#8217;t need an extension to add a Servlet to
+your application.  This guide is a simplified example to explain the
+concepts of extensions development.  Keep in mind it&#8217;s not representative of
+the power of moving things to build time or simplifying the build of native
+images.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="前提条件"><a class="anchor" href="#前提条件"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>三十分以内</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 1.8+ がインストールされ、 <code>JAVA_HOME</code>  が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.6.2+</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ソリューション"><a class="anchor" href="#ソリューション"></a>ソリューション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and
+create the extension step by step.  However, you can go right to the
+completed example.</p>
+</div>
+<div class="paragraph">
+<p>Gitレポジトリをクローンするか <code>git clone <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code> 、
+<a href="https://github.com/quarkusio/quarkus-quickstarts/archive/main.zip">アーカイブ</a> をダウンロードします。</p>
+</div>
+<div class="paragraph">
+<p>The solution is located in the <code>getting-started-extension</code>
+<a href="https://github.com/quarkusio/quarkus-quickstarts/tree/main/getting-started-extension">directory</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="基本概念"><a class="anchor" href="#基本概念"></a>基本概念</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず最初に、いくつかの基本的な概念から始めましょう。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>JVM mode vs Native mode</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Quarkus は最初の Java フレームワークです。つまり、従来の <strong>JAR</strong>
+アプリケーションの開発、パッケージ化、実行を行うことができます。これは、<strong>JAM モード</strong> と呼ばれます。</p>
+</li>
+<li>
+<p><a href="https://graalvm.org/">GraalVM</a> により、Java アプリケーションをマシン固有のコード (Go や C++
+のように) にコンパイルすることができます。これは、<strong>ネイティブモード</strong> と呼ばれます。</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Java バイトコードをネイティブシステム固有のマシンコードにコンパイルする操作は、<strong>Ahead of Time Compilation</strong> (AoT)
+と呼ばれています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>build time vs runtime in classic Java frameworks</p>
+<div class="ulist">
+<ul>
+<li>
+<p>ビルド時間は、Java ソースファイルを実行可能なもの (クラスファイル、jar/war、ネイティブイメージ) に変換するために Java
+   ソースファイルに適用するすべてのアクションに対応しています。
+Usually this stage is composed by the compilation, annotation processing,
+bytecode generation, etc. At this point, everything is under developer&#8217;s
+scope and control.</p>
+</li>
+<li>
+<p>ランタイムとは、アプリケーションを実行するときに発生するすべてのアクションのことです。
+これは明らかにビジネス指向のアクションを開始することに焦点を当てていますが、ライブラリや設定ファイルのロード、アプリケーションのクラスパスのスキャン、依存性インジェクションの設定、オブジェクトリレーショナルマッピングの設定、REST
+コントローラのインスタンス化など、多くの技術的なアクションに依存しています。</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>通常、Javaフレームワークは、アプリケーションの "ビジネス志向のレイヤー"
+を実際に起動する前に、実行時中にブートストラップを行います。ブートストラップの際、フレームワークは、リフレクションによって適切なオブジェクトをインスタンス化するために、設定、エンティティー定義、依存関係の注入バインディングなどを見つけるためにクラスパスをスキャンします。これにより、動的にメタデータを収集します。主な結果は以下の通りです。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>アプリケーションの準備が遅れる: 実際にビジネスリクエストに対応する前に数秒待つ必要があります。</p>
+</li>
+<li>
+<p>ブートストラップでリソース消費のピークを持つ:
+制約のある環境では、実際のビジネスニーズではなく、技術的なブートストラップのニーズに基づいて、必要なリソースのサイズを決定する必要があります。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Quarkus
+の概念は、これらのアクションの左シフトを行い、最終的にはビルド時に実行することで、可能な限り低速でメモリー集約的な動的コードの実行を防ぐことです。Quarkus
+のエクステンションは、お気に入りのライブラリやテクノロジーのアダプターレイヤーとして機能する Java のコードです。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="description-of-a-quarkus-extension"><a class="anchor" href="#description-of-a-quarkus-extension"></a>Description of a Quarkus extension</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus のエクステンションは、2 つの部分から構成されています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>エクステンション開発者がアプリケーション開発者に公開する機能を表す <strong>ランタイムモジュール</strong> (認証フィルター、強化されたデータ層 API
+など)。ランタイム依存関係は、ユーザーがアプリケーションの依存関係として追加するものです (Maven POM または Gradle
+ビルドスクリプト)。</p>
+</li>
+<li>
+<p>ビルドの拡張フェーズで使用される <strong>デプロイモジュール</strong> で、Quarkus
+の概念に従ったライブラリを「デプロイ」する方法を説明しています。つまり、ビルド中にアプリケーションに Quarkus
+のすべての最適化を適用します。このデプロイメントモジュールは、GraalVM のネイティブコンパイルのための準備をする場所でもあります。</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+ユーザーは、エクステンションのデプロイメントモジュールをアプリケーションの依存関係として追加すべきではありません。デプロイメントの依存関係は、拡張フェーズの間に
+Quarkus によってアプリケーションの実行時依存関係から解決されます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>この時点で、このデプロイメントモジュールにより、多くのマジックは拡張ビルド時に起こることを理解しているはずです。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="quarkus-application-bootstrap"><a class="anchor" href="#quarkus-application-bootstrap"></a>Quarkus Application Bootstrap</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus アプリケーションには、3 つの異なるブートストラップフェーズがあります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>拡張 (Augmentation)</strong>。ビルド時に、Quarkus エクステンションはアプリケーションのバイトコード (依存関係を含む) と設定をロードしてスキャンします。
+この段階で、エクステンションは設定ファイルを読み込んだり、特定のアノテーションのためにクラスをスキャンしたりすることができます。
+すべてのメタデータが収集されたら、エクステンションは、ORM、DI、または REST コントローラーの設定のようなライブラリーのブートストラップアクションを前処理することができます。
+ブートストラップの結果はバイトコードに直接記録され、最終的なアプリケーションパッケージの一部となります。</p>
+</li>
+<li>
+<p><strong>静的 Init</strong> 実行時に、Quarkus は最初に、いくつかの拡張アクション/設定を含む最初の静的 init メソッドを実行します。
+ネイティブパッケージングを行う場合、このスタティックメソッドはビルド時に前処理され、生成されたオブジェクトは最終的なネイティブ実行ファイルにシリアライズされるため、初期化コードはネイティブモードでは実行されません (このフェーズではフィボナッチ関数を実行すると想像してください。計算の結果は、ネイティブ実行ファイルに直接記録されます)。
+JVM モードでアプリケーションを実行している場合、この静的 init フェーズはアプリケーションの開始時に実行されます。</p>
+</li>
+<li>
+<p><strong>ランタイム Init</strong> このフェーズでは特に目立つことはありません。従来的なランタイムコード実行を行います。
+つまり、上記の 2 つのフェーズでより多くのコードを実行すればするほど、アプリケーションの起動が速くなります。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>これで全てが説明されたので、さっそくコーディングに取り掛かりましょう</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="maven-setup"><a class="anchor" href="#maven-setup"></a>Maven setup</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus は、 <code>create-extension</code> Maven Mojo を提供し、拡張プロジェクトを初期化します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ mvn io.quarkus:quarkus-maven-plugin:1.7.6.Final:create-extension -N \
+    -DgroupId=org.acme \ <i class="conum" data-value="1"></i><b>(1)</b>
+    -DartifactId=quarkus-greeting \  <i class="conum" data-value="2"></i><b>(2)</b>
+    -Dversion=1.0-SNAPSHOT \ <i class="conum" data-value="3"></i><b>(3)</b>
+    -Dquarkus.nameBase="Greeting Extension" <i class="conum" data-value="4"></i><b>(4)</b>
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ------------------&lt; org.apache.maven:standalone-pom &gt;-------------------
+[INFO] Building Maven Stub Project (No POM) 1
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO]
+[INFO] --- quarkus-maven-plugin:1.7.6.Final:create-extension (default-cli) @ standalone-pom ---
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.233 s
+[INFO] Finished at: 2020-04-22T23:28:15+02:00
+[INFO] ------------------------------------------------------------------------</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Project&#8217;s groupId</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>artifactId for the runtime artifact of the extension (the deployment
+artifactId will be derived from the runtime artifactId by appending
+<code>-deployment</code>)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Project&#8217;s version</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Prefix for the <code>&lt;name&gt;</code> element values in the generated POMs</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Maven has generated a <code>quarkus-greeting</code> directory containing the extension
+project which consists of the parent <code>pom.xml</code>, the <code>runtime</code> and the
+<code>deployment</code> modules.</p>
+</div>
+<div class="sect2">
+<h3 id="親-pom-xml"><a class="anchor" href="#親-pom-xml"></a>親 pom.xml</h3>
+<div class="paragraph">
+<p>Your extension is a multi-module project. So let&#8217;s start by checking out the
+parent POM at <code>./quarkus-greeting/pom.xml</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;groupId&gt;org.acme&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-greeting-parent&lt;/artifactId&gt;
+    &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+    &lt;name&gt;Greeting Extension - Parent&lt;/name&gt;
+
+    &lt;packaging&gt;pom&lt;/packaging&gt;
+    &lt;properties&gt;
+        &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+        &lt;project.reporting.outputEncoding&gt;UTF-8&lt;/project.reporting.outputEncoding&gt;
+        &lt;maven.compiler.source&gt;1.8&lt;/maven.compiler.source&gt;
+        &lt;maven.compiler.target&gt;1.8&lt;/maven.compiler.target&gt;
+        &lt;maven.compiler.parameters&gt;true&lt;/maven.compiler.parameters&gt;
+        &lt;quarkus.version&gt;1.7.6.Final&lt;/quarkus.version&gt;
+        &lt;compiler-plugin.version&gt;3.8.1&lt;/compiler-plugin.version&gt;
+    &lt;/properties&gt;
+    &lt;modules&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+        &lt;module&gt;deployment&lt;/module&gt;
+        &lt;module&gt;runtime&lt;/module&gt;
+    &lt;/modules&gt;
+    &lt;dependencyManagement&gt;
+        &lt;dependencies&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+                &lt;artifactId&gt;quarkus-bom-deployment&lt;/artifactId&gt; <i class="conum" data-value="2"></i><b>(2)</b>
+                &lt;version&gt;${quarkus.version}&lt;/version&gt;
+                &lt;type&gt;pom&lt;/type&gt;
+                &lt;scope&gt;import&lt;/scope&gt;
+            &lt;/dependency&gt;
+        &lt;/dependencies&gt;
+    &lt;/dependencyManagement&gt;
+    &lt;build&gt;
+        &lt;pluginManagement&gt;
+            &lt;plugins&gt;
+                &lt;plugin&gt;
+                    &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                    &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+                    &lt;version&gt;${compiler-plugin.version}&lt;/version&gt; <i class="conum" data-value="3"></i><b>(3)</b>
+                &lt;/plugin&gt;
+            &lt;/plugins&gt;
+        &lt;/pluginManagement&gt;
+    &lt;/build&gt;
+&lt;/project&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>エクステンションは、2 つのサブモジュール <code>deployment</code> と <code>runtime</code> を宣言しています。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The <code>quarkus-bom-deployment</code> aligns your dependencies with those used by
+Quarkus during the augmentation phase.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Quarkus では、annotationProcessorPaths 設定に対応する、最新バージョンの Maven
+コンパイラープラグインのが必要です。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-deployment-module"><a class="anchor" href="#the-deployment-module"></a>The Deployment module</h3>
+<div class="paragraph">
+<p>Let&#8217;s have a look at the deployment&#8217;s
+<code>./quarkus-greeting/deployment/pom.xml</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+    &lt;parent&gt;
+        &lt;groupId&gt;org.acme&lt;/groupId&gt;
+        &lt;artifactId&gt;quarkus-greeting-parent&lt;/artifactId&gt;
+        &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+        &lt;relativePath&gt;../pom.xml&lt;/relativePath&gt;
+    &lt;/parent&gt;
+
+    &lt;artifactId&gt;quarkus-greeting-deployment&lt;/artifactId&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+    &lt;name&gt;Greeting Extension - Deployment&lt;/name&gt;
+
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+            &lt;artifactId&gt;quarkus-core-deployment&lt;/artifactId&gt; <i class="conum" data-value="2"></i><b>(2)</b>
+            &lt;version&gt;${quarkus.version}&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.acme&lt;/groupId&gt;
+            &lt;artifactId&gt;quarkus-greeting&lt;/artifactId&gt; <i class="conum" data-value="3"></i><b>(3)</b>
+            &lt;version&gt;${project.version}&lt;/version&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+                &lt;configuration&gt;
+                    &lt;annotationProcessorPaths&gt;
+                        &lt;path&gt;
+                            &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+                            &lt;artifactId&gt;quarkus-extension-processor&lt;/artifactId&gt;  <i class="conum" data-value="4"></i><b>(4)</b>
+                            &lt;version&gt;${quarkus.version}&lt;/version&gt;
+                        &lt;/path&gt;
+                    &lt;/annotationProcessorPaths&gt;
+                &lt;/configuration&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+
+&lt;/project&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>主なポイント:</p>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>By convention, the deployment module has the <code>-deployment</code> suffix
+(<code>greeting-deployment</code>).</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The deployment module depends on the <code>quarkus-core-deployment</code> artifact.  We
+will see later which dependencies are convenient to add.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>デプロイメントモジュールも実行時モジュールに依存している <strong>必要があります</strong> 。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>コンパイラーのアノテーションプロセッサーに <code>quarkus-extension-processor</code> を追加します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>In addition to the <code>pom.xml</code> <code>create-extension</code> also generated the
+<code>org.acme.quarkus.greeting.deployment.GreetingProcessor</code> class.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.quarkus.greeting.deployment;
+
+import io.quarkus.deployment.annotations.BuildStep;
+import io.quarkus.deployment.builditem.FeatureBuildItem;
+
+class GreetingProcessor {
+
+    private static final String FEATURE = "greeting";
+
+    @BuildStep
+    FeatureBuildItem feature() {
+        return new FeatureBuildItem(FEATURE);
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>FeatureBuildItem</code>
+はエクステンションによって提供される機能を表します。機能の名前は、アプリケーションの起動時にログに表示されます。エクステンションは最大でも 1
+つの機能を提供しなければなりません。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>Build Step Processor</code> の概念とすべてのエクステンションのデプロイメント API
+については、後で説明します。この時点では、このクラスは、<code>greeting</code> というエクステンションをデプロイする方法を Quarkus
+に説明していることを理解する必要があります。つまり、アプリケーションを拡張して、Quarkus のすべての利点
+(ビルド時間の最適化、ネイティブサポートなど) とともに <code>greeting</code> エクステンションを使用することになります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ランタイムモジュール"><a class="anchor" href="#ランタイムモジュール"></a>ランタイムモジュール</h3>
+<div class="paragraph">
+<p>Finally <code>./quarkus-greeting/runtime/pom.xml</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+    &lt;parent&gt;
+        &lt;groupId&gt;org.acme&lt;/groupId&gt;
+        &lt;artifactId&gt;quarkus-greeting-parent&lt;/artifactId&gt;
+        &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+        &lt;relativePath&gt;../pom.xml&lt;/relativePath&gt;
+    &lt;/parent&gt;
+
+    &lt;artifactId&gt;quarkus-greeting&lt;/artifactId&gt;  <i class="conum" data-value="1"></i><b>(1)</b>
+    &lt;name&gt;Greeting Extension - Runtime&lt;/name&gt;
+
+    &lt;dependencies&gt;
+    &lt;/dependencies&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+                &lt;artifactId&gt;quarkus-bootstrap-maven-plugin&lt;/artifactId&gt;  <i class="conum" data-value="2"></i><b>(2)</b>
+                &lt;version&gt;${quarkus.version}&lt;/version&gt;
+                &lt;executions&gt;
+                    &lt;execution&gt;
+                        &lt;goals&gt;
+                            &lt;goal&gt;extension-descriptor&lt;/goal&gt;
+                        &lt;/goals&gt;
+                        &lt;phase&gt;compile&lt;/phase&gt;
+                        &lt;configuration&gt;
+                            &lt;deployment&gt;${project.groupId}:${project.artifactId}-deployment:${project.version}
+                            &lt;/deployment&gt;
+                        &lt;/configuration&gt;
+                    &lt;/execution&gt;
+                &lt;/executions&gt;
+            &lt;/plugin&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+                &lt;configuration&gt;
+                    &lt;annotationProcessorPaths&gt;
+                        &lt;path&gt;
+                            &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+                            &lt;artifactId&gt;quarkus-extension-processor&lt;/artifactId&gt; <i class="conum" data-value="3"></i><b>(3)</b>
+                            &lt;version&gt;${quarkus.version}&lt;/version&gt;
+                        &lt;/path&gt;
+                    &lt;/annotationProcessorPaths&gt;
+                &lt;/configuration&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+&lt;/project&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>主なポイント:</p>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>By convention, the runtime module has no suffix (<code>greeting</code>) as it is the
+artifact exposed to the end user.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>ランタイムアーティファクトに含まれる Quarkus 拡張記述子を生成するために <code>quarkus-bootstrap-maven-plugin</code>
+を追加し、これを対応するデプロイメントアーティファクトとリンクさせています。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>コンパイラーのアノテーションプロセッサーに <code>quarkus-extension-processor</code> を追加します。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="サンプル-greeting-エクステンションの基本バージョン"><a class="anchor" href="#サンプル-greeting-エクステンションの基本バージョン"></a>サンプル Greeting エクステンションの基本バージョン</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="implementing-the-greeting-feature"><a class="anchor" href="#implementing-the-greeting-feature"></a>Implementing the Greeting feature</h3>
+<div class="paragraph">
+<p>ここでのエクステンションの素晴らしい機能は、ユーザーに挨拶をすることです。これを行うには、このエクステンションはユーザーアプリケーションで、平文
+<code>Hello</code> で GET 動詞に応答する HTTP エンドポイント <code>/greeting</code> を公開するサーブレットを展開します。</p>
+</div>
+<div class="paragraph">
+<p>この <code>ランタイム</code> モジュールは、ユーザーに提案したい機能を開発するところなので、そろそろ Web Servlet を作成しましょう。</p>
+</div>
+<div class="paragraph">
+<p>To use Servlets in your applications you need to have a Servlet Container
+such as <a href="http://undertow.io">Undertow</a>.  Luckily, <code>quarkus-bom-deployment</code>
+imported by our parent <code>pom.xml</code> already includes the Undertow Quarkus
+extension.  All we need to do is add</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+            &lt;artifactId&gt;quarkus-undertow&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>to our <code>./quarkus-greeting/runtime/pom.xml</code>.</p>
+</div>
+<div class="paragraph">
+<p>Now we can create our Servlet <code>org.acme.quarkus.greeting.GreetingServlet</code> in
+the <code>runtime</code> module.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.quarkus.greeting;
+
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+@WebServlet
+public class GreetingServlet extends HttpServlet { <i class="conum" data-value="1"></i><b>(1)</b>
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException { <i class="conum" data-value="2"></i><b>(2)</b>
+        resp.getWriter().write("Hello");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>通常通り、サーブレットを定義するには <code>javax.servlet.http.HttpServlet</code> の拡張が必要です。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>HTTP GET 動詞に応答したいので、<code>doGet</code> メソッドをオーバーライドして、サーブレット応答の出力ストリームに <code>Hello</code> を記述します。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="deploying-the-greeting-feature"><a class="anchor" href="#deploying-the-greeting-feature"></a>Deploying the Greeting feature</h3>
+<div class="paragraph">
+<p><code>deployment</code> Quarkus magic
+は、実行時のコード評価を待つのではなく、ビルド時のバイトコード生成に依存しています。これは、エクステンションの <code>deployment</code>
+モジュールのロールです。安心してください。バイトコードは難しいので、手動での作業は理想的でないことは理解しています。基本的な概念のおかげで、デプロイ時に生成するバイトコード生成のために、生成/消費するアイテムとそれに対応するステップを説明します。</p>
+</div>
+<div class="paragraph">
+<p><code>io.quarkus.builder.item.BuildItem</code>
+の概念は、<code>@io.quarkus.deployment.annotations.BuildStep</code>
+でアノテーションされたメソッドのおかげで、生成または消費 (そしてある時点でバイトコードに変換したり)
+するオブジェクトインスタンスを表しています。このアノテーションは、エクステンションのデプロイメントタスクを説明しています。</p>
+</div>
+<div class="paragraph">
+<p>Go back to the generated
+<code>org.acme.quarkus.greeting.deployment.GreetingProcessor</code> class.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.quarkus.greeting.deployment;
+
+import io.quarkus.deployment.annotations.BuildStep;
+import io.quarkus.deployment.builditem.FeatureBuildItem;
+
+class GreetingProcessor {
+
+    private static final String FEATURE = "greeting";
+
+    @BuildStep <i class="conum" data-value="1"></i><b>(1)</b>
+    FeatureBuildItem feature() {
+        return new FeatureBuildItem(FEATURE); <i class="conum" data-value="2"></i><b>(2)</b>
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>feature()</code> メソッドには <code>@BuildStep</code> というアノテーションが付けられています。これは、Quarkus
+がデプロイ時に実行しなければならないデプロイタスクとして識別されます。<code>BuildStep</code>
+メソッドは、アプリケーションを拡張するための拡張時に同時に実行されます。これらは、プロデューサー/コンシューマーモデルを使用しています。このステップは、消費しているすべての項目が生成されるまで、実行されないことが保証されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>io.quarkus.deployment.builditem.FeatureBuildItem</code> は、エクステンションの説明を表す
+<code>BuildItem</code> の実装です。この <code>BuildItem</code> は、アプリケーションの起動時にユーザーに情報を表示するために Quarkus
+が使用します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>多くの <code>BuildItem</code> 実装があり、それぞれが展開プロセスの一面を表しています。ここではいくつかの例を紹介します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>ServletBuildItem</code>: デプロイ時に生成したいサーブレット (名前、パスなど) を記述します。</p>
+</li>
+<li>
+<p><code>BeanContainerBuildItem</code>: デプロイ時にオブジェクトインスタンスを保存・取得するために使用するコンテナーについて説明します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>実現したいことに対応する <code>BuildItem</code> が見つからない場合は、独自の実装を作成することができます。 <code>BuildItem</code>
+は、デプロイメントの特定の部分を表すもので、できるだけ細かいものでなければならないということを覚えておいてください。<code>BuildItem</code>
+を作成する方法:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>io.quarkus.builder.item.SimpleBuildItem</code> デプロイ時にアイテムのインスタンスを1つだけ必要とする場合 (例:
+<code>BeanContainerBuildItem</code>、コンテナーが 1 つのみ必要な場合)。</p>
+</li>
+<li>
+<p>複数のインスタンスを使いたい場合は <code>io.quarkus.builder.item.MultiBuildItem</code> (例:
+<code>ServletBuildItem</code>、デプロイ時に多くのサーブレットを生成することができます)。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>次は、HTTP エンドポイントを宣言します。これを行うには、<code>ServletBuildItem</code> を生成する必要があります。この時点では、
+<code>quarkus-undertow</code> 依存関係が <code>runtime</code> モジュールの Servlet
+サポートを提案している場合は、<code>deployment</code> モジュールの <code>quarkus-undertow-deployment</code> 依存関係が
+<code>io.quarkus.undertow.deployment.ServletBuildItem</code>
+にアクセスできるようにする必要があることをご理解いただけたと思います。</p>
+</div>
+<div class="paragraph">
+<p>Update the <code>./quarkus-greeting/deployment/pom.xml</code> as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.acme&lt;/groupId&gt;
+            &lt;artifactId&gt;quarkus-greeting&lt;/artifactId&gt;
+            &lt;version&gt;${project.version}&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+            &lt;artifactId&gt;quarkus-undertow-deployment&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The dependency on <code>quarkus-core-deployment</code> generated by the
+<code>create-extension</code> mojo can now be removed since
+<code>quarkus-undertow-deployment</code> already depends on it.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>We can now update <code>org.acme.quarkus.greeting.deployment.GreetingProcessor</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.quarkus.greeting.deployment;
+
+import io.quarkus.deployment.annotations.BuildStep;
+import io.quarkus.deployment.builditem.FeatureBuildItem;
+import org.acme.quarkus.greeting.GreetingServlet;
+import io.quarkus.undertow.deployment.ServletBuildItem;
+
+class GreetingProcessor {
+
+    private static final String FEATURE = "greeting";
+
+    @BuildStep
+    FeatureBuildItem feature() {
+        return new FeatureBuildItem(FEATURE);
+    }
+
+    @BuildStep
+    ServletBuildItem createServlet() { <i class="conum" data-value="1"></i><b>(1)</b>
+      ServletBuildItem servletBuildItem = ServletBuildItem.builder("greeting", GreetingServlet.class.getName())
+        .addMapping("/greeting")
+        .build(); <i class="conum" data-value="2"></i><b>(2)</b>
+      return servletBuildItem;
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>ServletBuildItem</code> を返す <code>createServlet</code> メソッドを追加し、<code>@BuildStep</code>
+でアノテーションを付けます。これで、Quarkus はこの新しいタスクを処理して、ビルド時にサーブレット登録のバイトコードを生成します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>ServletBuildItem</code> proposes a fluent API to instantiate a Servlet named
+<code>greeting</code> of type <code>GreetingServlet</code> (it&#8217;s our class provided by our
+extension <code>runtime</code> module), and map it the <code>/greeting</code> path.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="testing-the-greeting-feature"><a class="anchor" href="#testing-the-greeting-feature"></a>Testing the Greeting feature</h3>
+<div class="paragraph">
+<p>Quarkus
+エクステンションを開発する際には、主に機能がアプリケーションに正しくデプロイされ、期待通りに動作するかどうかをテストすることを考える必要があります。そのため、テストは
+<code>deployment</code> モジュールでホストされます。</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s add the testing dependencies into the
+<code>./quarkus-greeting/deployment/pom.xml</code> and <code>maven-surefire</code> configuration</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">    &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+    &lt;parent&gt;
+        &lt;groupId&gt;org.acme&lt;/groupId&gt;
+        &lt;artifactId&gt;quarkus-greeting-parent&lt;/artifactId&gt;
+        &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+        &lt;relativePath&gt;../pom.xml&lt;/relativePath&gt;
+    &lt;/parent&gt;
+
+    &lt;artifactId&gt;quarkus-greeting-deployment&lt;/artifactId&gt;
+    &lt;name&gt;Greeting Extension - Deployment&lt;/name&gt;
+
+    &lt;properties&gt;
+        &lt;maven.surefire.version&gt;3.0.0-M4&lt;/maven.surefire.version&gt;
+    &lt;/properties&gt;
+
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.acme&lt;/groupId&gt;
+            &lt;artifactId&gt;quarkus-greeting&lt;/artifactId&gt;
+            &lt;version&gt;${project.version}&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+            &lt;artifactId&gt;quarkus-undertow-deployment&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+            &lt;artifactId&gt;quarkus-junit5-internal&lt;/artifactId&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;io.rest-assured&lt;/groupId&gt;
+            &lt;artifactId&gt;rest-assured&lt;/artifactId&gt; <i class="conum" data-value="2"></i><b>(2)</b>
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+                &lt;configuration&gt;
+                    &lt;annotationProcessorPaths&gt;
+                        &lt;path&gt;
+                            &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+                            &lt;artifactId&gt;quarkus-extension-processor&lt;/artifactId&gt;
+                            &lt;version&gt;${quarkus.version}&lt;/version&gt;
+                        &lt;/path&gt;
+                    &lt;/annotationProcessorPaths&gt;
+                &lt;/configuration&gt;
+            &lt;/plugin&gt;
+            &lt;plugin&gt;
+                &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt; <i class="conum" data-value="3"></i><b>(3)</b>
+                &lt;version&gt;${maven.surefire.version}&lt;/version&gt;
+                &lt;configuration&gt;
+                    &lt;systemPropertyVariables&gt;
+                        &lt;java.util.logging.manager&gt;org.jboss.logmanager.LogManager&lt;/java.util.logging.manager&gt;
+                        &lt;maven.home&gt;${maven.home}&lt;/maven.home&gt;
+                    &lt;/systemPropertyVariables&gt;
+                &lt;/configuration&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+
+&lt;/project&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Quarkus proposes facilities to test extensions via the
+<code>quarkus-junit5-internal</code> artifact, in particular the
+<code>io.quarkus.test.QuarkusUnitTest</code> runner which starts an application with
+your extension.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>We will use <a href="http://rest-assured.io">RestAssured</a> (massively used in Quarkus)
+to test our HTTP endpoint.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>In order to not fallback to JUnit 4 legacy mode you need to define a recent
+version of <code>maven-surefire</code> plugin.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Currently, the <code>create-extension</code> Maven Mojo does not create the test
+structure. We&#8217;ll create it ourselves:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">mkdir -p ./quarkus-greeting/deployment/src/test/java/org/acme/quarkus/greeting/deployment</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To start testing your extension, create the following
+<code>org.acme.quarkus.greeting.deployment.GreetingTest</code> test class:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.quarkus.greeting.deployment;
+
+import io.quarkus.test.QuarkusUnitTest;
+import io.restassured.RestAssured;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+
+import static org.hamcrest.Matchers.containsString;
+
+public class GreetingTest {
+
+  @RegisterExtension
+  static final QuarkusUnitTest config = new QuarkusUnitTest()
+    .setArchiveProducer(() -&gt; ShrinkWrap.create(JavaArchive.class)); <i class="conum" data-value="1"></i><b>(1)</b>
+
+  @Test
+  public void testGreeting() {
+    RestAssured.when().get("/greeting").then().statusCode(200).body(containsString("Hello")); <i class="conum" data-value="2"></i><b>(2)</b>
+  }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Greeting エクステンションで Quarkus アプリを起動する Junit エクステンションを登録します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>アプリケーションが <code>greeting</code> エンドポイントから OK ステータス (200) の HTTP GET
+要求に応答していることと、<code>Hello</code> を含むプレーンテキスト本文があることを確認します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Time to test!</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ mvn clean test
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO]
+[INFO] Greeting Extension - Parent                                        [pom]
+[INFO] Greeting Extension - Runtime                                       [jar]
+[INFO] Greeting Extension - Deployment                                    [jar]
+[INFO]
+...
+[INFO] --- maven-surefire-plugin:3.0.0-M4:test (default-test) @ quarkus-greeting-deployment ---
+[INFO]
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running org.acme.quarkus.greeting.deployment.GreetingTest
+2020-04-23 13:55:44,612 INFO  [io.quarkus] (main) Quarkus 1.7.6.Final started in 0.395s. Listening on: http://0.0.0.0:8081
+2020-04-23 13:55:44,614 INFO  [io.quarkus] (main) Profile test activated.
+2020-04-23 13:55:44,614 INFO  [io.quarkus] (main) Installed features: [cdi, quarkus-greeting, servlet]
+2020-04-23 13:55:45,876 INFO  [io.quarkus] (main) Quarkus stopped in 0.025s
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.609 s - in org.acme.quarkus.greeting.deployment.GreetingTest
+[INFO]
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for getting-started-extension 1.0-SNAPSHOT:
+[INFO]
+[INFO] getting-started-extension .......................... SUCCESS [  0.076 s]
+[INFO] Greeting Extension - Parent ........................ SUCCESS [  0.002 s]
+[INFO] Greeting Extension - Runtime ....................... SUCCESS [  1.467 s]
+[INFO] Greeting Extension - Deployment .................... SUCCESS [  4.099 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  5.745 s
+[INFO] Finished at: 2020-01-28T22:40:56+01:00
+[INFO] ------------------------------------------------------------------------</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>問題なさそうですね。初めてのエクステンションの作成、おつかれさまでした。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="エクステンションのデバッグ"><a class="anchor" href="#エクステンションのデバッグ"></a>エクステンションのデバッグ</h3>
+<div class="paragraph">
+<p>デバッグ作業がバグを取り除く作業であるならば、プログラミングとは、バグを入れ込む作業ということになる。エドガー・W・ダイクストラ</p>
+</div>
+<div class="sect3">
+<h4 id="アプリケーションビルドのデバッグ"><a class="anchor" href="#アプリケーションビルドのデバッグ"></a>アプリケーションビルドのデバッグ</h4>
+<div class="paragraph">
+<p>Since your extension deployment is made during the application build, this
+process is triggered by your build tool.  That means if your want to debug
+this phase you need to launch your build tool with the remote debug mode
+switched one.</p>
+</div>
+<div class="sect4">
+<h5 id="maven"><a class="anchor" href="#maven"></a>Maven</h5>
+<div class="paragraph">
+<p><code>mvnDebug</code> を使用して、Maven リモートデバッグを有効にすることができます。以下のコマンドラインでアプリケーションを起動できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">mvnDebug clean compile quarkus:dev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>デフォルトでは、Maven は、<code>localhost:8000</code> 上の接続を待ちます。これで、<code>localhost:8000</code>
+にアタッチするために、IDE <code>Remote</code> の設定を実行することができます。</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="gradle"><a class="anchor" href="#gradle"></a>Gradle</h5>
+<div class="paragraph">
+<p>Gradle のリモートデバッグは、デーモンモードでフラグ <code>org.gradle.debug=true</code> または
+<code>org.gradle.daemon.debug=true</code>
+を使用して有効にすることができます。以下のコマンドラインでアプリケーションを起動することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">./gradlew quarkusDev -Dorg.gradle.daemon.debug=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>By default, Maven will wait for a connection on <code>localhost:5005</code>.  Now, you
+can run your IDE <code>Remote</code> configuration to attach it to <code>localhost:5005</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="エクステンションテストのデバッグ"><a class="anchor" href="#エクステンションテストのデバッグ"></a>エクステンションテストのデバッグ</h4>
+<div class="paragraph">
+<p>エクステンションをテストする方法を一緒に見てきましたが、時にはうまくいかず、テストをデバッグしたい場合もあります。ここでも同じ原理で、IDE
+<code>Remote</code> の設定をアタッチするために Maven Surefire リモートデバッグを有効にします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ cd ./greeting
+$ mvn clean test -Dmaven.surefire.debug</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>デフォルトでは、Maven は <code>localhost:5005</code> で接続を待ちます。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="extension-publication"><a class="anchor" href="#extension-publication"></a>Extension publication</h3>
+<div class="paragraph">
+<p>Now that you just finish to build your first extension you should be eager
+to use it in a Quarkus application!</p>
+</div>
+<div class="paragraph">
+<p><strong>お約束の Maven キャッチ</strong></p>
+</div>
+<div class="paragraph">
+<p>Because your extension produces traditional JARs, the easiest way to share
+your extension is to publish it to a Maven repository.  Once published you
+can simply declare it with your project dependencies. Let&#8217;s demonstrate that
+by creating a simple Quarkus application</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$mvn io.quarkus:quarkus-maven-plugin:1.7.6.Final:create \
+     -DprojectGroupId=org.acme \
+     -DprojectArtifactId=greeting-app \
+     -DprojectVersion=1.0-SNAPSHOT \
+     -DclassName=HelloResource</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>cd</code> into <code>greeting-app</code> and add the dependency on <code>quarkus-greeting</code>
+extension we created above.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>quarkus-greeting</code> extension has to be installed in the local Maven
+repository to be usable in the application.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.acme&lt;/groupId&gt;
+            &lt;artifactId&gt;quarkus-greeting&lt;/artifactId&gt;
+            &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+            &lt;artifactId&gt;quarkus-resteasy&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;!-- the rest of the application dependencies --&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Run the application and notice the <code>Install Features</code> list contains the
+<code>quarkus-greeting</code> extension.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ mvn clean compile quarkus:dev
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ---------------------&lt; org.acme:code-with-quarkus &gt;---------------------
+[INFO] Building code-with-quarkus 1.0.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ code-with-quarkus ---
+[INFO] Deleting /tmp/code-with-quarkus/target
+[INFO]
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ code-with-quarkus ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 2 resources
+[INFO]
+[INFO] --- maven-compiler-plugin:3.8.1:compile (default-compile) @ code-with-quarkus ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 1 source file to /tmp/code-with-quarkus/target/classes
+[INFO]
+[INFO] --- quarkus-maven-plugin:1.7.6.Final:dev (default-cli) @ code-with-quarkus ---
+Listening for transport dt_socket at address: 5005
+__  ____  __  _____   ___  __ ____  ______
+ --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
+ -/ /_/ / /_/ / __ |/ , _/ ,&lt; / /_/ /\ \
+--\___\_\____/_/ |_/_/|_/_/|_|\____/___/
+2020-04-23 14:17:36,137 INFO  [io.quarkus] (Quarkus Main Thread) greeting-app 1.0-SNAPSHOT (powered by Quarkus 1.7.6.Final) started in 0.985s. Listening on: http://0.0.0.0:8080
+2020-04-23 14:17:36,140 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
+2020-04-23 14:17:36,140 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, quarkus-greeting, resteasy, servlet]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>エクステンションの開発者の立場からすると、Maven の公開戦略は非常に便利で高速ですが、Quarkus
+は、エクステンションを使用する人々のためにエコシステムの信頼性も確保することで、さらに一歩進んでいきたいと考えています。考えてみてください。私たちは皆、メンテナンスされていないライブラリや依存関係間の非互換性
+(法的な問題は除く) で、開発体験が著しく低下したことを経験していることでしょう。Quarkus Platform は、そのためのものです。</p>
+</div>
+<div class="paragraph">
+<p><strong>Quarkus Platform</strong></p>
+</div>
+<div class="paragraph">
+<p>Quarkus は、Quarkus Platform ラベルの下に置かれたエクステンションの認定リストである
+<code>quarkus-universe-bom</code> を提案しています。アプリケーション開発者からすると、このプラットフォームの目的は以下の通りです。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>エクステンションのサポート性を保証する (バグフィックス、セキュリティー問題、依存関係のアップグレード)</p>
+</li>
+<li>
+<p>To ease the extension discovery through the Quarkus CLI or
+<a href="https://code.quarkus.io/" class="bare">https://code.quarkus.io/</a></p>
+</li>
+<li>
+<p>エクステンションエコシステムのグローバルな整合性を確保する</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="title">エクステンションをプラットフォームに公開すべきかどうか</div>
+エクステンションが自分自信や限定されたグループのためのものだと感じるのであれば、Maven
+に公開するだけでも構いません。エクステンションが一般的な問題を解決する場合は、Quarkus ユーザーが <a href="https://code.quarkus.io" class="bare">https://code.quarkus.io</a>
+で見つけられることは有益です。しかし、これには、Quarkus のマイナーリリース (現時点では 1 か月に 1 回程度)
+に合わせて最新の状態に保たなければならないという責任が伴います。質問がある場合は、Quarkus の
+<a href="https://groups.google.com/forum/#!forum/quarkus-dev">Google グループ</a>
+でコミュニティと話してください。ここでは、集団的な決定を行うことができます。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+As for now, the process to propose a new extension is not defined yet.  Your
+best chance is to present your extension on the
+<a href="https://groups.google.com/forum/#!forum/quarkus-dev">Quarkus Google Group</a>
+and wait for an official invitation to join the Quarkus Platform.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="まとめ"><a class="anchor" href="#まとめ"></a>まとめ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>新しいエクステンションの作成は、最初は複雑な作業に見えるかもしれませんが、Quarkus の変革をもたらすパラダイム (ビルド時間とランタイム)
+を理解してしまえば、エクステンションの構造は完璧に理にかなったものになります。</p>
+</div>
+<div class="paragraph">
+<p>いつものように、Quarkus は地道に、新機能の開発を快適にするために、Maven
+Mojo、バイトコード生成またはテストといった作業を簡素化するために努めています。</p>
+</div>
+</div>
+</div>
+    </div>
+  </div>
+</div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkus はオープンです。このプロジェクトの全ての依存関係は<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a>または互換性のあるライセンスの元で利用出来ます。<br /><br />このウェブサイトは <a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築されており、<a href='https://pages.github.com/' target='_blank'>Github Pages</a>にホストされており、完全にオープンソースです。改善したい場合、 <a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォークし</a>、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+            <li><a href="/">ホーム</a></li>
+          
+            <li><a href="/guides">ガイド</a></li>
+          
+            <li><a href="/community/#contributing">貢献</a></li>
+          
+            <li><a href="/faq">FAQ</a></li>
+          
+            <li><a href="/get-started">はじめに</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>貢献</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://twitter.com/quarkusio">フォロー</a></li>
+          
+            <li><a href="https://github.com/quarkusio">GitHub</a></li>
+          
+            <li><a href="/security">セキュリティポリシー</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>サポート</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus">Stack Overflow</a></li>
+          
+            <li><a href="https://quarkusio.zulipchat.com">チャットルーム</a></li>
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev">フォーラム</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています：</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a href="https://hibernate.org" target="_blank">Hibernate</a></li>
+          
+            <li><a href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a href="https://code.quarkus.io/" target="_blank">等々...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/search-filter.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+</body>
+
+</html>

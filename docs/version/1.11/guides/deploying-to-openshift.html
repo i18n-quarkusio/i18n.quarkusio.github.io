@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html>
+
+
+
+
+
+<head>
+  <title>Quarkus - Deploying on OpenShift - 1.11</title>
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/1.11/guides/deploying-to-openshift" />
+  <meta property="og:title" content="Quarkus - Deploying on OpenShift - 1.11" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/deploying-to-openshift">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/goan.js" type="text/javascript"></script>
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+</head>
+
+<body class="guides">
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NJWS5L"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+  <div class="container">
+    <div class="logo-wrapper">
+      
+        <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+      
+    </div>
+    <label class="nav-toggle" for="checkbox">
+      <i class="fa fa-bars"></i>
+    </label>
+    <div id="menu" class="menu">
+      <span>
+        <a href="/get-started/" class="">はじめに</a>
+      </span>
+      <span>
+        <a href="/guides/" class="active">ガイド</a>
+      </span>
+      <span>
+        <a href="/community/" class="">コミュニティ</a>
+      </span>
+      <span>
+        <a href="/support/" class="">サポート</a>
+      </span>
+      <span>
+        <a href="/blog/" class="">ブログ</a>
+      </span>
+      <span>
+        <a href="https://code.quarkus.io" class="button-cta secondary white">コーディングを開始</a>
+      </span>
+    </div>
+  </div>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+<div class="grid-wrapper guide">
+  <div class="grid__item width-9-12 width-12-12-mobile">
+    <h1 class="text-caps">Quarkus - Deploying on OpenShift </h1>
+  </div>
+  <div class="grid__item width-3-12 align-self-center text-right hide-mobile">
+    <label id="guide-version-label">Select Guide Version</label>
+    <select id="guide-version-dropdown">
+      
+        
+        
+        
+        
+          <option value="main" >Main - SNAPSHOT</option>
+        
+      
+        
+        
+        
+        
+          <option value="latest" >2.2 - Latest</option>
+        
+      
+        
+        
+        
+        
+          <option value="1.11" selected>1.11</option>
+        
+      
+        
+        
+        
+        
+          <option value="1.7" >1.7</option>
+        
+      
+    </select>
+  </div>
+  <div class="width-12-12">
+    <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#前提条件">前提条件</a></li>
+<li><a href="#creating-the-maven-project">Creating the Maven project</a>
+<ul class="sectlevel2">
+<li><a href="#openshift">OpenShift</a></li>
+<li><a href="#ビルドとデプロイ別々のステップで">ビルドとデプロイ(別々のステップで)</a></li>
+<li><a href="#非s2iビルド">非S2iビルド</a></li>
+<li><a href="#ビルドとデプロイ1つのステップで">ビルドとデプロイ(1つのステップで)</a></li>
+<li><a href="#カスタマイズ">カスタマイズ</a></li>
+<li><a href="#knative-openshift-serverless">Knative - OpenShift Serverless</a></li>
+</ul>
+</li>
+</ul></div>
+    <div>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、妥当なデフォルト設定とユーザーが提供する設定に基づいたOpenShiftリソースの生成とデプロイについて説明します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="前提条件"><a class="anchor" href="#前提条件"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ざっと五分</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 1.8+ がインストールされ、 <code>JAVA_HOME</code>  が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.6.2+</p>
+</li>
+<li>
+<p>OpenShift クラスターへのアクセス(Minishift も選択可能なオプションです)</p>
+</li>
+<li>
+<p>OpenShift CLI (オプション。手動でデプロイする場合のみ必要)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-maven-project"><a class="anchor" href="#creating-the-maven-project"></a>Creating the Maven project</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、OpenShift エクステンションを含む新しいプロジェクトが必要です。これは以下のコマンドを使用して行うことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus:quarkus-maven-plugin:1.11.7.Final:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=openshift-quickstart \
+    -DclassName="org.acme.rest.GreetingResource" \
+    -Dpath="/greeting" \
+    -Dextensions="resteasy,openshift"
+
+cd openshift-quickstart</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="openshift"><a class="anchor" href="#openshift"></a>OpenShift</h3>
+<div class="paragraph">
+<p>Quarkusは、妥当なデフォルトとユーザーが提供する設定に基づいてOpenShiftリソースを自動的に生成する機能を提供します。OpenShift
+エクステンションは、実際には <a href="deploying-to-kubernetes">kubernetes</a> エクステンションと
+<a href="container-image#s2i">container-image-s2i</a>
+エクステンションをよく考えられたデフォルトでまとめたラッパーエクステンションであり、ユーザーがOpenShift上でQuarkusを使い始めるのを容易にするためのものです。</p>
+</div>
+<div class="paragraph">
+<p>上記のコマンドライン呼び出しにOpenShift エクステンションを追加すると、以下のような依存関係が <code>pom.xml</code> に追加されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">    &lt;dependency&gt;
+      &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+      &lt;artifactId&gt;quarkus-openshift&lt;/artifactId&gt;
+    &lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この依存関係を追加することで、Quarkusが提供している通常の <code>application.properties</code>
+のアプローチでOpenShiftリソースの生成とアプリケーションの設定ができるようになりました。利用できる設定項目は、
+<code>io.quarkus.kubernetes.deployment.OpenShiftConfig</code> クラスにあります。さらに、
+<code>io.quarkus.deployment.ApplicationConfig</code> で提供されている項目は OpenShift
+リソースに影響を与えます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ビルドとデプロイ別々のステップで"><a class="anchor" href="#ビルドとデプロイ別々のステップで"></a>ビルドとデプロイ(別々のステップで)</h3>
+<div class="paragraph">
+<p>プロジェクトのブートストラップ時にOpenShiftエクステンションが含まれていなかったり、その後に追加されなかったりした場合(pom.xmlファイルを確認してください)、以下のように追加することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"> ./mvnw quarkus:add-extension -Dextensions="openshift"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ビルドは <a href="container-image#s2i">container-image-s2i</a>
+エクステンションによって処理されます。ビルドをトリガーするには次のようにします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw clean package -Dquarkus.container-image.build=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>実行されるビルドは s2i バイナリービルドです。ビルドの入力はローカルでビルドされた jar
+で、ビルドの出力はデプロイを自動的に起動するように設定された ImageStream です。</p>
+</div>
+<div class="paragraph">
+<p>上記の手順で作成したコンテナーイメージをOpenShiftにデプロイするには、以下のコマンドを実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get is
+oc new-app --name=greeting &lt;project&gt;/openshift-quickstart:1.0.0-SNAPSHOT
+oc get svc
+oc expose svc/greeting
+oc get routes
+curl http://&lt;route&gt;/greeting</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上記では、 <code>oc get is</code>
+で、作成されたイメージストリームが一覧表示されます。&lt;project&gt;/openshift-quickstart:1.0.0-snapshotとタグ付けされているはずです。</p>
+</div>
+<div class="paragraph">
+<p>同様に、 <code>oc get route</code>
+で、公開されているサービス「greeting」のルートURLをリストアップしてくれるので、アプリケーションのテストに利用することができます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="非s2iビルド"><a class="anchor" href="#非s2iビルド"></a>非S2iビルド</h3>
+<div class="paragraph">
+<p>openshift エクステンションは <a href="container-image#s2i">container-image-s2i</a>
+を使用するように設定されています。しかし、次のようにして他のコンテナーイメージエクステンションを使用することも可能です。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="container-image#s2i">container-image-docker</a></p>
+</li>
+<li>
+<p><a href="container-image#s2i">container-image-jib</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>非 s2i コンテナーイメージエクステンションが使用されている場合、外部の <code>dockerImageRepository</code> を指す
+ImageStream が作成されます。イメージはビルドされてレジストリーにプッシュされ、ImageStream は
+<code>dockerImageRepository</code> において有効なタグを生成します。</p>
+</div>
+<div class="paragraph">
+<p>イメージのビルドに使用するエクステンションを選択するには次のようにします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.container-image.builder=docker</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.container-image.builder=jib</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ビルドとデプロイ1つのステップで"><a class="anchor" href="#ビルドとデプロイ1つのステップで"></a>ビルドとデプロイ(1つのステップで)</h3>
+<div class="paragraph">
+<p>プロジェクトのブートストラップ時にOpenShiftエクステンションが含まれていなかったり、その後に追加されなかったりした場合(pom.xmlファイルを確認してください)、以下のように追加することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"> ./mvnw quarkus:add-extension -Dextensions="openshift"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ビルドとデプロイを1つのステップでトリガーするためには次のようにします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw clean package -Dquarkus.kubernetes.deploy=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>前述のコマンドは、ローカルで jar ファイルをビルドし、コンテナーイメージのビルドをトリガーして、生成された OpenShift
+リソースを適用します。生成されたリソースは、 <code>ImageStream</code> の変更に気づいたときに自動的に再デプロイをトリガーするように設定されている
+OpenShift の <code>DeploymentConfig</code>
+を使用しています。つまり、最初のデプロイ後のコンテナーイメージビルドであれば、生成されたリソースを削除、更新、再適用する必要がなく、自動的に再デプロイがトリガーされます。</p>
+</div>
+<div class="paragraph">
+<p>上記コマンドでイメージストリーム、サービスリソースが作成され、アプリケーションがデプロイされている(ポッドが実行されている)ことを確認するために、これらのコマンドを適用します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get is
+oc get pods
+oc get svc</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>作成したサービスを route に公開してテストするには次のようにします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc expose svc/greeting
+oc get routes
+curl http://&lt;route&gt;/greeting</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="カスタマイズ"><a class="anchor" href="#カスタマイズ"></a>カスタマイズ</h3>
+<div class="paragraph">
+<p>利用可能なカスタマイズオプションはすべて
+<a href="deploying-to-kubernetes#openshift">OpenShiftの設定オプション</a> で利用可能です。</p>
+</div>
+<div class="paragraph">
+<p>いくつかの例は、以下のセクションで提供されています。</p>
+</div>
+<div class="sect3">
+<h4 id="exposing-routes"><a class="anchor" href="#exposing-routes"></a>Exposing Routes</h4>
+<div class="paragraph">
+<p>Quarkusアプリケーションの <code>Route</code> を公開するには次のようにします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.openshift.expose=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ヒント: このプロパティーを <code>application.properties</code>
+で追加する必要はありません。コマンドラインの引数として渡すことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw clean package -Dquarkus.openshift.expose=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>以下にリストされているすべてのプロパティも同様です。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="ラベル"><a class="anchor" href="#ラベル"></a>ラベル</h4>
+<div class="paragraph">
+<p>生成されたリソースにラベルを追加するには次のようにします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.openshift.labels.foo=bar</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="アノテーション"><a class="anchor" href="#アノテーション"></a>アノテーション</h4>
+<div class="paragraph">
+<p>生成されたリソースにアノテーションを追加するには次のようにします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.openshift.annotations.foo=bar</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="env-vars"><a class="anchor" href="#env-vars"></a>環境変数</h4>
+<div class="paragraph">
+<p>OpenShiftでは環境変数の定義方法が複数用意されています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>key/value pairs</p>
+</li>
+<li>
+<p>Secret または ConfigMap からすべての値をインポートする</p>
+</li>
+<li>
+<p>Secret または ConfigMap の指定されたフィールドで識別される単一の値を補間する</p>
+</li>
+<li>
+<p>interpolate a value from a field within the same resource</p>
+</li>
+</ul>
+</div>
+<div class="sect4">
+<h5 id="キー値のペアからの環境変数"><a class="anchor" href="#キー値のペアからの環境変数"></a>キー/値のペアからの環境変数</h5>
+<div class="paragraph">
+<p>生成されたリソースに環境変数としてキーとバリューのペアを追加する場合:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.openshift.env.vars.my-env-var=foobar</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上のコマンドは <code>MY_ENV_VAR=foobar</code> を環境変数として追加します。キー <code>my-env-var</code>
+は大文字に変換され、ダッシュはアンダースコアに置き換えられて <code>MY_ENV_VAR</code> となることに注意してください。</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="シークレットからの環境変数"><a class="anchor" href="#シークレットからの環境変数"></a>シークレットからの環境変数</h5>
+<div class="paragraph">
+<p><code>Secret</code> のすべてのキーと値のペアを環境変数として追加するには、以下の設定を適用し、ソースとして使用する各 <code>Secret</code> をカンマ (
+<code>,</code> ) で区切ってください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.openshift.env.secrets=my-secret,my-other-secret</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>とすると、コンテナーの定義に以下のようなものが生成されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">envFrom:
+  - secretRef:
+      name: my-secret
+      optional: false
+  - secretRef:
+      name: my-other-secret
+      optional: false</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>以下は、 <code>my-secret</code> Secret から <code>keyName</code> フィールドで識別される値を <code>foo</code> 環境変数に抽出します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.openshift.env.mapping.foo.from-secret=my-secret
+quarkus.openshift.env.mapping.foo.with-key=keyName</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、コンテナーの <code>env</code> セクションに以下のようなものが生成されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">- env:
+  - name: FOO
+    valueFrom:
+      secretKeyRef:
+        key: keyName
+        name: my-secret
+        optional: false</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="environment-variables-from-configmap"><a class="anchor" href="#environment-variables-from-configmap"></a>Environment variables from ConfigMap</h5>
+<div class="paragraph">
+<p><code>ConfigMap</code> からのすべてのキーと値のペアを環境変数として追加するには、以下の設定を適用し、ソースとして使用する各 <code>ConfigMap</code>
+をカンマ ( <code>,</code> ) で区切ってください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.openshift.env.configmaps=my-config-map,another-config-map</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>とすると、コンテナーの定義に以下のようなものが生成されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">envFrom:
+  - configMapRef:
+      name: my-config-map
+      optional: false
+  - configMapRef:
+      name: another-config-map
+      optional: false</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>以下は、 <code>my-config-map</code> ConfigMap から <code>keyName</code> フィールドで識別される値を <code>foo</code>
+環境変数に抽出したものです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.openshift.env.mapping.foo.from-configmap=my-configmap
+quarkus.openshift.env.mapping.foo.with-key=keyName</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、コンテナーの <code>env</code> セクションに以下のようなものが生成されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">- env:
+  - name: FOO
+    valueFrom:
+      configMapRefKey:
+        key: keyName
+        name: my-configmap
+        optional: false</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="フィールドからの環境変数"><a class="anchor" href="#フィールドからの環境変数"></a>フィールドからの環境変数</h5>
+<div class="paragraph">
+<p>また、以下のように、ソースとして使用するフィールドのパスを指定することで、別のフィールドの値を使用して新しい環境変数を追加することも可能です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.openshift.env.fields.foo=metadata.name</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="バリデーション"><a class="anchor" href="#バリデーション"></a>バリデーション</h5>
+<div class="paragraph">
+<p>例えば、誤って両方の値を代入したり、変数がフィールドから派生したものであることを指定したりするなど、2つの定義の間で競合が発生すると、ビルド時にエラーが発生します。そのため、問題の原因を診断するのが困難なクラスターにアプリケーションをデプロイする前に問題を修正する機会を得ることができます。</p>
+</div>
+<div class="paragraph">
+<p>同様に、同じシークレットからのインジェクションを2回定義するなど、2つの冗長な定義があっても問題は発生しませんが、その定義を複製することを意図していなかった可能性があることを知らせる警告が実際に報告されます。</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="env-vars-backwards"><a class="anchor" href="#env-vars-backwards"></a>下位互換性</h5>
+<div class="paragraph">
+<p>OpenShift
+エクステンションの以前のバージョンでは、環境変数を追加するための異なる構文がサポートされていました。古い構文はまだサポートされていますが、非推奨となっており、新しい構文に移行することをお勧めします。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. 古い構文と新しい構文</caption>
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">旧</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">新</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">素の変数</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus.openshift.env-vars.my-env-var.value=foobar</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus.openshift.env.vars.my-env-var=foobar</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">フィールドから</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus.openshift.env-vars.my-env-var.field=foobar</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus.openshift.env.fields.my-env-var=foobar</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">すべての <code>ConfigMap</code> から</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus.openshift.env-vars.xxx.configmap=foobar</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus.openshift.env.configmaps=foobar</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">すべての <code>Secret</code> から</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus.openshift.env-vars.xxx.secret=foobar</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus.openshift.env.secrets=foobar</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ある <code>Secret</code> フィールドから</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus.openshift.env-vars.foo.secret=foobar</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus.openshift.env.mapping.foo.from-secret=foobar</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus.openshift.env-vars.foo.value=field</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus.openshift.env.mapping.foo.with-key=field</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ある <code>ConfigMap</code> フィールドから</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus.openshift.env-vars.foo.configmap=foobar</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus.openshift.env.mapping.foo.from-configmap=foobar</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus.openshift.env-vars.foo.value=field</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus.openshift.env.mapping.foo.with-key=field</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+古い構文を維持したまま新しい構文を使用して同じ変数を再定義した場合、新しいバージョン <strong>のみ</strong> が保持され、警告が表示されて問題を警告します。例えば、
+<code>quarkus.openshift.env-vars.my-env-var.value=foobar</code> と
+<code>quarkus.openshift.env.vars.my-env-var=newValue</code> の両方を定義した場合、エクステンションは環境変数
+<code>MY_ENV_VAR=newValue</code> のみを生成し、警告を発行します。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="ボリュームのマウント"><a class="anchor" href="#ボリュームのマウント"></a>ボリュームのマウント</h4>
+<div class="paragraph">
+<p>OpenShiftエクステンションを使用すると、アプリケーションのボリュームとマウントの両方を設定することができます。</p>
+</div>
+<div class="paragraph">
+<p>どんなボリュームでも、簡単な構成でマウントすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.openshift.mounts.my-volume.path=/where/to/mount</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、 Podのパス  <code>/where/to/mount</code> にボリューム <code>my-volume</code> のマウントを追加します。</p>
+</div>
+<div class="paragraph">
+<p>ボリューム自体は、以下のセクションに示すように設定することができます。</p>
+</div>
+<div class="sect4">
+<h5 id="シークレットのボリューム"><a class="anchor" href="#シークレットのボリューム"></a>シークレットのボリューム</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.openshift.secret-volumes.my-volume.secret-name=my-secret</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="configmap-volumes"><a class="anchor" href="#configmap-volumes"></a>ConfigMap volumes</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.openshift.config-map-volumes.my-volume.config-map-name=my-secret</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="knative-openshift-serverless"><a class="anchor" href="#knative-openshift-serverless"></a>Knative - OpenShift Serverless</h3>
+<div class="paragraph">
+<p>また、OpenShiftでは、OpenShift
+<a href="https://www.openshift.com/learn/topics/serverless">Serverless</a>
+機能を介してKnativeを利用する機能も提供されています。</p>
+</div>
+<div class="paragraph">
+<p>まず最初にQuarkusの設定でKnativeのリソースを生成するように指示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.kubernetes.deployment-target=knative</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>OpenShift S2I
+を利用してクラスタ上にコンテナイメージを構築し、その結果のコンテナイメージをKnativeアプリケーションで使用するためには、いくつかの設定プロパティを設定する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># set the Kubernetes namespace which will be used to run the application
+quarkus.container-image.group=geoand
+# set the container image registry - this is the standard URL used to refer to the internal OpenShift registry
+quarkus.container-image.registry=image-registry.openshift-image-registry.svc:5000</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>その後、標準の <code>quarkus.kubernetes.deploy=true</code> プロパティを有効にすることで、アプリケーションを OpenShift
+Serverless にデプロイすることができます。</p>
+</div>
+</div>
+</div>
+</div>
+    </div>
+  </div>
+</div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkus はオープンです。このプロジェクトの全ての依存関係は<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a>または互換性のあるライセンスの元で利用出来ます。<br /><br />このウェブサイトは <a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築されており、<a href='https://pages.github.com/' target='_blank'>Github Pages</a>にホストされており、完全にオープンソースです。改善したい場合、 <a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォークし</a>、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+            <li><a href="/">ホーム</a></li>
+          
+            <li><a href="/guides">ガイド</a></li>
+          
+            <li><a href="/community/#contributing">貢献</a></li>
+          
+            <li><a href="/faq">FAQ</a></li>
+          
+            <li><a href="/get-started">はじめに</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>貢献</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://twitter.com/quarkusio">フォロー</a></li>
+          
+            <li><a href="https://github.com/quarkusio">GitHub</a></li>
+          
+            <li><a href="/security">セキュリティポリシー</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>サポート</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus">Stack Overflow</a></li>
+          
+            <li><a href="https://quarkusio.zulipchat.com">チャットルーム</a></li>
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev">フォーラム</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています：</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a href="https://hibernate.org" target="_blank">Hibernate</a></li>
+          
+            <li><a href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a href="https://code.quarkus.io/" target="_blank">等々...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/search-filter.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+</body>
+
+</html>

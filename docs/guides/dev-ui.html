@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html>
+
+
+
+
+
+<head>
+  <title>Quarkus - Dev UI</title>
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/guides/dev-ui" />
+  <meta property="og:title" content="Dev UI" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/dev-ui">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/goan.js" type="text/javascript"></script>
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+</head>
+
+<body class="guides">
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NJWS5L"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+  <div class="container">
+    <div class="logo-wrapper">
+      
+        <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+      
+    </div>
+    <label class="nav-toggle" for="checkbox">
+      <i class="fa fa-bars"></i>
+    </label>
+    <div id="menu" class="menu">
+      <span>
+        <a href="/get-started/" class="">はじめに</a>
+      </span>
+      <span>
+        <a href="/guides/" class="active">ガイド</a>
+      </span>
+      <span>
+        <a href="/community/" class="">コミュニティ</a>
+      </span>
+      <span>
+        <a href="/support/" class="">サポート</a>
+      </span>
+      <span>
+        <a href="/blog/" class="">ブログ</a>
+      </span>
+      <span>
+        <a href="https://code.quarkus.io" class="button-cta secondary white">コーディングを開始</a>
+      </span>
+    </div>
+  </div>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+<div class="grid-wrapper guide">
+  <div class="grid__item width-9-12 width-12-12-mobile">
+    <h1 class="text-caps">Dev UI </h1>
+  </div>
+  <div class="grid__item width-3-12 align-self-center text-right hide-mobile">
+    <label id="guide-version-label">Select Guide Version</label>
+    <select id="guide-version-dropdown">
+      
+        
+        
+        
+        
+          <option value="main" >Main - SNAPSHOT</option>
+        
+      
+        
+        
+        
+        
+          <option value="latest" selected>2.2 - Latest</option>
+        
+      
+        
+        
+        
+        
+          <option value="1.11" >1.11</option>
+        
+      
+        
+        
+        
+        
+      
+    </select>
+  </div>
+  <div class="width-12-12">
+    <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#エクステンションをdev-uiに対応させるにはどうすればいいですか">エクステンションをDev UIに対応させるにはどうすればいいですか?</a></li>
+<li><a href="#path-considerations">Path considerations</a></li>
+<li><a href="#テンプレートとスタイリングのサポート">テンプレートとスタイリングのサポート</a>
+<ul class="sectlevel2">
+<li><a href="#設定プロパティーへのアクセス">設定プロパティーへのアクセス</a></li>
+</ul>
+</li>
+<li><a href="#フルページの追加">フルページの追加</a></li>
+<li><a href="#フルページテンプレートへのリンク">フルページテンプレートへのリンク</a></li>
+<li><a href="#テンプレートに情報を渡す">テンプレートに情報を渡す</a>
+<ul class="sectlevel2">
+<li><a href="#実行時情報を渡す">実行時情報を渡す</a></li>
+<li><a href="#ビルド時情報を渡す">ビルド時情報を渡す</a></li>
+</ul>
+</li>
+<li><a href="#高度な使用法アクションの追加">高度な使用法:アクションの追加</a></li>
+</ul></div>
+    <div>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、 <a href="building-my-first-extension">エクステンションの作者</a> のためにQuarkus Dev
+UIについて説明します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusは現在、新しく実験的なDev UIを搭載しています。このUIは、 devモード( <code>mvn quarkus:dev</code>
+でquarkusを起動)でデフォルトで利用可能で、<a href="http://localhost:8080/q/dev">/q/dev</a>
+に存在し、以下のようなものが表示されます。</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="/guides/images/dev-ui-overview.png" alt="Dev" width="90%">
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、現在ロードされているすべてのエクステンションを素早く可視化し、そのステータスを確認し、ドキュメントに直接アクセスすることができます。</p>
+</div>
+<div class="paragraph">
+<p>その上で、各エクステンションは以下を追加することができます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#how-can-i-make-my-extension-support-the-dev-ui">カスタムのランタイム情報の概要</a></p>
+</li>
+<li>
+<p><a href="#adding-full-pages">フルカスタムページ</a></p>
+</li>
+<li>
+<p><a href="#advanced-usage-adding-actions">アクション付きのインタラクティブページ</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="エクステンションをdev-uiに対応させるにはどうすればいいですか"><a class="anchor" href="#エクステンションをdev-uiに対応させるにはどうすればいいですか"></a>エクステンションをDev UIに対応させるにはどうすればいいですか?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>エクステンションをDev UIに表示させるためには、何もする必要はありません!</p>
+</div>
+<div class="paragraph">
+<p>だから、いつでもそれから始めることができます :)</p>
+</div>
+<div class="paragraph">
+<p>Dev UI概要ページのエクステンションのカードにバッジやリンクを追加したい場合は、このようにします:</p>
+</div>
+<div class="paragraph">
+<p><span class="image center"><img src="/guides/images/dev-ui-embedded.png" alt="Dev UI embedded"></span></p>
+</div>
+<div class="paragraph">
+<p><a href="building-my-first-extension#description-of-a-quarkus-extension"><code>deployment</code></a>
+エクステンションのリソースに <code>dev-templates/embedded.html</code> というファイルを追加する必要があります。</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="/guides/images/dev-ui-embedded-file.png" alt="Dev" width="UI embedded.html">
+</div>
+</div>
+<div class="paragraph">
+<p>このファイルの内容が、エクステンションカードに含まれますので、例えば、次のようにいくつかのスタイリングとアイコンと共に2つのリンクを配置することができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;a href="{config:http-path('quarkus.smallrye-openapi.path')}" class="badge badge-light"&gt;
+  &lt;i class="fa fa-map-signs fa-fw"&gt;&lt;/i&gt;
+  OpenAPI&lt;/a&gt;
+&lt;br&gt;
+&lt;a href="{config:http-path('quarkus.swagger-ui.path')}/" class="badge badge-light"&gt;
+  &lt;i class="fa fa-map-signs fa-fw"&gt;&lt;/i&gt;
+  Swagger UI&lt;/a&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Font Awesome Freeアイコンセットを使用しています。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Note how the paths are specified:
+<code>{config:http-path('quarkus.smallrye-openapi.path')}</code>. This is a special
+directive that the quarkus dev console understands: it will replace that
+value with the resolved route named 'quarkus.smallrye-openapi.path'.</p>
+</div>
+<div class="paragraph">
+<p>The corresponding non-application endpoint is declared using
+<code>.routeConfigKey</code> to associate the route with a name:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    nonApplicationRootPathBuildItem.routeBuilder()
+            .route(openApiConfig.path) <i class="conum" data-value="1"></i><b>(1)</b>
+            .routeConfigKey("quarkus.smallrye-openapi.path") <i class="conum" data-value="2"></i><b>(2)</b>
+            ...
+            .build();</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The configured path is resolved into a valid route.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The resolved route path is then associated with the key
+<code>quarkus.smallrye-openapi.path</code>.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="path-considerations"><a class="anchor" href="#path-considerations"></a>Path considerations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>パスというのは厄介なものです。以下の点に注意してください。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Assume your UI will be nested under the dev endpoint. Do not provide a way
+to customize this without a strong reason.</p>
+</li>
+<li>
+<p>Never construct your own absolute paths. Adding a suffix to a known,
+normalized and resolved path is fine.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Configured paths, like the <code>dev</code> endpoint used by the console or the
+SmallRye OpenAPI path shown in the example above, need to be properly
+resolved against both <code>quarkus.http.root-path</code> and
+<code>quarkus.http.non-application-root-path</code>.  Use
+<code>NonApplicationRootPathBuildItem</code> or <code>HttpRootPathBuildItem</code> to construct
+endpoint routes and identify resolved path values that can then be used in
+templates.</p>
+</div>
+<div class="paragraph">
+<p>The <code>{devRootAppend}</code> variable can also be used in templates to construct
+URLs for static dev console resources, for example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;img src="{devRootAppend}/resources/images/quarkus_icon_rgb_reverse.svg" width="40" height="30" class="d-inline-block align-middle" alt="Quarkus"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Refer to the
+<a href="all-config#quarkus-vertx-http_quarkus.http.non-application-root-path">Quarkus
+Vertx HTTP configuration reference</a> for details on how the non-application
+root path is configured.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="テンプレートとスタイリングのサポート"><a class="anchor" href="#テンプレートとスタイリングのサポート"></a>テンプレートとスタイリングのサポート</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>embedded.html</code> ファイルと <code>/dev-templates</code> に追加したフルページの両方共、 <a href="qute">Qute
+テンプレートエンジン</a> によって処理されます。</p>
+</div>
+<div class="paragraph">
+<p>これはテンプレートを使用できるようにする為に、 <code>/dev-templates/tags</code> に
+<a href="qute-reference#user_tags">カスタム Qute タグを追加</a> 出来ることも意味します。</p>
+</div>
+<div class="paragraph">
+<p>現在使用されているスタイルシステムは
+<a href="https://getbootstrap.com/docs/4.6/getting-started/introduction/">Bootstrap
+V4(4.6.0)</a> ですが、将来的に変更される可能性があるので注意してください。</p>
+</div>
+<div class="paragraph">
+<p>メインテンプレートには <a href="https://jquery.com/">jQuery 3.5.1</a> も含まれていますが、こちらも変わるかもしれません。</p>
+</div>
+<div class="sect2">
+<h3 id="設定プロパティーへのアクセス"><a class="anchor" href="#設定プロパティーへのアクセス"></a>設定プロパティーへのアクセス</h3>
+<div class="paragraph">
+<p><code>config:property(name)</code>
+式を使用して、指定されたプロパティー名の設定値を出力することができます。プロパティー名は、文字列リテラルか、別の式で動的に取得することができます。例えば
+<code>{config:property('quarkus.lambda.handler')}</code> や
+<code>{config:property(foo.propertyName)}</code> が可能です。</p>
+</div>
+<div class="paragraph">
+<p>Reminder: do not use this to retrieve raw configured path values. As shown
+above, use <code>{config:http-path(&#8230;&#8203;)}</code> with a known route configuration key
+when working with resource paths.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="フルページの追加"><a class="anchor" href="#フルページの追加"></a>フルページの追加</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>以下のようなDev UIエクステンションにフルページを追加するには</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="/guides/images/dev-ui-page.png" alt="Dev" width="90%">
+</div>
+</div>
+<div class="paragraph">
+<p>それらを<a href="cache"><code>quarkus-cache</code></a> エクステンションのこのページのように、
+エクステンションの
+<a href="building-my-first-extension#description-of-a-quarkus-extension"><code>deployment</code></a>
+モジュールの <code>/dev-templates</code> リソースフォルダーに配置する必要があります。</p>
+</div>
+<div id="action-example" class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">{#include main}<i class="conum" data-value="1"></i><b>(1)</b>
+    {#style}<i class="conum" data-value="2"></i><b>(2)</b>
+        .custom {
+            color: gray;
+        }
+    {/style}
+    {#script} <i class="conum" data-value="3"></i><b>(3)</b>
+     $(document).ready(function(){
+        $(function () {
+          $('[data-toggle="tooltip"]').tooltip()
+        });
+    });
+    {/script}
+    {#title}Cache{/title}<i class="conum" data-value="4"></i><b>(4)</b>
+    {#body}<i class="conum" data-value="5"></i><b>(5)</b>
+        &lt;table class="table table-striped custom"&gt;
+            &lt;thead class="thead-dark"&gt;
+                &lt;tr&gt;
+                    &lt;th scope="col"&gt;Name&lt;/th&gt;
+                    &lt;th scope="col"&gt;Size&lt;/th&gt;
+                &lt;/tr&gt;
+            &lt;/thead&gt;
+            &lt;tbody&gt;
+                {#for cacheInfo in info:cacheInfos}<i class="conum" data-value="6"></i><b>(6)</b>
+                    &lt;tr&gt;
+                        &lt;td&gt;
+                            {cacheInfo.name}
+                        &lt;/td&gt;
+                        &lt;td&gt;
+                            &lt;form method="post"<i class="conum" data-value="7"></i><b>(7)</b>
+                                  enctype="application/x-www-form-urlencoded"&gt;
+                                &lt;label class="form-check-label" for="clear"&gt;
+                                    {cacheInfo.size}
+                                &lt;/label&gt;
+                                &lt;input type="hidden" name="name" value="{cacheInfo.name}"&gt;
+                                &lt;input id="clear" type="submit"
+                                       class="btn btn-primary btn-sm" value="Clear" &gt;
+                            &lt;/form&gt;
+                        &lt;/td&gt;
+                    &lt;/tr&gt;
+                {/for}
+            &lt;/tbody&gt;
+        &lt;/table&gt;
+    {/body}
+{/include}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>他の Dev UI ページと同じスタイルを利用するには、 <code>main</code> テンプレートを拡張します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>style</code> テンプレートパラメーターで、ページに追加の CSS を渡すことができます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>You can pass extra JavaScript for your page in the <code>script</code> template
+parameter. This will be added inline after the JQuery script, so you can
+safely use JQuery in your script.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>title</code> テンプレートパラメーターにページタイトルを設定することを忘れないでください。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td><code>body</code> テンプレートパラメーターには、コンテンツが含まれます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>テンプレートがQuarkusエクステンションからカスタム情報を読み取るためには、 <code>info</code>
+<a href="qute-reference#namespace_extension_methods">名前空間</a> を使用することができます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>これは、 <a href="#advanced-usage-adding-actions">インタラクティブページ</a> を示しています。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="フルページテンプレートへのリンク"><a class="anchor" href="#フルページテンプレートへのリンク"></a>フルページテンプレートへのリンク</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Full-page templates for extensions live under a pre-defined
+<code>{devRootAppend}/{groupId}.{artifactId}/</code> directory that is referenced using
+the <code>urlbase</code> template parameter. Using configuration defaults, that would
+resolve to <code>/q/dev/io.quarkus.quarkus-cache/</code>, as an example.</p>
+</div>
+<div class="paragraph">
+<p>Use the <code>{urlbase}</code> template parameter to reference this folder in
+<code>embedded.html</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;a href="{urlbase}/caches" class="badge badge-light"&gt;<i class="conum" data-value="1"></i><b>(1)</b>
+  &lt;i class="fa ..."&gt;&lt;/i&gt;
+  Caches &lt;span class="badge badge-light"&gt;{info:cacheInfos.size()}&lt;/span&gt;&lt;/a&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use the <code>urlbase</code> template parameter to reference full-page templates for
+your extension</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="テンプレートに情報を渡す"><a class="anchor" href="#テンプレートに情報を渡す"></a>テンプレートに情報を渡す</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>embedded.html</code> やフルページのテンプレートでは、エクステンションから得られる情報を表示したい場合が多いでしょう。</p>
+</div>
+<div class="paragraph">
+<p>その情報を利用可能にするには、ビルド時に利用可能か、実行時に利用可能かによって、2つの方法があります。</p>
+</div>
+<div class="paragraph">
+<p>どちらの場合も、 <code>{pkg}.deployment.devconsole</code> パッケージの <code>DevConsoleProcessor</code> クラス
+(エクステンションの
+<a href="building-my-first-extension#description-of-a-quarkus-extension"><code>deployment</code></a>
+モジュール)でDev UIのサポートを追加することをお勧めします。</p>
+</div>
+<div class="sect2">
+<h3 id="実行時情報を渡す"><a class="anchor" href="#実行時情報を渡す"></a>実行時情報を渡す</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.cache.deployment.devconsole;
+
+import io.quarkus.cache.runtime.CaffeineCacheSupplier;
+import io.quarkus.deployment.IsDevelopment;
+import io.quarkus.deployment.annotations.BuildStep;
+import io.quarkus.devconsole.spi.DevConsoleRuntimeTemplateInfoBuildItem;
+
+public class DevConsoleProcessor {
+
+    @BuildStep(onlyIf = IsDevelopment.class)<i class="conum" data-value="1"></i><b>(1)</b>
+    public DevConsoleRuntimeTemplateInfoBuildItem collectBeanInfo() {
+        return new DevConsoleRuntimeTemplateInfoBuildItem("cacheInfos",
+                      new CaffeineCacheSupplier());<i class="conum" data-value="2"></i><b>(2)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>この <a href="building-my-first-extension#deploying-the-greeting-feature">ビルドステップ</a>は
+、開発者モードであることを条件にすることを忘れないでください。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>実行時 dev <code>info:cacheInfos</code> テンプレート値を宣言します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>これにより、 <code>info:cacheInfos</code> の値がエクステンションの
+<a href="building-my-first-extension#description-of-a-quarkus-extension"><code>runtime
+module</code></a> にマップされます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.cache.runtime;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Supplier;
+
+import io.quarkus.arc.Arc;
+import io.quarkus.cache.runtime.caffeine.CaffeineCache;
+
+public class CaffeineCacheSupplier implements Supplier&lt;Collection&lt;CaffeineCache&gt;&gt; {
+
+    @Override
+    public List&lt;CaffeineCache&gt; get() {
+        List&lt;CaffeineCache&gt; allCaches = new ArrayList&lt;&gt;(allCaches());
+        allCaches.sort(Comparator.comparing(CaffeineCache::getName));
+        return allCaches;
+    }
+
+    public static Collection&lt;CaffeineCache&gt; allCaches() {
+        // Get it from ArC at run-time
+        return (Collection&lt;CaffeineCache&gt;) (Collection)
+            Arc.container().instance(CacheManagerImpl.class).get().getAllCaches();
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ビルド時情報を渡す"><a class="anchor" href="#ビルド時情報を渡す"></a>ビルド時情報を渡す</h3>
+<div class="paragraph">
+<p>ビルド時の情報だけをテンプレートに渡す必要がある場合もあります。その場合、このようにすることができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.qute.deployment.devconsole;
+
+import java.util.List;
+
+import io.quarkus.deployment.IsDevelopment;
+import io.quarkus.deployment.annotations.BuildStep;
+import io.quarkus.devconsole.spi.DevConsoleTemplateInfoBuildItem;
+import io.quarkus.qute.deployment.CheckedTemplateBuildItem;
+import io.quarkus.qute.deployment.TemplateVariantsBuildItem;
+
+public class DevConsoleProcessor {
+
+    @BuildStep(onlyIf = IsDevelopment.class)
+    public DevConsoleTemplateInfoBuildItem collectBeanInfo(
+            List&lt;CheckedTemplateBuildItem&gt; checkedTemplates,<i class="conum" data-value="1"></i><b>(1)</b>
+            TemplateVariantsBuildItem variants) {
+        DevQuteInfos quteInfos = new DevQuteInfos();
+        for (CheckedTemplateBuildItem checkedTemplate : checkedTemplates) {
+            DevQuteTemplateInfo templateInfo =
+                new DevQuteTemplateInfo(checkedTemplate.templateId,
+                    variants.getVariants().get(checkedTemplate.templateId),
+                    checkedTemplate.bindings);
+            quteInfos.addQuteTemplateInfo(templateInfo);
+        }
+        return new DevConsoleTemplateInfoBuildItem("devQuteInfos", quteInfos);<i class="conum" data-value="2"></i><b>(2)</b>
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>必要な依存関係を入力として使用します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>ビルド時 <code>info:devQuteInfos</code> DEVテンプレート値を宣言します。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="高度な使用法アクションの追加"><a class="anchor" href="#高度な使用法アクションの追加"></a>高度な使用法:アクションの追加</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Dev UI テンプレートにアクションを追加することもできます。</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="/guides/images/dev-ui-interactive.png" alt="Dev" width="90%">
+</div>
+</div>
+<div class="paragraph">
+<p>これは、別の
+<a href="building-my-first-extension#deploying-the-greeting-feature">ビルドステップ</a>
+を追加してエクステンションの
+<a href="building-my-first-extension#description-of-a-quarkus-extension"><code>deployment</code></a>
+モジュールでアクションを宣言することで実現可能です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.cache.deployment.devconsole;
+
+import static io.quarkus.deployment.annotations.ExecutionTime.STATIC_INIT;
+
+import io.quarkus.cache.runtime.devconsole.CacheDevConsoleRecorder;
+import io.quarkus.deployment.annotations.BuildStep;
+import io.quarkus.deployment.annotations.Record;
+import io.quarkus.devconsole.spi.DevConsoleRouteBuildItem;
+
+public class DevConsoleProcessor {
+
+    @BuildStep
+    @Record(value = STATIC_INIT, optional = true)<i class="conum" data-value="1"></i><b>(1)</b>
+    DevConsoleRouteBuildItem invokeEndpoint(CacheDevConsoleRecorder recorder) {
+        return new DevConsoleRouteBuildItem("caches", "POST",
+                                            recorder.clearCacheHandler());<i class="conum" data-value="2"></i><b>(2)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>レコーダーをオプションとしてマークし、開発モードの時にのみ起動されるようにします。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>与えられたハンドラーによって処理される <code>POST {urlbase}/caches</code> ルートを宣言します。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<a href="#action-example">アクションを呼び出す方法は、ページ全体から見る</a> ことができます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>あとは、エクステンションの
+<a href="building-my-first-extension#description-of-a-quarkus-extension"><code>runtime
+module</code></a> でrecorderを実装するだけです:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.cache.runtime.devconsole;
+
+import io.quarkus.cache.runtime.CaffeineCacheSupplier;
+import io.quarkus.cache.runtime.caffeine.CaffeineCache;
+import io.quarkus.runtime.annotations.Recorder;
+import io.quarkus.devconsole.runtime.spi.DevConsolePostHandler;
+import io.quarkus.vertx.http.runtime.devmode.devconsole.FlashScopeUtil.FlashMessageStatus;
+import io.vertx.core.Handler;
+import io.vertx.core.MultiMap;
+import io.vertx.ext.web.RoutingContext;
+
+@Recorder
+public class CacheDevConsoleRecorder {
+
+    public Handler&lt;RoutingContext&gt; clearCacheHandler() {
+        return new DevConsolePostHandler() {<i class="conum" data-value="1"></i><b>(1)</b>
+            @Override
+            protected void handlePost(RoutingContext event, MultiMap form) <i class="conum" data-value="2"></i><b>(2)</b>
+              throws Exception {
+                String cacheName = form.get("name");
+                for (CaffeineCache cache : CaffeineCacheSupplier.allCaches()) {
+                    if (cache.getName().equals(cacheName)) {
+                        cache.invalidateAll();
+                        flashMessage(event, "Cache for " + cacheName + " cleared");<i class="conum" data-value="3"></i><b>(3)</b>
+                        return;
+                    }
+                }
+                flashMessage(event, "Cache for " + cacheName + " not found",
+                             FlashMessageStatus.ERROR);<i class="conum" data-value="4"></i><b>(4)</b>
+            }
+        };
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><a href="https://vertx.io/docs/vertx-web/java/#_routing_by_http_method">どのVert.x
+ハンドラーでも</a> 使用することができますが、 <code>DevConsolePostHandler</code> スーパークラスは POST
+アクションをうまく処理し、最適な動作を実現するために <code>POST</code> の直後に <code>GET</code> URI に自動リダイレクトします。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Vert.x <code>RoutingContext</code> の他、 <code>form</code> のコンテンツも入手できます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>すべてがうまくいったことを知らせるために、ユーザーにメッセージを追加することを忘れないでください。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>エラーメッセージを追加することもできます。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+フラッシュメッセージは <code>main</code> DEV テンプレートで処理され、ユーザーへの素敵な通知になります。
+</td>
+</tr>
+</table>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="/guides/images/dev-ui-message.png" alt="Dev" width="90%">
+</div>
+</div>
+</div>
+</div>
+    </div>
+  </div>
+</div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkus はオープンです。このプロジェクトの全ての依存関係は<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a>または互換性のあるライセンスの元で利用出来ます。<br /><br />このウェブサイトは <a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築されており、<a href='https://pages.github.com/' target='_blank'>Github Pages</a>にホストされており、完全にオープンソースです。改善したい場合、 <a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォークし</a>、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+            <li><a href="/">ホーム</a></li>
+          
+            <li><a href="/guides">ガイド</a></li>
+          
+            <li><a href="/community/#contributing">貢献</a></li>
+          
+            <li><a href="/faq">FAQ</a></li>
+          
+            <li><a href="/get-started">はじめに</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>貢献</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://twitter.com/quarkusio">フォロー</a></li>
+          
+            <li><a href="https://github.com/quarkusio">GitHub</a></li>
+          
+            <li><a href="/security">セキュリティポリシー</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>サポート</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus">Stack Overflow</a></li>
+          
+            <li><a href="https://quarkusio.zulipchat.com">チャットルーム</a></li>
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev">フォーラム</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています：</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a href="https://hibernate.org" target="_blank">Hibernate</a></li>
+          
+            <li><a href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a href="https://code.quarkus.io/" target="_blank">等々...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/search-filter.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+</body>
+
+</html>

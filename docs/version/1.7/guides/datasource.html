@@ -1,0 +1,2563 @@
+<!DOCTYPE html>
+<html>
+
+
+
+
+
+<head>
+  <title>Quarkus - Datasources - 1.7</title>
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/1.7/guides/datasource" />
+  <meta property="og:title" content="Quarkus - Datasources - 1.7" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/datasource">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/goan.js" type="text/javascript"></script>
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+</head>
+
+<body class="guides">
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NJWS5L"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+  <div class="container">
+    <div class="logo-wrapper">
+      
+        <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+      
+    </div>
+    <label class="nav-toggle" for="checkbox">
+      <i class="fa fa-bars"></i>
+    </label>
+    <div id="menu" class="menu">
+      <span>
+        <a href="/get-started/" class="">はじめに</a>
+      </span>
+      <span>
+        <a href="/guides/" class="active">ガイド</a>
+      </span>
+      <span>
+        <a href="/community/" class="">コミュニティ</a>
+      </span>
+      <span>
+        <a href="/support/" class="">サポート</a>
+      </span>
+      <span>
+        <a href="/blog/" class="">ブログ</a>
+      </span>
+      <span>
+        <a href="https://code.quarkus.io" class="button-cta secondary white">コーディングを開始</a>
+      </span>
+    </div>
+  </div>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+<div class="grid-wrapper guide">
+  <div class="grid__item width-9-12 width-12-12-mobile">
+    <h1 class="text-caps">Quarkus - Datasources </h1>
+  </div>
+  <div class="grid__item width-3-12 align-self-center text-right hide-mobile">
+    <label id="guide-version-label">Select Guide Version</label>
+    <select id="guide-version-dropdown">
+      
+        
+        
+        
+        
+          <option value="main" >Main - SNAPSHOT</option>
+        
+      
+        
+        
+        
+        
+          <option value="latest" >2.2 - Latest</option>
+        
+      
+        
+        
+        
+        
+          <option value="1.11" >1.11</option>
+        
+      
+        
+        
+        
+        
+          <option value="1.7" selected>1.7</option>
+        
+      
+    </select>
+  </div>
+  <div class="width-12-12">
+    <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#詳細な説明">詳細な説明</a>
+<ul class="sectlevel2">
+<li><a href="#jdbc-datasource">JDBC datasource</a></li>
+<li><a href="#リアクティブデータソース">リアクティブデータソース</a></li>
+</ul>
+</li>
+<li><a href="#デフォルトのデータソース">デフォルトのデータソース</a>
+<ul class="sectlevel2">
+<li><a href="#jdbc-datasource-2">JDBC datasource</a></li>
+<li><a href="#リアクティブデータソース-2">リアクティブデータソース</a></li>
+<li><a href="#jdbc-とリアクティブデータソースの同時利用">JDBC とリアクティブデータソースの同時利用</a></li>
+</ul>
+</li>
+<li><a href="#複数のデータソース">複数のデータソース</a>
+<ul class="sectlevel2">
+<li><a href="#複数のデータソースの構成">複数のデータソースの構成</a></li>
+<li><a href="#名前付きデータソースインジェクション">名前付きデータソースインジェクション</a></li>
+</ul>
+</li>
+<li><a href="#データソースヘルスチェック">データソースヘルスチェック</a></li>
+<li><a href="#データソースメトリクス">データソースメトリクス</a></li>
+<li><a href="#narayana-transaction-manager-integration">Narayana Transaction Manager integration</a></li>
+<li><a href="#in-memory-databases">インメモリーデータベースを使用したテスト</a></li>
+<li><a href="#configuration-reference">共通データソース構成リファレンス</a></li>
+<li><a href="#jdbc-configuration">JDBC Configuration Reference</a></li>
+<li><a href="#jdbc-url">JDBC URL Reference</a>
+<ul class="sectlevel2">
+<li><a href="#h2">H2</a></li>
+<li><a href="#postgresql">PostgreSQL</a></li>
+<li><a href="#db2">DB2</a></li>
+<li><a href="#mariadb">MariaDB</a></li>
+<li><a href="#mysql">MySQL</a></li>
+<li><a href="#microsoft-sql-server">Microsoft SQL Server</a></li>
+<li><a href="#derby">Derby</a></li>
+</ul>
+</li>
+<li><a href="#reactive-configuration">リアクティブデータソース構成リファレンス</a>
+<ul class="sectlevel2">
+<li><a href="#リアクティブな-db2-の設定">リアクティブな DB2 の設定</a></li>
+<li><a href="#リアクティブな-mariadbmysql-固有の設定">リアクティブな MariaDB/MySQL 固有の設定</a></li>
+<li><a href="#リアクティブな-postgresql-固有の設定">リアクティブな PostgreSQL 固有の設定</a></li>
+</ul>
+</li>
+</ul></div>
+    <div>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>データを使用する多くのプロジェクトでは、リレーショナルデータベースへの接続が必要になります。</p>
+</div>
+<div class="paragraph">
+<p>データベースへの接続を取得する一般的な方法は、データソースを使用して JDBC
+ドライバーを設定することです。しかし、リアクティブな方法でデータベースに接続するために、リアクティブなドライバーを使用することが好まれる場合もあります。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus では、どちらにも対応できます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>JDBC の場合、データソースと接続プーリングの実装は <a href="https://agroal.github.io/">Agroal</a> が好まれます。</p>
+</li>
+<li>
+<p>リアクティブには、https://vertx.io/[Vert.x] リアクティブドライバーを使用します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>どちらも統一された柔軟な構成で構成されています。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Agroal is a modern, light weight connection pool implementation designed for
+very high performance and scalability, and features first class integration
+with the other components in Quarkus, such as security, transaction
+management components, health metrics.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>このガイドでは、以下の方法を説明します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>configure a datasource, or multiple datasources</p>
+</li>
+<li>
+<p>how to obtain a reference to those datasources in code</p>
+</li>
+<li>
+<p>which pool tuning configuration properties are available</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>このガイドでは、主にデータソースの設定について説明します。反応性のあるデータソースを消費して利用する方法の詳細については、リアクティブデータソースの利用方法についての詳細は、<a href="reactive-sql-clients">リアクティブ
+SQL クライアントガイド</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="詳細な説明"><a class="anchor" href="#詳細な説明"></a>詳細な説明</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>これはデータソースの設定についての簡単な紹介です。すべての動作について理解を深める場合は、このガイドの後の段落でさらに多くの情報を得ることができます。</p>
+</div>
+<div class="sect2">
+<h3 id="jdbc-datasource"><a class="anchor" href="#jdbc-datasource"></a>JDBC datasource</h3>
+<div class="paragraph">
+<p><code>agroal</code>
+エクステンションに加えて、<code>jdbc-db2</code>、<code>jdbc-derby</code>、<code>jdbc-h2</code>、<code>jdbc-mariadb</code>、<code>jdbc-mssql</code>、<code>jdbc-mysql</code>、<code>jdbc-postgresql</code>
+のいずれかを追加します。</p>
+</div>
+<div class="paragraph">
+<p>次に、データソースを設定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.datasource.db-kind=postgresql
+quarkus.datasource.username=&lt;your username&gt;
+quarkus.datasource.password=&lt;your password&gt;
+
+quarkus.datasource.jdbc.url=jdbc:postgresql://localhost:5432/hibernate_orm_test
+quarkus.datasource.jdbc.min-size=4
+quarkus.datasource.jdbc.max-size=16</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="リアクティブデータソース"><a class="anchor" href="#リアクティブデータソース"></a>リアクティブデータソース</h3>
+<div class="paragraph">
+<p>使用しているデータベースに適切なリアクティブ拡張を追加します。<code>reactive-pg-client</code> ,
+<code>reactive-mysql-client</code>、または <code>reactive-db2-client</code>。</p>
+</div>
+<div class="paragraph">
+<p>次に、リアクティブデータソースを構成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.datasource.db-kind=postgresql
+quarkus.datasource.username=&lt;your username&gt;
+quarkus.datasource.password=&lt;your password&gt;
+
+quarkus.datasource.reactive.url=postgresql:///your_database
+quarkus.datasource.reactive.max-size=20</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="デフォルトのデータソース"><a class="anchor" href="#デフォルトのデータソース"></a>デフォルトのデータソース</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>データソースは、JDBC データソースまたはリアクティブデータソースのいずれか 1
+つでも、その両方でも構いません。データソースの設定方法と、プロジェクトに追加した拡張機能によって異なります。</p>
+</div>
+<div class="paragraph">
+<p>データソースを定義するには、以下から始めます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.datasource.db-kind=h2</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>データベースの種類は、接続するデータベースの種類を定義します。</p>
+</div>
+<div class="paragraph">
+<p>現在のところ、これらの組み込みデータベースの種類が含まれています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>DB2: <code>db2</code></p>
+</li>
+<li>
+<p>Derby: <code>derby</code></p>
+</li>
+<li>
+<p>H2: <code>h2</code></p>
+</li>
+<li>
+<p>MariaDB: <code>mariadb</code></p>
+</li>
+<li>
+<p>Microsoft SQL Server: <code>mssql</code></p>
+</li>
+<li>
+<p>MySQL: <code>mysql</code></p>
+</li>
+<li>
+<p>PostgreSQL: <code>postgresql</code>、<code>pgsql</code>、または <code>pg</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>対象とするデータベースの種類を Quarkus に指定することで、設定が容易になります。JDBC
+ドライバーの拡張を使用して、設定でタイプを指定することで、Quarkus は自動的に JDBC
+ドライバーを解決します。そのため、自分で設定する必要はありません。組み込みのものに含まれていないデータベースの種類を使用したい場合は、<code>other</code>
+を使用して、JDBCドライバーを明示的に定義してください。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>JVM モードの Quarkus アプリでは、任意のJDBCドライバーを使用することができます (<a href="#other-databases">Using
+other databases</a> を参照)。しかし、アプリケーションをネイティブの実行ファイルにコンパイルした場合には動作しない可能性があります。</p>
+</div>
+<div class="paragraph">
+<p>ネイティブ実行ファイルを作成する場合は、既存の JDBC Quarkus エクステンションを使用するこが推奨されます
+(または、ドライバーに貢献することをお勧めします)。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>データベースにアクセスするために、いくつかの認証情報を定義する必要がある可能性があります。</p>
+</div>
+<div class="paragraph">
+<p>これは、以下のプロパティーを設定することで行います。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.datasource.username=&lt;your username&gt;
+quarkus.datasource.password=&lt;your password&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>また、データソースの <a href="vault-datasource">認証情報プロバイダを使用</a> 、Vault からパスワードを取得することもできます。</p>
+</div>
+<div class="paragraph">
+<p>データベースの種類と認証情報を定義したら、JDBC データソースまたはリアクティブデータソースのいずれか 1
+つ、あるいはその両方を設定することができます。</p>
+</div>
+<div class="sect2">
+<h3 id="jdbc-datasource-2"><a class="anchor" href="#jdbc-datasource-2"></a>JDBC datasource</h3>
+<div class="paragraph">
+<p>JDBC は最も一般的なデータベース接続パターンです。通常、Hibernate ORM を使用する場合は JDBC データソースが必要です。</p>
+</div>
+<div class="sect3">
+<h4 id="maven-の依存関係をインストールします"><a class="anchor" href="#maven-の依存関係をインストールします"></a>Maven の依存関係をインストールします。</h4>
+<div class="paragraph">
+<p>まず、<code>quarkus-agroal</code> 依存関係をプロジェクトに追加する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>シンプルな Maven コマンドを使って追加することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">./mvnw quarkus:add-extension -Dextensions="agroal"</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Agroal は Hibernate ORM 拡張の遷移依存関係として提供されるので、Hibernate ORM を使用している場合は、Agroal
+エクステンションの依存関係を明示的に追加する必要はありません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>また、リレーショナルデータベースドライバー用の Quarkus エクステンションを選択して追加する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus は、以下のためのドライバーエクステンションを提供しています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>DB2 - <code>jdbc-db2</code></p>
+</li>
+<li>
+<p>Derby - <code>jdbc-derby</code></p>
+</li>
+<li>
+<p>H2 - <code>jdbc-h2</code></p>
+</li>
+<li>
+<p>MariaDB - <code>jdbc-mariadb</code></p>
+</li>
+<li>
+<p>Microsoft SQL Server - <code>jdbc-mssql</code></p>
+</li>
+<li>
+<p>MySQL - <code>jdbc-mysql</code></p>
+</li>
+<li>
+<p>PostgreSQL - <code>jdbc-postgresql</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>別のデータベースに JDBC ドライバーを使用する場合は、<a href="#other-databases">ビルトインエクステンションのないデータベースを使用するか、別のドライバーのあるデータベースを使用します。</a> を参照してください。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>H2 データベースと Derby
+データベースは通常、「埋め込みモード」で実行するように設定することができます。また、この拡張は、組み込みデータベースエンジンのネイティブ実行ファイルへのコンパイルに対応していません。</p>
+</div>
+<div class="paragraph">
+<p>統合テストに関する提案については、<a href="#in-memory-databases">Testing with in-memory databases</a>
+(下) をお読みください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>通常通り、<code>add-extension</code> を使ってエクステンションをインストールします。</p>
+</div>
+<div class="paragraph">
+<p>PostgreSQL ドライバーの依存関係をインスタンスにインストールするには、以下のコマンドを実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">./mvnw quarkus:add-extension -Dextensions="jdbc-postgresql"</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="configure-the-jdbc-connection"><a class="anchor" href="#configure-the-jdbc-connection"></a>Configure the JDBC connection</h4>
+<div class="paragraph">
+<p>JDBC 接続の設定は簡単で、必須のプロパティーは JDBC URL のみです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.datasource.jdbc.url=jdbc:postgresql://localhost:5432/hibernate_orm_test</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>プロパティー名の接頭辞 <code>jdbc</code> に注意してください。JDBC に固有のすべての構成プロパティーには、この接頭辞があります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>JDBC URL 形式の詳細については、<a href="#jdbc-url">JDBC url reference section</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>ビルトインデータソースのいずれかの種類を使用している場合、JDBC ドライバーは以下の値に自動的に解決されます。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. Database kind to JDBC driver mapping</caption>
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">データベースの種類</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JDBC driver</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">XA driver</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>db2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>com.ibm.db2.jcc.DBDriver</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>com.ibm.db2.jcc.DB2XADataSource</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>derby</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.apache.derby.jdbc.ClientDriver</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.apache.derby.jdbc.ClientXADataSource</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>h2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.h2.Driver</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.h2.jdbcx.JdbcDataSource</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mariadb</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.mariadb.jdbc.Driver</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.mariadb.jdbc.MySQLDataSource</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mssql</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>com.microsoft.sqlserver.jdbc.SQLServerDriver</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>com.microsoft.sqlserver.jdbc.SQLServerXADataSource</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mysql</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>com.mysql.cj.jdbc.Driver</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>com.mysql.cj.jdbc.MysqlXADataSource</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>postgresql</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.postgresql.Driver</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.postgresql.xa.PGXADataSource</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>前述したように、多くの場合、この自動解像度が適切で、ドライバーを設定する必要はありません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="other-databases"><a class="anchor" href="#other-databases"></a>ビルトインエクステンションのないデータベースを使用するか、別のドライバーのあるデータベースを使用します。</h4>
+<div class="paragraph">
+<p>必要に応じて (例えば OpenTracing ドライバーを使用する場合)、あるいはビルトイン JDBC ドライバー拡張のない Quarkus
+のデータベースを使用する必要がある場合は、特定のドライバーを使用できます。</p>
+</div>
+<div class="paragraph">
+<p>拡張がない場合でも、JVM モードで実行されている Quarkus
+アプリであれば、ドライバーは問題なく動作します。しかし、アプリケーションをネイティブ実行ファイルにコンパイルした場合には動作しません。ネイティブ実行ファイルを作成する予定がある場合は、既存の
+JDBC Quarkus エクステンションを使用することをお勧めします (または、ドライバー用のエクステンションを提供することをお勧めします)。</p>
+</div>
+<div class="paragraph">
+<p>ここでは、OpenTracing ドライバーをどのように使用するかを説明します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.datasource.jdbc.driver=io.opentracing.contrib.jdbc.TracingDriver</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ここでは、組み込みサポートのないデータベースへのアクセスを定義する方法を説明します (JVMモードで)。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.datasource.db-kind=other
+quarkus.datasource.jdbc.driver=oracle.jdbc.driver.OracleDriver
+quarkus.datasource.jdbc.url=jdbc:oracle:thin:@192.168.1.12:1521/ORCL_SVC
+quarkus.datasource.username=scott
+quarkus.datasource.password=tiger</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="その他設定"><a class="anchor" href="#その他設定"></a>その他設定</h4>
+<div class="paragraph">
+<p>接続プールのサイズなど、より多くのことを設定することができます。</p>
+</div>
+<div class="paragraph">
+<p>JDBC 構成ノブの詳細については、<a href="#jdbc-configuration">JDBC configuration reference</a>
+を参照してください。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="データソースの消費"><a class="anchor" href="#データソースの消費"></a>データソースの消費</h4>
+<div class="paragraph">
+<p>Hibernate ORM を使用している場合、データソースは自動的に消費されます。</p>
+</div>
+<div class="paragraph">
+<p>何らかの理由でコード内でデータソースへのアクセスが必要な場合は、以下の方法で他の Bean と同じようにデータソースを取得することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject
+AgroalDataSource defaultDataSource;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上記の例では、型は <code>AgroalDataSource</code> であり、 <code>javax.sql.DataSource</code>
+のサブタイプです。このため、<code>javax.sql.DataSource</code> を注入された型として使用することもできます。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="リアクティブデータソース-2"><a class="anchor" href="#リアクティブデータソース-2"></a>リアクティブデータソース</h3>
+<div class="paragraph">
+<p>リアクティブデータソースを使用したい場合は、Quarkus では、DB2、MySQL/MariaDB、PostgreSQL
+リアクティブクライアントを利用できます。</p>
+</div>
+<div class="sect3">
+<h4 id="maven-の依存関係をインストールします-2"><a class="anchor" href="#maven-の依存関係をインストールします-2"></a>Maven の依存関係をインストールします。</h4>
+<div class="paragraph">
+<p>使用したいデータベースに応じて、対応するエクステンションを追加します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>DB2: <code>quarkus-reactive-db2-client</code></p>
+</li>
+<li>
+<p>MySQL/MariaDB: <code>quarkus-reactive-mysql-client</code></p>
+</li>
+<li>
+<p>PostgreSQL: <code>quarkus-reactive-pg-client</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>インストールされているエクステンションは、データソースの設定で定義する <code>quarkus.datasource.db-kind</code>
+と一致している必要があります。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="リアクティブデータソースの構成"><a class="anchor" href="#リアクティブデータソースの構成"></a>リアクティブデータソースの構成</h4>
+<div class="paragraph">
+<p>ドライバーあれば、あとは接続 URL を設定するだけです。</p>
+</div>
+<div class="paragraph">
+<p>任意ですが、接続プールの適切なサイズを定義することを強くお勧めします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.datasource.reactive.url=postgresql:///your_database
+quarkus.datasource.reactive.max-size=20</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jdbc-とリアクティブデータソースの同時利用"><a class="anchor" href="#jdbc-とリアクティブデータソースの同時利用"></a>JDBC とリアクティブデータソースの同時利用</h3>
+<div class="paragraph">
+<p>デフォルトでは、JDBC 拡張 (+ Agroal)
+と、指定したデータベースの種類を扱うリアクティブデータソース拡張の両方を含めると、これらのファイル両方が作成されます。</p>
+</div>
+<div class="paragraph">
+<p>JDBC データソースを明示的に無効にしたい場合は、以下を使用します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.datasource.jdbc=false</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>リアクティブデータソースを明示的に無効にしたい場合は、以下のようにします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.datasource.reactive=false</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>多くの場合、存在するのはJDBC
+ドライバーまたはリアクティブデータソース拡張のどちらかで、両方存在するわけではありません。そのため、上記の設定は必要ありません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="複数のデータソース"><a class="anchor" href="#複数のデータソース"></a>複数のデータソース</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="複数のデータソースの構成"><a class="anchor" href="#複数のデータソースの構成"></a>複数のデータソースの構成</h3>
+<div class="paragraph">
+<p>現在のところ、複数のデータソースは JDBC と Agroal
+拡張でのみサポートされています。そのため、現在、複数の反応性データソースを作成することはできません。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Currently, Hibernate ORM supports only one persistence unit which uses the
+default datasource.  If you want to use multiple datasources, you will need
+to manipulate them directly.</p>
+</div>
+<div class="paragraph">
+<p>Multiple persistence units support is planned for a future version of
+Quarkus.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>複数のデータソースの定義は、単一のデータソースの定義と全く同じです。ただし、1 つだけ重要な変更点があります。それは、名前を定義することです。</p>
+</div>
+<div class="paragraph">
+<p>以下の例では、3 つの異なるデータソースがあります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>デフォルトのものです。</p>
+</li>
+<li>
+<p><code>users</code> という名前のデータソース。</p>
+</li>
+<li>
+<p><code>inventory</code> という名前のデータソース。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>それぞれが独自の設定を持っています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.datasource.db-kind=h2
+quarkus.datasource.username=username-default
+quarkus.datasource.jdbc.url=jdbc:h2:tcp://localhost/mem:default
+quarkus.datasource.jdbc.min-size=3
+quarkus.datasource.jdbc.max-size=13
+
+quarkus.datasource.users.db-kind=h2
+quarkus.datasource.users.username=username1
+quarkus.datasource.users.jdbc.url=jdbc:h2:tcp://localhost/mem:users
+quarkus.datasource.users.jdbc.min-size=1
+quarkus.datasource.users.jdbc.max-size=11
+
+quarkus.datasource.inventory.db-kind=h2
+quarkus.datasource.inventory.username=username2
+quarkus.datasource.inventory.jdbc.url=jdbc:h2:tcp://localhost/mem:inventory
+quarkus.datasource.inventory.jdbc.min-size=2
+quarkus.datasource.inventory.jdbc.max-size=12</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>キーに余分なビットがあることに注意してください。構文は以下の通りです。<code>quarkus.datasource.[optional
+name.][datasource property]</code> .</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="名前付きデータソースインジェクション"><a class="anchor" href="#名前付きデータソースインジェクション"></a>名前付きデータソースインジェクション</h3>
+<div class="paragraph">
+<p>複数のデータソースを使用する場合、それぞれの <code>DataSource</code> にも、値としてデータソース名のある
+<code>io.quarkus.agroal.DataSource</code> の修飾子が付けられています。上記のプロパティーを使って 3
+つの異なるデータソースを設定すると、以下のようにそれぞれのデータソースを注入することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject
+AgroalDataSource defaultDataSource;
+
+@Inject
+@DataSource("users")
+AgroalDataSource usersDataSource;
+
+@Inject
+@DataSource("inventory")
+AgroalDataSource inventoryDataSource;</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="データソースヘルスチェック"><a class="anchor" href="#データソースヘルスチェック"></a>データソースヘルスチェック</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>quarkus-smallrye-health</code> 拡張を使用している場合、<code>quarkus-agroal</code>
+とリアクティブクライアント拡張は、データソースを検証するための準備の健全性チェックを自動的に追加します。</p>
+</div>
+<div class="paragraph">
+<p>So when you access the <code>/health/ready</code> endpoint of your application you will
+have information about the datasource validation status.  If you have
+multiple datasources, all datasources will be checked and the status will be
+<code>DOWN</code> as soon as there is one datasource validation failure.</p>
+</div>
+<div class="paragraph">
+<p>この動作は、プロパティー <code>quarkus.datasource.health.enabled</code> で無効にすることができます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="データソースメトリクス"><a class="anchor" href="#データソースメトリクス"></a>データソースメトリクス</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you are using the <code>quarkus-smallrye-metrics</code> extension, <code>quarkus-agroal</code>
+can expose some data source metrics on the <code>/metrics</code> endpoint. This can be
+turned on by setting the property <code>quarkus.datasource.metrics.enabled</code> to
+true.</p>
+</div>
+<div class="paragraph">
+<p>For the exposed metrics to contain any actual values, it is necessary that
+metric collection is enabled internally by Agroal mechanisms. By default,
+this metric collection mechanism gets turned on for all data sources if the
+<code>quarkus-smallrye-metrics</code> is present and metrics for the Agroal extension
+are enabled. If you want to disable metrics for a particular data source,
+this can be done by setting <code>quarkus.datasource.jdbc.enable-metrics</code> to
+<code>false</code> (or <code>quarkus.datasource.&lt;datasource name&gt;.jdbc.enable-metrics</code> for a
+named datasource).  This disables collecting the metrics as well as exposing
+them in the <code>/metrics</code> endpoint, because it does not make sense to expose
+metrics if the mechanism to collect them is disabled.</p>
+</div>
+<div class="paragraph">
+<p>Conversely, setting <code>quarkus.datasource.jdbc.enable-metrics</code> to <code>true</code> (or
+<code>quarkus.datasource.&lt;datasource name&gt;.jdbc.enable-metrics</code> for a named
+datasource) explicitly can be used to enable collection of metrics even if
+the <code>quarkus-smallrye-metrics</code> extension is not in use.  This can be useful
+if you need to access the collected metrics programmatically.  They are
+available after calling <code>dataSource.getMetrics()</code> on an injected
+<code>AgroalDataSource</code> instance. If collection of metrics is disabled for this
+data source, all values will be zero.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="narayana-transaction-manager-integration"><a class="anchor" href="#narayana-transaction-manager-integration"></a>Narayana Transaction Manager integration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Narayana JTA のエクステンションも利用できる場合、統合は自動的に行われます。</p>
+</div>
+<div class="paragraph">
+<p>これを上書きするには、<code>transactions</code> 構成プロパティーを設定します。以下の <a href="#configuration-reference">Configuration Reference</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="in-memory-databases"><a class="anchor" href="#in-memory-databases"></a>インメモリーデータベースを使用したテスト</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>H2 や Derby のようなデータベースの中には、迅速な統合テストを実行するためのファシリティして "embedded mode"
+で一般的に使用されているものもあります。</p>
+</div>
+<div class="paragraph">
+<p>本番で使用する予定の実際のデータベースを使用することを提案します。コンテナーテクノロジーによりこれが容易になりました。依然として、JVM
+を搭載したデータベースを使用して迅速な統合テストを実行する機能が必要な場合もあります。そのような場合でも、これが可能です。</p>
+</div>
+<div class="paragraph">
+<p>埋め込みエンジンを使用するように H2 (または Derby) を設定する場合、JVM
+モードでは通常通り動作しますが、そのようなアプリケーションはネイティブの実行ファイルにはコンパイルされません。これは、Quarkus 拡張が、JDBC
+クライアントコードをネイティブコンパイルステップに対応させることのみを対象としているためです。データベースエンジン全体のネイティブ実行可能ファイルへの組み込みは現在実装されていません。</p>
+</div>
+<div class="paragraph">
+<p>このような統合テストを JVM で排他的に実行する予定であれば、もちろん通常通りに動作します。</p>
+</div>
+<div class="paragraph">
+<p>このような統合テストを JVM
+やネイティブ実行ファイルの両方で実行できるようにしたい場合は、いくつかの便利なヘルパーを利用できます。統合テストの任意のクラスに
+<code>@QuarkusTestResource(H2DatabaseTestResource.class)</code> または
+<code>@QuarkusTestResource(DerbyDatabaseTestResource.class)</code>
+を追加するだけで、テストスイートがテストを実行するために必要なデータベースを別のプロセスに組み込んで起動 (および停止) するようになります。</p>
+</div>
+<div class="paragraph">
+<p>これらの追加のヘルパーは、H2 と Derby 用にそれぞれ Maven 座標 <code>io.quarkus:quarkus-test-h2</code> と
+<code>io.quarkus:quarkus-test-derby</code> を持アーティファクトによって提供されています。</p>
+</div>
+<div class="paragraph">
+<p>以下は、H2 の例です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package my.app.integrationtests.db;
+
+import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.h2.H2DatabaseTestResource;
+
+@QuarkusTestResource(H2DatabaseTestResource.class)
+public class TestResources {
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、ネイティブ実行ファイルにコンパイルされている場合でもアプリケーションをテストすることができ、データベースは通常通り JVM で実行されます。</p>
+</div>
+<div class="paragraph">
+<p>以下を使用して接続します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">quarkus.datasource.db-kind=h2
+quarkus.datasource.jdbc.url=jdbc:h2:tcp://localhost/mem:test</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration-reference"><a class="anchor" href="#configuration-reference"></a>共通データソース構成リファレンス</h2>
+<div class="sectionbody">
+<div class="paragraph configuration-legend">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> Configuration property fixed at build
+time - All other configuration properties are overridable at runtime</p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference searchable">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-datasource_configuration"></a><a href="#quarkus-datasource_configuration">Configuration property</a></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-datasource_quarkus.datasource.db-kind"></a><code><a href="#quarkus-datasource_quarkus.datasource.db-kind">quarkus.datasource.db-kind</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The kind of database we will connect to (e.g. h2, postgresql&#8230;&#8203;).</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-datasource_quarkus.datasource.health.enabled"></a><code><a href="#quarkus-datasource_quarkus.datasource.health.enabled">quarkus.datasource.health.enabled</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Whether or not an health check is published in case the smallrye-health extension is present.
+ This is a global setting and is not specific to a datasource.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-datasource_quarkus.datasource.metrics.enabled"></a><code><a href="#quarkus-datasource_quarkus.datasource.metrics.enabled">quarkus.datasource.metrics.enabled</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Whether or not datasource metrics are published in case the smallrye-metrics extension is present.
+ This is a global setting and is not specific to a datasource.
+ NOTE: This is different from the "jdbc.enable-metrics" property that needs to be set on the JDBC datasource level to enable collection of metrics for that datasource.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-datasource_quarkus.datasource.username"></a><code><a href="#quarkus-datasource_quarkus.datasource.username">quarkus.datasource.username</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The datasource username</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-datasource_quarkus.datasource.password"></a><code><a href="#quarkus-datasource_quarkus.datasource.password">quarkus.datasource.password</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The datasource password</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-datasource_quarkus.datasource.credentials-provider"></a><code><a href="#quarkus-datasource_quarkus.datasource.credentials-provider">quarkus.datasource.credentials-provider</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The credentials provider name</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-datasource_quarkus.datasource.credentials-provider-name"></a><code><a href="#quarkus-datasource_quarkus.datasource.credentials-provider-name">quarkus.datasource.credentials-provider-name</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The credentials provider bean name.
+ It is the <code>&amp;#64;Named</code> value of the credentials provider bean. It is used to discriminate if multiple CredentialsProvider beans are available.
+ For Vault it is: vault-credentials-provider. Not necessary if there is only one credentials provider available.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-datasource_quarkus.datasource.max-size"></a><code><a href="#quarkus-datasource_quarkus.datasource.max-size">quarkus.datasource.max-size</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>20</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-datasource_quarkus.datasource.named-data-sources"></a><a href="#quarkus-datasource_quarkus.datasource.named-data-sources">Additional named datasources</a></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-datasource_quarkus.datasource.-datasource-name-.db-kind"></a><code><a href="#quarkus-datasource_quarkus.datasource.-datasource-name-.db-kind">quarkus.datasource."datasource-name".db-kind</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The kind of database we will connect to (e.g. h2, postgresql&#8230;&#8203;).</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-datasource_quarkus.datasource.-datasource-name-.username"></a><code><a href="#quarkus-datasource_quarkus.datasource.-datasource-name-.username">quarkus.datasource."datasource-name".username</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The datasource username</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-datasource_quarkus.datasource.-datasource-name-.password"></a><code><a href="#quarkus-datasource_quarkus.datasource.-datasource-name-.password">quarkus.datasource."datasource-name".password</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The datasource password</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-datasource_quarkus.datasource.-datasource-name-.credentials-provider"></a><code><a href="#quarkus-datasource_quarkus.datasource.-datasource-name-.credentials-provider">quarkus.datasource."datasource-name".credentials-provider</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The credentials provider name</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-datasource_quarkus.datasource.-datasource-name-.credentials-provider-name"></a><code><a href="#quarkus-datasource_quarkus.datasource.-datasource-name-.credentials-provider-name">quarkus.datasource."datasource-name".credentials-provider-name</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The credentials provider bean name.
+ It is the <code>&amp;#64;Named</code> value of the credentials provider bean. It is used to discriminate if multiple CredentialsProvider beans are available.
+ For Vault it is: vault-credentials-provider. Not necessary if there is only one credentials provider available.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-datasource_quarkus.datasource.-datasource-name-.max-size"></a><code><a href="#quarkus-datasource_quarkus.datasource.-datasource-name-.max-size">quarkus.datasource."datasource-name".max-size</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>20</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="jdbc-configuration"><a class="anchor" href="#jdbc-configuration"></a>JDBC Configuration Reference</h2>
+<div class="sectionbody">
+<div class="paragraph configuration-legend">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> Configuration property fixed at build
+time - All other configuration properties are overridable at runtime</p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference searchable">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-agroal_configuration"></a><a href="#quarkus-agroal_configuration">Configuration property</a></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-agroal_quarkus.datasource.jdbc"></a><code><a href="#quarkus-agroal_quarkus.datasource.jdbc">quarkus.datasource.jdbc</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>If we create a JDBC datasource for this datasource.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-agroal_quarkus.datasource.jdbc.driver"></a><code><a href="#quarkus-agroal_quarkus.datasource.jdbc.driver">quarkus.datasource.jdbc.driver</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The datasource driver class name</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-agroal_quarkus.datasource.jdbc.transactions"></a><code><a href="#quarkus-agroal_quarkus.datasource.jdbc.transactions">quarkus.datasource.jdbc.transactions</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Whether we want to use regular JDBC transactions, XA, or disable all transactional capabilities.
+ When enabling XA you will need a driver implementing <code>javax.sql.XADataSource</code>.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>enabled</code>, <code>xa</code>, <code>disabled</code></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>enabled</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-agroal_quarkus.datasource.jdbc.enable-metrics"></a><code><a href="#quarkus-agroal_quarkus.datasource.jdbc.enable-metrics">quarkus.datasource.jdbc.enable-metrics</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Enable datasource metrics collection. If unspecified, collecting metrics will be enabled by default if the smallrye-metrics extension is active.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.jdbc.url"></a><code><a href="#quarkus-agroal_quarkus.datasource.jdbc.url">quarkus.datasource.jdbc.url</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The datasource URL</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.jdbc.initial-size"></a><code><a href="#quarkus-agroal_quarkus.datasource.jdbc.initial-size">quarkus.datasource.jdbc.initial-size</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The initial size of the pool. Usually you will want to set the initial size to match at least the minimal size, but this is not enforced so to allow for architectures which prefer a lazy initialization of the connections on boot, while being able to sustain a minimal pool size after boot.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.jdbc.min-size"></a><code><a href="#quarkus-agroal_quarkus.datasource.jdbc.min-size">quarkus.datasource.jdbc.min-size</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The datasource pool minimum size</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>0</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.jdbc.max-size"></a><code><a href="#quarkus-agroal_quarkus.datasource.jdbc.max-size">quarkus.datasource.jdbc.max-size</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The datasource pool maximum size</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>20</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.jdbc.background-validation-interval"></a><code><a href="#quarkus-agroal_quarkus.datasource.jdbc.background-validation-interval">quarkus.datasource.jdbc.background-validation-interval</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The interval at which we validate idle connections in the background.
+ Set to <code>0</code> to disable background validation.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor" title="More information about the Duration format"><span class="icon"><i class="fa fa-question-circle"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>2M</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.jdbc.acquisition-timeout"></a><code><a href="#quarkus-agroal_quarkus.datasource.jdbc.acquisition-timeout">quarkus.datasource.jdbc.acquisition-timeout</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The timeout before cancelling the acquisition of a new connection</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor" title="More information about the Duration format"><span class="icon"><i class="fa fa-question-circle"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>5</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.jdbc.leak-detection-interval"></a><code><a href="#quarkus-agroal_quarkus.datasource.jdbc.leak-detection-interval">quarkus.datasource.jdbc.leak-detection-interval</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The interval at which we check for connection leaks.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor" title="More information about the Duration format"><span class="icon"><i class="fa fa-question-circle"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.jdbc.idle-removal-interval"></a><code><a href="#quarkus-agroal_quarkus.datasource.jdbc.idle-removal-interval">quarkus.datasource.jdbc.idle-removal-interval</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The interval at which we try to remove idle connections.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor" title="More information about the Duration format"><span class="icon"><i class="fa fa-question-circle"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>5M</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.jdbc.max-lifetime"></a><code><a href="#quarkus-agroal_quarkus.datasource.jdbc.max-lifetime">quarkus.datasource.jdbc.max-lifetime</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The max lifetime of a connection.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor" title="More information about the Duration format"><span class="icon"><i class="fa fa-question-circle"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.jdbc.transaction-isolation-level"></a><code><a href="#quarkus-agroal_quarkus.datasource.jdbc.transaction-isolation-level">quarkus.datasource.jdbc.transaction-isolation-level</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The transaction isolation level.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>undefined</code>, <code>none</code>, <code>read-uncommitted</code>, <code>read-committed</code>, <code>repeatable-read</code>, <code>serializable</code></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.jdbc.detect-statement-leaks"></a><code><a href="#quarkus-agroal_quarkus.datasource.jdbc.detect-statement-leaks">quarkus.datasource.jdbc.detect-statement-leaks</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>When enabled Agroal will be able to produce a warning when a connection is returned to the pool without the application having closed all open statements. This is unrelated with tracking of open connections. Disable for peak performance, but only when there&#8217;s high confidence that no leaks are happening.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.jdbc.new-connection-sql"></a><code><a href="#quarkus-agroal_quarkus.datasource.jdbc.new-connection-sql">quarkus.datasource.jdbc.new-connection-sql</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Query executed when first using a connection.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.jdbc.validation-query-sql"></a><code><a href="#quarkus-agroal_quarkus.datasource.jdbc.validation-query-sql">quarkus.datasource.jdbc.validation-query-sql</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Query executed to validate a connection.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.jdbc.pooling-enabled"></a><code><a href="#quarkus-agroal_quarkus.datasource.jdbc.pooling-enabled">quarkus.datasource.jdbc.pooling-enabled</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Disable pooling to prevent reuse of Connections. Use this with when an external pool manages the life-cycle of Connections.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-agroal_quarkus.datasource.named-data-sources"></a><a href="#quarkus-agroal_quarkus.datasource.named-data-sources">Additional named datasources</a></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc"></a><code><a href="#quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc">quarkus.datasource."datasource-name".jdbc</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>If we create a JDBC datasource for this datasource.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.driver"></a><code><a href="#quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.driver">quarkus.datasource."datasource-name".jdbc.driver</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The datasource driver class name</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.transactions"></a><code><a href="#quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.transactions">quarkus.datasource."datasource-name".jdbc.transactions</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Whether we want to use regular JDBC transactions, XA, or disable all transactional capabilities.
+ When enabling XA you will need a driver implementing <code>javax.sql.XADataSource</code>.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>enabled</code>, <code>xa</code>, <code>disabled</code></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>enabled</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.enable-metrics"></a><code><a href="#quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.enable-metrics">quarkus.datasource."datasource-name".jdbc.enable-metrics</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Enable datasource metrics collection. If unspecified, collecting metrics will be enabled by default if the smallrye-metrics extension is active.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.url"></a><code><a href="#quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.url">quarkus.datasource."datasource-name".jdbc.url</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The datasource URL</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.initial-size"></a><code><a href="#quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.initial-size">quarkus.datasource."datasource-name".jdbc.initial-size</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The initial size of the pool. Usually you will want to set the initial size to match at least the minimal size, but this is not enforced so to allow for architectures which prefer a lazy initialization of the connections on boot, while being able to sustain a minimal pool size after boot.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.min-size"></a><code><a href="#quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.min-size">quarkus.datasource."datasource-name".jdbc.min-size</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The datasource pool minimum size</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>0</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.max-size"></a><code><a href="#quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.max-size">quarkus.datasource."datasource-name".jdbc.max-size</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The datasource pool maximum size</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>20</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.background-validation-interval"></a><code><a href="#quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.background-validation-interval">quarkus.datasource."datasource-name".jdbc.background-validation-interval</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The interval at which we validate idle connections in the background.
+ Set to <code>0</code> to disable background validation.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor" title="More information about the Duration format"><span class="icon"><i class="fa fa-question-circle"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>2M</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.acquisition-timeout"></a><code><a href="#quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.acquisition-timeout">quarkus.datasource."datasource-name".jdbc.acquisition-timeout</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The timeout before cancelling the acquisition of a new connection</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor" title="More information about the Duration format"><span class="icon"><i class="fa fa-question-circle"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>5</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.leak-detection-interval"></a><code><a href="#quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.leak-detection-interval">quarkus.datasource."datasource-name".jdbc.leak-detection-interval</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The interval at which we check for connection leaks.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor" title="More information about the Duration format"><span class="icon"><i class="fa fa-question-circle"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.idle-removal-interval"></a><code><a href="#quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.idle-removal-interval">quarkus.datasource."datasource-name".jdbc.idle-removal-interval</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The interval at which we try to remove idle connections.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor" title="More information about the Duration format"><span class="icon"><i class="fa fa-question-circle"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>5M</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.max-lifetime"></a><code><a href="#quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.max-lifetime">quarkus.datasource."datasource-name".jdbc.max-lifetime</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The max lifetime of a connection.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor" title="More information about the Duration format"><span class="icon"><i class="fa fa-question-circle"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.transaction-isolation-level"></a><code><a href="#quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.transaction-isolation-level">quarkus.datasource."datasource-name".jdbc.transaction-isolation-level</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The transaction isolation level.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>undefined</code>, <code>none</code>, <code>read-uncommitted</code>, <code>read-committed</code>, <code>repeatable-read</code>, <code>serializable</code></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.detect-statement-leaks"></a><code><a href="#quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.detect-statement-leaks">quarkus.datasource."datasource-name".jdbc.detect-statement-leaks</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>When enabled Agroal will be able to produce a warning when a connection is returned to the pool without the application having closed all open statements. This is unrelated with tracking of open connections. Disable for peak performance, but only when there&#8217;s high confidence that no leaks are happening.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.new-connection-sql"></a><code><a href="#quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.new-connection-sql">quarkus.datasource."datasource-name".jdbc.new-connection-sql</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Query executed when first using a connection.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.validation-query-sql"></a><code><a href="#quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.validation-query-sql">quarkus.datasource."datasource-name".jdbc.validation-query-sql</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Query executed to validate a connection.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.pooling-enabled"></a><code><a href="#quarkus-agroal_quarkus.datasource.-datasource-name-.jdbc.pooling-enabled">quarkus.datasource."datasource-name".jdbc.pooling-enabled</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Disable pooling to prevent reuse of Connections. Use this with when an external pool manages the life-cycle of Connections.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+</tbody>
+</table>
+<div id="duration-note-anchor" class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">About the Duration format</div>
+<div class="paragraph">
+<p>期間のフォーマットは標準の <code>java.time.Duration</code> フォーマットを使用します。詳細は
+<a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html#parse-java.lang.CharSequence-">Duration#parse()
+javadoc</a> を参照してください。</p>
+</div>
+<div class="paragraph">
+<p>数値で始まる期間の値を指定することもできます。この場合、値が数値のみで構成されている場合、コンバーターは値を秒として扱います。そうでない場合は、
+<code>PT</code> が暗黙的に値の前に付加され、標準の <code>java.time.Duration</code> 形式が得られます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="jdbc-url"><a class="anchor" href="#jdbc-url"></a>JDBC URL Reference</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>サポートされているデータベースにはそれぞれ異なる JDBC URL
+設定オプションがあります。それぞれのオプションについては、本ドキュメントの説明範囲を超えていますが、以下のセクションでは各データベースの URL
+の概要と公式ドキュメントへのリンクを示します。</p>
+</div>
+<div class="sect2">
+<h3 id="h2"><a class="anchor" href="#h2"></a>H2</h3>
+<div class="paragraph">
+<p><code>jdbc:h2:{ {.|mem:}[name] | [file:]fileName |
+{tcp|ssl}:[//]server[:port][,server2[:port]]/name }[;key=value&#8230;&#8203;]</code></p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">例</dt>
+<dd>
+<p><code>jdbc:h2:tcp://localhost/~/test</code>, <code>jdbc:h2:mem:myDB</code></p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>H2
+は組み込みデータベースです。サーバーとして、ファイルに基づいて、あるいは、メモリー内で完全にライブで実行できます。これらすべてのオプションは上記のように利用可能です。詳細は、<a href="https://h2database.com/html/features.html?highlight=url&amp;search=url#database_url">公式ドキュメント</a>
+にあります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="postgresql"><a class="anchor" href="#postgresql"></a>PostgreSQL</h3>
+<div class="paragraph">
+<p>PostgreSQL
+は、以下の他のデータベースと同様に、サーバーとしてのみ動作します。そのため、接続の詳細を指定するか、デフォルトを使用する必要があります。</p>
+</div>
+<div class="paragraph">
+<p><code>jdbc:postgresql:[//][host][:port][/database][?key=value&#8230;&#8203;]</code></p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">例</dt>
+<dd>
+<p><code>jdbc:postgresql://localhost/test</code></p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>各部のデフォルトは以下の通りです。</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>host</code></dt>
+<dd>
+<p>localhost</p>
+</dd>
+<dt class="hdlist1"><code>port</code></dt>
+<dd>
+<p>5432</p>
+</dd>
+<dt class="hdlist1"><code>database</code></dt>
+<dd>
+<p>same name as the username</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p><a href="https://jdbc.postgresql.org/documentation/head/connect.html">公式ドキュメント</a>
+では、より詳細な情報を紹介しており、同様にオプションのパラメーターをリストアップしています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="db2"><a class="anchor" href="#db2"></a>DB2</h3>
+<div class="paragraph">
+<p><code>jdbc:db2://&lt;serverName&gt;[:&lt;portNumber&gt;]/&lt;databaseName&gt;[:&lt;key1&gt;=&lt;value&gt;;[&lt;key2&gt;=&lt;value2&gt;;]]</code></p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">例</dt>
+<dd>
+<p><code>jdbc:db2://localhost:50000/MYDB:user=dbadm;password=dbadm;</code></p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>URL の構文やサポートされているオプションの詳細は、
+<a href="https://www.ibm.com/support/knowledgecenter/SSEPGG_11.5.0/com.ibm.db2.luw.apdv.java.doc/src/tpc/imjcc_r0052342.html">公式ドキュメント</a>
+を参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="mariadb"><a class="anchor" href="#mariadb"></a>MariaDB</h3>
+<div class="paragraph">
+<p><code>jdbc:mariadb:[replication:|failover:|sequential:|aurora:]//&lt;hostDescription&gt;[,&lt;hostDescription&gt;&#8230;&#8203;]/[database][?&lt;key1&gt;=&lt;value1&gt;[&amp;&lt;key2&gt;=&lt;value2&gt;]]</code>
+ hostDescription::  <code>&lt;host&gt;[:&lt;portnumber&gt;] or
+ address=(host=&lt;host&gt;)[(port=&lt;portnumber&gt;)][(type=(master|slave))]</code></p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">例</dt>
+<dd>
+<p><code>jdbc:mariadb://localhost:3306/test</code></p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>この機能の詳細は、<a href="https://mariadb.com/kb/en/library/about-mariadb-connector-j/">公式ドキュメント</a>
+に掲載されています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="mysql"><a class="anchor" href="#mysql"></a>MySQL</h3>
+<div class="paragraph">
+<p><code>jdbc:mysql:[replication:|failover:|sequential:|aurora:]//&lt;hostDescription&gt;[,&lt;hostDescription&gt;&#8230;&#8203;]/[database][?&lt;key1&gt;=&lt;value1&gt;[&amp;&lt;key2&gt;=&lt;value2&gt;]]</code>
+ hostDescription::  <code>&lt;host&gt;[:&lt;portnumber&gt;] or
+ address=(host=&lt;host&gt;)[(port=&lt;portnumber&gt;)][(type=(master|slave))]</code></p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">例</dt>
+<dd>
+<p><code>jdbc:mysql://localhost:3306/test</code></p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>この機能は、<a href="https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference.html">公式ドキュメント</a>
+に詳しい情報が掲載されています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="microsoft-sql-server"><a class="anchor" href="#microsoft-sql-server"></a>Microsoft SQL Server</h3>
+<div class="paragraph">
+<p>Microsoft SQL Server は、以下の形式で接続 URL を処理します。</p>
+</div>
+<div class="paragraph">
+<p><code>jdbc:sqlserver://[serverName[\instanceName][:portNumber]][;property=value[;property=value]]</code></p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">例</dt>
+<dd>
+<p><code>jdbc:sqlserver://localhost:1433;databaseName=AdventureWorks</code></p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>Microsoft SQL Server JDBC ドライバーは基本的に他のものと同じように動作します。詳細は
+<a href="https://docs.microsoft.com/en-us/sql/connect/jdbc/connecting-to-sql-server-with-the-jdbc-driver?view=sql-server-2017">公式ドキュメント</a>
+に記載されています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="derby"><a class="anchor" href="#derby"></a>Derby</h3>
+<div class="paragraph">
+<p><code>jdbc:derby:[//serverName[:portNumber]/][memory:]databaseName[;property=value[;property=value]]</code></p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">例</dt>
+<dd>
+<p><code>jdbc:derby://localhost:1527/myDB</code>, <code>jdbc:derby:memory:myDB;create=true</code></p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>Derby
+は組み込みデータベースです。サーバーとして、ファイルを元にして、あるいは完全にメモリー内でライブで実行するこもできます。これらすべてのオプションは上記のように利用可能です。詳細は
+<a href="https://db.apache.org/derby/docs/10.8/devguide/cdevdvlp17453.html#cdevdvlp17453">公式ドキュメント</a>
+で確認できます。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="reactive-configuration"><a class="anchor" href="#reactive-configuration"></a>リアクティブデータソース構成リファレンス</h2>
+<div class="sectionbody">
+<div class="paragraph configuration-legend">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> Configuration property fixed at build
+time - All other configuration properties are overridable at runtime</p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference searchable">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-reactive-datasource_configuration"></a><a href="#quarkus-reactive-datasource_configuration">Configuration property</a></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-reactive-datasource_quarkus.datasource.reactive"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive">quarkus.datasource.reactive</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>If we create a Reactive datasource for this datasource.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.cache-prepared-statements"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.cache-prepared-statements">quarkus.datasource.reactive.cache-prepared-statements</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Whether prepared statements should be cached on the client side.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.url"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.url">quarkus.datasource.reactive.url</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The datasource URL.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.max-size"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.max-size">quarkus.datasource.reactive.max-size</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The datasource pool maximum size.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.trust-all"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.trust-all">quarkus.datasource.reactive.trust-all</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Whether all server certificates should be trusted.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.trust-certificate-pem"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.trust-certificate-pem">quarkus.datasource.reactive.trust-certificate-pem</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>PEM Trust config is disabled by default.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.trust-certificate-pem.certs"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.trust-certificate-pem.certs">quarkus.datasource.reactive.trust-certificate-pem.certs</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Comma-separated list of the trust certificate files (Pem format).</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.trust-certificate-jks"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.trust-certificate-jks">quarkus.datasource.reactive.trust-certificate-jks</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>JKS config is disabled by default.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.trust-certificate-jks.path"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.trust-certificate-jks.path">quarkus.datasource.reactive.trust-certificate-jks.path</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Path of the key file (JKS format).</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.trust-certificate-jks.password"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.trust-certificate-jks.password">quarkus.datasource.reactive.trust-certificate-jks.password</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Password of the key file.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.trust-certificate-pfx"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.trust-certificate-pfx">quarkus.datasource.reactive.trust-certificate-pfx</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>PFX config is disabled by default.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.trust-certificate-pfx.path"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.trust-certificate-pfx.path">quarkus.datasource.reactive.trust-certificate-pfx.path</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Path to the key file (PFX format).</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.trust-certificate-pfx.password"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.trust-certificate-pfx.password">quarkus.datasource.reactive.trust-certificate-pfx.password</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Password of the key.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.key-certificate-pem"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.key-certificate-pem">quarkus.datasource.reactive.key-certificate-pem</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>PEM Key/cert config is disabled by default.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.key-certificate-pem.keys"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.key-certificate-pem.keys">quarkus.datasource.reactive.key-certificate-pem.keys</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Comma-separated list of the path to the key files (Pem format).</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.key-certificate-pem.certs"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.key-certificate-pem.certs">quarkus.datasource.reactive.key-certificate-pem.certs</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Comma-separated list of the path to the certificate files (Pem format).</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.key-certificate-jks"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.key-certificate-jks">quarkus.datasource.reactive.key-certificate-jks</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>JKS config is disabled by default.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.key-certificate-jks.path"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.key-certificate-jks.path">quarkus.datasource.reactive.key-certificate-jks.path</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Path of the key file (JKS format).</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.key-certificate-jks.password"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.key-certificate-jks.password">quarkus.datasource.reactive.key-certificate-jks.password</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Password of the key file.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.key-certificate-pfx"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.key-certificate-pfx">quarkus.datasource.reactive.key-certificate-pfx</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>PFX config is disabled by default.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.key-certificate-pfx.path"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.key-certificate-pfx.path">quarkus.datasource.reactive.key-certificate-pfx.path</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Path to the key file (PFX format).</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.key-certificate-pfx.password"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.key-certificate-pfx.password">quarkus.datasource.reactive.key-certificate-pfx.password</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Password of the key.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.thread-local"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.thread-local">quarkus.datasource.reactive.thread-local</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Experimental: use one connection pool per thread.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.reconnect-attempts"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.reconnect-attempts">quarkus.datasource.reactive.reconnect-attempts</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The number of reconnection attempts when a pooled connection cannot be established on first try.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>0</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.reconnect-interval"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.reconnect-interval">quarkus.datasource.reactive.reconnect-interval</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The interval between reconnection attempts when a pooled connection cannot be established on first try.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor" title="More information about the Duration format"><span class="icon"><i class="fa fa-question-circle"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>PT1S</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-datasource_quarkus.datasource.reactive.idle-timeout"></a><code><a href="#quarkus-reactive-datasource_quarkus.datasource.reactive.idle-timeout">quarkus.datasource.reactive.idle-timeout</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The maximum time without data written to or read from a connection before it is removed from the pool.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor" title="More information about the Duration format"><span class="icon"><i class="fa fa-question-circle"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>no timeout</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="リアクティブな-db2-の設定"><a class="anchor" href="#リアクティブな-db2-の設定"></a>リアクティブな DB2 の設定</h3>
+<div class="paragraph configuration-legend">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> Configuration property fixed at build
+time - All other configuration properties are overridable at runtime</p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference searchable">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-reactive-db2-client_configuration"></a><a href="#quarkus-reactive-db2-client_configuration">Configuration property</a></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-db2-client_quarkus.datasource.reactive.db2.ssl"></a><code><a href="#quarkus-reactive-db2-client_quarkus.datasource.reactive.db2.ssl">quarkus.datasource.reactive.db2.ssl</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Whether SSL/TLS is enabled.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="リアクティブな-mariadbmysql-固有の設定"><a class="anchor" href="#リアクティブな-mariadbmysql-固有の設定"></a>リアクティブな MariaDB/MySQL 固有の設定</h3>
+<div class="paragraph configuration-legend">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> Configuration property fixed at build
+time - All other configuration properties are overridable at runtime</p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference searchable">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-reactive-mysql-client_configuration"></a><a href="#quarkus-reactive-mysql-client_configuration">Configuration property</a></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-mysql-client_quarkus.datasource.reactive.mysql.charset"></a><code><a href="#quarkus-reactive-mysql-client_quarkus.datasource.reactive.mysql.charset">quarkus.datasource.reactive.mysql.charset</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Charset for connections.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-mysql-client_quarkus.datasource.reactive.mysql.collation"></a><code><a href="#quarkus-reactive-mysql-client_quarkus.datasource.reactive.mysql.collation">quarkus.datasource.reactive.mysql.collation</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Collation for connections.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-mysql-client_quarkus.datasource.reactive.mysql.ssl-mode"></a><code><a href="#quarkus-reactive-mysql-client_quarkus.datasource.reactive.mysql.ssl-mode">quarkus.datasource.reactive.mysql.ssl-mode</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>Desired security state of the connection to the server.
+ See <a href="https://dev.mysql.com/doc/refman/8.0/en/connection-options.html#option_general_ssl-mode">MySQL Reference Manual</a>.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>disabled</code>, <code>preferred</code>, <code>required</code>, <code>verify-ca</code>, <code>verify-identity</code></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>disabled</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="リアクティブな-postgresql-固有の設定"><a class="anchor" href="#リアクティブな-postgresql-固有の設定"></a>リアクティブな PostgreSQL 固有の設定</h3>
+<div class="paragraph configuration-legend">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> Configuration property fixed at build
+time - All other configuration properties are overridable at runtime</p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference searchable">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-reactive-pg-client_configuration"></a><a href="#quarkus-reactive-pg-client_configuration">Configuration property</a></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-pg-client_quarkus.datasource.reactive.postgresql.pipelining-limit"></a><code><a href="#quarkus-reactive-pg-client_quarkus.datasource.reactive.postgresql.pipelining-limit">quarkus.datasource.reactive.postgresql.pipelining-limit</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>The maximum number of inflight database commands that can be pipelined.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-reactive-pg-client_quarkus.datasource.reactive.postgresql.ssl-mode"></a><code><a href="#quarkus-reactive-pg-client_quarkus.datasource.reactive.postgresql.ssl-mode">quarkus.datasource.reactive.postgresql.ssl-mode</a></code></p>
+</div>
+<div class="openblock description">
+<div class="content">
+<div class="paragraph">
+<p>SSL operating mode of the client.
+ See <a href="https://www.postgresql.org/docs/current/libpq-ssl.html#LIBPQ-SSL-PROTECTION">Protection Provided in Different Modes</a>.</p>
+</div>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>disable</code>, <code>allow</code>, <code>prefer</code>, <code>require</code>, <code>verify-ca</code>, <code>verify-full</code></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>disable</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+    </div>
+  </div>
+</div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkus はオープンです。このプロジェクトの全ての依存関係は<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a>または互換性のあるライセンスの元で利用出来ます。<br /><br />このウェブサイトは <a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築されており、<a href='https://pages.github.com/' target='_blank'>Github Pages</a>にホストされており、完全にオープンソースです。改善したい場合、 <a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォークし</a>、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+            <li><a href="/">ホーム</a></li>
+          
+            <li><a href="/guides">ガイド</a></li>
+          
+            <li><a href="/community/#contributing">貢献</a></li>
+          
+            <li><a href="/faq">FAQ</a></li>
+          
+            <li><a href="/get-started">はじめに</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>貢献</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://twitter.com/quarkusio">フォロー</a></li>
+          
+            <li><a href="https://github.com/quarkusio">GitHub</a></li>
+          
+            <li><a href="/security">セキュリティポリシー</a></li>
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>サポート</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus">Stack Overflow</a></li>
+          
+            <li><a href="https://quarkusio.zulipchat.com">チャットルーム</a></li>
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev">フォーラム</a></li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています：</span>
+        <ul class="footer-links">
+          
+            <li><a href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a href="https://hibernate.org" target="_blank">Hibernate</a></li>
+          
+            <li><a href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a href="https://code.quarkus.io/" target="_blank">等々...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/search-filter.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+</body>
+
+</html>
