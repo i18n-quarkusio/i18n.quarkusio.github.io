@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>REST クライアントの利用 - 2.13 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/2.13/guides/rest-client" />
+  <meta property="og:title" content="REST クライアントの利用 - 2.13" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/rest-client">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/2.13/guides/rest-client">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/2.13/guides/rest-client" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/2.13/guides/rest-client">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/2.13/guides/rest-client">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/2.13/guides/rest-client">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/2.13/guides/rest-client">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/2.13/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" selected>2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">REST クライアントの利用 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>このガイドは、 Quarkus 2.8 までデフォルトの JAX-RS 実装であった <a href="https://resteasy.dev">RESTEasy Classic</a>と互換性のある REST Client に関するものです。</p>
+</div>
+<div class="paragraph">
+<p>現在では、従来のブロック型ワークロードとリアクティブ型ワークロードを同様にサポートするRESTEasy Reactiveの使用が推奨されています。RESTEasy Reactiveの詳細については、 <a href="rest-client-reactive.html">REST Client Reactiveガイド</a>、サーバーサイドについては、 <a href="rest-json.html">REST JSON入門ガイド</a>、またはより詳細な <a href="resteasy-reactive.html">RESTEasy Reactiveガイド</a>を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>このガイドでは、MicroProfile REST Clientを使用して、ほとんど手間をかけずにREST APIとやりとりする方法を説明します。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+サーバーサイドで JSON REST API を書く必要がある場合は、<a href="rest-json.html">JSON REST API ガイド</a>を参照してください。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>約15分</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 11+ がインストールされ、 <code>JAVA_HOME</code>  が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.8.6</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルをビルドしたい場合、MandrelまたはGraalVM（あるいはネイティブなコンテナビルドを使用する場合はDocker）をインストールし、 <a href="building-native-image.html#configuring-graalvm">適切に設定</a>していること</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution"><a class="anchor" href="#solution"></a>ソリューション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次の章で紹介する手順に沿って、ステップを踏んでアプリを作成することをお勧めします。ただし、完成した例にそのまま進んでも構いません。</p>
+</div>
+<div class="paragraph">
+<p>Gitリポジトリをクローンする： <code>git clone <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code> 、またはhttps://github.com/quarkusio/quarkus-quickstarts/archive/main.zip[archive] をダウンロードする。</p>
+</div>
+<div class="paragraph">
+<p>ソリューションは <code>rest-client-quickstart</code> <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/main/rest-client-quickstart">ディレクトリ</a> にあります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-maven-project"><a class="anchor" href="#creating-the-maven-project"></a>Mavenプロジェクトの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、新しいプロジェクトが必要です。以下のコマンドで新規プロジェクトを作成します:</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:rest-client-quickstart \
+    --stream=2.13 \
+    --extension='resteasy,resteasy-jackson,rest-client,rest-client-jackson' \
+    --no-code
+cd rest-client-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p><em>Quarkus CLIのインストール方法や使用方法については、 <a href="cli-tooling">Quarkus CLIガイド</a> を参照してください。</em></p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:2.13.9.Final:create \
+    -DplatformVersion=2.13.9.Final \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=rest-client-quickstart \
+    -Dextensions='resteasy,resteasy-jackson,rest-client,rest-client-jackson' \
+    -DnoCode
+cd rest-client-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>このコマンドは、REST エンドポイントを持つ Maven プロジェクトを生成し、 <code>rest-client</code> と <code>resteasy-jackson</code> のエクステンションをインポートします。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>REST サーバーのサポートのための <code>resteasy</code> と <code>resteasy-jackson</code> のエクステンション。</p>
+</li>
+<li>
+<p>REST クライアントのサポートのための <code>rest-client</code> と <code>rest-client-jackson</code> のエクステンション。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>すでにQuarkusプロジェクトが設定されている場合は、プロジェクトのベースディレクトリーで以下のコマンドを実行することで、 <code>rest-client</code> と <code>rest-client-jackson</code> のエクステンションをプロジェクトに追加することができます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus extension add 'rest-client,rest-client-jackson'</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:add-extension -Dextensions='rest-client,rest-client-jackson'</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew addExtension --extensions='rest-client,rest-client-jackson'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、 <code>pom.xml</code> に以下が追加されます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-rest-client&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-rest-client-jackson&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-rest-client")
+implementation("io.quarkus:quarkus-rest-client-jackson")</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="setting-up-the-model"><a class="anchor" href="#setting-up-the-model"></a>モデルのセットアップ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、 <a href="https://stage.code.quarkus.io">stage.code.quarkus.io</a> サービスが提供するREST APIの一部を利用する方法をデモします。まず最初に、 使用するモデルを`Extension` POJO の形式でセットアップします。</p>
+</div>
+<div class="paragraph">
+<p><code>src/main/java/org/acme/rest/client/Extension.java</code> ファイルを作成し、以下の内容を設定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import java.util.List;
+
+public class Extension {
+
+    public String id;
+    public String name;
+    public String shortName;
+    public List&lt;String&gt; keywords;
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上記のモデルは、サービスによって提供されるフィールドのサブセットに過ぎませんが、このガイドの目的には十分です。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-the-interface"><a class="anchor" href="#create-the-interface"></a>インターフェースの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>RESTEasy REST Client の利用は、適切な JAX-RS と MicroProfile アノテーションを使用してインターフェースを作成するのと同じくらい簡単です。今回の場合、インタフェースは <code>src/main/java/org/acme/rest/client/ExtensionsService.java</code> として、以下のような内容で作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import org.jboss.resteasy.annotations.jaxrs.QueryParam;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+import java.util.Set;
+
+@Path("/extensions")
+@RegisterRestClient
+public interface ExtensionsService {
+
+    @GET
+    Set&lt;Extension&gt; getById(@QueryParam String id);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>getById</code> メソッドは、私たちのコードに、Code Quarkus API からidを指定してエクステンションを問い合わせる機能を与えます。クライアントがすべてのネットワーキングとマーシャリングを処理してくれるので、このような技術的な詳細は一切ありません。</p>
+</div>
+<div class="paragraph">
+<p>上のコードのアノテーションの目的は以下の通りです。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>@RegisterRestClient</code> により、Quarkusは、このインターフェイスがRESTクライアントとしてCDIインジェクションに利用可能であることを知ることができます。</p>
+</li>
+<li>
+<p><code>@Path</code> と <code>@GET</code> 、 <code>@QueryParam</code> はサービスへのアクセス方法を定義するために使用される標準的な JAX-RS アノテーションです。</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>quarkus-rest-client-jackson</code> や <code>quarkus-rest-client-jsonb</code> などの JSON エクステンションがインストールされている場合、メディアタイプが <code>@Produces</code> や <code>@Consumes</code> アノテーションで明示的に設定されていない限り、Quarkus はほとんどの戻り値に <code>application/json</code> メディアタイプをデフォルトで使用します( <code>String</code> や <code>File</code> などのよく知られたタイプには例外があり、それぞれ <code>text/plain</code> と <code>application/octet-stream</code> がデフォルトとなっています)。</p>
+</div>
+<div class="paragraph">
+<p>デフォルトでJSONを使用したくない場合は、 <code>quarkus.resteasy-json.default-json=false</code> を設定すると、デフォルトは自動ネゴシエーションに戻ります。これを設定した場合、JSON を使用するためには <code>@Produces(MediaType.APPLICATION_JSON)</code> と <code>@Consumes(MediaType.APPLICATION_JSON)</code> をエンドポイントに追加する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>JSON のデフォルトに頼らない場合は、エンドポイントに <code>@Produces</code> や <code>@Consumes</code> のアノテーションを付けて、期待されるコンテンツタイプを正確に定義することを強くお勧めします。これにより、ネイティブ実行可能ファイルに含まれる JAX-RS プロバイダ (コンバータとみなすことができます) の数を絞り込むことができます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="path-parameters"><a class="anchor" href="#path-parameters"></a>パスパラメーター</h3>
+<div class="paragraph">
+<p>GET リクエストにパスパラメーターが必要な場合は、 <code>@QueryParam</code> の代わりに、または追加で、 <code>@PathParam("parameter-name")</code> を利用することができます。パスとクエリパラメーターは、必要に応じて組み合わせることができます。以下のモックの例を参照してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import org.jboss.resteasy.annotations.jaxrs.PathParam;
+import org.jboss.resteasy.annotations.jaxrs.QueryParam;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import java.util.Set;
+
+@Path("/extensions")
+@RegisterRestClient
+public interface ExtensionsService {
+
+    @GET
+    @Path("/stream/{stream}")
+    Set&lt;Extension&gt; getByStream(@PathParam String stream, @QueryParam("id") String id);
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-the-configuration"><a class="anchor" href="#create-the-configuration"></a>設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>REST 呼び出しが行われるベース URL を決定するために、REST クライアントは <code>application.properties</code> からの設定を使用します。プロパティーの名前は、以下のコードで表示される特定の規則に従う必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># Your configuration properties
+quarkus.rest-client."org.acme.rest.client.ExtensionsService".url=https://stage.code.quarkus.io/api # <i class="conum" data-value="1"></i><b>(1)</b>
+quarkus.rest-client."org.acme.rest.client.ExtensionsService".scope=javax.inject.Singleton # <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>この設定をすると、 <code>ExtensionsService</code> を使用して実行されるすべてのリクエストが <code><a href="https://stage.code.quarkus.io" class="bare">https://stage.code.quarkus.io</a></code> をベースURLとして使用します。上記の設定を使用して、 <code>ExtensionsService</code> の <code>getById</code> メソッドを <code>io.quarkus:quarkus-rest-client</code> の値で呼び出すと、HTTP GET リクエストが <code><a href="https://stage.code.quarkus.io/api/extensions?id=io.quarkus:quarkus-rest-client" class="bare">https://stage.code.quarkus.io/api/extensions?id=io.quarkus:quarkus-rest-client</a></code> に対して実行されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>この設定をすると、 <code>ExtensionsService</code> のデフォルトのスコープは <code>@Singleton</code> になります。サポートされているスコープの値は <code>@Singleton</code> , <code>@Dependent</code> , <code>@ApplicationScoped</code> および <code>@RequestScoped</code> です。既定のスコープは <code>@Dependent</code> です。デフォルトのスコープはインターフェイス上で定義することもできます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>org.acme.rest.client.ExtensionsService</code> は、前のセクションで作成した <code>ExtensionsService</code> インターフェイスの完全修飾名と <em>一致しなければならない</em> ことに注意してください。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>クライアントを設定の設定には、標準の MicroProfile Rest Client のプロパティー記法を使用することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">org.acme.rest.client.ExtensionsService/mp-rest/url=https://stage.code.quarkus.io/api
+org.acme.rest.client.ExtensionsService/mp-rest/scope=javax.inject.Singleton</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>プロパティーが Quarkus 記法と MicroProfile 記法の両方で指定されている場合、 Quarkus 記法が優先されます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>設定を容易にするために、 <code>@RegisterRestClient</code> <code>configKey</code> プロパティーを使用して、インターフェースの完全修飾名とは別の設定ルートを使用することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@RegisterRestClient(configKey="extensions-api")
+public interface ExtensionsService {
+    [...]
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># Your configuration properties
+quarkus.rest-client.extensions-api.url=https://stage.code.quarkus.io/api
+quarkus.rest-client.extensions-api.scope=javax.inject.Singleton</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="disabling-hostname-verification"><a class="anchor" href="#disabling-hostname-verification"></a>ホスト名の検証の無効化</h3>
+<div class="paragraph">
+<p>特定の REST クライアントの SSL ホスト名検証を無効にするには、以下の内容を設定に追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.rest-client.extensions-api.hostname-verifier=io.quarkus.restclient.NoopHostnameVerifier</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="disabling-ssl-verifications"><a class="anchor" href="#disabling-ssl-verifications"></a>SSL の検証の無効化</h3>
+<div class="paragraph">
+<p>全ての SSL の検証を無効にするには、以下の内容を設定に追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.tls.trust-all=true</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>この設定は、あらゆる種類の SSL 検証を無効にするため、実運用環境では使用しないでください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-the-jax-rs-resource"><a class="anchor" href="#create-the-jax-rs-resource"></a>JAX-RSリソースの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>src/main/java/org/acme/rest/client/ExtensionsResource.java</code> ファイルを以下の内容で作成してください:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.resteasy.annotations.jaxrs.PathParam;
+
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import java.util.Set;
+
+@Path("/extension")
+public class ExtensionsResource {
+
+    @Inject
+    @RestClient
+    ExtensionsService extensionsService;
+
+    @GET
+    @Path("/id/{id}")
+    public Set&lt;Extension&gt; id(@PathParam String id) {
+        return extensionsService.getById(id);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>標準の CDI <code>@Inject</code> アノテーションに加えて、 <code>ExtensionsService</code> を注入するために MicroProfile <code>@RestClient</code> アノテーションを使用する必要があることに注意してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="update-the-test"><a class="anchor" href="#update-the-test"></a>テストの更新</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>また、エンドポイントに加えられた変更を反映させるために、機能テストを更新する必要があります。 <code>src/test/java/org/acme/rest/client/ExtensionsResourceTest.java</code> ファイルを編集し、 <code>testExtensionIdEndpoint</code> メソッドの内容を変更します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.greaterThan;
+
+import org.acme.rest.client.resources.WireMockExtensionsResource;
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.junit.QuarkusTest;
+
+@QuarkusTest
+@QuarkusTestResource(WireMockExtensionsResource.class)
+public class ExtensionsResourceTest {
+
+    @Test
+    public void testExtensionsIdEndpoint() {
+        given()
+            .when().get("/extension/id/io.quarkus:quarkus-rest-client")
+            .then()
+            .statusCode(200)
+            .body("$.size()", is(1),
+                "[0].id", is("io.quarkus:quarkus-rest-client"),
+                "[0].name", is("REST Client Classic"),
+                "[0].keywords.size()", greaterThan(1),
+                "[0].keywords", hasItem("rest-client"));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上のコードでは、 <a href="http://rest-assured.io/">REST Assured</a> の <a href="https://github.com/rest-assured/rest-assured/wiki/GettingStarted#jsonpath">json-path</a> 機能を使用しています。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="async-support"><a class="anchor" href="#async-support"></a>非同期サポート</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>rest クライアントは非同期の rest 呼び出しをサポートしています。非同期のサポートには、2パターンあります。 <code>CompletionStage</code> を返却するか <code>Uni</code> ( <code>quarkus-rest-client-mutiny</code> のエクステンションが必要です) を返却するかです。 <code>ExtensionsService</code> REST インタフェースに <code>getByIdAsync</code> メソッドを追加してみましょう。コードは以下のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import java.util.Set;
+import java.util.concurrent.CompletionStage;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import org.jboss.resteasy.annotations.jaxrs.QueryParam;
+
+@Path("/extensions")
+@RegisterRestClient
+public interface ExtensionsService {
+
+    @GET
+    Set&lt;Extension&gt; getById(@QueryParam String id);
+
+    @GET
+    CompletionStage&lt;Set&lt;Extension&gt;&gt; getByIdAsync(@QueryParam String id);
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>src/main/java/org/acme/rest/client/ExtensionsResource.java</code> ファイルを開き、以下の内容で更新してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import java.util.Set;
+import java.util.concurrent.CompletionStage;
+
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.resteasy.annotations.jaxrs.PathParam;
+
+@Path("/extension")
+public class ExtensionsResource {
+
+    @Inject
+    @RestClient
+    ExtensionsService extensionsService;
+
+    @GET
+    @Path("/id/{id}")
+    public Set&lt;Extension&gt; id(@PathParam String id) {
+        return extensionsService.getById(id);
+    }
+
+    @GET
+    @Path("/id-async/{id}")
+    public CompletionStage&lt;Set&lt;Extension&gt;&gt; idAsync(@PathParam String id) {
+        return extensionsService.getByIdAsync(id);
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>非同期メソッドをテストするには、<code>ExtensionsResourceTest</code> に以下のテストメソッドを追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Test
+public void testExtensionIdAsyncEndpoint() {
+    given()
+        .when().get("/extension/id-async/io.quarkus:quarkus-rest-client")
+        .then()
+        .statusCode(200)
+        .body("$.size()", is(1),
+            "[0].id", is("io.quarkus:quarkus-rest-client"),
+            "[0].name", is("REST Client Classic"),
+            "[0].keywords.size()", greaterThan(1),
+            "[0].keywords", hasItem("rest-client"));
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Uni</code> 版は非常に似ています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import java.util.Set;
+import java.util.concurrent.CompletionStage;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import org.jboss.resteasy.annotations.jaxrs.QueryParam;
+
+import io.smallrye.mutiny.Uni;
+
+@Path("/extensions")
+@RegisterRestClient
+public interface ExtensionsService {
+
+    // ...
+
+    @GET
+    Uni&lt;Set&lt;Extension&gt;&gt; getByIdAsUni(@QueryParam String id);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>ExtensionsResource</code> は次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import java.util.Set;
+import java.util.concurrent.CompletionStage;
+
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.resteasy.annotations.jaxrs.PathParam;
+
+import io.smallrye.mutiny.Uni;
+
+@Path("/extension")
+public class ExtensionsResource {
+
+    @Inject
+    @RestClient
+    ExtensionsService extensionsService;
+
+
+    // ...
+
+    @GET
+    @Path("/id-uni/{id}")
+    public Uni&lt;Set&lt;Extension&gt;&gt; idMutiny(@PathParam String id) {
+        return extensionsService.getByIdAsUni(id);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="title">Mutiny</div>
+<div class="paragraph">
+<p>前のスニペットでは、Mutinyのリアクティブ型を使用していますが、もし慣れていない場合は、まず <a href="mutiny-primer">Mutiny - 直感的なリアクティブプログラミングライブラリ</a> を読んでください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>Uni</code> を返すとき、すべての <em>サブスクリプション</em> は 、リモートサービスを呼び出します。つまり、 <code>Uni</code> で再購読してリクエストを再送信するか、以下のように <code>retry</code> を使用することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject @RestClient ExtensionsService extensionsService;
+
+// ...
+
+extensionsService.getByIdAsUni(id)
+    .onFailure().retry().atMost(10);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>CompletionStage</code> を使用する場合は、サービスのメソッドを呼び出して再試行する必要があります。この違いは、Mutinyとそのサブスクリプションプロトコルの lazy 性の側面から来ています。これについての詳細は Mutiny の <a href="https://smallrye.io/smallrye-mutiny/#_uni_and_multi">ドキュメント</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="custom-headers-support"><a class="anchor" href="#custom-headers-support"></a>カスタムヘッダーのサポート</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>MicroProfile REST クライアントでは、 <code>ClientHeadersFactory</code> を <code>@RegisterClientHeaders</code> アノテーションで登録することで、リクエストヘッダーを修正することができます。</p>
+</div>
+<div class="paragraph">
+<p><code>ExtensionsResource</code> REST インタフェースに <code>@RegisterClientHeaders</code> アノテーションを追加して、 <code>RequestUUIDHeaderFactory</code> クラスを指すようにします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import java.util.Set;
+import java.util.concurrent.CompletionStage;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import org.jboss.resteasy.annotations.jaxrs.QueryParam;
+
+import io.smallrye.mutiny.Uni;
+
+@Path("/extensions")
+@RegisterRestClient
+@RegisterClientHeaders(RequestUUIDHeaderFactory.class)
+public interface ExtensionsService {
+
+    @GET
+    Set&lt;Extension&gt; getById(@QueryParam String id);
+
+    @GET
+    CompletionStage&lt;Set&lt;Extension&gt;&gt; getByIdAsync(@QueryParam String id);
+
+    @GET
+    Uni&lt;Set&lt;Extension&gt;&gt; getByIdAsUni(@QueryParam String id);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>RequestUUIDHeaderFactory</code> は以下ようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import org.eclipse.microprofile.rest.client.ext.ClientHeadersFactory;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import java.util.UUID;
+
+@ApplicationScoped
+public class RequestUUIDHeaderFactory implements ClientHeadersFactory {
+
+    @Override
+    public MultivaluedMap&lt;String, String&gt; update(MultivaluedMap&lt;String, String&gt; incomingHeaders, MultivaluedMap&lt;String, String&gt; clientOutgoingHeaders) {
+        MultivaluedMap&lt;String, String&gt; result = new MultivaluedHashMap&lt;&gt;();
+        result.add("X-request-uuid", UUID.randomUUID().toString());
+        return result;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上の例のように、 <code>@Singleton</code>, <code>@ApplicationScoped</code> などのスコープを定義するアノテーションを付けることで、 <code>ClientHeadersFactory</code> の実装をCDI Beanにすることができます。</p>
+</div>
+<div class="sect2">
+<h3 id="default-header-factory"><a class="anchor" href="#default-header-factory"></a>デフォルトのヘッダーファクトリー</h3>
+<div class="paragraph">
+<p>また、カスタムファクトリーを指定せずに <code>@RegisterClientHeaders</code> アノテーションを使用することもできます。その場合は、 <code>DefaultClientHeadersFactoryImpl</code> ファクトリーが使用され、 <code>org.eclipse.microprofile.rest.client.propagateHeaders</code> プロパティーに記載されているすべてのヘッダーが修正されます。個々のヘッダー名はコンマで区切られています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Path("/extensions")
+@RegisterRestClient
+@RegisterClientHeaders
+public interface ExtensionsService {
+
+    @GET
+    Set&lt;Extension&gt; getById(@QueryParam String id);
+
+    @GET
+    CompletionStage&lt;Set&lt;Extension&gt;&gt; getByIdAsync(@QueryParam String id);
+
+    @GET
+    Uni&lt;Set&lt;Extension&gt;&gt; getByIdAsUni(@QueryParam String id);
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">org.eclipse.microprofile.rest.client.propagateHeaders=Authorization,Proxy-Authorization</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="package-and-run-the-application"><a class="anchor" href="#package-and-run-the-application"></a>アプリケーションをパッケージ化して実行する</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>アプリケーションを実行します。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ブラウザで <a href="http://localhost:8080/extension/id/io.quarkus:quarkus-rest-client" class="bare">http://localhost:8080/extension/id/io.quarkus:quarkus-rest-client</a> を開きます。</p>
+</div>
+<div class="paragraph">
+<p>REST Client extension に関する基本情報を含む JSON オブジェクトが表示されます。</p>
+</div>
+<div class="paragraph">
+<p>いつものように、アプリケーションは以下の方法でパッケージ化できます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして次のコマンドで実行できます。<code>java -jar target/quarkus-app/quarkus-run.jar</code></p>
+</div>
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルを <code>./mvnw clean package -Pnative</code> で生成することもできます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build --native</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install -Dnative</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build -Dquarkus.package.type=native</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="rest-client-and-resteasy-interactions"><a class="anchor" href="#rest-client-and-resteasy-interactions"></a>REST クライアントと RESTEasy のやりとり</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus では、REST Client エクステンションと <a href="rest-json">RESTEasy エクステンション</a>は同じインフラストラクチャーを共有しています。この考察の重要な結果の1つは、 JAX-RS の意味においての同じプロバイダーリストを共有していることです。</p>
+</div>
+<div class="paragraph">
+<p>例えば、 <code>WriterInterceptor</code> を宣言した場合、デフォルトではサーバーの呼び出しとクライアントの呼び出しの両方をインターセプトしますが、これは望ましい動作ではないかもしれません。</p>
+</div>
+<div class="paragraph">
+<p>しかし、このデフォルトの動作を変更してプロバイダーに制約を設けることができます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>プロバイダーに <code>@ConstrainedTo(RuntimeType.CLIENT)</code> アノテーションを追加することで、 <strong>クライアント</strong> の呼び出しのみを考慮します。</p>
+</li>
+<li>
+<p>プロバイダーに <code>@ConstrainedTo(RuntimeType.SERVER)</code> アノテーションを追加することで、 <strong>サーバー</strong> の呼び出しのみを考慮します。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-a-mock-http-server-for-tests"><a class="anchor" href="#using-a-mock-http-server-for-tests"></a>テストにモックHTTPサーバーを使用する</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>テストを実行する際にモック HTTP サーバーを設定することは、一般的なテストパターンです。そのようなサーバーの例としては、 <a href="http://wiremock.org/">Wiremock</a> や <a href="https://docs.hoverfly.io/projects/hoverfly-java/en/latest/index.html">Hoverfly</a> があります。このセクションでは、ここまでで開発した <code>ExtensionsService</code> をテストするために Wiremock を活用する方法を示します。</p>
+</div>
+<div class="paragraph">
+<p>まず、Wiremockをテストの依存関係として追加する必要があります。Mavenプロジェクトの場合は以下のようになります:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;com.github.tomakehurst&lt;/groupId&gt;
+    &lt;artifactId&gt;wiremock-jre8&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+    &lt;version&gt;${wiremock.version}&lt;/version&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>適切なWiremockのバージョンを使用してください。利用可能なすべてのバージョンは <a href="https://search.maven.org/artifact/com.github.tomakehurst/wiremock-jre8">ここ</a> で確認できます。</td>
+</tr>
+</table>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">testImplementation("com.github.tomakehurst:wiremock-jre8:$wiremockVersion") <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>適切なWiremockのバージョンを使用してください。利用可能なすべてのバージョンは <a href="https://search.maven.org/artifact/com.github.tomakehurst/wiremock-jre8">ここ</a> で確認できます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Quarkusのテストを実行する前にサービスを開始する必要がある場合、Quarkusのテストでは、 <code>@io.quarkus.test.common.QuarkusTestResource</code> アノテーションを利用して、サービスを開始できる <code>io.quarkus.test.common.QuarkusTestResourceLifecycleManager</code> を指定し、Quarkusが使用する設定値を提供します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>@QuarkusTestResource</code> の詳細については、 <a href="getting-started-testing.html#quarkus-test-resource">ドキュメントのこの部分</a>を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>WiremockExtensions</code> という名前で、 <code>QuarkusTestResourceLifecycleManager</code> の実装を以下のように作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import java.util.Collections;
+import java.util.Map;
+
+import com.github.tomakehurst.wiremock.WireMockServer;
+import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*; <i class="conum" data-value="1"></i><b>(1)</b>
+
+public class WireMockExtensions implements QuarkusTestResourceLifecycleManager {  <i class="conum" data-value="2"></i><b>(2)</b>
+
+    private WireMockServer wireMockServer;
+
+    @Override
+    public Map&lt;String, String&gt; start() {
+        wireMockServer = new WireMockServer();
+        wireMockServer.start(); <i class="conum" data-value="3"></i><b>(3)</b>
+
+        wireMockServer.stubFor(get(urlEqualTo("/extensions?id=io.quarkus:quarkus-rest-client"))   <i class="conum" data-value="4"></i><b>(4)</b>
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            "[{" +
+                            "\"id\": \"io.quarkus:quarkus-rest-client\"," +
+                            "\"name\": \"REST Client Classic\"" +
+                            "}]"
+                        )));
+
+        wireMockServer.stubFor(get(urlMatching(".*")).atPriority(10).willReturn(aResponse().proxiedFrom("https://stage.code.quarkus.io/api")));   <i class="conum" data-value="5"></i><b>(5)</b>
+
+        return Collections.singletonMap("quarkus.rest-client.\"org.acme.rest.client.ExtensionsService\".url", wireMockServer.baseUrl()); <i class="conum" data-value="6"></i><b>(6)</b>
+    }
+
+    @Override
+    public void stop() {
+        if (null != wireMockServer) {
+            wireMockServer.stop();  <i class="conum" data-value="7"></i><b>(7)</b>
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Wiremock パッケージのメソッドを静的にインポートすることで、テストが読みやすくなります。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>start</code> メソッドは、テストを実行する前にQuarkusによって呼び出され、テスト実行中に適用される設定プロパティーの <code>Map</code> を返します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Wiremockを起動します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>/extensions?id=io.quarkus:quarkus-rest-client</code> への呼び出しに対して特定のレスポンスを返すよう、Wiremock のスタブを設定します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>スタブ化されていないすべての HTTP 呼び出しは、実際のサービスを呼び出すことで処理されます。これはデモンストレーションを目的として行われているものであり、通常は実際のテストでは発生しません。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td><code>start</code> メソッドはテストに適用される設定を返すので、 <code>ExtensionsResource</code> の実装で使用されるベースURLを制御する rest-client プロパティーを、Wiremock がリクエストの着信をリッスンするベースURLに設定します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>すべてのテストが終了したら、Wiremockをシャットダウンします。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>ExtensionsResourceTest</code> クラスには、以下のようなアノテーションが必要です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@QuarkusTest
+@QuarkusTestResource(WireMockExtensions.class)
+public class ExtensionsResourceTest {
+
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>@QuarkusTestResource</code> は <code>ExtensionsResourceTest</code> だけでなく、すべてのテストに適用されます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="further-reading"><a class="anchor" href="#further-reading"></a>さらに詳しく</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://download.eclipse.org/microprofile/microprofile-rest-client-2.0/microprofile-rest-client-spec-2.0.html">MicroProfile Rest Client specification</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#solution">ソリューション</a></li>
+<li><a href="#creating-the-maven-project">Mavenプロジェクトの作成</a></li>
+<li><a href="#setting-up-the-model">モデルのセットアップ</a></li>
+<li><a href="#create-the-interface">インターフェースの作成</a>
+<ul class="sectlevel2">
+<li><a href="#path-parameters">パスパラメーター</a></li>
+</ul>
+</li>
+<li><a href="#create-the-configuration">設定</a>
+<ul class="sectlevel2">
+<li><a href="#disabling-hostname-verification">ホスト名の検証の無効化</a></li>
+<li><a href="#disabling-ssl-verifications">SSL の検証の無効化</a></li>
+</ul>
+</li>
+<li><a href="#create-the-jax-rs-resource">JAX-RSリソースの作成</a></li>
+<li><a href="#update-the-test">テストの更新</a></li>
+<li><a href="#async-support">非同期サポート</a></li>
+<li><a href="#custom-headers-support">カスタムヘッダーのサポート</a>
+<ul class="sectlevel2">
+<li><a href="#default-header-factory">デフォルトのヘッダーファクトリー</a></li>
+</ul>
+</li>
+<li><a href="#package-and-run-the-application">アプリケーションをパッケージ化して実行する</a></li>
+<li><a href="#rest-client-and-resteasy-interactions">REST クライアントと RESTEasy のやりとり</a></li>
+<li><a href="#using-a-mock-http-server-for-tests">テストにモックHTTPサーバーを使用する</a></li>
+<li><a href="#further-reading">さらに詳しく</a></li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

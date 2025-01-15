@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>JReleaser によるパッケージングとリリース - 3.15 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.15/guides/jreleaser" />
+  <meta property="og:title" content="JReleaser によるパッケージングとリリース - 3.15" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/jreleaser">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.15/guides/jreleaser">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.15/guides/jreleaser" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.15/guides/jreleaser">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.15/guides/jreleaser">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.15/guides/jreleaser">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.15/guides/jreleaser">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.15/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" selected>3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">JReleaser によるパッケージングとリリース </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、<a href="https://jreleaser.org">JReleaser</a> ツールを使ったCLIアプリケーションのパッケージングとリリースについて説明します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>1. 前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>約15分</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 17+がインストールされ、 <code>JAVA_HOME</code> が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.9.8</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルをビルドしたい場合、MandrelまたはGraalVM（あるいはネイティブなコンテナビルドを使用する場合はDocker）をインストールし、 <a href="building-native-image.html#configuring-graalvm">適切に設定</a>していること</p>
+</li>
+<li>
+<p>GitHubアカウントとGitHubパーソナルアクセストークン</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="bootstrapping-the-project"><a class="anchor" href="#bootstrapping-the-project"></a>2. プロジェクトのブートストラップ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず，CLIアプリケーションを定義したプロジェクトが必要です。 <a href="picocli.html">PicoCLI</a>エクステンションの使用をお勧めします。これは以下のコマンドで行うことができます。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create cli org.acme:app
+cd app</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:3.15.2:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=app \
+    -Dextensions='picocli'
+cd app</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>このコマンドは、プロジェクトのファイル構造と最低限必要なファイルのセットを初期化します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">.
+├── README.md
+├── mvnw
+├── mvnw.cmd
+├── pom.xml
+└── src
+    └── main
+        ├── docker
+        │   ├── Dockerfile.jvm
+        │   ├── Dockerfile.legacy-jar
+        │   └── Dockerfile.native
+        ├── java
+        │   └── org
+        │       └── acme
+        │           └── GreetingCommand.java
+        └── resources
+            └── application.properties</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>また、このコマンドは <code>pom.xml</code> にpicocli エクステンションを設定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">    &lt;dependency&gt;
+      &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+      &lt;artifactId&gt;quarkus-picocli&lt;/artifactId&gt;
+    &lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="preparing-the-project-for-github-releases"><a class="anchor" href="#preparing-the-project-for-github-releases"></a>3. GitHub リリース用のプロジェクトの準備</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>この作業を続ける前に、プロジェクトをGitHubリポジトリでホストする必要があります。この作業は、GitHub アカウントにログインし、新しいリポジトリを作成して、新しく作成したソースをそのリポジトリに追加することで完了します。 <code>main</code> ブランチをデフォルトとして選択すると、規約を利用して <code>pom.xml</code> で設定を少なくすることが可能です。</p>
+</div>
+<div class="paragraph">
+<p>また、作成したリポジトリにリリースを投稿するためには、GitHub パーソナルアクセストークンが必要です。 <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token">パーソナルアクセストークンの作成</a>方法は、公式ドキュメントに従ってください。作成したトークンは、今後のために安全な場所に保管しておきましょう。次に、トークンを環境変数 <code>JRELEASER_GITHUB_TOKEN</code> として設定し、ツールに読み込ませる方法があります。あるいは、 <code>.yml</code> 、 <code>.toml</code> 、 <code>.json</code> 、 <code>.properties</code> のいずれかのファイルを使用して、トークンを安全な場所に保存することもできます。デフォルトの場所は <code>~/.jreleaser/config[format]</code> です。例えば、 <code>.yml</code> のフォーマットを使用した場合、このファイルは次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="title">~/.jreleaser/config.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">JRELEASER_GITHUB_TOKEN: &lt;github-token-value&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>さてさて。すべてのソースを追加し、最初のコミットを作成します。コミットメッセージの規約は自由ですが、 <a href="https://www.conventionalcommits.org/en/v1.0.0/">Conventional Commits</a> 仕様に従った方が、JReleaserをより効果的に使うことができます。最初のコミットでは、"build:Add initial sources" というメッセージで最初のコミットを行います。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="packaging-as-a-native-image-distribution"><a class="anchor" href="#packaging-as-a-native-image-distribution"></a>4. ネイティブイメージでの配布</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusは、GraalVM Native Imageを使用してネイティブ実行可能ファイルを作成する方法をすでに知っています。デフォルトの設定では、命名規則に従って1つの実行ファイルが作成されます。しかし、JReleaserツールは、ZipまたはTarファイルとしてパッケージ化された従来のファイル構造であるディストリビューションを期待しています。ファイル構造は以下のようなレイアウトになっている必要があります:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">.
+├── LICENSE
+├── README
+└── bin
+    └── executable</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この構造では、設定ファイル、シェル補完スクリプト、マンページ、ライセンス、Readmeなど、実行ファイルに必要なあらゆる種類のサポートファイルを追加することができます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-distribution"><a class="anchor" href="#creating-the-distribution"></a>5. ディストリビューションの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="http://maven.apache.org/plugins/maven-assembly-plugin/">maven-assembly-plugin</a>を利用して、このようなディストリビューションを作成することができます。また、 <a href="https://github.com/trustin/os-maven-plugin">os-maven-plugin</a> を利用して、この実行ファイルが実行可能なプラットフォームを適切に識別し、ディストリビューションのファイル名にそのプラットフォームを追加します。</p>
+</div>
+<div class="paragraph">
+<p>まず、 <code>pom.xml</code> に os-maven-plugin を追加しましょう。このプラグインは、Maven のエクステンションとして動作するため、ファイルの <code>&lt;build&gt;</code> セクションに追加する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">  &lt;build&gt;
+    &lt;extensions&gt;
+      &lt;extension&gt;
+        &lt;groupId&gt;kr.motd.maven&lt;/groupId&gt;
+        &lt;artifactId&gt;os-maven-plugin&lt;/artifactId&gt;
+        &lt;version&gt;1.7.1&lt;/version&gt;
+      &lt;/extension&gt;
+    &lt;/extensions&gt;
+    &lt;!-- ... --&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に，Linux や macOS プラットフォーム上のネイティブ実行可能ファイルには通常拡張子がありませんが，Windows の実行ファイルには拡張子がありますので，生成された実行ファイルの名前を変更する際にはこの点に注意する必要があります．また，生成されたディストリビューションを独自のディレクトリに配置することで， <code>target</code> ディレクトリが散らかるのを防ぐことができます．そこで、 <code>pom.xml</code> の既存の <code>&lt;properties&gt;</code> セクションに、いくつかのプロパティを追加してみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;executable-suffix/&gt;
+&lt;distribution.directory&gt;${project.build.directory}/distributions&lt;/distribution.directory&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、maven-assembly-plugin を設定して、実行可能ファイルと、そのジョブを実行するために必要になる可能性のあるサポートファイルを含む Zip ファイルと Tar ファイルを作成します。ディストリビューションの名前に特に注意してください。ここで、os-maven-plugin によって検出されたプラットフォームのプロパティーを利用します。このプラグインは、<code>package</code> フェーズにバインドされた <code>single</code> ゴールを使用して独自のプロファイルで設定されます。これは、リリースの準備ができたときにのみ必要になるため、ビルドが呼び出されるたびにディストリビューションを再ビルドすることを回避するためにこのように行われます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">    &lt;profile&gt;
+      &lt;id&gt;dist&lt;/id&gt;
+      &lt;build&gt;
+        &lt;plugins&gt;
+          &lt;plugin&gt;
+            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-assembly-plugin&lt;/artifactId&gt;
+            &lt;version&gt;3.3.0&lt;/version&gt;
+            &lt;configuration&gt;
+              &lt;attach&gt;false&lt;/attach&gt;
+              &lt;appendAssemblyId&gt;false&lt;/appendAssemblyId&gt;
+              &lt;finalName&gt;${project.artifactId}-${project.version}-${os.detected.classifier}&lt;/finalName&gt;
+              &lt;outputDirectory&gt;${distribution.directory}&lt;/outputDirectory&gt;
+              &lt;workDirectory&gt;${project.build.directory}/assembly/work&lt;/workDirectory&gt;
+              &lt;descriptors&gt;
+                &lt;descriptor&gt;src/main/assembly/assembly.xml&lt;/descriptor&gt;
+              &lt;/descriptors&gt;
+            &lt;/configuration&gt;
+            &lt;executions&gt;
+              &lt;execution&gt;
+                &lt;id&gt;make-distribution&lt;/id&gt;
+                &lt;phase&gt;package&lt;/phase&gt;
+                &lt;goals&gt;
+                  &lt;goal&gt;single&lt;/goal&gt;
+                &lt;/goals&gt;
+              &lt;/execution&gt;
+            &lt;/executions&gt;
+          &lt;/plugin&gt;
+        &lt;/plugins&gt;
+      &lt;/build&gt;
+    &lt;/profile&gt;
+    &lt;profile&gt;
+      &lt;id&gt;dist-windows&lt;/id&gt;
+      &lt;activation&gt;
+        &lt;os&gt;
+          &lt;family&gt;windows&lt;/family&gt;
+        &lt;/os&gt;
+      &lt;/activation&gt;
+      &lt;properties&gt;
+        &lt;executable-suffix&gt;.exe&lt;/executable-suffix&gt;
+      &lt;/properties&gt;
+    &lt;/profile&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>2 つのプロファイルが設定されていることに注意してください。<code>dist</code> プロファイルはアセンブリプラグインを設定し、コマンドフラグとして <code>-Pdist</code> を渡すことによって明示的にアクティブ化する必要があるように設定されています。一方、ビルドが Windows プラットフォームで実行されると、<code>dist-windows</code> プロファイルが自動的にアクティブになります。この 2 番目のプロファイルは、次に示すように、アセンブリ記述子に必要な <code>executable-suffix</code> プロパティーの値の設定を処理します。</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/assembly/assembly.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;assembly
+        xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd"&gt;
+    &lt;id&gt;dist&lt;/id&gt;
+    &lt;formats&gt;
+        &lt;format&gt;tar.gz&lt;/format&gt;
+        &lt;format&gt;zip&lt;/format&gt;
+        &lt;format&gt;dir&lt;/format&gt;
+    &lt;/formats&gt;
+    &lt;files&gt;
+        &lt;file&gt;
+            &lt;source&gt;${project.build.directory}/${project.artifactId}-${project.version}-runner${executable-suffix}&lt;/source&gt;
+            &lt;outputDirectory&gt;./bin&lt;/outputDirectory&gt;
+            &lt;destName&gt;${project.artifactId}${executable-suffix}&lt;/destName&gt;
+        &lt;/file&gt;
+    &lt;/files&gt;
+&lt;/assembly&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これらのファイルは、macOS上で <code>./mvnw -Pdist package</code> を起動したときに、assembly プラグインによって作成されるファイルです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">$ tree target/distributions/
+target/distributions/
+├── app-1.0.0-SNAPSHOT-osx-x86_64
+│   └── app-1.0.0-SNAPSHOT-osx-x86_64
+│       └── bin
+│           └── app
+├── app-1.0.0-SNAPSHOT-osx-x86_64.tar.gz
+└── app-1.0.0-SNAPSHOT-osx-x86_64.zip</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>アセンブリ記述子を自由に更新して、LICENSE、readme、または実行可能ファイルのコンシューマーが必要とするその他のファイルを追加してください。ここでビルド: ディストリビューションアセンブリの設定を使用して別のコミットを行います。</p>
+</div>
+<div class="paragraph">
+<p>これで、次の段階であるリリースの設定に進むことができます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="adding-jreleaser"><a class="anchor" href="#adding-jreleaser"></a>6. JReleaser の追加</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>JReleaser ツールは、CLI ツール、Docker イメージ、または Maven プラグインなどのさまざまな方法で呼び出すことができます。最後のオプションは、すでに Maven を使用していることを考えると、非常に便利です。リリース設定を含むさらに別のプロファイルを追加しましょう。リリースを投稿する準備ができている場合にのみ、この動作を常にアクティブにする必要はありません。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">    &lt;profile&gt;
+      &lt;id&gt;release&lt;/id&gt;
+      &lt;build&gt;
+        &lt;plugins&gt;
+          &lt;plugin&gt;
+            &lt;groupId&gt;org.jreleaser&lt;/groupId&gt;
+            &lt;artifactId&gt;jreleaser-maven-plugin&lt;/artifactId&gt;
+            &lt;version&gt;1.6.0&lt;/version&gt;
+          &lt;/plugin&gt;
+        &lt;/plugins&gt;
+      &lt;/build&gt;
+    &lt;/profile&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この時点で呼び出すことができるいくつかの目標があります。たとえば、<code>./mvnw -Prelease jreleaser:config</code> コマンドを呼び出すことにより、JReleaser に現在の設定を出力するように依頼できます。ツールは、プロジェクトについて知っているすべてのものを出力します。<code>./mvnw -Prelease jreleaser:changelog</code> を呼び出して変更ログを生成することもできます。変更ログを含むファイルは <code>target/jreleaser/release/CHANGELOG.md</code> に配置され、この時点では次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="title">target/jreleaser/release/CHANGELOG.md</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-markdown hljs" data-lang="markdown">## Changelog
+
+8ef3307 build: Configure distribution assembly
+5215200 build: Add initial sources</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>あまりエキサイティングではありません。しかし、JReleaser に独自の規約に従ってチェンジログをフォーマットするように指示することでこれを変更することが出来ます。パターンを手動で指定してコミットを分類できますが、規約に沿ったコミットに従うことを選択した場合は、JReleaser に同じことを行うように指示できます。JReleaser プラグイン設定セクションに以下を追加します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">            &lt;configuration&gt;
+              &lt;jreleaser&gt;
+                &lt;release&gt;
+                  &lt;github&gt;
+                    &lt;changelog&gt;
+                      &lt;formatted&gt;ALWAYS&lt;/formatted&gt;
+                      &lt;preset&gt;conventional-commits&lt;/preset&gt;
+                    &lt;/changelog&gt;
+                  &lt;/github&gt;
+                &lt;/release&gt;
+              &lt;/jreleaser&gt;
+            &lt;/configuration&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>前述のMavenコマンドをもう一度実行し、生成されたチェンジログを確認してください、以下のようになるはずです:</p>
+</div>
+<div class="listingblock">
+<div class="title">target/jreleaser/release/CHANGELOG.md</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-markdown hljs" data-lang="markdown">## Changelog
+
+## 🛠  Build
+- 8ef3307 Configure distribution assembly (Andres Almiray)
+- 5215200 Add initial sources (Andres Almiray)
+
+
+## Contributors
+We'd like to thank the following people for their contributions:
+Andres Almiray</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>適用できるフォーマットオプションは他にもありますが、今のところはこれらで十分です。ビルド: JReleaser プラグインの設定をコミットメッセージとして使用して、今すぐさらに別のコミットを行いましょう。必要に応じて、変更ログをもう一度生成して、この最新のコミットがファイルに追加されていることを確認できます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="adding-distributions-to-the-release"><a class="anchor" href="#adding-distributions-to-the-release"></a>7. リリースへのディストリビューションの追加</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>バイナリー配布を設定できるようになりました。<code>./mvnw -Prelease jreleaser:config</code> コマンドを実行すると、前の手順で設定した配布ファイルについての言及がないことに気付くでしょう。これは、ツールに暗黙の知識がないため、リリースするファイルを JReleaser に通知する必要があるためです。これにより、ファイルを自由に追加または削除したい場合に、ディストリビューションの作成がリリースアセットから切り離されます。この特定のケースでは、macOS と Windows の両方に Zip ファイルを設定し、Linux に Tar ファイルを設定します。これらのファイルは、次のように JReleaser プラグイン設定セクションに追加する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">            &lt;configuration&gt;
+              &lt;jreleaser&gt;
+                &lt;release&gt;
+                  &lt;github&gt;
+                    &lt;changelog&gt;
+                      &lt;formatted&gt;ALWAYS&lt;/formatted&gt;
+                      &lt;preset&gt;conventional-commits&lt;/preset&gt;
+                    &lt;/changelog&gt;
+                  &lt;/github&gt;
+                &lt;/release&gt;
+                &lt;distributions&gt;
+                  &lt;app&gt;
+                    &lt;type&gt;BINARY&lt;/type&gt;
+                    &lt;artifacts&gt;
+                      &lt;artifact&gt;
+                        &lt;path&gt;${distribution.directory}/{{distributionName}}-{{projectVersion}}-linux-x86_64.tar.gz&lt;/path&gt;
+                        &lt;platform&gt;linux-x86_64&lt;/platform&gt;
+                      &lt;/artifact&gt;
+                      &lt;artifact&gt;
+                        &lt;path&gt;${distribution.directory}/{{distributionName}}-{{projectVersion}}-windows-x86_64.zip&lt;/path&gt;
+                        &lt;platform&gt;windows-x86_64&lt;/platform&gt;
+                      &lt;/artifact&gt;
+                      &lt;artifact&gt;
+                        &lt;path&gt;${distribution.directory}/{{distributionName}}-{{projectVersion}}-osx-x86_64.zip&lt;/path&gt;
+                        &lt;platform&gt;osx-x86_64&lt;/platform&gt;
+                      &lt;/artifact&gt;
+                    &lt;/artifacts&gt;
+                  &lt;/app&gt;
+                &lt;/distributions&gt;
+              &lt;/jreleaser&gt;
+            &lt;/configuration&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>3 つの設定されたアーティファクトを持つ`app`(便宜上プロジェクトの artifactId と同じ) という名前のディストリビューションを評価できます。パスを定義するための Maven プロパティーと Mustache テンプレートの使用に注意してください。設定をパラメーター化するためにプロパティーが必要な場合、またはプロパティーに依存する場合は、明示的な値を使用できます。Maven プロパティーはビルドの検証中に即時に解決されますが、Mustache テンプレートは JReleaser プラグインの目標の実行中に遅延して解決されます。各アーティファクトは、それらを一意に識別する <code>platform</code> プロパティーを定義する必要があります。<code>./mvnw -Prelease jreleaser:config</code> を実行すると、プラグインがプロジェクトによって提供されるメタデータが増えることを期待する設定済みのディストリビューションがあるため、すぐにエラーが発生します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">[ERROR] == JReleaser ==
+[ERROR] project.copyright must not be blank
+[ERROR] project.description must not be blank
+[ERROR] project.website must not be blank
+[ERROR] project.docsUrl must not be blank
+[ERROR] project.license must not be blank
+[ERROR] project.authors must not be blank</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このメタデータは、JReleaser プラグインの設定の一部として、または標準の POM 要素を使用して 2 つの方法で提供できます。前者のオプションを選択した場合、プラグインの設定は次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">            &lt;configuration&gt;
+              &lt;jreleaser&gt;
+                &lt;project&gt;
+                 &lt;description&gt;app - Sample Quarkus CLI application&lt;/description&gt;
+                 &lt;links&gt;
+                   &lt;homepage&gt;&lt;a href="https://github.com/aalmiray/app" class="bare"&gt;https://github.com/aalmiray/app&lt;/a&gt;&lt;/homepage&gt;
+                   &lt;documentation&gt;&lt;a href="https://github.com/aalmiray/app" class="bare"&gt;https://github.com/aalmiray/app&lt;/a&gt;&lt;/documentation&gt;
+                 &lt;/links&gt;
+                 &lt;license&gt;APACHE-2.0&lt;/license&gt;
+                 &lt;authors&gt;Andres Almiray&lt;/authors&gt;
+                 &lt;copyright&gt;2021 Kordamp&lt;/copyright&gt;
+                &lt;/project&gt;
+                &lt;!-- ... --&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>標準の POM 要素を使用することを選択した場合、<code>pom.xml</code> には少なくともこれらのエントリーが含まれている必要があります。もちろん、値を独自のものに適合させます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">  &lt;name&gt;app&lt;/name&gt;
+  &lt;description&gt;app -- Sample Quarkus CLI application&lt;/description&gt;
+  &lt;inceptionYear&gt;2021&lt;/inceptionYear&gt;
+  &lt;url&gt;https://github.com/aalmiray/app&lt;/url&gt;
+  &lt;developers&gt;
+    &lt;developer&gt;
+      &lt;id&gt;aalmiray&lt;/id&gt;
+      &lt;name&gt;Andres Almiray&lt;/name&gt;
+    &lt;/developer&gt;
+  &lt;/developers&gt;
+  &lt;licenses&gt;
+    &lt;license&gt;
+      &lt;name&gt;Apache-2.0&lt;/name&gt;
+      &lt;url&gt;http://www.apache.org/licenses/LICENSE-2.0.txt&lt;/url&gt;
+      &lt;distribution&gt;repo&lt;/distribution&gt;
+    &lt;/license&gt;
+  &lt;/licenses&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>それでも、<code>./mvnw -Prelease jreleaser:config</code> をもう一度呼び出すと、別のエラーが発生するため、まだトラブルを脱していません。今回の失敗は、アーティファクトの欠落に関連しています。これは、必要なすべてのアーティファクトをアセンブルしなかったためですが、プラグインはそれらがすぐに利用できることを期待しています。ここでは、他のノードで必要なアーティファクトをビルドし、それらを予想される場所にコピーすることを選択できます。これは、複数のノードで GitHub Actions ワークフローを実行できるタスクです。または、一部のアーティファクトを無視して、現在のプラットフォームに一致するアーティファクトのみを選択するように JReleaser に指示することもできます。macOS で作成したときにディストリビューションがどのように表示されるかを前述しましたが、そのプラットフォーム上にまだ正しいアーティファクトがあると仮定しています。</p>
+</div>
+<div class="paragraph">
+<p>追加のフラグ <code>./mvnw-Prelease jreleaser:config -Djreleaser.select.current.platform</code> を指定して <code>jreleaser:config</code> ゴールを呼び出すことにより、この時点で macOS に一致するアーティファクトのみを選択するように JReleaser に指示できます。今回はコマンドが成功し、モデルが出力されます。macOS アーティファクトのパスのみが完全に解決されており、他の 2 つのパスは変更されていないことに注意してください。</p>
+</div>
+<div class="paragraph">
+<p>ここで、ビルド: 配布アーティファクトの設定をメッセージとしてもう 1 つコミットしてみましょう。別のゴール <code>./mvnw -Prelease jreleaser:release -Djreleaser.select.current.platform</code> を呼び出すことで、今すぐリリースを作成できます。これにより、選択したリポジトリーに Git リリースが作成されます。これには、リポジトリーのタグ付け、変更ログのアップロード、すべての配布アーティファクト、およびそれらのチェックサムがリリースアセットとして含まれます。</p>
+</div>
+<div class="paragraph">
+<p>しかし、その前に、もう 1 つの機能を追加して、macOS ユーザーがバイナリーディストリビューションを簡単に利用できるようにする Homebrew 式を作成しましょう。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-homebrew-as-a-packager"><a class="anchor" href="#configuring-homebrew-as-a-packager"></a>8. パッケージャーとしての Homebrew の設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://brew.sh/">Homebrew</a> は、バイナリーをインストールおよび管理するための macOS ユーザーの間で人気のある選択肢です。Homebrew パッケージは、特定のバイナリーをインストールまたはアップグレードするためにターゲット環境で実行される Ruby ファイル (フォーミュラと呼ばれる) をコアにしています。JReleaser は、すでに設定したようなバイナリー分布から数式を作成できます。</p>
+</div>
+<div class="paragraph">
+<p>これを機能させるには、次のように JReleaser プラグイン設定で Homebrew を有効にする必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">                &lt;distributions&gt;
+                  &lt;app&gt;
+                    &lt;type&gt;BINARY&lt;/type&gt;
+                    &lt;brew&gt;
+                      &lt;active&gt;ALWAYS&lt;/active&gt;
+                    &lt;/brew&gt;
+                    &lt;artifacts&gt;
+                      &lt;artifact&gt;
+                        &lt;path&gt;${distribution.directory}/{{distributionName}}-{{projectVersion}}-linux-x86_64.tar.gz&lt;/path&gt;
+                        &lt;platform&gt;linux-x86_64&lt;/platform&gt;
+                      &lt;/artifact&gt;
+                      &lt;artifact&gt;
+                        &lt;path&gt;${distribution.directory}/{{distributionName}}-{{projectVersion}}-windows-x86_64.zip&lt;/path&gt;
+                        &lt;platform&gt;windows-x86_64&lt;/platform&gt;
+                      &lt;/artifact&gt;
+                      &lt;artifact&gt;
+                        &lt;path&gt;${distribution.directory}/{{distributionName}}-{{projectVersion}}-osx-x86_64.zip&lt;/path&gt;
+                        &lt;platform&gt;osx-x86_64&lt;/platform&gt;
+                      &lt;/artifact&gt;
+                    &lt;/artifacts&gt;
+                  &lt;/app&gt;
+                &lt;/distributions&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>最後に、スナップショットでないリリースの Homebrew 公式を公開するのは良い習慣なので、プロジェクトのバージョンを <code>1.0.0-SNAPSHOT</code> から <code>1.0.0.Alpha1</code> に変更するか、あるいはそのまま <code>1.0.0</code> に変更します。最後のコミットで完了です。コミットメッセージは "feat: Add Homebrew packager configuration" です。さて、ついに準備が整いました。リリースをポストしましょう。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-a-release"><a class="anchor" href="#creating-a-release"></a>9. リリースの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>これは <code>pom.xml</code> に設定を追加する慌ただしいツアーでしたが、これはプロジェクトの最初のリリースを準備するためのもので、それ以降のリリースでは設定に手を加える必要はありません。Git リリースと Homebrew 式を <code>jreleaser:full-release</code> というゴールで作成しますが、もしまだどうなるかわからないという場合は、ドライランモードでゴールを起動することができます。つまり、Git リポジトリなどのリモートリソースに影響を与えることなく、必要に応じてすべてのローカル操作を JReleaser に実行させます。以下のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs"># because we changed the project's version
+./mvnw -Dnative,dist package
+./mvnw -Prelease jreleaser:full-release -Djreleaser.select.current.platform -Djreleaser.dry.run=true
+
+[INFO] --- jreleaser-maven-plugin:1.6.0:full-release (default-cli) @ app ---
+[INFO] JReleaser 1.6.0
+[INFO]   - basedir set to /tmp/app
+[INFO]   - outputdir set to /tmp/app/target/jreleaser
+[WARNING] Platform selection is in effect
+[WARNING] Artifacts will be filtered by platform matching: [osx-x86_64]
+[INFO] git-root-search set to false
+[INFO] Loading variables from /Users/aalmiray/.jreleaser/config.toml
+[INFO] Validating configuration
+[INFO] Strict mode set to false
+[INFO] Project version set to 1.0.0.Alpha1
+[INFO] Release is not snapshot
+[INFO] Timestamp is 2023-04-27T15:06:34.289907+02:00
+[INFO] HEAD is at 73603ac
+[INFO] Platform is osx-x86_64
+[INFO] dry-run set to true
+[INFO] Generating changelog
+[INFO] Storing changelog: target/jreleaser/release/CHANGELOG.md
+[INFO] Cataloging artifacts
+[INFO]   [sbom] Cataloging is not enabled. Skipping
+[INFO] Calculating checksums for distributions and files
+[INFO]   [checksum] target/distributions/app-1.0.0.Alpha1-osx-x86_64.zip.sha256
+[INFO] Signing distributions and files
+[INFO]   [sign] Signing is not enabled. Skipping
+[INFO] Deploying Maven artifacts
+[INFO]   [maven] Deploying is not enabled. Skipping
+[INFO] Uploading distributions and files
+[INFO]   [upload] Uploading is not enabled. Skipping
+[INFO] Releasing to https://github.com/aalmiray/app@main
+[INFO]  - uploading app-1.0.0.Alpha1-osx-x86_64.zip
+[INFO]  - uploading checksums_sha256.txt
+[INFO] Preparing distributions
+[INFO]   - Preparing app distribution
+[INFO]     [brew] preparing app distribution
+[INFO] Packaging distributions
+[INFO]   - Packaging app distribution
+[INFO]     [brew] packaging app distribution
+[INFO] Publishing distributions
+[INFO]   - Publishing app distribution
+[INFO]     [brew] publishing app distribution
+[INFO]     [brew] setting up repository aalmiray/homebrew-tap
+[INFO] Announcing release
+[INFO]   [announce] Announcing is not enabled. Skipping
+[INFO] Writing output properties to target/jreleaser/output.properties
+[INFO] JReleaser succeeded after 0.620 s</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>JReleaserが以下の作業を代行します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>最後のタグ（もしあれば）から最新のコミットまでのすべてのコミットを基にして、チェンジログを生成します。</p>
+</li>
+<li>
+<p>すべての入力ファイルに対してSHA256（デフォルト）のチェックサムを計算します。</p>
+</li>
+<li>
+<p>すべてのファイルにGPGで署名します。ここでは、このステップを設定していないので、スキップされます。</p>
+</li>
+<li>
+<p>JFrog ArtifactoryまたはAWS S3にアセットをアップロードします。このステップは設定しないのでこれも省略します。</p>
+</li>
+<li>
+<p>選択したリポジトリーに Git リリースを作成し、タグを付けます。</p>
+</li>
+<li>
+<p>チェックサムを含むすべてのアセットをアップロードします。</p>
+</li>
+<li>
+<p>Homebrew 公式を作成し、 https://github.com/aalmiray/homebrew-tap に公開します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>もちろん、 <code>-Djreleaser.dry.run=true</code> プロパティが有効だったので、リモートリポジトリは影響を受けませんでした。もし気になる場合は、公開するHomebrewの公式を定義している <code>target/jreleaser/package/app/brew/Formula/app.rb</code> の内容を確認してください。以下のようになるはずです：</p>
+</div>
+<div class="listingblock">
+<div class="title">app.rb</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-ruby hljs" data-lang="ruby"># Generated with JReleaser 1.6.0 at 2023-04-27T15:06:34.289907+02:00
+class App < Formula
+  desc "app -- Sample Quarkus CLI application"
+  homepage "pass:[https://github.com/aalmiray/app]"
+  url "pass:[https://github.com/aalmiray/app/releases/download/v1.0.0.Alpha1/app-1.0.0.Alpha1-osx-x86_64.zip]"
+  version "1.0.0.Alpha1"
+  sha256 "85c9918b23e3ac4ef64d5dd02714e241231d3f1358afdba09d3fd0b9a889e131"
+  license "Apache-2.0"
+
+
+  def install
+    libexec.install Dir["*"]
+    bin.install_symlink "#{libexec}/bin/app" => "app"
+  end
+
+  test do
+    output = shell_output("#{bin}/app --version")
+    assert_match "1.0.0.Alpha1", output
+  end
+end</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>準備ができたら、今度はコマンド ラインから <code>-Djreleaser.dry.run</code> フラグを削除して実際にリリースを作成し、リポジトリを参照して新しく作成されたリリースを確認します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="further-reading"><a class="anchor" href="#further-reading"></a>10. さらに詳しく</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://jreleaser.org/guide/latest/index.html">JReleaser</a>のドキュメント</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="reference"><a class="anchor" href="#reference"></a>11. 参考</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>参考までに、 <code>pom.xml</code> の全内容は以下の通りです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;?xml version="1.0"?&gt;
+&lt;project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+  &lt;groupId&gt;org.acme&lt;/groupId&gt;
+  &lt;artifactId&gt;app&lt;/artifactId&gt;
+  &lt;version&gt;1.0.0.Alpha1&lt;/version&gt;
+  &lt;name&gt;app&lt;/name&gt;
+  &lt;description&gt;app -- Sample Quarkus CLI application&lt;/description&gt;
+  &lt;inceptionYear&gt;2021&lt;/inceptionYear&gt;
+  &lt;url&gt;https://github.com/aalmiray/app&lt;/url&gt;
+  &lt;developers&gt;
+    &lt;developer&gt;
+      &lt;id&gt;aalmiray&lt;/id&gt;
+      &lt;name&gt;Andres Almiray&lt;/name&gt;
+    &lt;/developer&gt;
+  &lt;/developers&gt;
+  &lt;licenses&gt;
+    &lt;license&gt;
+      &lt;name&gt;Apache-2.0&lt;/name&gt;
+      &lt;url&gt;http://www.apache.org/licenses/LICENSE-2.0.txt&lt;/url&gt;
+      &lt;distribution&gt;repo&lt;/distribution&gt;
+    &lt;/license&gt;
+  &lt;/licenses&gt;
+  &lt;properties&gt;
+    &lt;executable-suffix/&gt;
+    &lt;distribution.directory&gt;${project.build.directory}/distributions&lt;/distribution.directory&gt;
+    &lt;compiler-plugin.version&gt;3.13.0&lt;/compiler-plugin.version&gt;
+    &lt;maven.compiler.parameters&gt;true&lt;/maven.compiler.parameters&gt;
+    &lt;maven.compiler.source&gt;17&lt;/maven.compiler.source&gt;
+    &lt;maven.compiler.target&gt;17&lt;/maven.compiler.target&gt;
+    &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+    &lt;project.reporting.outputEncoding&gt;UTF-8&lt;/project.reporting.outputEncoding&gt;
+    &lt;quarkus.platform.artifact-id&gt;quarkus-bom&lt;/quarkus.platform.artifact-id&gt;
+    &lt;quarkus.platform.group-id&gt;io.quarkus.platform&lt;/quarkus.platform.group-id&gt;
+    &lt;quarkus.platform.version&gt;3.15.2&lt;/quarkus.platform.version&gt;
+    &lt;surefire-plugin.version&gt;3.0.0&lt;/surefire-plugin.version&gt;
+  &lt;/properties&gt;
+  &lt;dependencyManagement&gt;
+    &lt;dependencies&gt;
+      &lt;dependency&gt;
+        &lt;groupId&gt;${quarkus.platform.group-id}&lt;/groupId&gt;
+        &lt;artifactId&gt;${quarkus.platform.artifact-id}&lt;/artifactId&gt;
+        &lt;version&gt;${quarkus.platform.version}&lt;/version&gt;
+        &lt;type&gt;pom&lt;/type&gt;
+        &lt;scope&gt;import&lt;/scope&gt;
+      &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+  &lt;/dependencyManagement&gt;
+  &lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+      &lt;artifactId&gt;quarkus-picocli&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+      &lt;artifactId&gt;quarkus-arc&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+      &lt;artifactId&gt;quarkus-junit5&lt;/artifactId&gt;
+      &lt;scope&gt;test&lt;/scope&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+  &lt;build&gt;
+    &lt;extensions&gt;
+      &lt;extension&gt;
+        &lt;groupId&gt;kr.motd.maven&lt;/groupId&gt;
+        &lt;artifactId&gt;os-maven-plugin&lt;/artifactId&gt;
+        &lt;version&gt;1.7.1&lt;/version&gt;
+      &lt;/extension&gt;
+    &lt;/extensions&gt;
+    &lt;plugins&gt;
+      &lt;plugin&gt;
+        &lt;groupId&gt;${quarkus.platform.group-id}&lt;/groupId&gt;
+        &lt;artifactId&gt;quarkus-maven-plugin&lt;/artifactId&gt;
+        &lt;version&gt;${quarkus.platform.version}&lt;/version&gt;
+        &lt;extensions&gt;true&lt;/extensions&gt;
+        &lt;executions&gt;
+          &lt;execution&gt;
+            &lt;goals&gt;
+              &lt;goal&gt;build&lt;/goal&gt;
+              &lt;goal&gt;generate-code&lt;/goal&gt;
+              &lt;goal&gt;generate-code-tests&lt;/goal&gt;
+            &lt;/goals&gt;
+          &lt;/execution&gt;
+        &lt;/executions&gt;
+      &lt;/plugin&gt;
+      &lt;plugin&gt;
+        &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+        &lt;version&gt;${compiler-plugin.version}&lt;/version&gt;
+        &lt;configuration&gt;
+          &lt;parameters&gt;${maven.compiler.parameters}&lt;/parameters&gt;
+        &lt;/configuration&gt;
+      &lt;/plugin&gt;
+      &lt;plugin&gt;
+        &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt;
+        &lt;version&gt;${surefire-plugin.version}&lt;/version&gt;
+        &lt;configuration&gt;
+          &lt;systemPropertyVariables&gt;
+            &lt;java.util.logging.manager&gt;org.jboss.logmanager.LogManager&lt;/java.util.logging.manager&gt;
+            &lt;maven.home&gt;${maven.home}&lt;/maven.home&gt;
+          &lt;/systemPropertyVariables&gt;
+        &lt;/configuration&gt;
+      &lt;/plugin&gt;
+    &lt;/plugins&gt;
+  &lt;/build&gt;
+  &lt;profiles&gt;
+    &lt;profile&gt;
+      &lt;id&gt;native&lt;/id&gt;
+      &lt;activation&gt;
+        &lt;property&gt;
+          &lt;name&gt;native&lt;/name&gt;
+        &lt;/property&gt;
+      &lt;/activation&gt;
+      &lt;properties&gt;
+        &lt;skipITs&gt;false&lt;/skipITs&gt;
+        &lt;quarkus.native.enabled&gt;true&lt;/quarkus.native.enabled&gt;
+      &lt;/properties&gt;
+    &lt;/profile&gt;
+    &lt;profile&gt;
+      &lt;id&gt;dist&lt;/id&gt;
+      &lt;build&gt;
+        &lt;plugins&gt;
+          &lt;plugin&gt;
+            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-assembly-plugin&lt;/artifactId&gt;
+            &lt;version&gt;3.3.0&lt;/version&gt;
+            &lt;configuration&gt;
+              &lt;attach&gt;false&lt;/attach&gt;
+              &lt;appendAssemblyId&gt;false&lt;/appendAssemblyId&gt;
+              &lt;finalName&gt;${project.artifactId}-${project.version}-${os.detected.classifier}&lt;/finalName&gt;
+              &lt;outputDirectory&gt;${distribution.directory}&lt;/outputDirectory&gt;
+              &lt;workDirectory&gt;${project.build.directory}/assembly/work&lt;/workDirectory&gt;
+              &lt;descriptors&gt;
+                &lt;descriptor&gt;src/main/assembly/assembly.xml&lt;/descriptor&gt;
+              &lt;/descriptors&gt;
+            &lt;/configuration&gt;
+            &lt;executions&gt;
+              &lt;execution&gt;
+                &lt;id&gt;make-distribution&lt;/id&gt;
+                &lt;phase&gt;package&lt;/phase&gt;
+                &lt;goals&gt;
+                  &lt;goal&gt;single&lt;/goal&gt;
+                &lt;/goals&gt;
+              &lt;/execution&gt;
+            &lt;/executions&gt;
+          &lt;/plugin&gt;
+        &lt;/plugins&gt;
+      &lt;/build&gt;
+    &lt;/profile&gt;
+    &lt;profile&gt;
+      &lt;id&gt;dist-windows&lt;/id&gt;
+      &lt;activation&gt;
+        &lt;os&gt;
+          &lt;family&gt;windows&lt;/family&gt;
+        &lt;/os&gt;
+      &lt;/activation&gt;
+      &lt;properties&gt;
+        &lt;executable-suffix&gt;.exe&lt;/executable-suffix&gt;
+      &lt;/properties&gt;
+    &lt;/profile&gt;
+    &lt;profile&gt;
+      &lt;id&gt;release&lt;/id&gt;
+      &lt;build&gt;
+        &lt;plugins&gt;
+          &lt;plugin&gt;
+            &lt;groupId&gt;org.jreleaser&lt;/groupId&gt;
+            &lt;artifactId&gt;jreleaser-maven-plugin&lt;/artifactId&gt;
+            &lt;version&gt;1.6.0&lt;/version&gt;
+            &lt;configuration&gt;
+              &lt;jreleaser&gt;
+                &lt;!--project&gt;
+                 &lt;description&gt;app - Sample Quarkus CLI application&lt;/description&gt;
+                 &lt;website&gt;https://github.com/aalmiray/app&lt;/website&gt;
+                 &lt;docsUrl&gt;https://github.com/aalmiray/app&lt;/docsUrl&gt;
+                 &lt;license&gt;APACHE-2.0&lt;/license&gt;
+                 &lt;authors&gt;Andres Almiray&lt;/authors&gt;
+                 &lt;copyright&gt;2021 Kordamp&lt;/copyright&gt;
+                &lt;/project--&gt;
+                &lt;release&gt;
+                  &lt;github&gt;
+                    &lt;changelog&gt;
+                      &lt;formatted&gt;ALWAYS&lt;/formatted&gt;
+                      &lt;preset&gt;conventional-commits&lt;/preset&gt;
+                    &lt;/changelog&gt;
+                  &lt;/github&gt;
+                &lt;/release&gt;
+                &lt;distributions&gt;
+                  &lt;app&gt;
+                    &lt;type&gt;BINARY&lt;/type&gt;
+                    &lt;brew&gt;
+                      &lt;active&gt;ALWAYS&lt;/active&gt;
+                    &lt;/brew&gt;
+                    &lt;artifacts&gt;
+                      &lt;artifact&gt;
+                        &lt;path&gt;${distribution.directory}/{{distributionName}}-{{projectVersion}}-linux-x86_64.tar.gz&lt;/path&gt;
+                        &lt;platform&gt;linux-x86_64&lt;/platform&gt;
+                      &lt;/artifact&gt;
+                      &lt;artifact&gt;
+                        &lt;path&gt;${distribution.directory}/{{distributionName}}-{{projectVersion}}-windows-x86_64.zip&lt;/path&gt;
+                        &lt;platform&gt;windows-x86_64&lt;/platform&gt;
+                      &lt;/artifact&gt;
+                      &lt;artifact&gt;
+                        &lt;path&gt;${distribution.directory}/{{distributionName}}-{{projectVersion}}-osx-x86_64.zip&lt;/path&gt;
+                        &lt;platform&gt;osx-x86_64&lt;/platform&gt;
+                      &lt;/artifact&gt;
+                    &lt;/artifacts&gt;
+                  &lt;/app&gt;
+                &lt;/distributions&gt;
+              &lt;/jreleaser&gt;
+            &lt;/configuration&gt;
+          &lt;/plugin&gt;
+        &lt;/plugins&gt;
+      &lt;/build&gt;
+    &lt;/profile&gt;
+  &lt;/profiles&gt;
+&lt;/project&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">1. 前提条件</a></li>
+<li><a href="#bootstrapping-the-project">2. プロジェクトのブートストラップ</a></li>
+<li><a href="#preparing-the-project-for-github-releases">3. GitHub リリース用のプロジェクトの準備</a></li>
+<li><a href="#packaging-as-a-native-image-distribution">4. ネイティブイメージでの配布</a></li>
+<li><a href="#creating-the-distribution">5. ディストリビューションの作成</a></li>
+<li><a href="#adding-jreleaser">6. JReleaser の追加</a></li>
+<li><a href="#adding-distributions-to-the-release">7. リリースへのディストリビューションの追加</a></li>
+<li><a href="#configuring-homebrew-as-a-packager">8. パッケージャーとしての Homebrew の設定</a></li>
+<li><a href="#creating-a-release">9. リリースの作成</a></li>
+<li><a href="#further-reading">10. さらに詳しく</a></li>
+<li><a href="#reference">11. 参考</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/cli-tooling">Quarkus コマンドラインインターフェイス (CLI) を使用した Quarkus アプリの構築</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/upx">UPXでネイティブ実行可能ファイルを圧縮</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/continuous-testing">継続的テスト</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/tests-with-coverage">テストカバレッジの測定</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/gradle-tooling">QuarkusとGradle</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/maven-tooling">QuarkusとMaven</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/quarkus-maven-plugin">Quarkus Mavenプラグイン</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.15/guides/ide-tooling">お好みのIDEのQuarkus Tools</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/reaugmentation">Quarkusアプリケーションの再オーグメンテーション</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/testing-components">Testing components</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/getting-started-testing">アプリケーションのテスト</a></li>
+      
+        
+        <li class="howto"><a href="/version/3.15/guides/update-quarkus">プロジェクトをQuarkusの最新バージョンに更新</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.15/guides/tooling">ツールの使用</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/podman">Podman と Quarkus の併用</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

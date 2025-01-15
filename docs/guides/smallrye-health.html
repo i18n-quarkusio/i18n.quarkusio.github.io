@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>SmallRye Health - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/guides/smallrye-health" />
+  <meta property="og:title" content="SmallRye Health" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/smallrye-health">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/guides/smallrye-health">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/guides/smallrye-health" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/guides/smallrye-health">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/guides/smallrye-health">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/guides/smallrye-health">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/guides/smallrye-health">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" selected>3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <a class="editlink" href="https://github.com/quarkusio/quarkus/edit/main/docs/src/main/asciidoc/smallrye-health.adoc">このページを編集</a>
+      
+      <h1 class="text-caps">SmallRye Health </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、 <a href="https://github.com/eclipse/microprofile-health/">MicroProfile Health</a>仕様の実装である <a href="https://github.com/smallrye/smallrye-health/">SmallRye Health</a>をQuarkusアプリケーションで使用する方法を説明します。</p>
+</div>
+<div class="paragraph">
+<p>SmallRye Healthは、アプリケーションがその状態に関する情報を外部のビューアーに提供することを可能にします。これは、典型的には自動化されたプロセスがアプリケーションを破棄すべきか再起動すべきかを判断できなければならないクラウド環境において、有用です。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>約15分</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 17+がインストールされ、 <code>JAVA_HOME</code> が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.9.9</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルをビルドしたい場合、MandrelまたはGraalVM（あるいはネイティブなコンテナビルドを使用する場合はDocker）をインストールし、 <a href="building-native-image.html#configuring-graalvm">適切に設定</a>していること</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="architecture"><a class="anchor" href="#architecture"></a>アーキテクチャ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、仕様に従って <code>/q/health/live</code> および <code>/q/health/ready</code> エンドポイントで MicroProfile Health 機能を公開するシンプルな REST アプリケーションを構築します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution"><a class="anchor" href="#solution"></a>ソリューション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次の章で紹介する手順に沿って、ステップを踏んでアプリを作成することをお勧めします。ただし、完成した例にそのまま進んでも構いません。</p>
+</div>
+<div class="paragraph">
+<p>Gitレポジトリをクローンするか <code>git clone <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code> 、 <a href="https://github.com/quarkusio/quarkus-quickstarts/archive/main.zip">アーカイブ</a> をダウンロードします。</p>
+</div>
+<div class="paragraph">
+<p>ソリューションは <code>microprofile-health-quickstart</code> <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/main/microprofile-health-quickstart">ディレクトリ</a> にあります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-maven-project"><a class="anchor" href="#creating-the-maven-project"></a>Mavenプロジェクトの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、新しいプロジェクトが必要です。以下のコマンドで新規プロジェクトを作成します:</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:microprofile-health-quickstart \
+    --extension='smallrye-health' \
+    --no-code
+cd microprofile-health-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:3.17.6:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=microprofile-health-quickstart \
+    -Dextensions='smallrye-health' \
+    -DnoCode
+cd microprofile-health-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Windowsユーザーの場合:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>cmdを使用する場合、（バックスラッシュ <code>\</code> を使用せず、すべてを同じ行に書かないでください）。</p>
+</li>
+<li>
+<p>Powershellを使用する場合は、 <code>-D</code> パラメータを二重引用符で囲んでください。例: <code>"-DprojectArtifactId=microprofile-health-quickstart"</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>このコマンドは、 <code>smallrye-health</code> エクステンションをインポートしたプロジェクトを生成します。</p>
+</div>
+<div class="paragraph">
+<p>すでにQuarkusプロジェクトが設定されている場合は、プロジェクトのベースディレクトリで以下のコマンドを実行することで、 <code>smallrye-health</code> エクステンションをプロジェクトに追加することができます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus extension add smallrye-health</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:add-extension -Dextensions='smallrye-health'</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew addExtension --extensions='smallrye-health'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、ビルドファイルに以下が追加されます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-smallrye-health&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-smallrye-health")</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-health-check"><a class="anchor" href="#running-the-health-check"></a>ヘルスチェックの実行</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>smallrye-health</code> エクステンションを直接インポートすると、3つのRESTエンドポイントが公開されます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>/q/health/live</code> - アプリケーションが稼働していること</p>
+</li>
+<li>
+<p><code>/q/health/ready</code> - アプリケーションは、リクエストに対応する準備ができていること</p>
+</li>
+<li>
+<p><code>/q/health/started</code> - アプリケーションが開始されていること</p>
+</li>
+<li>
+<p><code>/q/health</code> - アプリケーションのすべてのヘルスチェック手順の累積</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>smallrye-health</code> エクステンションが期待通りに動作しているかのチェックをします:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Quarkusアプリケーションを次のように起動します:</p>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p><code><a href="http://localhost:8080/q/health/live" class="bare">http://localhost:8080/q/health/live</a></code> エンドポイントにブラウザか、 <code>curl <a href="http://localhost:8080/q/health/live" class="bare">http://localhost:8080/q/health/live</a></code> でアクセス</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>すべての <code>health</code> RESTエンドポイントは、2つのフィールドを持つシンプルなJSONオブジェクトを返します:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>status</code>&#8201;&#8212;&#8201;すべてのヘルスチェックの結果</p>
+</li>
+<li>
+<p><code>checks</code>&#8201;&#8212;&#8201;個別チェック結果の配列</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>ヘルスチェックの一般的な <code>status</code> は、宣言されたすべてのヘルスチェックの論理的な AND として計算されます。 <code>checks</code> 配列は、まだヘルスチェックの手順を指定していないので空ですが、いくつか定義してみましょう。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">マネジメントインターフェース</div>
+<div class="paragraph">
+<p>デフォルトでは、ヘルスチェックはメインのHTTPサーバー上で公開されます。 <code>quarkus.management.enabled=true</code> プロパティで管理インターフェイスを有効にすることで、別のネットワークインターフェイスとポートで公開することができます。詳細については、 <a href="./management-interface-reference">管理インターフェイスのリファレンス</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-your-first-health-check"><a class="anchor" href="#creating-your-first-health-check"></a>初めてのヘルスチェックの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このセクションでは、最初の簡単なヘルスチェック手順を作成します。</p>
+</div>
+<div class="paragraph">
+<p><code>org.acme.microprofile.health.SimpleHealthCheck</code> クラスを作成します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.microprofile.health;
+
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+import org.eclipse.microprofile.health.Liveness;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+@Liveness
+@ApplicationScoped <i class="conum" data-value="1"></i><b>(1)</b> <i class="conum" data-value="2"></i><b>(2)</b>
+public class SimpleHealthCheck implements HealthCheck {
+
+    @Override
+    public HealthCheckResponse call() {
+        return HealthCheckResponse.up("Simple health check");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>すべてのヘルスチェックのリクエストに単一のBeanインスタンスが使用されるように、ヘルスチェッククラスに <code>@ApplicationScoped</code> または <code>@Singleton</code> のスコープでアノテーションを付けることをお勧めします。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>アノテーションされたBeanクラスがスコープを宣言していない場合、 <code>@Singleton</code> のスコープが自動的に使用されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>ご覧のように、ヘルスチェックは、 <code>HealthCheck</code> インターフェースを実装するCDI Beanとして定義され、次のようなヘルスチェックの修飾子の1つでアノテーションされています:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>@Liveness</code> - <code>/q/health/live</code> でアクセス可能なLivenessチェック</p>
+</li>
+<li>
+<p><code>@Readiness</code> - <code>/q/health/ready</code> でアクセス可能なReadinessチェック</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>HealthCheck</code> は関数インターフェースで、その単一のメソッド <code>call</code> は <code>HealthCheckResponse</code> オブジェクトを返します。このオブジェクトは、例で示した fluent builder API で簡単に構築することができます。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusアプリケーションを開発モードで起動しているので、 <code><a href="http://localhost:8080/q/health/live" class="bare">http://localhost:8080/q/health/live</a></code> へのリクエストを ブラウザウィンドウを更新するか <code>curl <a href="http://localhost:8080/q/health/live" class="bare">http://localhost:8080/q/health/live</a></code> で単に繰り返してください。ヘルスチェックをlivenessプロシージャ（ <code>@Liveness</code> 修飾子付き）と定義したため、新しいヘルスチェックプロシージャが <code>checks</code> 配列に存在するようになりました。</p>
+</div>
+<div class="paragraph">
+<p>おめでとうございます。初めてのQuarkus Health Checkプロシージャを作成しました。続けて、SmallRye Healthで他にどのようなことができるかを調べてみましょう。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="adding-a-readiness-health-check-procedure"><a class="anchor" href="#adding-a-readiness-health-check-procedure"></a>readiness ヘルスチェックプロシージャの追加</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>前のセクションでは、アプリケーションが実行されているかどうかを示す単純な liveness ヘルスチェックプロシージャを作成しました。このセクションでは、アプリケーションがリクエストを処理することができるかどうかを示すことができるReadinessヘルスチェックを作成します。</p>
+</div>
+<div class="paragraph">
+<p>ここでは、データベースなどの外部サービスプロバイダへの接続をシミュレートする別のヘルスチェックプロシージャを作成します。まずは、アプリケーションの準備ができていることを示すレスポンスを常に返すようにします。</p>
+</div>
+<div class="paragraph">
+<p><code>org.acme.microprofile.health.DatabaseConnectionHealthCheck</code> クラスを作成します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.microprofile.health;
+
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+import org.eclipse.microprofile.health.Readiness;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+@Readiness
+@ApplicationScoped
+public class DatabaseConnectionHealthCheck implements HealthCheck {
+
+    @Override
+    public HealthCheckResponse call() {
+        return HealthCheckResponse.up("Database connection health check");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code><a href="http://localhost:8080/q/health/live`のヘルスチェックを再実行すると、" class="bare">http://localhost:8080/q/health/live`のヘルスチェックを再実行すると、</a> `checks</code> の配列には、以前に定義した <code>SimpleHealthCheck</code> のみが含まれます。これは <code>@Liveness</code> という修飾子で定義された唯一のチェックだからです。しかし、次のようにアクセスすると <code><a href="http://localhost:8080/q/health/ready" class="bare">http://localhost:8080/q/health/ready</a></code> (ブラウザや <code>curl <a href="http://localhost:8080/q/health/ready" class="bare">http://localhost:8080/q/health/ready</a></code>)にアクセスすると、 <code>Database connection health check</code> のみが表示されます。これは、Readinessヘルスチェック手順として <code>@Readiness</code> の修飾子で定義された唯一のヘルスチェックだからです。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code><a href="http://localhost:8080/q/health" class="bare">http://localhost:8080/q/health</a></code> にアクセスすると、両方のチェックが戻ってきます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>どのような状況でどのヘルスチェック手順を使用すべきかについての詳細は、MicroProfile Health 仕様に記載されています。一般的には、liveness手続きはアプリケーションを再起動すべきかどうかを判断し、readiness手続きはアプリケーションにリクエストを出すことが意味のあることかどうかを判断します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="adding-a-startup-health-check-procedure"><a class="anchor" href="#adding-a-startup-health-check-procedure"></a>スタートアップヘルスチェックプロシージャの追加</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ヘルスチェックプロシージャの最後の3つ目のタイプはスタートアップです。スタートアッププロシージャは、起動が遅いコンテナ（Quarkusでは必要ないはず）のオプションとして定義されており、起動が初めてUPに応答すると起動から引き継がれるliveness probeの呼び出しを遅らせることができます。スタートアップのヘルスチェックは、 <code>@Startup</code> で定義されます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>io.quarkus.runtime.Startup</code> と不幸にも衝突してしまうため、microprofile <code>org.eclipse.microprofile.health.Startup</code> のアノテーションを必ずインポートしてください。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>org.acme.microprofile.health.SimpleHealthCheck</code> クラスを作成:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.microprofile.health;
+
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+import org.eclipse.microprofile.health.Startup;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+@Startup
+@ApplicationScoped
+public class StartupHealthCheck implements HealthCheck {
+
+    @Override
+    public HealthCheckResponse call() {
+        return HealthCheckResponse.up("Startup health check");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code><a href="http://localhost:8080/q/health/live" class="bare">http://localhost:8080/q/health/live</a></code> エンドポイントにブラウザか、 <code>curl <a href="http://localhost:8080/q/health/live" class="bare">http://localhost:8080/q/health/live</a></code> でアクセスします:</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="negative-health-check-procedures"><a class="anchor" href="#negative-health-check-procedures"></a>ネガティブヘルスチェックプロシージャ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このセクションでは、 <code>Database connection health check</code> を拡張して、基礎となるデータベース接続が確立できないために、アプリケーションがリクエストを処理する準備ができていないことを示すオプションを追加します。簡略化のため、データベースにアクセスできるかどうかの判断は、設定プロパティでのみ行います。</p>
+</div>
+<div class="paragraph">
+<p><code>org.acme.microprofile.health.DatabaseConnectionHealthCheck</code> クラスを以下のようにアップデートします:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.microprofile.health;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+import org.eclipse.microprofile.health.HealthCheckResponseBuilder;
+import org.eclipse.microprofile.health.Readiness;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+@Readiness
+@ApplicationScoped
+public class DatabaseConnectionHealthCheck implements HealthCheck {
+
+    @ConfigProperty(name = "database.up", defaultValue = "false")
+    private boolean databaseUp;
+
+    @Override
+    public HealthCheckResponse call() {
+
+        HealthCheckResponseBuilder responseBuilder = HealthCheckResponse.named("Database connection health check");
+
+        try {
+            simulateDatabaseConnectionVerification();
+            responseBuilder.up();
+        } catch (IllegalStateException e) {
+            // cannot access the database
+            responseBuilder.down();
+        }
+
+        return responseBuilder.build();
+    }
+
+    private void simulateDatabaseConnectionVerification() {
+        if (!databaseUp) {
+            throw new IllegalStateException("Cannot contact database");
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+これまでは、レスポンスオブジェクトを直接構築する <code>HealthCheckResponse#up(String)</code> （ <code>HealthCheckResponse#down(String)</code> もあります）を通して <code>HealthCheckResponse</code> を構築するという単純な方法を使っていました。今後は、 <code>HealthCheckResponseBuilder</code> クラスが提供するビルダー機能をフルに活用します。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>再度、Readinessヘルスチェック <code><a href="http://localhost:8080/q/health/ready" class="bare">http://localhost:8080/q/health/ready</a></code>)を再実行すると、全ての <code>status</code> がDOWNするはずです。また、以下の場所でlivenessチェックを行うこともできます。 <code><a href="http://localhost:8080/q/health/live`この場合、全体の" class="bare">http://localhost:8080/q/health/live`この場合、全体の</a> `status</code> はUPです。これは、Readinessチェックの影響を受けないためです。</p>
+</div>
+<div class="paragraph">
+<p>このアプリケーションをreadiness チェックを DOWN 状態のままにしておいてはいけないため、また、
+Quarkus を開発モードで実行しているため、 <code>database.up=true</code> を <code>src/main/resources/application.properties</code> に追加し、
+readiness ヘルスチェックを再度実行できます。&#8201;&#8212;&#8201;再びupになるはずです。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="adding-user-specific-data-to-the-health-check-response"><a class="anchor" href="#adding-user-specific-data-to-the-health-check-response"></a>ヘルスチェックのレスポンスにユーザー固有のデータを追加</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>前のセクションでは、最小限の属性、すなわちヘルスチェック名とそのステータス（UPまたはDOWN）のみを持つ単純なヘルスチェックを作成する方法を説明しました。しかし、MicroProfile Health仕様では、アプリケーションが任意のデータを、コンシューマーに送信されるキー・バリュー・ペアの形で供給する方法も提供しています。これは、ヘルスチェックレスポンスビルダーAPIの <code>withData(key, value)</code> メソッドを使用することで可能です。</p>
+</div>
+<div class="paragraph">
+<p>新しいヘルスチェック・プロシージャ <code>org.acme.microprofile.health.DataHealthCheck</code> を作成してみましょう:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.microprofile.health;
+
+import org.eclipse.microprofile.health.Liveness;
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+@Liveness
+@ApplicationScoped
+public class DataHealthCheck implements HealthCheck {
+
+    @Override
+    public HealthCheckResponse call() {
+        return HealthCheckResponse.named("Health check with data")
+                .up()
+                .withData("foo", "fooValue")
+                .withData("bar", "barValue")
+                .build();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>/q/health/live</code> エンドポイントにアクセスしてLivenessヘルスチェック・プロシージャを再実行すると、新しいヘルスチェック <code>Health check with data</code> が <code>checks</code> 配列に存在していることがわかります。このチェックには、 <code>data</code> という新しい属性が含まれています。この属性は、ヘルスチェック手順で定義したプロパティで構成されるJSONオブジェクトです。</p>
+</div>
+<div class="paragraph">
+<p>この機能は、ヘルスチェックの応答と一緒にエラーを渡すことができる障害シナリオで特に有用です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">        try {
+            simulateDatabaseConnectionVerification();
+            responseBuilder.up();
+        } catch (IllegalStateException e) {
+            // cannot access the database
+            responseBuilder.down()
+                    .withData("error", e.getMessage()); // pass the exception message
+        }</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="context-propagation-into-the-health-check-invocations"><a class="anchor" href="#context-propagation-into-the-health-check-invocations"></a>ヘルスチェック呼び出しへのコンテキストの伝搬</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>パフォーマンス上の理由から、コンテキスト（例：CDIまたはセキュリティ・コンテキスト）は各ヘルスチェック呼び出しに伝搬されません。しかし、この機能を有効にする必要がある場合は、 <code>quarkus.smallrye-health.context-propagation=true</code> を設定して、すべてのヘルスチェック呼び出しにコンテキストの伝搬を許可することができます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="reactive-health-checks"><a class="anchor" href="#reactive-health-checks"></a>リアクティブヘルスチェック</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>MicroProfile Healthは現在、reactive型の戻り値をサポートしていませんが、SmallRye Healthはサポートしています。</p>
+</div>
+<div class="paragraph">
+<p>リアクティブなヘルスチェックを行いたい場合は、 <code>org.eclipse.microprofile.health.HealthCheck</code> の代わりに <code>io.smallrye.health.api.AsyncHealthCheck</code> のインターフェイスを実装することができます。 <code>io.smallrye.health.api.AsyncHealthCheck</code> インターフェイスでは、 <code>Uni&lt;HealthCheckResponse&gt;</code> を返すことができます。</p>
+</div>
+<div class="paragraph">
+<p>以下の例では、リアクティブなLivenessチェックを行っています:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.smallrye.health.api.AsyncHealthCheck;
+
+import org.eclipse.microprofile.health.Liveness;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+@Liveness
+@ApplicationScoped
+public class LivenessAsync implements AsyncHealthCheck {
+
+    @Override
+    public Uni&lt;HealthCheckResponse&gt; call() {
+        return Uni.createFrom().item(HealthCheckResponse.up("liveness-reactive"))
+                .onItem().delayIt().by(Duration.ofMillis(10));
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="extension-health-checks"><a class="anchor" href="#extension-health-checks"></a>エクステンションのヘルスチェック</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>一部のエクステンションでは、デフォルトのヘルスチェックを提供している場合があり、その場合、エクステンションは自動的にヘルスチェックを登録します。</p>
+</div>
+<div class="paragraph">
+<p>例えば、Quarkusのデータソースを管理するために使用される <code>quarkus-agroal</code> は、各 <a href="datasource.html#datasource-health-check">データソースのヘルスチェック</a> を検証するReadinessのヘルスチェックを自動的に登録します。</p>
+</div>
+<div class="paragraph">
+<p>エクステンションのヘルスチェックは、プロパティ（ <code>quarkus.health.extensions.enabled</code> ）で無効にすることができ、自動的に登録されることはありません。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ui"><a class="anchor" href="#ui"></a>Health UI </h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+実験的 - MicroProfileの仕様に含まれない
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>health-ui</code> はヘルスチェックの内容をWeb GUIで確認することができます。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusの <code>smallrye-health</code> エクステンションは、 <code>health-ui</code> を同梱しており、devおよびtestモードでデフォルトで有効になりますが、productionモードでも同様に明示的に設定することができます。</p>
+</div>
+<div class="paragraph">
+<p><code>health-ui</code> は、 <a href="http://localhost:8080/q/health-ui/" class="bare">http://localhost:8080/q/health-ui/</a> からアクセスできます。</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="/guides/images/health-ui-screenshot01.png" alt="Health UI"></span></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="management-interface"><a class="anchor" href="#management-interface"></a>マネジメントインターフェース</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>デフォルトでは、ヘルスチェックはメインのHTTPサーバー上で公開されます。アプリケーションの設定で <code>quarkus.management.enabled=true</code> を設定することで、別のネットワークインターフェイスとポートで公開することができます。このプロパティは、ビルド時のプロパティであることに注意してください。実行時に値をオーバーライドすることはできません。</p>
+</div>
+<div class="paragraph">
+<p>マネジメントネットワークインターフェースとポートをカスタマイズせずにマネジメントインターフェースを有効にした場合、ヘルスチェックは以下のように公開されます： <code><a href="http://0.0.0.0:9000/q/health" class="bare">http://0.0.0.0:9000/q/health</a></code> . <code>quarkus.smallrye-health.root-path</code> プロパティを使用して、 <em>path</em> （前の URL の <code>health</code> セグメント）を設定することができます。</p>
+</div>
+<div class="paragraph">
+<p>詳しくは、 <a href="./management-interface-reference">マネジメントインターフェイスのリファレンス</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="conclusion"><a class="anchor" href="#conclusion"></a>まとめ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>SmallRye Healthは、アプリケーションが正常に機能できるかどうかを示すために、 アプリケーションの健全性に関する情報を得る方法を提供します。Liveness チェックは、アプリケーションを再起動すべきかどうかを判断するために使用され、Readinessチェックは、アプリケーションがリクエストを処理できるかどうかを判断するために使用されます。</p>
+</div>
+<div class="paragraph">
+<p>QuarkusでSmallRye Healthの機能を有効にするために必要なことは、以下の通りです:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus-maven-plugin</code> で <code>smallrye-health</code> Quarkusエクステンションをプロジェクトに追加します:</p>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus extension add smallrye-health</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:add-extension -Dextensions='smallrye-health'</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew addExtension --extensions='smallrye-health'</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>または、単に以下のMaven依存関係を追加するだけです:</p>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-smallrye-health&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-smallrye-health")</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration-reference"><a class="anchor" href="#configuration-reference"></a>設定リファレンス</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="ビルド時に固定"></i></span>ビルド時に固定される構成プロパティ - 他のすべての構成プロパティは実行時にオーバーライド可能 <input type="search" id="config-search-0" placeholder="FILTER CONFIGURATION" disabled></p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference searchable configuration-reference-all-rows">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><span class="header-title">Configuration property</span></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-smallrye-health_quarkus-smallrye-health-enabled"></a> <span class="property-path"><a href="#quarkus-smallrye-health_quarkus-smallrye-health-enabled"><code>quarkus.smallrye-health.enabled</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-1" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Activate or disable this extension. Disabling this extension means that no health related information is exposed.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8289">QUARKUS_SMALLRYE_HEALTH_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8289" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">ブーリアン</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-smallrye-health_quarkus-smallrye-health-extensions-enabled"></a> <span class="property-path"><a href="#quarkus-smallrye-health_quarkus-smallrye-health-extensions-enabled"><code>quarkus.smallrye-health.extensions.enabled</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-2" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Whether extensions published health check should be enabled.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8290">QUARKUS_SMALLRYE_HEALTH_EXTENSIONS_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8290" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">ブーリアン</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-smallrye-health_quarkus-smallrye-health-openapi-included"></a> <span class="property-path"><a href="#quarkus-smallrye-health_quarkus-smallrye-health-openapi-included"><code>quarkus.smallrye-health.openapi.included</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-3" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Whether to include the Liveness and Readiness Health endpoints in the generated OpenAPI document</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8291">QUARKUS_SMALLRYE_HEALTH_OPENAPI_INCLUDED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8291" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">ブーリアン</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-smallrye-health_quarkus-smallrye-health-root-path"></a> <span class="property-path"><a href="#quarkus-smallrye-health_quarkus-smallrye-health-root-path"><code>quarkus.smallrye-health.root-path</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-4" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Root path for health-checking endpoints. By default, this value will be resolved as a path relative to <code>${quarkus.http.non-application-root-path}</code>. If the management interface is enabled, the value will be resolved as a path relative to <code>${quarkus.management.root-path}</code>.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8292">QUARKUS_SMALLRYE_HEALTH_ROOT_PATH</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8292" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>health</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-smallrye-health_quarkus-smallrye-health-liveness-path"></a> <span class="property-path"><a href="#quarkus-smallrye-health_quarkus-smallrye-health-liveness-path"><code>quarkus.smallrye-health.liveness-path</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-5" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The relative path of the liveness health-checking endpoint. By default, this value will be resolved as a path relative to <code>${quarkus.smallrye-health.rootPath}</code>.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8293">QUARKUS_SMALLRYE_HEALTH_LIVENESS_PATH</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8293" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>live</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-smallrye-health_quarkus-smallrye-health-readiness-path"></a> <span class="property-path"><a href="#quarkus-smallrye-health_quarkus-smallrye-health-readiness-path"><code>quarkus.smallrye-health.readiness-path</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-6" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The relative path of the readiness health-checking endpoint. By default, this value will be resolved as a path relative to <code>${quarkus.smallrye-health.rootPath}</code>.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8294">QUARKUS_SMALLRYE_HEALTH_READINESS_PATH</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8294" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>ready</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-smallrye-health_quarkus-smallrye-health-group-path"></a> <span class="property-path"><a href="#quarkus-smallrye-health_quarkus-smallrye-health-group-path"><code>quarkus.smallrye-health.group-path</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-7" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The relative path of the health group endpoint. By default, this value will be resolved as a path relative to <code>${quarkus.smallrye-health.rootPath}</code>.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8295">QUARKUS_SMALLRYE_HEALTH_GROUP_PATH</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8295" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>group</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-smallrye-health_quarkus-smallrye-health-wellness-path"></a> <span class="property-path"><a href="#quarkus-smallrye-health_quarkus-smallrye-health-wellness-path"><code>quarkus.smallrye-health.wellness-path</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-8" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The relative path of the wellness health-checking endpoint. By default, this value will be resolved as a path relative to <code>${quarkus.smallrye-health.rootPath}</code>.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8296">QUARKUS_SMALLRYE_HEALTH_WELLNESS_PATH</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8296" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>well</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-smallrye-health_quarkus-smallrye-health-startup-path"></a> <span class="property-path"><a href="#quarkus-smallrye-health_quarkus-smallrye-health-startup-path"><code>quarkus.smallrye-health.startup-path</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-9" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The relative path of the startup health-checking endpoint. By default, this value will be resolved as a path relative to <code>${quarkus.smallrye-health.rootPath}</code>.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8297">QUARKUS_SMALLRYE_HEALTH_STARTUP_PATH</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8297" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>started</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-smallrye-health_quarkus-smallrye-health-context-propagation"></a> <span class="property-path"><a href="#quarkus-smallrye-health_quarkus-smallrye-health-context-propagation"><code>quarkus.smallrye-health.context-propagation</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-10" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Whether the context should be propagated to each health check invocation.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8298">QUARKUS_SMALLRYE_HEALTH_CONTEXT_PROPAGATION</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8298" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">ブーリアン</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-smallrye-health_quarkus-smallrye-health-max-group-registries-count"></a> <span class="property-path"><a href="#quarkus-smallrye-health_quarkus-smallrye-health-max-group-registries-count"><code>quarkus.smallrye-health.max-group-registries-count</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-11" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The number of the maximum health groups that can be created.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8299">QUARKUS_SMALLRYE_HEALTH_MAX_GROUP_REGISTRIES_COUNT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8299" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-smallrye-health_quarkus-smallrye-health-default-health-group"></a> <span class="property-path"><a href="#quarkus-smallrye-health_quarkus-smallrye-health-default-health-group"><code>quarkus.smallrye-health.default-health-group</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-12" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The name of the default health group used when no other health group is defined on the health check.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8300">QUARKUS_SMALLRYE_HEALTH_DEFAULT_HEALTH_GROUP</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8300" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-smallrye-health_quarkus-smallrye-health-management-enabled"></a> <span class="property-path"><a href="#quarkus-smallrye-health_quarkus-smallrye-health-management-enabled"><code>quarkus.smallrye-health.management.enabled</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-13" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If management interface is turned on the health endpoints and ui will be published under the management interface. This allows you to exclude Health from management by setting the value to false</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8301">QUARKUS_SMALLRYE_HEALTH_MANAGEMENT_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8301" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">ブーリアン</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-smallrye-health_quarkus-smallrye-health-include-problem-details"></a> <span class="property-path"><a href="#quarkus-smallrye-health_quarkus-smallrye-health-include-problem-details"><code>quarkus.smallrye-health.include-problem-details</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-14" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Specify the reported DOWN responses should be aligned with RFC 9457 - Problem Details for HTTP APIs.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8302">QUARKUS_SMALLRYE_HEALTH_INCLUDE_PROBLEM_DETAILS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8302" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">ブーリアン</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-smallrye-health_quarkus-smallrye-health-ui-enable"></a> <span class="property-path"><a href="#quarkus-smallrye-health_quarkus-smallrye-health-ui-enable"><code>quarkus.smallrye-health.ui.enable</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-15" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If Health UI should be enabled. By default, Health UI is enabled if it is included (see <code>always-include</code>).</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8303">QUARKUS_SMALLRYE_HEALTH_UI_ENABLE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8303" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">ブーリアン</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-smallrye-health_quarkus-smallrye-health-additional-property-property-name"></a> <span class="property-path"><a href="#quarkus-smallrye-health_quarkus-smallrye-health-additional-property-property-name"><code>quarkus.smallrye-health.additional.property."property-name"</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-16" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Additional top-level properties to be included in the resulting JSON object.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8304">QUARKUS_SMALLRYE_HEALTH_ADDITIONAL_PROPERTY__PROPERTY_NAME_</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8304" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Map&lt;String,String&gt;</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-smallrye-health_quarkus-smallrye-health-check-check-name-enabled"></a> <span class="property-path"><a href="#quarkus-smallrye-health_quarkus-smallrye-health-check-check-name-enabled"><code>quarkus.smallrye-health.check."check-name".enabled</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-17" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Whether the HealthCheck should be enabled.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8305">QUARKUS_SMALLRYE_HEALTH_CHECK__CHECK_NAME__ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8305" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">ブーリアン</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-smallrye-health_section_quarkus-smallrye-health-ui"></a> <span class="section-name section-level0"><a href="#quarkus-smallrye-health_section_quarkus-smallrye-health-ui">SmallRye Health UI configuration</a></span></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-smallrye-health_quarkus-smallrye-health-ui-root-path"></a> <span class="property-path"><a href="#quarkus-smallrye-health_quarkus-smallrye-health-ui-root-path"><code>quarkus.smallrye-health.ui.root-path</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-18" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The path where Health UI is available. The value <code>/</code> is not allowed as it blocks the application from serving anything else. By default, this value will be resolved as a path relative to <code>${quarkus.http.non-application-root-path}</code>.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8306">QUARKUS_SMALLRYE_HEALTH_UI_ROOT_PATH</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8306" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>health-ui</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-smallrye-health_quarkus-smallrye-health-ui-always-include"></a> <span class="property-path"><a href="#quarkus-smallrye-health_quarkus-smallrye-health-ui-always-include"><code>quarkus.smallrye-health.ui.always-include</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-19" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Always include the UI. By default, this will only be included in dev and test. Setting this to true will also include the UI in Prod</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8307">QUARKUS_SMALLRYE_HEALTH_UI_ALWAYS_INCLUDE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8307" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">ブーリアン</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#architecture">アーキテクチャ</a></li>
+<li><a href="#solution">ソリューション</a></li>
+<li><a href="#creating-the-maven-project">Mavenプロジェクトの作成</a></li>
+<li><a href="#running-the-health-check">ヘルスチェックの実行</a></li>
+<li><a href="#creating-your-first-health-check">初めてのヘルスチェックの作成</a></li>
+<li><a href="#adding-a-readiness-health-check-procedure">readiness ヘルスチェックプロシージャの追加</a></li>
+<li><a href="#adding-a-startup-health-check-procedure">スタートアップヘルスチェックプロシージャの追加</a></li>
+<li><a href="#negative-health-check-procedures">ネガティブヘルスチェックプロシージャ</a></li>
+<li><a href="#adding-user-specific-data-to-the-health-check-response">ヘルスチェックのレスポンスにユーザー固有のデータを追加</a></li>
+<li><a href="#context-propagation-into-the-health-check-invocations">ヘルスチェック呼び出しへのコンテキストの伝搬</a></li>
+<li><a href="#reactive-health-checks">リアクティブヘルスチェック</a></li>
+<li><a href="#extension-health-checks">エクステンションのヘルスチェック</a></li>
+<li><a href="#ui">Health UI </a></li>
+<li><a href="#management-interface">マネジメントインターフェース</a></li>
+<li><a href="#conclusion">まとめ</a></li>
+<li><a href="#configuration-reference">設定リファレンス</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/guides/centralized-log-management">ログの一元管理（Graylog、Logstash、Fluentd）</a></li>
+      
+        
+        <li class="tutorial"><a href="/guides/telemetry-micrometer-tutorial">マイクロメータを用いたメトリクスの収集</a></li>
+      
+        
+        <li class="reference"><a href="/guides/logging">ロギング設定</a></li>
+      
+        
+        <li class="reference"><a href="/guides/management-interface-reference">マネジメントインターフェースリファレンス</a></li>
+      
+        
+        <li class="reference"><a href="/guides/telemetry-micrometer">Micrometerメトリクス</a></li>
+      
+        
+        <li class="tutorial"><a href="/guides/telemetry-opentracing-to-otel-tutorial">OpenTracingからOpenTelemetry tracingへの移行</a></li>
+      
+        
+        <li class="guide"><a href="/guides/observability-devservices">Observability Dev Services</a></li>
+      
+        
+        <li class="guide"><a href="/guides/smallrye-metrics">SmallRye Metrics</a></li>
+      
+        
+        <li class="guide"><a href="/guides/jfr">Using Java Flight Recorder</a></li>
+      
+        
+        <li class="reference"><a href="/guides/opentelemetry">Using OpenTelemetry</a></li>
+      
+        
+        <li class="guide"><a href="/guides/opentelemetry-logging">Using OpenTelemetry Logging</a></li>
+      
+        
+        <li class="guide"><a href="/guides/opentelemetry-metrics">Using OpenTelemetry Metrics</a></li>
+      
+        
+        <li class="guide"><a href="/guides/opentelemetry-tracing">Using OpenTelemetry Tracing</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

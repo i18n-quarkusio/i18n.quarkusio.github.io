@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>OpenID Connect (OIDC)のDev ServicesとDev UI - 3.8 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.8/guides/security-openid-connect-dev-services" />
+  <meta property="og:title" content="OpenID Connect (OIDC)のDev ServicesとDev UI - 3.8" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/security-openid-connect-dev-services">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.8/guides/security-openid-connect-dev-services">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.8/guides/security-openid-connect-dev-services" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.8/guides/security-openid-connect-dev-services">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.8/guides/security-openid-connect-dev-services">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.8/guides/security-openid-connect-dev-services">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.8/guides/security-openid-connect-dev-services">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.8/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" selected>3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">OpenID Connect (OIDC)のDev ServicesとDev UI </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Dev Services for Keycloak と OpenID Connect (OIDC) Keycloak プロバイダー用の Dev UI を使用して、これらのサービスを他の OpenID Connect プロバイダーに適応させることができます。
+Quarkus を開発モードで実行する前に、すでに起動している OpenID Connect プロバイダーで Dev UI を使用することもできます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="introduction"><a class="anchor" href="#introduction"></a>はじめに</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusには、Dev Services for Keycloak機能があります。この機能は、 <code>quarkus-oidc</code> エクステンションがdevモードで開始され、結合テストがtestモードで実行され、 <code>quarkus.oidc.auth-server-url</code> プロパティが設定されていない場合にデフォルトで有効になります。
+Dev Services for Keycloak機能は、devモードとtestモードの両方でKeycloakコンテナを起動します。
+既存のKeycloakレルムを登録するか、Keycloakでセキュリティ保護されたQuarkusアプリケーションの開発をすぐに開始するために必要なクライアントとユーザーを含む新しいレルムを作成することで、これらのレルムを初期化します。 
+<code>application.properties</code> 、あるいはレルムファイルの変更が検出されると、コンテナは再起動します。</p>
+</div>
+<div class="paragraph">
+<p>さらに、http://localhost:8080/q/dev[/q/dev] で入手可能な <a href="dev-ui">Dev UI</a> は、Dev UI ページでこの機能を補完します。これは、Keycloak からトークンを取得して Quarkus アプリケーションをテストする際に役立ちます。</p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.oidc.auth-server-url</code> がすでに設定されている場合、すべての OpenID Connect プロバイダーで使用できる汎用の OpenID Connect Dev Console がアクティブになります。
+詳細は、<a href="#dev-ui-all-oidc-providers">Dev UI for all OpenID Connect providers</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dev-services-for-keycloak"><a class="anchor" href="#dev-services-for-keycloak"></a>Dev Services for Keycloak</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>application.properties</code> ファイルで <code>quarkus.oidc</code> プロパティーを設定せずにアプリケーションを起動します。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>コンソールに次のような出力が表示されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">KeyCloak Dev Services Starting:
+2021-11-02 17:14:24,864 INFO  [org.tes.con.wai.str.HttpWaitStrategy] (build-10) /unruffled_agnesi: Waiting for 60 seconds for URL: http://localhost:32781 (where port 32781 maps to container port 8080)
+2021-11-02 17:14:44,170 INFO  [io.qua.oid.dep.dev.key.KeycloakDevServicesProcessor] (build-10) Dev Services for Keycloak started.</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Keycloak 管理コンソールにログインする場合、ユーザー名は <code>admin</code>、パスワードは <code>admin</code> です。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Dev Services for Keycloak は、<code>quarkus-dev-service-keycloak</code> というラベルの付いた既存のコンテナーを検出した場合、デフォルトで新しいコンテナーを起動しないことに注意してください。
+<code>quarkus.keycloak.devservices.service-name</code> プロパティーの値がラベルの値 (デフォルトは <code>quarkus</code>) と一致する場合、このコンテナーに接続します。
+このような場合、以下を実行すると出力が若干変更されることがあります。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">2021-08-27 18:42:43,530 INFO  [io.qua.dev.com.ContainerLocator] (build-15) Dev Services container found: 48fee151a31ddfe32c39965be8f61108587b25ed2f66cdc18bb926d9e2e570c5 (quay.io/keycloak/keycloak:21.0.2). Connecting to: 0.0.0.0:32797.
+2021-08-27 18:42:43,600 INFO  [io.qua.oid.dep.dev.key.KeycloakDevServicesProcessor] (build-15) Dev Services for Keycloak started.
+...</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Keycloak コンテナーがデフォルトの 60 秒のタイムアウト内に準備できない場合は、タイムアウト期間を延長することで解決できます。
+たとえば、<code>quarkus.devservices.timeout=2M</code> で 2 分に設定します。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>quarkus.keycloak.devservices.shared=false</code> を指定すると、コンテナーの共有をオフにすることができます。</p>
+</div>
+<div class="paragraph">
+<p>次に、メインの <a href="http://localhost:8080/q/dev">Dev UI ページ</a> を開き、Keycloak ページにリンクしている <strong>OpenID Connect</strong> カードを確認します。
+次に例を示します。</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="./images/dev-ui-oidc-keycloak-card.png" alt="Dev UI OpenID Connect card">
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Keycloak provider</strong> リンクをクリックします。
+このアクションにより、Dev Services for Keycloak 機能の設定に応じて外観が異なる Keycloak ページが開きます。</p>
+</div>
+<div class="sect2">
+<h3 id="develop-service-applications"><a class="anchor" href="#develop-service-applications"></a>サービスアプリケーションの開発</h3>
+<div class="paragraph">
+<p>デフォルトでは、Keycloak ページを使用して、<a href="security-oidc-bearer-token-authentication">Quarkus OIDC サービスアプリケーション</a> の開発をサポートできます。</p>
+</div>
+<div class="sect3">
+<h4 id="keycloak-authorization-code-grant"><a class="anchor" href="#keycloak-authorization-code-grant"></a>認可コード グラント</h4>
+<div class="paragraph">
+<p><code>application.properties</code> ファイルで <code>quarkus.oidc.devui.grant.type=code</code> を設定すると (これがデフォルト値です)、アクセストークンと ID トークンの両方を取得するために <code>authorization_code</code> グラントが使用されます。
+シングルページアプリケーション (SPA) でトークンを取得し、それを使用して Quarkus サービスにアクセスする一般的なフローをエミュレートするには、このグラントを使用することを推奨します。</p>
+</div>
+<div class="paragraph">
+<p>まず、<strong>Log into Single Page Application</strong> オプションが表示されます。
+次に例を示します。</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="./images/dev-ui-keycloak-sign-in-to-spa.png" alt="Dev UI OpenID Connect Keycloak Page - Log into Single Page Application">
+</div>
+</div>
+<div class="paragraph">
+<p>認証プロセス中に使用する Keycloak レルムとクライアント ID を選択します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>この SPA は、OpenId Connect の public クライアントを表します。したがって、入力するクライアント ID は、シークレットのない Keycloak の public クライアントを指す必要があります。
+これは、SPA が Web アプリケーションではないため、クライアントシークレットも認可コードフローを完了することが予想される場合、認可コードフローを完了するために必要なクライアントシークレットを安全に扱うことができないためです。</p>
+</div>
+<div class="paragraph">
+<p>シークレットが必要なクライアントは、デフォルトのレルムが作成されている場合、または <code>quarkus.oidc.credentials.secret</code> が設定されていて単一のカスタムレルムが使用されている場合にのみ、この SPA でサポートできます。
+どちらの場合も、Keycloak がユーザーを SPA にリダイレクトした後、SPA は認可コードフローを完了するために必要なクライアントシークレットを把握できます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>次に、<strong>Log into Single Page Application</strong> を選択すると、Keycloak にリダイレクトされ、たとえば <code>alice:alice</code> として認証されます。
+次に、SPA を表すページに戻ります。</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="./images/dev-ui-keycloak-test-service-from-spa.png" alt="Dev UI OpenID Connect Keycloak Single Page Application">
+</div>
+</div>
+<div class="paragraph">
+<p>取得したアクセストークンやIDトークンなどを確認することができます。</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="./images/dev-ui-keycloak-decoded-tokens.png" alt="Dev UI OpenID Connect Keycloak Decoded Tokens View">
+</div>
+</div>
+<div class="paragraph">
+<p>このビューでは、エンコードされた JSON Web Token (JWT) トークンが左側に表示され、ヘッダーが赤で、ペイロードまたはクレームが緑で、署名が青で強調表示されます。
+また、右側にはデコードされた JWT トークンが表示され、ヘッダー、クレーム名、およびそれらの値を確認できます。</p>
+</div>
+<div class="paragraph">
+<p>次に、相対サービスパスを入力し、トークンを送信してサービスをテストします。
+SPAは通常、アプリケーションのエンドポイントにアクセストークンを送信するので、たとえば <strong>With Access Token</strong> オプションを選択します。</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="./images/dev-ui-keycloak-test-access-token.png" alt="Dev UI Keycloak - With Access Token">
+</div>
+</div>
+<div class="paragraph">
+<p>テスト結果領域を消去するには、右下隅にある消しゴムアイコンを使用します。</p>
+</div>
+<div class="paragraph">
+<p>場合によっては、ID トークンがベアラートークンとしてアプリケーションフロントエンドに転送されることがあります。
+これにより、エンドポイントが SPA にログインしているユーザーを識別したり、帯域外のトークン検証を実行したりできるようになります。
+このような場合は、<strong>With ID Token</strong> オプションを選択してください。</p>
+</div>
+<div class="paragraph">
+<p>サービスパスを手動で入力するのは理想的ではありません。
+OIDC Dev UI ですでに取得済みのアクセストークンを使用してサービスをテストするために Swagger または GraphQL UI を有効にする方法については、<a href="#test-with-swagger-graphql">Test with Swagger UI or GraphQL UI</a> セクションを参照してください。</p>
+</div>
+<div class="paragraph">
+<p>最後に、<strong>Log Out</strong> image::dev-ui-keycloak-logout.png[alt=Dev UI Keycloak - Log Out,role="center"] をクリックすると、別のユーザーとして Keycloak に認証できるようになります。</p>
+</div>
+<div class="paragraph">
+<p><strong>Log into Single Page Application</strong> を選択しすると、Keycloak からエラーが返される場合があります。
+たとえば、<code>quarkus.oidc.client-id</code> が Keycloak にインポートされたレルム内のクライアント ID と一致しない可能性があります。または、このレルム内のクライアントが認可コードフローをサポートするように正しく設定されていない可能性があります。
+このような場合、Keycloak は <code>error_description</code> クエリーパラメーターを返し、Dev UI にもこのエラーの説明が表示されます。
+次に例を示します。</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="./images/dev-ui-keycloak-login-error.png" alt="Dev UI Keycloak Login Error">
+</div>
+</div>
+<div class="paragraph">
+<p>エラーが発生した場合は、<strong>Keycloak Admin</strong> オプションを使用して Keycloak にログインし、必要に応じてレルム設定を更新し、<code>application.properties</code> を確認してください。</p>
+</div>
+<div class="sect4">
+<h5 id="test-with-swagger-graphql"><a class="anchor" href="#test-with-swagger-graphql"></a>Swagger UI または GraphQL UI を使用したテスト</h5>
+<div class="paragraph">
+<p>プロジェクトで <code>quarkus-smallrye-openapi</code> または <code>quarkus-smallrye-graphql</code> が使用されている場合は、サービスパスを手動で入力する必要がなくなり、Swagger UI または GraphQL UI を使用してサービスをテストできます。
+たとえば、<code>quarkus-smallrye-openapi</code> と <code>quarkus-smallrye-graphql</code> の両方の依存関係を使用して Quarkus を開発モードで起動します。
+Keycloak にログインすると、次のオプションが表示されます。</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="./images/dev-ui-keycloak-test-service-swaggerui-graphql.png" alt="Test your service with Swagger UI or GraphQL UI">
+</div>
+</div>
+<div class="paragraph">
+<p>たとえば、<strong>Swagger UI</strong> をクリックすると、新しいブラウザータブで Swagger UI が開き、Keycloak 用の Dev UI によって取得されたトークンを使用してサービスをテストできます。
+Swagger UI は再度認証を試行しません。
+Swagger UI で、Swagger UI の <code>Authorize</code> オプションを選択しないでください。OIDC Dev UI が Swagger UI を認可し、テストに使用するアクセストークンを提供しているためです。</p>
+</div>
+<div class="paragraph">
+<p><code>GraphQL UI</code> とのインテグレーションも同様に機能し、Keycloak 用の Dev UI によって取得されたアクセストークンが使用されます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Keycloak 用の Dev UI によって開始される認可コードフローを機能させるには、リダイレクト URI を登録する必要がある場合があります。
+Keycloak は、認証されたユーザーが設定されたリダイレクト URI にのみリダイレクトされるように強制する場合があるためです。
+認証リクエスト内の正しい <code>redirect_uri</code> パラメーターが操作されると、ユーザーが間違ったエンドポイントにリダイレクトされる可能性があるため、本番環境ではこれを行うことを推奨します。</p>
+</div>
+<div class="paragraph">
+<p>Keycloak がそれを強制する場合、<code>redirect_uri</code> 値が間違っていることを通知する認証エラーが表示されます。</p>
+</div>
+<div class="paragraph">
+<p>この場合、右上隅の <strong>Keycloak Admin</strong> オプションを選択し、<code>admin:admin</code> としてログインし、テストレルムと、Keycloak 用の Dev UI が設定されているクライアントを選択し、<code><a href="http://localhost:8080/q/dev-ui/io.quarkus.quarkus-oidc/keycloak-provider" class="bare">http://localhost:8080/q/dev-ui/io.quarkus.quarkus-oidc/keycloak-provider</a></code> を <code>Valid Redirect URIs</code> に追加します。
+Quarkus の起動時に <code>-Dquarkus.http.port</code> を使用した場合は、<code>8080</code> を <code>quarkus.http.port</code> の値に変更します。</p>
+</div>
+<div class="paragraph">
+<p>異なるポートで実行されている複数のアプリケーション間でコンテナーを共有する場合は、アプリケーションごとに <code>redirect_uri</code> 値を登録する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>特にコンテナーが複数のアプリケーション間で共有されている場合は、テスト目的でのみ <code>redirect_uri</code> 値を <code>*</code> に設定できます。</p>
+</div>
+<div class="paragraph">
+<p>カスタムレルムがインポートされていない場合、Dev Services for Keycloak はデフォルトのレルムを作成するときに <code>redirect_uri</code> 値を <code>*</code> に設定します。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="implicit-grant"><a class="anchor" href="#implicit-grant"></a>インプリシット・グラント</h4>
+<div class="paragraph">
+<p><code>application.properties</code> ファイルで <code>quarkus.oidc.devui.grant.type=implicit</code> を設定すると、アクセストークンと ID トークンの両方を取得するために <code>implicit</code> グラントが使用されます。
+認可コードグラントが機能しない場合 (インプリシットグラントをサポートするためにクライントが Keycloak に設定されている場合) に限り、このグラントを使用してシングルページアプリケーションをエミュレートします。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="password-grant"><a class="anchor" href="#password-grant"></a>パスワード・グラント</h4>
+<div class="paragraph">
+<p><code>application.properties</code> ファイルで <code>quarkus.oidc.devui.grant.type=password</code> を設定すると、次のような画面が表示されます。</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="./images/dev-ui-keycloak-password-grant.png" alt="Dev UI OpenID Connect Keycloak Page - Password Grant">
+</div>
+</div>
+<div class="paragraph">
+<p>レルムを選択し、クライアント ID とシークレット、ユーザー名とパスワード、相対サービスエンドポイントパスを入力して、<strong>Test service</strong> をクリックします。
+<code>200</code>、<code>403</code>、<code>401</code>、<code>404</code> などのステータスコードが返されます。
+ユーザー名とパスワードを含む <code>quarkus.keycloak.devservices.users</code> マッププロパティーにもユーザー名が設定されている場合は、サービスをテストするときにパスワードを設定する必要はありません。
+<code>password</code> グラントを使用してサービスをテストするために、<code>quarkus.keycloak.devservices.users</code> を初期化する必要はないことに注意してください。</p>
+</div>
+<div class="paragraph">
+<p>Dev UI コンソールでは、次のような出力も表示されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">2021-07-19 17:58:11,407 INFO  [io.qua.oid.dep.dev.key.KeycloakDevConsolePostHandler] (security-openid-connect-quickstart-dev.jar) (DEV Console action) Using password grant to get a token from 'http://localhost:32818/realms/quarkus/protocol/openid-connect/token' for user 'alice' in realm 'quarkus' with client id 'quarkus-app'
+2021-07-19 17:58:11,533 INFO  [io.qua.oid.dep.dev.key.KeycloakDevConsolePostHandler] (security-openid-connect-quickstart-dev.jar) (DEV Console action) Test token: eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJ6Z2tDazJQZ1JaYnVlVG5kcTFKSW1sVnNoZ2hhbWhtbnBNcXU0QUt5MnJBIn0.ey...
+2021-07-19 17:58:11,536 INFO  [io.qua.oid.dep.dev.key.KeycloakDevConsolePostHandler] (security-openid-connect-quickstart-dev.jar) (DEV Console action) Sending token to 'http://localhost:8080/api/admin'
+2021-07-19 17:58:11,674 INFO  [io.qua.oid.dep.dev.key.KeycloakDevConsolePostHandler] (security-openid-connect-quickstart-dev.jar) (DEV Console action) Result: 200</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>トークンは <code>password</code> グラントを使用して Keycloak から取得され、サービスエンドポイントに送信されます。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="client-credentials-grant"><a class="anchor" href="#client-credentials-grant"></a>クライアントクレデンシャル・グラント</h4>
+<div class="paragraph">
+<p><code>quarkus.oidc.devui.grant.type=client</code> を設定すると、トークンの取得に <code>client_credentials</code> グラントが使用されます。この場合、ページに <strong>User</strong> フィールドは表示されません。</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="./images/dev-ui-keycloak-client-credentials-grant.png" alt="Dev UI OpenID Connect Keycloak Page - Client Credentials Grant">
+</div>
+</div>
+<div class="paragraph">
+<p>レルムを選択し、クライアント ID とシークレット、相対サービスエンドポイントパスを入力して、<strong>Test service</strong> をクリックします。
+<code>200</code>、<code>403</code>、<code>401</code>、<code>404</code> などのステータスコードが返されます。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="develop-web-app-applications"><a class="anchor" href="#develop-web-app-applications"></a>OpenID Connectウェブアプリケーション開発</h3>
+<div class="paragraph">
+<p><a href="security-oidc-code-flow-authentication">Quarkus OIDCウェブアプリケーション</a> を開発するには、アプリケーションを開始する前に、 <code>application.properties</code> ファイルで <code>quarkus.oidc.application-type=web-app</code> を設定します。</p>
+</div>
+<div class="paragraph">
+<p>アプリケーションを起動すると、このような画面が表示されます：</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="./images/dev-ui-keycloak-sign-in-to-service.png" alt="Dev UI OpenID Connect Keycloak Sign In">
+</div>
+</div>
+<div class="paragraph">
+<p>相対的なサービスエンドポイントパスを設定し、<strong>Log in to your web application</strong> をクリックします。
+Quarkus アプリケーションからのレスポンスを受け取る前に、新しいブラウザータブでユーザー名とパスワードを入力するために Keycloak にリダイレクトされます。</p>
+</div>
+<div class="paragraph">
+<p>この場合、Quarkus OIDC <code>web-app</code> アプリケーションが認可コードフローを制御し、トークンを取得するため、Dev UI はあまり役に立ちません。</p>
+</div>
+<div class="paragraph">
+<p>Dev UI を OIDC <code>web-app</code> アプリケーションの開発のサポートにさらに役立てるために、<code>quarkus.oidc.application-type</code> にプロファイル固有の値を設定することを検討してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">%prod.quarkus.oidc.application-type=web-app
+%test.quarkus.oidc.application-type=web-app
+%dev.quarkus.oidc.application-type=service</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このプロファイルによって、<a href="#develop-service-applications">Developing service applications</a> で説明されているすべての Dev UI オプションが、<code>web-app</code> アプリケーションが開発モードで実行されているときに利用可能になります。
+このアプローチの制限は、コードフローで返され、Dev UI で取得されたアクセストークンと ID トークンの両方が HTTP <code>Bearer</code> トークンとしてエンドポイントに送信されることです。これは、エンドポイントで <code>IdToken</code> の注入が必要な場合はうまく機能しません。
+ただし、<code>web-app</code> アプリケーションがアクセストークンを、たとえばロールのソースとして、または <code>UserInfo</code> を取得するためにのみ使用する場合は、開発モードの <code>service</code> アプリケーションであると想定される場合でも、期待どおりに機能します。</p>
+</div>
+<div class="paragraph">
+<p>開発モードの場合、さらに良い選択肢は、<code>application-type</code> プロパティーを <code>hybrid</code> に設定することです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">%prod.quarkus.oidc.application-type=web-app
+%test.quarkus.oidc.application-type=web-app
+%dev.quarkus.oidc.application-type=hybrid</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このタイプを設定すると、OIDC Dev UI を使用せずに開発モードでブラウザーからアプリケーションにアクセスした場合に、Quarkus OIDC が本番モードと同様に認可コードフローを実行するようになります。
+また、ハイブリッドアプリケーションもベアラーアクセストークンを受け入れることができるため、OIDC Dev UI がより便利になります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="running-the-tests"><a class="anchor" href="#running-the-tests"></a>テストの実行</h3>
+<div class="paragraph">
+<p>テストモードで起動した Keycloak コンテナーに対して、<a href="continuous-testing">継続テスト</a> モードでテストを実行できます。</p>
+</div>
+<div class="paragraph">
+<p>It is also recommended to run the integration tests against Keycloak by using Dev Services for Keycloak.
+For more information, see <a href="security-oidc-bearer-token-authentication#bearer-token-integration-testing-keycloak-devservices">Testing OpenID Connect Service Applications with Dev Services</a> and <a href="security-oidc-code-flow-authentication#code-flow-integration-testing-keycloak-devservices">Testing OpenID Connect WebApp Applications with Dev Services</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="keycloak-initialization"><a class="anchor" href="#keycloak-initialization"></a>Keycloak 初期化</h3>
+<div class="paragraph">
+<p>デフォルトでは、Quarkus を利用した Keycloak ディストリビューションを含む <code>quay.io/keycloak/keycloak:24.0.4</code> イメージがコンテナーの起動に使用されます。
+<code>quarkus.keycloak.devservices.image-name</code> を使用して、Keycloak イメージ名を変更できます。
+たとえば、WildFly を利用した Keycloak ディストリビューションを使用するには、これを <code>quay.io/keycloak/keycloak:19.0.3-legacy</code> に設定します。
+Quarkus ベースの Keycloak ディストリビューションは、Keycloak <code>20.0.0</code> 以降でのみ利用可能であることに注意してください。</p>
+</div>
+<div class="paragraph">
+<p>Dev Services for Keycloakは、起動したKeycloakサーバーを次に初期化します。</p>
+</div>
+<div class="paragraph">
+<p>デフォルトでは、パスワードが <code>secret</code> の <code>quarkus</code> および <code>quarkus-app</code> クライアント、<code>alice</code> および <code>bob</code> ユーザー (パスワードは名前と同じ)、<code>user</code> および <code>admin</code> ロールが作成されます。このとき、<code>alice</code> には <code>admin</code> と <code>user</code> の両方のロールが与えられ、<code>bob</code> には <code>user</code> ロールが与えられます。</p>
+</div>
+<div class="paragraph">
+<p>ユーザー名、シークレット、およびそれらのロールは、<code>quarkus.keycloak.devservices.users</code> (ユーザー名とシークレットを含むマップ) および <code>quarkus.keycloak.devservices.roles</code> (ユーザー名とコンマ区切りのロール値を含むマップ) でカスタマイズできます。</p>
+</div>
+<div class="paragraph">
+<p>例えば、以下のようになります:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">%dev.quarkus.keycloak.devservices.users.duke=dukePassword
+%dev.quarkus.keycloak.devservices.roles.duke=reader
+%dev.quarkus.keycloak.devservices.users.john=johnPassword
+%dev.quarkus.keycloak.devservices.roles.john=reader,writer</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この設定により、2人のユーザーが作成されます:
+* <code>dukePassword</code> パスワードと <code>reader</code> ロールを持つ <code>duke</code> 
+* <code>johnPassword</code> パスワードと <code>reader</code> および <code>writer</code> ロールを持つ <code>john</code></p>
+</div>
+<div class="paragraph">
+<p>クライアント ID とシークレットをカスタマイズするには、<code>quarkus.oidc.client-id</code> プロパティーと <code>quarkus.oidc.credentials.secret</code> プロパティーを使用できます。</p>
+</div>
+<div class="paragraph">
+<p>ただし、Keycloak の設定がより複雑になり、より多くのプロパティーの設定が必要になる可能性があります。</p>
+</div>
+<div class="paragraph">
+<p>このため、Keycloak をデフォルトまたは設定されたレルム、クライアント、ユーザー、およびロールのプロパティーで初期化する前に、常に <code>quarkus.keycloak.devservices.realm-path</code> がチェックされます。
+realm ファイルがファイルシステムまたはクラスパス上に存在する場合、この realm だけが Keycloak を初期化するために使用されます。次に例を示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.keycloak.devservices.realm-path=quarkus-realm.json</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>quarkus.keycloak.devservices.realm-path</code> を使って、カンマで区切られたファイルのリストを提供することで、複数のレルムファイルでKeycloakを初期化することができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>quarkus.keycloak.devservices.realm-path=quarkus-realm1.json,quarkus-realm2.json</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>また、Keycloak ページには、右上隅にある <strong>Keycloak Admin</strong> オプションを使用して、Keycloak にサインインしてレルムを設定するオプション (<code>Sign In To Keycloak To Configure Realms</code>) があります。</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="./images/dev-ui-keycloak-admin.png" alt="Dev UI OpenID Connect Keycloak Page - Keycloak Admin">
+</div>
+</div>
+<div class="paragraph">
+<p>レルムのプロパティーのカスタマイズ、新規レルムの作成またはインポート、レルムのエクスポートを実行するには、Keycloak に <code>admin:admin</code> としてサインインします。</p>
+</div>
+<div class="paragraph">
+<p>クラスパスとファイルシステムリソースをコンテナーにコピーすることもできます。
+たとえば、jar ファイルで Keycloak にデプロイされる <a href="https://www.keycloak.org/docs/latest/authorization_services/index.html#_policy_js">JavaScript ポリシー</a> を使用してアプリケーションが Keycloak 認証を設定する場合、次のようにしてこの jar を Keycloak コンテナーにコピーするように <code>Dev Services for Keycloak</code> を設定できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.keycloak.devservices.resource-aliases.policies=/policies.jar <i class="conum" data-value="1"></i><b>(1)</b>
+quarkus.keycloak.devservices.resource-mappings.policies=/opt/keycloak/providers/policies.jar <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>クラスパス <code>/policies.jar</code> リソースに対して <code>policies</code> エイリアスが作成されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>ポリシー jar はファイルシステム内に配置することもできます。
+&lt;2&gt; ポリシー jar は、<code>/opt/keycloak/providers/policies.jar</code> コンテナーの場所にマップされます。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="disable-dev-services-for-keycloak"><a class="anchor" href="#disable-dev-services-for-keycloak"></a>Keycloak の Dev サービスを無効にする</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>quarkus.oidc.auth-server-url</code> がすでに初期化されているか、デフォルトの OIDC テナントが <code>quarkus.oidc.tenant.enabled=false</code> で無効になっている場合、Keycloak を使用するかどうかにかかわらず、<code>Dev Services For Keycloak</code> はアクティブ化されません。</p>
+</div>
+<div class="paragraph">
+<p>Dev Services for Keycloak コンテナーを起動させない、または使用しない場合も、<code>quarkus.keycloak.devservices.enabled=false</code> を使用してこの機能を無効化できます。これは、<code>quarkus.oidc.auth-server-url</code> なしで <code>quarkus:dev</code> を起動する予定がある場合にのみ必要です。</p>
+</div>
+<div class="paragraph">
+<p>Dev Services for Keycloak が無効になっていて、<code>quarkus.oidc.auth-server-url</code> プロパティーが初期化されていない場合、メインの Dev UI ページに空の <strong>OpenID Connect</strong> カードが表示されます。</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="./images/dev-ui-oidc-card.png" alt="Dev UI OpenID Connect card">
+</div>
+</div>
+<div class="paragraph">
+<p><code>quarkus.oidc.auth-server-url</code> がすでに設定されている場合は、すべての OpenID Connect プロバイダーで使用できる汎用の OpenID Connect Dev Console をアクティブ化できます。詳細は、<a href="#dev-ui-all-oidc-providers">Dev UI for all OpenID Connect providers</a> セクションを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dev-ui-all-oidc-providers"><a class="anchor" href="#dev-ui-all-oidc-providers"></a>すべてのOpenID ConnectプロバイダーのためのDev UI</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>以下の条件を満たす場合、すべての OpenID Connect プロバイダーの Dev UI が有効になります：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus.oidc.auth-server-url</code> が、すでに起動している OpenID Connect プロバイダー (Keycloak またはその他のプロバイダー) を指している。</p>
+</li>
+<li>
+<p><code>quarkus.oidc.application-type</code> が、デフォルト値の <code>service</code> または <code>hybrid</code> に設定されている。</p>
+</li>
+<li>
+<p><code>quarkus.oidc.client-id</code> が設定されている。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>quarkus.oidc.client-id</code> で識別されるクライアントが OpenID Connect プロバイダーの管理コンソールで public クライアントとして設定されていない限り、Dev UI から開始された認可コードフローを完了するには、おそらく Keycloak やその他のプロバイダーで <code>quarkus.oidc.credentials.secret</code> を設定する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>たとえば、Dev UI を使用して、次の設定で Google 認証をテストできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.provider=google
+quarkus.oidc.application-type=hybrid
+quarkus.oidc.client-id=${google-client-id}
+quarkus.oidc.credentials.secret=${google-client-secret}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>実行:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このコマンドは、次の例のようなメッセージを出力します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">...
+2021-09-07 15:53:42,697 INFO  [io.qua.oid.dep.dev.OidcDevConsoleProcessor] (build-41) OIDC Dev Console: discovering the provider metadata at https://accounts.google.com/.well-known/openid-configuration
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>プロバイダーメタデータの検出が成功した場合、メインの <a href="http://localhost:8080/q/dev">Dev UI ページ</a> を開くと、<code>Google</code> プロバイダーを参照する次の <strong>OpenID Connect</strong> カードが表示されます。</p>
+</div>
+<div class="imageblock center">
+<div class="content">
+<img src="./images/dev-ui-oidc-devconsole-card.png" alt="Generic Dev UI OpenID Connect card">
+</div>
+</div>
+<div class="paragraph">
+<p>リンクをたどってプロバイダーにログインし、トークンを取得して、アプリケーションをテストします。
+特に Keycloakを使用している場合、これは <code>Dev Services for Keycloak</code> コンテナーを起動した <a href="#keycloak-authorization-code-grant">Authorization code grant for Keycloak</a> セクションの説明のとおりです。</p>
+</div>
+<div class="paragraph">
+<p>多くの場合、<code>Dev Console</code> へのリダイレクトをサポートするように OpenID Connect プロバイダーを設定する必要があります。
+<code><a href="http://localhost:8080/q/dev-ui/io.quarkus.quarkus-oidc/&lt;providerName&gt;-provider" class="bare">http://localhost:8080/q/dev-ui/io.quarkus.quarkus-oidc/&lt;providerName&gt;-provider</a></code> を、サポートされているリダイレクトおよびログアウト URL の 1 つとして追加します。<code>&lt;providerName&gt; ` は、Dev UI に表示されるプロバイダーの名前 (例: `auth0</code>) に置き換える必要があります。</p>
+</div>
+<div class="paragraph">
+<p>他のプロバイダーを使用している場合、<a href="#keycloak-authorization-code-grant">Authorization code grant for Keycloak</a> で説明されている Dev UI のエクスペリエンスが若干異なる場合があります。
+たとえば、アクセストークンが JWT 形式でない場合、その内部コンテンツを表示できません。
+ただし、すべてのプロバイダーが JWT 形式で ID トークンを返すはずです。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>現在のアクセストークンは、Swagger UI または GrapghQL UI でサービスをテストするためにデフォルトで使用されます。
+プロバイダー (Keycloak 以外) がバイナリーアクセストークンを返す場合、このプロバイダーにトークンイントロスペクションエンドポイントがある場合にのみ、Swagger UI または GrapghQL UI で使用されます。それ以外の場合は、常に JWT 形式の <code>IdToken</code> が Swagger UI または GrapghQL UI に渡されます。
+このような場合、手動の Dev UI テストを使用して、現在のバイナリーアクセストークンに対して常に <code>401</code> が返されることを確認できます。
+また、これらのいずれかのユーザーインターフェイスで <code>IdToken</code> をフォールバックとして使用することは、認可コードフローでのみ可能であることに注意してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>Auth0</code> などの一部のプロバイダーは、標準の RP 起点のログアウトをサポートしていないため、ログアウトオプションを表示するには、プロバイダー固有のログアウトプロパティーを設定する必要があります。
+詳細は、「Web アプリケーションを保護するための OpenID Connect 認可コードフローメカニズム」ガイドの <a href="security-oidc-code-flow-authentication#user-initiated-logout">ユーザー起点のログアウト</a> セクションを参照してください。</p>
+</div>
+<div class="paragraph">
+<p>同様に、Dev UI に <code>password</code> または <code>client_credentials</code> グラントを使用してトークンを取得する場合は、プロバイダー固有の追加のプロパティーを設定する必要がある場合があります。次に例を示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.devui.grant.type=password
+quarkus.oidc.devui.grant-options.password.audience=http://localhost:8080</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="non-application-root-path-considerations"><a class="anchor" href="#non-application-root-path-considerations"></a>アプリケーション以外のルートパスに関する考慮事項</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このドキュメントでは、いくつかの場所で Dev UI URL を <code><a href="http://localhost:8080/q/dev-ui" class="bare">http://localhost:8080/q/dev-ui</a></code> と表記しています。<code>q</code> は、デフォルトのアプリケーション以外のルートパスです。
+<code>quarkus.http.root-path</code> または <code>quarkus.http.non-application-root-path</code> プロパティーをカスタマイズする場合は、それに応じて <code>q</code> を置き換えてください。
+詳細は、ブログ記事の <a href="https://quarkus.io/blog/path-resolution-in-quarkus/">Path resolution in Quarkus</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="references"><a class="anchor" href="#references"></a>参照</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="dev-ui">Dev UI</a></p>
+</li>
+<li>
+<p><a href="https://www.keycloak.org/documentation.html">Keycloak Documentation</a></p>
+</li>
+<li>
+<p><a href="https://openid.net/connect/">OpenID Connect</a></p>
+</li>
+<li>
+<p><a href="security-oidc-bearer-token-authentication">OIDCベアラートークン認証</a></p>
+</li>
+<li>
+<p><a href="security-oidc-code-flow-authentication">ウェブアプリケーションを保護するOIDCコードフローメカニズム</a></p>
+</li>
+<li>
+<p><a href="security-overview">Quarkus Securityの概要</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#introduction">はじめに</a></li>
+<li><a href="#dev-services-for-keycloak">Dev Services for Keycloak</a>
+<ul class="sectlevel2">
+<li><a href="#develop-service-applications">サービスアプリケーションの開発</a></li>
+<li><a href="#develop-web-app-applications">OpenID Connectウェブアプリケーション開発</a></li>
+<li><a href="#running-the-tests">テストの実行</a></li>
+<li><a href="#keycloak-initialization">Keycloak 初期化</a></li>
+</ul>
+</li>
+<li><a href="#disable-dev-services-for-keycloak">Keycloak の Dev サービスを無効にする</a></li>
+<li><a href="#dev-ui-all-oidc-providers">すべてのOpenID ConnectプロバイダーのためのDev UI</a></li>
+<li><a href="#non-application-root-path-considerations">アプリケーション以外のルートパスに関する考慮事項</a></li>
+<li><a href="#references">参照</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same extensions</h3>
+      <ul class="related-content">
+      
+        
+        <li class="concepts"><a href="/version/3.8/guides/security-openid-connect-providers">よく知られたOpenID Connect プロバイダーの設定</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.8/guides/security-oidc-bearer-token-authentication">OpenID Connect (OIDC) ベアラートークン認証</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.8/guides/security-oidc-configuration-properties-reference">OpenID Connect (OIDC) 設定プロパティ</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.8/guides/security-oidc-code-flow-authentication">Web アプリケーションを保護するための OpenID Connect 認可コードフローメカニズム</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.8/guides/security-oidc-bearer-token-authentication-tutorial">OpenID Connect（OIDC）ベアラートークン認証によるサービスアプリケーションの保護</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.8/guides/security-oidc-code-flow-authentication-tutorial">Quarkus - 認可コードフローのOpenID Connectを使用してWebアプリケーションを保護</a></li>
+      
+        
+        <li class="howto"><a href="/version/3.8/guides/security-keycloak-authorization">OpenID Connect (OIDC)とKeycloakを使用した認可の一元化</a></li>
+      
+        
+        <li class="howto"><a href="/version/3.8/guides/security-openid-connect-multitenancy">OpenID Connect (OIDC)のマルチテナンシーの使用</a></li>
+      </ul>
+    </div>
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/amqp-dev-services">Dev Services for AMQP</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/apicurio-registry-dev-services">Dev Services for Apicurio Registry</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/databases-dev-services">Dev Services for Databases</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/elasticsearch-dev-services">Dev Services for Elasticsearch</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/infinispan-dev-services">Infinispanの開発サービス</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/kafka-dev-services">Dev Services for Kafka</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/kubernetes-dev-services">Dev Services for Kubernetes</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/pulsar-dev-services">Dev Services for Pulsar</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/rabbitmq-dev-services">Dev Services for RabbitMQ</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/redis-dev-services">Dev Services for Redis</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/dev-services">Dev Servicesの概要</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.8/guides/security-oidc-bearer-token-authentication">OpenID Connect (OIDC) ベアラートークン認証</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.8/guides/security-oidc-code-flow-authentication">Web アプリケーションを保護するための OpenID Connect 認可コードフローメカニズム</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.8/guides/security-oidc-bearer-token-authentication-tutorial">OpenID Connect（OIDC）ベアラートークン認証によるサービスアプリケーションの保護</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.8/guides/security-oidc-code-flow-authentication-tutorial">Quarkus - 認可コードフローのOpenID Connectを使用してWebアプリケーションを保護</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.8/guides/rabbitmq-reference">リアクティブメッセージング RabbitMQ コネクターのリファレンスドキュメント</a></li>
+      
+        
+        <li class="howto"><a href="/version/3.8/guides/security-keycloak-authorization">OpenID Connect (OIDC)とKeycloakを使用した認可の一元化</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.8/guides/security-openid-connect-providers">よく知られたOpenID Connect プロバイダーの設定</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/continuous-testing">継続的テスト</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.8/guides/security-openid-connect-client-reference">OpenID Connect (OIDC) と OAuth2 クライアントおよびフィルター</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

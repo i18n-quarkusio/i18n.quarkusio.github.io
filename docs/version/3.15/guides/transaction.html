@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Quarkusでのトランザクションの使用 - 3.15 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.15/guides/transaction" />
+  <meta property="og:title" content="Quarkusでのトランザクションの使用 - 3.15" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/transaction">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.15/guides/transaction">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.15/guides/transaction" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.15/guides/transaction">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.15/guides/transaction">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.15/guides/transaction">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.15/guides/transaction">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.15/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" selected>3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">Quarkusでのトランザクションの使用 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>quarkus-narayana-jta</code> エクステンションは、リンク先 <a href="https://jakarta.ee/specifications/transactions/">Jakarta Transactions</a> 仕様（旧称 Java Transaction API (JTA)）で説明されているように、トランザクションを調停し、アプリケーションに公開するトランザクション・マネージャを提供します 。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusのトランザクションについて説明する場合、このガイドではJakarta Transactionsのトランザクションスタイルを参照し、 <em>トランザクション</em> という用語のみを使用して説明します。</p>
+</div>
+<div class="paragraph">
+<p>また、Quarkusは分散トランザクションをサポートしていません。
+つまり、 <a href="https://download.oracle.com/otndocs/jcp/7309-jts-1.0-spec-oth-JSpec/">Java Transaction Service</a> （JTS）、REST-AT、WS-Atomic Transactionなど、トランザクションコンテキストを伝播するモデルは、 <code>narayana-jta</code> エクステンションではサポートされません。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="setting-it-up"><a class="anchor" href="#setting-it-up"></a>設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>これを必要とするエクステンションは単に依存関係として追加するだけなので、ほとんどの場合、設定について心配する必要はありません。例えばHibernate ORMはトランザクションマネージャーを含んでおり、適切に設定してくれます。</p>
+</div>
+<div class="paragraph">
+<p>例えば、Hibernate ORMを使用せずに直接トランザクションを使用している場合は、明示的に依存関係として追加する必要があるかもしれません。以下をビルドファイルに追加します:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-narayana-jta&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-narayana-jta")</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="starting-and-stopping-transactions-defining-your-boundaries"><a class="anchor" href="#starting-and-stopping-transactions-defining-your-boundaries"></a>トランザクションの開始と停止:境界線の定義</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>トランザクションの境界は、 <code>@Transactional</code> で宣言的に、または <code>QuarkusTransaction</code> でプログラム的に定義できます。 JTA <code>UserTransaction</code> API を直接使用することもできますが、これは <code>QuarkusTransaction</code> よりも使い勝手が悪くなります。</p>
+</div>
+<div class="sect2">
+<h3 id="declarative-approach"><a class="anchor" href="#declarative-approach"></a>宣言的アプローチ</h3>
+<div class="paragraph">
+<p>トランザクションの境界を定義する最も簡単な方法は、エントリーメソッドに <code>@Transactional</code> アノテーションを使用することです( <code>jakarta.transaction.Transactional</code> )。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+public class SantaClausService {
+
+    @Inject ChildDAO childDAO;
+    @Inject SantaClausDAO santaDAO;
+
+    @Transactional <i class="conum" data-value="1"></i><b>(1)</b>
+    public void getAGiftFromSanta(Child child, String giftDescription) {
+        // some transaction work
+        Gift gift = childDAO.addToGiftList(child, giftDescription);
+        if (gift == null) {
+            throw new OMGGiftNotRecognizedException(); <i class="conum" data-value="2"></i><b>(2)</b>
+        }
+        else {
+            santaDAO.addToSantaTodoList(gift);
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>このアノテーションは、トランザクションの境界を定義し、トランザクション内でこの呼び出しをラップします。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>RuntimeException</code> がトランザクションの境界を越えると、トランザクションがロールバックされます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>@Transactional</code> は、メソッドレベルまたはクラスレベルで、すべてのメソッドがトランザクションであることを保証するために、任意の CDI Bean のトランザクション境界を制御するために使用することができます。これにはRESTエンドポイントも含まれます。</p>
+</div>
+<div class="paragraph">
+<p><code>@Transactional</code> のパラメーターを使用して、トランザクションを開始するかどうか、どのように開始するかを制御することができます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>@Transactional(REQUIRED)</code> (デフォルト): 何も開始されていない場合はトランザクションを開始し、そうでない場合は既存のトランザクションを維持します。</p>
+</li>
+<li>
+<p><code>@Transactional(REQUIRES_NEW)</code> : 何も開始されていない場合はトランザクションを開始し、既存のトランザクションが開始されている場合はそれを一時停止し、そのメソッドの境界で新しいトランザクションを開始します。</p>
+</li>
+<li>
+<p><code>@Transactional(MANDATORY)</code> : トランザクションが開始されていない場合は失敗し、そうでない場合は既存のトランザクション内で動作します。</p>
+</li>
+<li>
+<p><code>@Transactional(SUPPORTS)</code> : トランザクションが開始されている場合、それに参加します。開始されていない場合はトランザクションなしで動作します。</p>
+</li>
+<li>
+<p><code>@Transactional(NOT_SUPPORTED)</code> : トランザクションが開始されている場合、それを一時停止し、メソッドの境界ではトランザクションなしで動作します。開始されていない場合は、トランザクションなしで動作します。</p>
+</li>
+<li>
+<p><code>@Transactional(NEVER)</code> : トランザクションが開始されている場合は例外を発生させます。開始されていない場合はトランザクションなしで動作します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>REQUIRED</code> や <code>NOT_SUPPORTED</code> が最も便利なものでしょう。これは、メソッドがトランザクション内で実行されるか、トランザクション外で実行されるかを決定する方法です。正確な意味については、必ずJavaDocを確認してください。</p>
+</div>
+<div class="paragraph">
+<p>トランザクション・コンテキストは、予想通り <code>@Transactional</code> メソッドにネストされたすべての呼び出しに伝搬されます (この例では <code>childDAO.addToGiftList()</code> と <code>santaDAO.addToSantaTodoList()</code>)。ランタイム例外がメソッドの境界を越えない限り、トランザクションはコミットされます。例外が発生したときに強制的にロールバックするかどうかは、 <code>@Transactional(dontRollbackOn=SomeException.class)</code> (または <code>rollbackOn</code>) を使ってオーバーライドできます。</p>
+</div>
+<div class="paragraph">
+<p>また、プログラムでトランザクションにロールバックのマークを付けることもできます。そのためには <code>TransactionManager</code> をインジェクトします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+public class SantaClausService {
+
+    @Inject TransactionManager tm; <i class="conum" data-value="1"></i><b>(1)</b>
+    @Inject ChildDAO childDAO;
+    @Inject SantaClausDAO santaDAO;
+
+    @Transactional
+    public void getAGiftFromSanta(Child child, String giftDescription) {
+        // some transaction work
+        Gift gift = childDAO.addToGiftList(child, giftDescription);
+        if (gift == null) {
+            tm.setRollbackOnly(); <i class="conum" data-value="2"></i><b>(2)</b>
+        }
+        else {
+            santaDAO.addToSantaTodoList(gift);
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>setRollbackOnly</code> のセマンティックを有効にするために、 <code>TransactionManager</code> をインジェクトします。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>プログラムにより、トランザクションをロールバックするように設定します。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="transaction-configuration"><a class="anchor" href="#transaction-configuration"></a>トランザクション設定</h3>
+<div class="paragraph">
+<p>トランザクションの高度な設定は、エントリメソッドまたはクラスレベルで標準の <code>@Transactional</code> アノテーションに加えて設定される <code>@TransactionConfiguration</code> アノテーションを使用することで可能です。</p>
+</div>
+<div class="paragraph">
+<p><code>@TransactionConfiguration</code> アノテーションでは、タイムアウトのプロパティを秒単位で設定できます。それは、アノテーションされたメソッド内で作成されたトランザクションに適用されます。</p>
+</div>
+<div class="paragraph">
+<p>このアノテーションは、トランザクションを定義するトップレベルのメソッドにのみ付けることができます。アノテーションされたネストされたメソッドでトランザクションが開始されると、例外がスローされます。</p>
+</div>
+<div class="paragraph">
+<p>クラスに定義されている場合、 <code>@Transactional</code> でマークされたクラスのすべてのメソッドに定義されているのと同じことになります。メソッドに定義された場合は、クラスに定義された設定よりも優先されます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="reactive-extensions"><a class="anchor" href="#reactive-extensions"></a>リアクティブエクステンション</h3>
+<div class="paragraph">
+<p>もし, <code>@Transactional</code> アノテーション付与されたメソッドが、次のようなリアクティブな値を返す場合:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>CompletionStage</code> （JDKから）</p>
+</li>
+<li>
+<p><code>Publisher</code> (Reactive-Streamsから)</p>
+</li>
+<li>
+<p>リアクティブ・タイプ・コンバータを使用して、前の2つのタイプのいずれかに変換できるすべてのタイプ</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>これらは、動作が少し異なり、返されたリアクティブ値が終了するまで、トランザクションは終了しません。実際には、返されたリアクティブ値を聞き、それが例外的に終了した場合、トランザクションはロールバックのためにマークされ、リアクティブ値の終了時にのみコミットまたはロールバックされることになります。</p>
+</div>
+<div class="paragraph">
+<p>これにより、リアクティブメソッドは、リアクティブメソッドが戻るまでではなく、その処理が本当に終了するまで、非同期でトランザクションを処理し続けることができます。</p>
+</div>
+<div class="paragraph">
+<p>トランザクションコンテキストをリアクティブパイプラインに伝播させる必要がある場合は、 <a href="context-propagation.html">Context Propagationガイド</a>を参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="programmatic-approach"><a class="anchor" href="#programmatic-approach"></a>プログラム的アプローチ</h3>
+<div class="paragraph">
+<p><code>QuarkusTransaction</code> の静的メソッドを使用して、トランザクションの境界を定義できます。これは、トランザクションの範囲内でラムダを実行できる関数的なアプローチと、明示的な <code>begin</code>,  <code>commit</code>,  <code>rollback</code> のメソッドを使用することによる2つの異なるオプションを提供します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.narayana.jta.QuarkusTransaction;
+
+public class TransactionExample {
+
+    public void beginExample() {
+        QuarkusTransaction.begin();
+        //do work
+        QuarkusTransaction.commit();
+
+        QuarkusTransaction.begin(QuarkusTransaction.beginOptions()
+                .timeout(10));
+        //do work
+        QuarkusTransaction.rollback();
+    }
+
+    public void runnerExample() {
+        QuarkusTransaction.requiringNew().run(() -&gt; {
+            //do work
+        });
+        QuarkusTransaction.joiningExisting().run(() -&gt; {
+            //do work
+        });
+
+        int result = QuarkusTransaction.requiringNew()
+                .timeout(10)
+                .exceptionHandler((throwable) -&gt; {
+                    if (throwable instanceof SomeException) {
+                        return TransactionExceptionResult.COMMIT;
+                    }
+                    return TransactionExceptionResult.ROLLBACK;
+                })
+                .call(() -&gt; {
+                    //do work
+                    return 0;
+                });
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上記の例では、APIの使用方法のいくつか異なる方法を紹介しています。</p>
+</div>
+<div class="paragraph">
+<p>最初の方法は、単純に begin を呼び出し、何らかの処理を行い、それをコミットするものです。この作成されたトランザクションはCDIリクエストスコープに関連付けられ、リクエストスコープが破棄されたときにまだアクティブであれば、自動的にロールバックされます。これにより、明示的に例外をキャッチしたり <code>rollback</code> を呼び出したりする必要がなくなり、 不用意なトランザクションリークに対するセーフティネットとして機能します。 しかし、これはリクエストスコープがアクティブであるときにしか使えないということになります。メソッド呼び出しの2番目の例は、タイムアウトオプションで開始し、トランザクションをロールバックします。</p>
+</div>
+<div class="paragraph">
+<p>2つ目のメソッドは、<code>QuarkusTransaction.runner(&#8230;&#8203;)</code> を使用したラムダスコープのトランザクションの使用を示しています。最初の例では、新しいトランザクション内で <code>Runnable</code> を実行し、2 番目の例では同じことをしますが、既存のトランザクション（もしあれば）に参加し、3 番目の例ではいくつかの特有のオプションを指定して <code>Callable</code> を呼び出します。 特に <code>exceptionHandler</code> メソッドは、例外が発生したときにトランザクションをロールバックするかどうかを制御するために使用することができます。</p>
+</div>
+<div class="paragraph">
+<p>以下のセマンティクスがサポートされています:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>QuarkusTransaction.disallowingExisting()</code>/<code>DISALLOW_EXISTING</code></dt>
+<dd>
+<p>もしトランザクションがすでに現在のスレッドに関連していれば、 <code>QuarkusTransactionException</code> が投げられます。そうでなければ、新しいトランザクションが開始され、すべての通常のライフサイクルのルールに従います。</p>
+</dd>
+<dt class="hdlist1"><code>QuarkusTransaction.joiningExisting()</code>/<code>JOIN_EXISTING</code></dt>
+<dd>
+<p>トランザクションがアクティブでない場合、新しいトランザクションが開始され、メソッドの終了時にコミットされます。例外が発生した場合、 <code>#exceptionHandler(Function)</code> によって登録された例外ハンドラが呼び出され、TX をコミットするかロールバックするかを決定します。既存のトランザクションがアクティブである場合、メソッドは既存のトランザクションのコンテキストで実行されます。例外が発生した場合、例外ハンドラが呼び出されますが、 <code>ExceptionResult#ROLLBACK</code> の結果は、TX がロールバックのみとマークされ、一方 <code>ExceptionResult#COMMIT</code> の結果は、何も行われないという結果になります。</p>
+</dd>
+<dt class="hdlist1"><code>QuarkusTransaction.requiringNew()</code>/<code>REQUIRE_NEW</code></dt>
+<dd>
+<p>もし既存のトランザクションがすでに現在のスレッドと関連付けられている場合、そのトランザクションは中断され、新しいトランザクションが開始され、すべての通常のライフサイクルルールに従います。その新しいトランザクションが完了すると元のトランザクションが再開されます。現在のスレッドと関連付けられているトランザクションがなければ、新しいトランザクションが開始され、すべての通常のライフサイクルルールに従います。</p>
+</dd>
+<dt class="hdlist1"><code>QuarkusTransaction.suspendingExisting()</code>/<code>SUSPEND_EXISTING</code></dt>
+<dd>
+<p>トランザクションがアクティブでない場合、このセマンティックは基本的にノー・オペレーションです。もしトランザクションがアクティブであれば、中断され、タスクの実行後に再開されます。このセマンティックが使用されている場合、例外ハンドラは決して参照されず、例外ハンドラとこのセマンティックの両方を指定することはエラーとみなされます。このセマンティックは、トランザクションの範囲外でコードを簡単に実行することを可能にします。</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="legacy-api-approach"><a class="anchor" href="#legacy-api-approach"></a>従来のAPIアプローチ</h3>
+<div class="paragraph">
+<p>あまり簡単ではない方法としては、 <code>UserTransaction</code> を注入し、様々なトランザクション・デマケーションのメソッドを使用します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+public class SantaClausService {
+
+    @Inject ChildDAO childDAO;
+    @Inject SantaClausDAO santaDAO;
+    @Inject UserTransaction transaction;
+
+    public void getAGiftFromSanta(Child child, String giftDescription) {
+        // some transaction work
+        try {
+            transaction.begin();
+            Gift gift = childDAO.addToGiftList(child, giftDescription);
+            santaDAO.addToSantaTodoList(gift);
+            transaction.commit();
+        }
+        catch(SomeException e) {
+            // do something on Tx failure
+            transaction.rollback();
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>@Transactional</code> によって呼び出されたトランザクションと持つメソッドでは、 <code>UserTransaction</code>  を使用できません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-the-transaction-timeout"><a class="anchor" href="#configuring-the-transaction-timeout"></a>トランザクションタイムアウトの設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>デフォルトのトランザクション・タイムアウト、つまりトランザクション・マネージャーによって管理されるすべてのトランザクションに適用されるタイムアウトを、プロパティー <code>quarkus.transaction-manager.default-transaction-timeout</code> を使用して、期間として指定して構成することができます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>期間の値を書くには、標準の <code>java.time.Duration</code> フォーマットを使います。
+詳細は <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html#parse(java.lang.CharSequence)">Duration#parse() javadoc</a> を参照してください。</p>
+</div>
+<div class="paragraph">
+<p>数字で始まる簡略化した書式を使うこともできます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値のみの場合は、秒単位の時間を表します。</p>
+</li>
+<li>
+<p>数値の後に <code>ms</code> が続く場合は、ミリ秒単位の時間を表します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>その他の場合は、簡略化されたフォーマットが解析のために <code>java.time.Duration</code> フォーマットに変換されます：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値の後に <code>h</code> 、 <code>m</code> 、 <code>s</code> が続く場合は、その前に <code>PT</code> が付けられます。</p>
+</li>
+<li>
+<p>数値の後に <code>d</code> が続く場合は、その前に <code>P</code> が付けられます。</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>デフォルト値は60秒です。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-transaction-node-name-identifier"><a class="anchor" href="#configuring-transaction-node-name-identifier"></a>トランザクションノード名識別子の設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Narayanaは、基礎となるトランザクションマネージャーであり、一意のノード識別子の概念を持っています。これは、複数のリソースを含む XA トランザクションの使用を検討している場合に重要です。</p>
+</div>
+<div class="paragraph">
+<p>ノード名識別子はトランザクションの識別において重要な役割を果たします。ノード名識別子は、トランザクションが作成されるときに、トランザクションIDの作成に使用されます。ノード名識別子に基づいて、トランザクションマネージャーはデータベースまたはJMSブローカに作成されたXAトランザクションのカウンターパートを認識することができます。この識別子により、トランザクションマネージャーはリカバリ中にトランザクションのカウンターパートをロールバックすることが可能になる。</p>
+</div>
+<div class="paragraph">
+<p>ノード名識別子は、トランザクションマネージャーのデプロイメントごとに一意である必要があります。また、ノード識別子はトランザクションマネージャーの再起動時に変化しない必要があります。</p>
+</div>
+<div class="paragraph">
+<p>ノード名識別子は、プロパティー <code>quarkus.transaction-manager.node-name</code> を通じて設定することができます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="transaction-scope"><a class="anchor" href="#transaction-scope"></a><code>@TransactionScoped</code> を使用し、CDI Bean をトランザクションライフサイクルにバインド</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>トランザクションと同じ期間だけ有効なBeanを定義し、CDIライフサイクルイベントを通じて、トランザクションの開始と終了時にアクションを実行することができます。</p>
+</div>
+<div class="paragraph">
+<p><code>@TransactionScoped</code> アノテーションを使用して、そのようなBeanにトランザクション <a href="cdi#bean-scope">scope</a> を 割り当てるだけです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@TransactionScoped
+public class MyTransactionScopedBean {
+
+    // The bean's state is bound to a specific transaction,
+    // and restored even after suspending then resuming the transaction.
+    int myData;
+
+    @PostConstruct
+    void onBeginTransaction() {
+        // This gets invoked after a transaction begins.
+    }
+
+    @PreDestroy
+    void onBeforeEndTransaction() {
+        // This gets invoked before a transaction ends (commit or rollback).
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>または、必ずしもトランザクション中に状態を保持する必要がなく、トランザクションの開始/終了イベントに反応したいだけであれば、別のスコープを持つBeanでイベントリスナーを宣言すればよいでしょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+public class MyTransactionEventListeningBean {
+
+    void onBeginTransaction(@Observes @Initialized(TransactionScoped.class) Object event) {
+        // This gets invoked when a transaction begins.
+    }
+
+    void onBeforeEndTransaction(@Observes @BeforeDestroyed(TransactionScoped.class) Object event) {
+        // This gets invoked before a transaction ends (commit or rollback).
+    }
+
+    void onAfterEndTransaction(@Observes @Destroyed(TransactionScoped.class) Object event) {
+        // This gets invoked after a transaction ends (commit or rollback).
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>event</code> オブジェクトはトランザクション ID を表し、それに応じて <code>toString()</code> / <code>equals()</code> / <code>hashCode()</code> を定義しています。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+リスナーメソッドでは、CDI Beanであり、 <code>@Inject</code> 出来る <code>TransactionManager</code> にアクセスすることで、進行中のトランザクションに関するより多くの情報にアクセスすることができます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="jdbcstore"><a class="anchor" href="#jdbcstore"></a>Quarkusのトランザクションログをデータベースに保存する設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>アプリケーションコンテナが永続ボリュームを使用できない場合など、永続ストレージを使用できないクラウド環境では、Java Database Connectivity（JDBC）データソースを使用してトランザクションログをデータベースに格納するようにトランザクション管理を構成できます。</p>
+</div>
+<div class="paragraph">
+<p>しかし、クラウドネイティブアプリでは、トランザクションログを保存するためにデータベースを使用すると、追加の要件があります。
+これらのトランザクションを管理する <code>narayana-jta</code> エクステンションが正しく動作するには、安定したストレージ、再利用可能な一意のノード識別子、安定した IP アドレスが必要です。
+JDBCオブジェクトストアは安定したストレージを提供しますが、ユーザーは他の2つの要件を満たす方法を計画する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusでは、トランザクションログの保存にデータベースを使用することが適切かどうかを評価したら、 <code>quarkus.transaction-manager.object-store. <em>&lt;property&gt;</em></code> プロパティで次のようにオブジェクトストアのjdbc固有の設定を行うことができます。  
+ここで、 <em>&lt;property&gt;</em> は次のとおりです:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>type</code> (<em>string</em>)：トランザクションログの保存にQuarkus JDBCデータソースを使用できるようにするには、このプロパティを <code>jdbc</code> に設定します。
+デフォルト値は <code>file-system</code> です。</p>
+</li>
+<li>
+<p><code>datasource</code> (<em>string</em>）：トランザクションログストレージのデータソース名を指定します。 ］プロパティに値が指定されていない場合、Quarkusは <code>datasource</code> <a href="datasource#configure-datasources">デフォルトのデータソース</a> を使用します。</p>
+</li>
+<li>
+<p><code>create-table</code> (<em>boolean</em>）: <code>true</code> に設定すると、トランザクション・ログ・テーブルが存在しない場合、自動的に作成されます。
+デフォルト値は <code>false</code> です。</p>
+</li>
+<li>
+<p><code>drop-table</code> (<em>boolean</em>）: <code>true</code> に設定すると、テーブルが既に存在する場合は起動時に削除されます。
+デフォルト値は <code>false</code> です。</p>
+</li>
+<li>
+<p><code>table-prefix</code> (string）：関連テーブル名のプレフィックスを指定します。
+デフォルト値は <code>quarkus_</code> です。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>設定の詳細については、Quarkus <a href="all-config">全設定オプション</a> リファレンスの <strong>Narayana JTA - Transaction manager</strong> セクションを参照してください。</p>
+</div>
+<div class="ulist">
+<div class="title">追加情報</div>
+<ul>
+<li>
+<p><code>create-table</code> プロパティを <code>true</code> に設定して、初期セットアップ中にトランザクション・ログ・テーブルを作成します。</p>
+</li>
+<li>
+<p>JDBCデータソースとActiveMQ Artemisは、 <code>XAResourceRecovery</code> を自動的に登録します。</p>
+<div class="ulist">
+<ul>
+<li>
+<p>JDBC データソースは <code>quarkus-agroal</code> の一部であり、 <code>quarkus.datasource.jdbc.transactions=XA</code> を使用する必要があります。</p>
+</li>
+<li>
+<p>ActiveMQ Artemis は <code>quarkus-pooled-jms</code> の一部であり、 <code>quarkus.pooled-jms.transaction=XA</code> を使用する必要があります。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>アプリケーションのクラッシュや障害が発生した場合にデータの整合性を確保するには、 <code>quarkus.transaction-manager.enable-recovery=true</code> 設定でトランザクションのクラッシュリカバリを有効にします。</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><a href="https://issues.redhat.com/browse/AG-209">トランザクションチェックを実行する際に Agroal が異なるビューを持つ</a> という現在の既知の問題を回避するには、トランザク ションログの書き込みを担当するデータソースのトランザクションタイプを <code>disabled</code> に設定します：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>quarkus.datasource.TX_LOG.jdbc.transactions=disabled</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この例では、データソース名としてTX_LOGを使用しています。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="why-always-having-a-transaction-manager"><a class="anchor" href="#why-always-having-a-transaction-manager"></a>なぜ常にトランザクションマネージャーを持っているのか?</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">使いたいところなら、どこでも使えるのでしょうか？</dt>
+<dd>
+<p>はい、Quarkusアプリケーションでも、IDEでも、テストでも動作します。JTAは一部の人に悪評があります。なぜかはわかりません。これはあなたのおじいちゃんのJTA実装ではないとは言っておきましょう。私たちが持っているものは、完全に埋め込み可能で無駄がありません。</p>
+</dd>
+<dt class="hdlist1">それは2フェーズコミットを行い、私のアプリの速度を遅くしますか?</dt>
+<dd>
+<p>いや、これは昔話です。基本的にはフリーで提供され、必要に応じて複数のデータソースを含むより複雑なケースにも対応できると考えてください。</p>
+</dd>
+<dt class="hdlist1">読み込み専用の操作をするときにはトランザクションはいらないので、その方が早いですね。</dt>
+<dd>
+<p>それは誤りです。+ まず第一に、トランザクションの境界を <code>@Transactional(NOT_SUPPORTED)</code> (または <code>NEVER</code> または <code>SUPPORTS</code> ) でマークすることで、トランザクションを無効にしてください。+ 第二に、トランザクションを使用しない方が速いというのは、またしてもおとぎ話です。答えは、それはDBとSQLのSELECT回数に依存します。トランザクションを使用しないということは、DBが単一操作のトランザクションコンテキストを持っていることを意味します。+ 第三に、複数のSELECTを実行する場合は、一つのトランザクションにまとめる方が全てのSELECTに一貫性が保たれます。DBが車のダッシュボードを表しているとすると、残りキロ数と燃料計のレベルなどを見ることができます。それを1つのトランザクションで読み取ることで、それらは整合性を保つことができます。 もし、2つの異なるトランザクションから一方と他方を読み取れば、それらは矛盾することがあります。例えば、権限やアクセス管理に関連するデータを読み取る場合は、より劇的なことが起こる可能性があります。</p>
+</dd>
+<dt class="hdlist1">Hibernateのトランザクション管理APIではなくJTAを好む理由</dt>
+<dd>
+<p><code>entityManager.getTransaction().begin()</code> やその類似を経由して手動でトランザクションを管理すると、最終的に人々が間違えるような試行回数の多い醜いコードになってしまいます。トランザクションはまた、JMSと他のデータベースアクセスについてですので、1つのAPIはより多くの理にかなっています。</p>
+</dd>
+<dt class="hdlist1">Jakarta Persistenceの永続化ユニットが <code>JTA</code> 、 <code>Resource-level</code> Transactionのどちらを使用しているのかが分からず混乱します</dt>
+<dd>
+<p>Quarkusでは混乱しません :)
+リソースレベルは、非マネージド環境でjakarta Persistenceをサポートするために導入されました。
+しかし、Quarkusはリーン環境であると同時にマネージド環境でもあるため、常にJTAモードであると安全に想定することができます。
+その結果、Java SEモードでHibernate ORM + CDI + トランザクションマネージャを実行することの難しさは、Quarkusによって解決されました。</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#setting-it-up">設定</a></li>
+<li><a href="#starting-and-stopping-transactions-defining-your-boundaries">トランザクションの開始と停止:境界線の定義</a>
+<ul class="sectlevel2">
+<li><a href="#declarative-approach">宣言的アプローチ</a></li>
+<li><a href="#transaction-configuration">トランザクション設定</a></li>
+<li><a href="#reactive-extensions">リアクティブエクステンション</a></li>
+<li><a href="#programmatic-approach">プログラム的アプローチ</a></li>
+<li><a href="#legacy-api-approach">従来のAPIアプローチ</a></li>
+</ul>
+</li>
+<li><a href="#configuring-the-transaction-timeout">トランザクションタイムアウトの設定</a></li>
+<li><a href="#configuring-transaction-node-name-identifier">トランザクションノード名識別子の設定</a></li>
+<li><a href="#transaction-scope"><code>@TransactionScoped</code> を使用し、CDI Bean をトランザクションライフサイクルにバインド</a></li>
+<li><a href="#jdbcstore">Quarkusのトランザクションログをデータベースに保存する設定</a></li>
+<li><a href="#why-always-having-a-transaction-manager">なぜ常にトランザクションマネージャーを持っているのか?</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/lra">Narayana LRA 参加者サポート</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/software-transactional-memory">Quarkus でのソフトウェアトランザクショナルメモリーの使用</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/cache">アプリケーションデータのキャッシング</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/datasource">Quarkusでデータソースを設定</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/elasticsearch">Elasticsearchクラスターの実行</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/databases-dev-services">Dev Services for Databases</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/elasticsearch-dev-services">Dev Services for Elasticsearch</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/infinispan-dev-services">Infinispanの開発サービス</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/redis-dev-services">Dev Services for Redis</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/cache-infinispan-reference">Infinispan Cache</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/infinispan-client-reference">Infinispanクライアントエクステンションリファレンスガイド</a></li>
+      
+        
+        <li class="howto"><a href="/version/3.15/guides/security-jpa">Quarkus SecurityとJakarta Persistence</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/reactive-sql-clients">リアクティブ SQL クライアント</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/cache-redis-reference">Redisキャッシュ</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/redis-reference">Redis エクステンションのリファレンスガイド</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/hibernate-orm-panache">シンプルになったHibernate ORM with Panache</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/hibernate-orm-panache-kotlin">シンプルになったHibernate ORM with PanacheとKotlin</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/hibernate-reactive-panache">シンプルなHibernate Reactive with Panache</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/mongodb-panache">シンプルになったMongoDB with Panache</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/mongodb-panache-kotlin">シンプルになったMongoDB with PanacheとKotlin</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

@@ -1,0 +1,2043 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>QuarkusとGradle - 3.8 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.8/guides/gradle-tooling" />
+  <meta property="og:title" content="QuarkusとGradle - 3.8" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/gradle-tooling">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.8/guides/gradle-tooling">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.8/guides/gradle-tooling" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.8/guides/gradle-tooling">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.8/guides/gradle-tooling">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.8/guides/gradle-tooling">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.8/guides/gradle-tooling">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.8/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" selected>3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">QuarkusとGradle </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Gradleを使用して、新しいプロジェクトを作成し、エクステンションを追加または削除し、開発モードを起動し、アプリケーションをデバッグし、アプリケーションをjar、ネイティブ実行ファイル、またはコンテナフレンドリーな実行ファイルにビルドします。Gradleプロジェクトのメタデータを使用して、お気に入りのIDEにプロジェクトをインポートします。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="project-creation"><a class="anchor" href="#project-creation"></a>新規プロジェクトの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Gradleプロジェクトを生成するには、 <a href="cli-tooling.html">Quarkus CLI</a>またはQuarkus Mavenプラグインを使用できます:</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app my-groupId:my-artifactId \
+    --extensions=resteasy-reactive,resteasy-reactive-jackson \
+    --gradle</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><em>Quarkus CLIのインストール方法や使用方法については、 <a href="cli-tooling">Quarkus CLIガイド</a> を参照してください。</em></p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:3.8.6:create \
+    -DprojectGroupId=my-groupId \
+    -DprojectArtifactId=my-artifactId \
+    -Dextensions="resteasy-reactive,resteasy-reactive-jackson" \
+    -DbuildTool=gradle</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>mvn io.quarkus:quarkus-maven-plugin:3.8.6:create</code> を起動すると、Maven プラグインはユーザー入力を要求します。 
+<code>-B</code> を Maven コマンドに渡すことで、この対話型モードを無効にすることが出来ます (デフォルト値を使用します)。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Kotlin DSLを使用したい場合は、 <code>gradle</code> の代わりに <code>gradle-kotlin-dsl</code> を使用してください。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Quarkusプロジェクトのスキャフォールドは、プロジェクトにGradleラッパー( <code>./gradlew</code> )を自動的にインストールします。</p>
+</div>
+<div class="paragraph">
+<p>スタンドアロンのGradleを使用したい場合は、Gradle 8.5 を使用してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>プロジェクトは、渡されたartifactIdにちなんだ名前のディレクトリに生成されます。</p>
+</div>
+<div class="paragraph">
+<p>ネイティブモードとJVMモード用の一対のDockerfilesも <code>src/main/docker</code> で生成されます。これらのDockerfileには、イメージをビルドしてコンテナを実行する手順が書かれています。</p>
+</div>
+<div class="sect2">
+<h3 id="custom-test-configuration-profile"><a class="anchor" href="#custom-test-configuration-profile"></a>JVMモードでのカスタムテスト構成プロファイル</h3>
+<div class="paragraph">
+<p>デフォルトでは、JVMモードのQuarkusテストは、 <code>test</code> 設定プロファイルを使用して実行されます。Quarkusの設定プロファイルに慣れていない場合は、 <a href="config.html#configuration-profiles">設定プロファイル</a> のドキュメントで必要な情報がすべて説明されていますので、そちらを参照してください。</p>
+</div>
+<div class="paragraph">
+<p>しかし、以下に示す Gradle ビルド設定でテスト用のカスタム設定プロファイルを使用することは可能です。これは例えば、デフォルトのテストデータベースではない特定のデータベースを使ってテストを実行する必要がある場合に便利です。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-groovy">
+<div class="content">
+<div class="title">Groovy DSL</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">test {
+    systemProperty "quarkus.test.profile", "foo" <i class="conum" data-value="1"></i><b>(1)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>foo</code>  設定プロファイルがテストの実行に使用されます。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-kotlin">
+<div class="content">
+<div class="title">Kotlin DSL</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">tasks.test {
+    systemProperty("quarkus.test.profile", "foo") <i class="conum" data-value="1"></i><b>(1)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>foo</code>  設定プロファイルがテストの実行に使用されます。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>今のところ、ネイティブモードでカスタムテスト設定プロファイルを使用することはできません。ネイティブテストは常に <code>prod</code>  プロファイルを使用して実行されます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dealing-with-extensions"><a class="anchor" href="#dealing-with-extensions"></a>エクステンションへの対応</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusプロジェクトの内部から、利用可能なエクステンションのリストを取得することができます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus extension</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew listExtensions</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>以下を使ってエクステンションを有効化できます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus extension add hibernate-validator</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew addExtension --extensions='hibernate-validator'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>エクステンションは、カンマ区切りのリストを使用して渡されます。</p>
+</div>
+<div class="paragraph">
+<p><code>io.quarkus:quarkus-agroal</code> エクステンション名は、エクステンションのGAV名です。しかし、部分的な名前を渡すことができ、Quarkusは適切なエクステンションを見つけるために最善を尽くします。例えば、 <code>agroal</code>  、 <code>Agroal</code>  、 <code>agro</code>  は <code>io.quarkus:quarkus-agroal</code>  に展開されます。エクステンションが見つからなかったり、複数のエクステンションが一致した場合は、コマンドの結果に赤いチェックマーク❌が表示されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ ./gradlew addExtension --extensions="jdbc,agroal,non-exist-ent"
+[...]
+❌ Multiple extensions matching 'jdbc'
+     * io.quarkus:quarkus-jdbc-h2
+     * io.quarkus:quarkus-jdbc-mariadb
+     * io.quarkus:quarkus-jdbc-postgresql
+     Be more specific e.g using the exact name or the full gav.
+✅ Adding extension io.quarkus:quarkus-agroal
+❌ Cannot find a dependency matching 'non-exist-ent', maybe a typo?
+[...]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>グロブパターンに一致するエクステンションをすべてインストールすることができます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus extension add smallrye-*</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew addExtension --extensions='smallrye-*'</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dev-mode"><a class="anchor" href="#dev-mode"></a>開発モード</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusには開発モードが組み込まれています。以下のコマンドで起動することができます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この方法で実行する場合、継続的テストの使い勝手は同じにはなりません。gradleはデーモンとして実行されるため、Quarkusは「きれいな」テスト出力を描くことができず、出力のログを取るだけになってしまうからです。</p>
+</div>
+<div class="paragraph">
+<p>その後、アプリケーションのソース、リソース、および設定を更新することができます。変更は実行中のアプリケーションに自動的に反映されます。変更がすぐに反映されるので、UIやデータベースにまたがった開発をするのに最適です。</p>
+</div>
+<div class="paragraph">
+<p><code>quarkusDev</code>  は、バックグラウンドでのコンパイルによるホットデプロイを可能にします。つまり、Java ファイルやリソースファイルを変更してブラウザを更新すると、これらの変更が自動的に有効になります。これは、設定プロパティーファイルのようなリソースファイルにも適用されます。ブラウザをリフレッシュする行為は、ワークスペースのスキャンをトリガし、変更が検出された場合、Javaファイルがコンパイルされ、アプリケーションが再配置されると、あなたの要求は再配置されたアプリケーションによって処理されます。コンパイルやデプロイに問題がある場合は、エラーページでお知らせします。</p>
+</div>
+<div class="paragraph">
+<p><code>CTRL+C</code>  を叩いてアプリケーションを停止させます。</p>
+</div>
+<div class="paragraph">
+<p>開発環境が動作する作業ディレクトリーを変更することができます:</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-groovy">
+<div class="content">
+<div class="title">Groovy DSL</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">quarkusDev {
+    workingDirectory = rootProject.layout.projectDirectory.asFile
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-kotlin">
+<div class="content">
+<div class="title">Kotlin DSL</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">tasks.quarkusDev {
+    workingDirectory = rootProject.layout.projectDirectory.asFile
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>デフォルトでは、 <code>quarkusDev</code>  タスクは <code>compileJava</code>  コンパイラ・オプションを使用します。これらは、タスクの <code>compilerArgs</code>  プロパティーを設定することで上書きすることができます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>デフォルトでは、 <code>quarkusDev</code> はデバッグホストを <code>localhost</code> に設定します (セキュリティー上の理由から)。これを変更する必要がある場合、例えばすべてのホストでデバッグを有効にしたい場合は、 <code>-DdebugHost</code> オプションを次のように使用します。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev -DdebugHost=0.0.0.0</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev -DdebugHost=0.0.0.0</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>また、開発環境に環境変数を追加することもできます：</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-groovy">
+<div class="content">
+<div class="title">Groovy DSL</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">quarkusDev {
+    environmentVariables = [FOO_VALUE: 'abc', BAR_VALUE: 'def']
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-kotlin">
+<div class="content">
+<div class="title">Kotlin DSL</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">tasks.quarkusDev {
+    environmentVariables.set(mapOf("FOO_VALUE" to "abc", "BAR_VALUE" to "def"))
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>このプラグインは <code>quarkusDev</code> の設定も公開しています。この設定を使って依存関係を宣言すると、その依存関係の使用が開発モードに制限されます。 <code>quarkusDev</code> の設定は以下のように使用できます。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-groovy">
+<div class="content">
+<div class="title">Groovy DSL</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">dependencies {
+    quarkusDev 'io.quarkus:quarkus-jdbc-h2'
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-kotlin">
+<div class="content">
+<div class="title">Kotlin DSL</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">dependencies {
+    quarkusDev("io.quarkus:quarkus-jdbc-h2")
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="remote-development-mode"><a class="anchor" href="#remote-development-mode"></a>リモート開発モード</h3>
+<div class="paragraph">
+<p>開発モードをリモートで使用することができるので、コンテナー環境(OpenShiftなど)でQuarkusを実行して、ローカルファイルに加えられた変更をすぐに確認できるようにすることができます。</p>
+</div>
+<div class="paragraph">
+<p>これにより、実際にアプリを実行するのと同じ環境で、同じサービスにアクセスしながら開発することができます。</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+本番環境では使用しないでください。開発環境でのみ使用してください。本番環境のアプリケーションを開発モードで実行してはいけません。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>そのためには、 <code>mutable-jar</code> のフォーマットを使って mutable アプリケーションを構築する必要があります。 <code>application.properties</code> で以下のプロパティを設定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.package.type=mutable-jar <i class="conum" data-value="1"></i><b>(1)</b>
+quarkus.live-reload.password=changeit <i class="conum" data-value="2"></i><b>(2)</b>
+quarkus.live-reload.url=http://my.cluster.host.com:8080 <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>これは、QuarkusにMutable-jar形式を使用するように指示します。ミュータブルアプリケーションには、Quarkusのデプロイメント時間の部分も含まれているため、より多くのディスクスペースを占有します。普通に実行した場合は、イミュータブルアプリケーションと同じ速度で起動し、同じメモリーを使用しますが、devモードで起動することもできます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>リモート側とローカル側の通信を安全に保つためのパスワードです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>アプリがdevモードで実行されるURL。これはローカル側でのみ必要なので、プロパティー ファイルから除外して、コマンド ラインでシステム プロパティーとして指定するとよいでしょう。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>mutable-jar</code> は、通常のQuarkus jarをビルドするのと同じ方法でビルドできます。つまり、次を実行します。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>リモートホストでQuarkusを起動する前に、環境変数 <code>QUARKUS_LAUNCH_DEVMODE=true</code>  を設定します。ベアメタルを使用している場合は、 <code>export QUARKUS_LAUNCH_DEVMODE=true</code>  コマンドで設定し、適切に <code>java -jar &#8230;&#8203;</code> コマンドでアプリケーションを実行します。</p>
+</div>
+<div class="paragraph">
+<p>アプリケーションをdocker経由で実行する場合は、 <code>docker run</code> コマンドに <code>-e QUARKUS_LAUNCH_DEVMODE=true</code> を追加してイメージを起動します。アプリケーションが起動すると、ログに次のような行が表示されるはずです: <code>Profile dev activated. Live Coding activated</code> .</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+リモート側にはMavenなどの開発ツールを入れる必要はありません。新しいQuarkusアプリケーションで生成される通常の <code>fast-jar</code> Dockerfileがあれば大丈夫です。ベアメタルのQuarkus runner jarを起動している場合は、通常のdevmodeを実行しようとしないでください。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>ここで、 <code>remote-dev</code> コマンドを使用し、ローカルエージェントをリモートホストに接続する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew quarkusRemoteDev -Dquarkus.live-reload.url=http://my-remote-host:8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これでブラウザを更新するたびに、ローカルで行った変更がリモートアプリにすぐに表示されるようになりました。</p>
+</div>
+<div class="paragraph">
+<p>すべての設定項目を以下に示します。</p>
+</div>
+<div class="paragraph configuration-legend">
+<p><span class="icon"><i class="fa fa-lock" title="ビルド時に固定"></i></span> ビルド時に固定される設定プロパティ - その他の設定プロパティは実行時にオーバーライド可能です。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference configuration-reference-all-rows">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-live-reload-live-reload-config_configuration"></a><a href="#quarkus-live-reload-live-reload-config_configuration">Configuration property</a></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-live-reload-live-reload-config_quarkus-live-reload-instrumentation"></a><code><a href="#quarkus-live-reload-live-reload-config_quarkus-live-reload-instrumentation">quarkus.live-reload.instrumentation</a></code></p>
+</div>
+<div id="conf-collapsible-desc-1" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Whether Quarkus should enable its ability to not do a full restart when changes to classes are compatible with JVM instrumentation. If this is set to true, Quarkus will perform class redefinition when possible.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-45247">QUARKUS_LIVE_RELOAD_INSTRUMENTATION</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-45247" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-live-reload-live-reload-config_quarkus-live-reload-watched-resources"></a><code><a href="#quarkus-live-reload-live-reload-config_quarkus-live-reload-watched-resources">quarkus.live-reload.watched-resources</a></code></p>
+</div>
+<div id="conf-collapsible-desc-2" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The names of additional resource files to watch for changes, triggering a reload on change. Directories are <em>not</em> supported.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-45248">QUARKUS_LIVE_RELOAD_WATCHED_RESOURCES</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-45248" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-live-reload-live-reload-config_quarkus-live-reload-password"></a><code><a href="#quarkus-live-reload-live-reload-config_quarkus-live-reload-password">quarkus.live-reload.password</a></code></p>
+</div>
+<div id="conf-collapsible-desc-3" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Password used to use to connect to the remote dev-mode application</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-45249">QUARKUS_LIVE_RELOAD_PASSWORD</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-45249" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-live-reload-live-reload-config_quarkus-live-reload-url"></a><code><a href="#quarkus-live-reload-live-reload-config_quarkus-live-reload-url">quarkus.live-reload.url</a></code></p>
+</div>
+<div id="conf-collapsible-desc-4" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>URL used to use to connect to the remote dev-mode application</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-45250">QUARKUS_LIVE_RELOAD_URL</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-45250" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-live-reload-live-reload-config_quarkus-live-reload-connect-timeout"></a><code><a href="#quarkus-live-reload-live-reload-config_quarkus-live-reload-connect-timeout">quarkus.live-reload.connect-timeout</a></code></p>
+</div>
+<div id="conf-collapsible-desc-5" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The amount of time to wait for a remote dev connect or reconnect</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-45251">QUARKUS_LIVE_RELOAD_CONNECT_TIMEOUT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-45251" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor-quarkus-live-reload-live-reload-config"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>30S</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-live-reload-live-reload-config_quarkus-live-reload-retry-interval"></a><code><a href="#quarkus-live-reload-live-reload-config_quarkus-live-reload-retry-interval">quarkus.live-reload.retry-interval</a></code></p>
+</div>
+<div id="conf-collapsible-desc-6" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The amount of time to wait between attempts when connecting to the server side of remote dev</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-45252">QUARKUS_LIVE_RELOAD_RETRY_INTERVAL</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-45252" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html">Duration</a>
+  <a href="#duration-note-anchor-quarkus-live-reload-live-reload-config"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>2S</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-live-reload-live-reload-config_quarkus-live-reload-retry-max-attempts"></a><code><a href="#quarkus-live-reload-live-reload-config_quarkus-live-reload-retry-max-attempts">quarkus.live-reload.retry-max-attempts</a></code></p>
+</div>
+<div id="conf-collapsible-desc-7" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The maximum number of attempts when connecting to the server side of remote dev</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-45253">QUARKUS_LIVE_RELOAD_RETRY_MAX_ATTEMPTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-45253" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>10</code></p></td>
+</tr>
+</tbody>
+</table>
+<div id="duration-note-anchor-quarkus-live-reload-live-reload-config" class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">期間フォーマットについて</div>
+<div class="paragraph">
+<p>To write duration values, use the standard <code>java.time.Duration</code> format.
+See the <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html#parse(java.lang.CharSequence)">Duration#parse() Java API documentation</a> for more information.</p>
+</div>
+<div class="paragraph">
+<p>数字で始まる簡略化した書式を使うこともできます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値のみの場合は、秒単位の時間を表します。</p>
+</li>
+<li>
+<p>数値の後に <code>ms</code> が続く場合は、ミリ秒単位の時間を表します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>その他の場合は、簡略化されたフォーマットが解析のために <code>java.time.Duration</code> フォーマットに変換されます：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値の後に <code>h</code> 、 <code>m</code> 、 <code>s</code> が続く場合は、その前に <code>PT</code> が付けられます。</p>
+</li>
+<li>
+<p>数値の後に <code>d</code> が続く場合は、その前に <code>P</code> が付けられます。</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="debugging"><a class="anchor" href="#debugging"></a>デバッグ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>開発モードでは、Quarkusはデフォルトでデバッグモードを有効にして起動し、JVMをサスペンドせずにポート <code>5005</code>  をリッスンします。</p>
+</div>
+<div class="paragraph">
+<p>この動作は、 <code>debug</code> システム・プロパティーに以下の値のいずれかを与えることで変更できます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>false</code>  - JVMはデバッグモードを無効にして起動します。</p>
+</li>
+<li>
+<p><code>true</code>  - JVM はデバッグモードで起動され、 `5005`ポートをリッスンします。</p>
+</li>
+<li>
+<p><code>client</code>  - JVM はクライアントモードで起動し、 `localhost:5005`に接続を試みます。</p>
+</li>
+<li>
+<p><code>{port}</code> - JVM はデバッグモードで起動されています。 <code>{port}</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>追加のシステム・プロパティー <code>suspend</code> は、デバッグ・モードで起動されたときに JVM をサスペンドするために使用できます。 <code>suspend</code> は以下の値をサポートしています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>y</code> または <code>true</code> - デバッグモードの JVM 起動が中断されます。</p>
+</li>
+<li>
+<p><code>n</code> または <code>false</code> - デバッグモードの JVM をサスペンドせずに起動します。</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>また、JVMをサスペンドした状態で、デバッグモードでQuarkusアプリケーションを実行することもできます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev -Dsuspend -Ddebug</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev -Dsuspend -Ddebug</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、デバッガーを <code>localhost:5005</code>  にアタッチします。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="import-in-your-ide"><a class="anchor" href="#import-in-your-ide"></a>IDEへのインポート</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="#project-creation">プロジェクトが生成されたら</a> 、好きなIDEでインポートできます。
+唯一の要件は、Gradleプロジェクトをインポートできることです。</p>
+</div>
+<div class="paragraph">
+<p><strong>Eclipse</strong></p>
+</div>
+<div class="paragraph">
+<p>Eclipse で、 <code>File → Import</code>  をクリックします。ウィザードで、 <code>Gradle → Existing Gradle Project</code>  を選択します。次の画面で、プロジェクトのルートの場所を選択します。次の画面では、見つかったモジュールのリストが表示されるので、生成されたプロジェクトを選択して <code>Finish</code>  をクリックします。</p>
+</div>
+<div class="paragraph">
+<p>別のターミナルで、次を実行します:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、生産性の高い環境をお楽しみください。</p>
+</div>
+<div class="paragraph">
+<p><strong>IntelliJ IDEA</strong></p>
+</div>
+<div class="paragraph">
+<p>IntelliJ IDEAの場合:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>IntelliJ IDEAの内部から <code>File → New → Project From Existing Sources…​</code> を選択するか、ウェルカム・ダイアログからであれば、 <code>Import project</code> を選択してください。</p>
+</li>
+<li>
+<p>プロジェクトのルートを選択します。</p>
+</li>
+<li>
+<p><code>Import project from external model</code>  を選択して <code>Gradle</code></p>
+</li>
+<li>
+<p>Next を数回(必要に応じてオプションを確認)</p>
+</li>
+<li>
+<p>最後の画面でFinishをクリックします。</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>別の端末や組込端末で、次を実行します:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>楽しんで!</p>
+</div>
+<div class="paragraph">
+<p><strong>Apache NetBeans</strong></p>
+</div>
+<div class="paragraph">
+<p>NetBeansの場合:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>File → Open Project</code> を選択</p>
+</li>
+<li>
+<p>プロジェクトのルートを選択します。</p>
+</li>
+<li>
+<p><code>Open Project</code> をクリックしてください。</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>別のターミナルまたは組込ターミナルで、プロジェクトのルートに移動して次を実行します:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>楽しんで!</p>
+</div>
+<div class="paragraph">
+<p><strong>Visual Studio Code</strong></p>
+</div>
+<div class="paragraph">
+<p>VS Codeでプロジェクトディレクトリーを開きます。Java Extension Pack(Javaエクステンションのセットをグループ化したもの)をインストールしている場合、プロジェクトはGradleプロジェクトとして読み込まれます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="downloading-dependencies-for-offline-development-and-testing"><a class="anchor" href="#downloading-dependencies-for-offline-development-and-testing"></a>オフラインでの開発やテストのための依存ファイルのダウンロード</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusのエクステンションの依存関係は、アプリケーションの実行時クラスパス上で終わる実行時エクステンションの依存関係と、ビルドクラスパスを作成するためにアプリケーションのビルド時にQuarkusによってのみ解決されるデプロイメント（またはビルド時）エクステンションの依存関係に分けられます。アプリケーション開発者は、Quarkusのエクステンションの実行時アーティファクトにのみ依存関係を表現することが期待されます。</p>
+</div>
+<div class="paragraph">
+<p>オフラインでQuarkusアプリケーションを構築してテストするというユースケースを可能にするために、プラグインには <code>quarkusGoOffline</code> タスクが含まれており、コマンドラインから次のように呼び出すことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew quarkusGoOffline</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このタスクは、アプリケーションの実行時、ビルド時、テスト、開発モードのすべての依存関係をGradleのキャッシュに解決します。実行すると、 <code>--offline</code> フラグを付けて quarkus タスクを安全に実行できるようになります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="building-a-native-executable"><a class="anchor" href="#building-a-native-executable"></a>ネイティブ実行可能ファイルのビルド</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルにより、Quarkusアプリケーションはコンテナーやサーバーレスのワークロードに最適です。</p>
+</div>
+<div class="paragraph">
+<p><code>GRAALVM_HOME</code> を設定し、最新リリースのGraalVM for JDK 21 を指しているようにして下さい。</p>
+</div>
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルの作成:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build --native</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build -Dquarkus.package.type=native</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルは、 <code>build/</code> に存在します。</p>
+</div>
+<div class="paragraph">
+<p>ネイティブ関連のプロパティーは、 <code>application.properties</code>  ファイルにコマンドライン引数として追加するか、 <code>quarkusBuild</code>  タスクに追加することができます。 <code>quarkusBuild</code>  タスクの設定は以下のように行います:</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-groovy">
+<div class="content">
+<div class="title">Groovy DSL</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">quarkusBuild {
+    nativeArgs {
+        containerBuild = true <i class="conum" data-value="1"></i><b>(1)</b>
+        builderImage = "quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21" <i class="conum" data-value="2"></i><b>(2)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>quarkus.native.container-build</code> プロパティーに <code>true</code> をセット</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>quarkus.native.builder-image</code> プロパティに <code>quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21</code> をセット</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-kotlin">
+<div class="content">
+<div class="title">Kotlin DSL</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">tasks.quarkusBuild {
+    nativeArgs {
+        "container-build" to true <i class="conum" data-value="1"></i><b>(1)</b>
+        "builder-image" to "quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21" <i class="conum" data-value="2"></i><b>(2)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>quarkus.native.container-build</code> プロパティーに <code>true</code> をセット</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>quarkus.native.builder-image</code> プロパティに <code>quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21</code> をセット</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Gradle Groovy DSL を使用する場合、プロパティーキーは小文字のキャメルケース表記に従わなければなりません。例: <code>container-build</code> は無効なので、 <code>containerBuild</code> で置き換えてください。この制限は Gradle Kotlin DSL には適用されません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="build-a-container-friendly-executable"><a class="anchor" href="#build-a-container-friendly-executable"></a>コンテナーフレンドリーな実行可能ファイルをビルドする</h3>
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルは、お使いのオペレーティングシステムに固有のものになります。コンテナー内で実行される実行ファイルを作成するには、次のようにします。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build --native --no-tests -Dquarkus.native.container-build=true
+# The --no-tests flag is required only on Windows and macOS.</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>生成される実行ファイルは64bitのLinux実行ファイルになるので、OSによっては実行できなくなる可能性があります。しかし、Dockerコンテナーにコピーするので問題ありません。この場合、ビルド自体もDockerコンテナー内で動作するので、ローカルにGraalVMをインストールする必要はないことに注目してください。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>デフォルトでは、ネイティブ実行可能ファイルは <code>quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21</code> Dockerイメージを使用して生成されます。</p>
+</div>
+<div class="paragraph">
+<p>異なるDockerイメージでネイティブ実行可能ファイルをビルドしたい場合(例えば、異なるGraalVMのバージョンを使用するなど)、 <code>-Dquarkus.native.builder-image=&lt;image name&gt;</code> のbuild引数を使用してください。</p>
+</div>
+<div class="paragraph">
+<p>利用可能なDockerイメージのリストは <a href="https://quay.io/repository/quarkus/ubi-quarkus-mandrel-builder-image?tab=tags">quay.io</a> にあります。Quarkusのバージョンが、利用可能な全てのイメージと互換性があるとは限りません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-native-tests"><a class="anchor" href="#running-native-tests"></a>ネイティブテストの実行</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次のようにネイティブテストを実行します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew testNative</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このタスクは <code>quarkusBuild</code>  に依存しているので、テストを実行する前にネイティブイメージを生成します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>デフォルトでは、 <code>native-test</code> のソースセットは、 <code>main</code> と <code>test</code> のソースセットに基づいています。ソースセットを追加することも可能です。たとえば、統合テストが <code>integrationTest</code> のソースセットにある場合は、次のように指定します。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-groovy">
+<div class="content">
+<div class="title">Groovy DSL</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">quarkus {
+    sourceSets {
+        extraNativeTest = sourceSets.integrationTest
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-kotlin">
+<div class="content">
+<div class="title">Kotlin DSL</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">quarkus {
+    sourceSets {
+        setExtraNativeTest(sourceSets["integrationTest"])
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-integration-tests"><a class="anchor" href="#running-integration-tests"></a>結合テストの実行</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>（ <code>@QuarkusIntegrationTest</code> でアノテーションされた）Quarkus結合テストは、Quarkusが生成したアーティファクトで実行されます。これらのテストは、 <code>src/integrationTest/java</code> ディレクトリに配置し、それを使用して実行することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew quarkusIntTest</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このタスクは <code>test</code> と <code>quarkusBuild</code> タスクに依存しています。最終的なアーティファクトは、テストを実行する前に生成されます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-fast-jar"><a class="anchor" href="#using-fast-jar"></a>fast-jar の使用</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>fast-jar</code> がデフォルトの quarkus パッケージタイプになりました。 <code>./gradlew build</code> コマンドの結果、 <code>build</code> の下に <code>quarkus-app</code> という名前の新しいディレクトリが作成されます。</p>
+</div>
+<div class="paragraph">
+<p>アプリケーションは次のようにで実行できます: <code>java -jar target/quarkus-app/quarkus-run.jar</code></p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+生成された jar を正常に実行するためには、 <code>quarkus-app</code> ディレクトリのすべての内容が必要です。いずれかのファイルが欠落していると、アプリケーションが起動しなかったり、正しく機能しない可能性があります。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<code>fast-jar</code> パッケージングでは、どの依存関係のjarにクラスやリソースが含まれているかという情報がインデックス化されているため、レガシーのQuarkus jarよりも起動が少し速く、メモリ消費量もわずかに少ないアーティファクトを作成できます。このため、クラスやリソースをロードする際に、 レガシー jar が必要とするクラスパス上のすべての jar を検索する必要がなくなります。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="building-uber-jars"><a class="anchor" href="#building-uber-jars"></a>UberJar のビルド</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus Gradleプラグインは、以下のように <code>--uber-jar</code>  引数を指定して UberJar の生成をサポートしています。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build -Dquarkus.package.type=uber-jar</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build -Dquarkus.package.type=uber-jar</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>UberJar を作成する際に、 <code>--ignored-entry</code>  引数を使用して生成された jar から除外したいエントリーを指定することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew quarkusBuild -Dquarkus.package.type=uber-jar --ignored-entry=META-INF/file1.txt</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>エントリーは、生成された Uber-Jar のルートからの相対的なものです。追加の <code>--ignored-entry</code>  引数を追加することで、複数のエントリーを指定することができます。</p>
+</div>
+<div class="sect2">
+<h3 id="multi-module-gradle"><a class="anchor" href="#multi-module-gradle"></a>マルチモジュールプロジェクトでの作業</h3>
+<div class="paragraph">
+<p>デフォルトでは、Quarkusは別のモジュール内のCDI Bean を検出しません。</p>
+</div>
+<div class="paragraph">
+<p>マルチモジュールプロジェクトのモジュールでCDI Bean検出を有効にするベストの方法は、 モジュールが、メインアプリケーションモジュールで、すでにquarkus-maven-pluginで設定されていない限り、<code>META-INF/beans.xml</code> ファイルをインクルードすることです。モジュールが、メインアプリケーションモジュールで、すでにquarkus-maven-pluginで設定されている場合は、自動的にインデックスが作成されます。</p>
+</div>
+<div class="paragraph">
+<p>あるいは、 <code>META-INF/beans.xml</code> ファイルの代わりに使える非公式の <a href="https://plugins.gradle.org/search?term=jandex">Gradle Jandex プラグイン</a> もあります。</p>
+</div>
+<div class="paragraph">
+<p>このトピックの詳細については、CDIガイドの <a href="cdi-reference.html#bean_discovery">Bean Discovery</a> セクションを参照してください。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="publishing-your-application"><a class="anchor" href="#publishing-your-application"></a>アプリケーションの発行</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Gradle で正しい依存関係のバージョンが使用されていることを担保するために、BOM はビルドファイル内で <code>enforcedPlatform</code> として宣言されています。デフォルトでは、 <code>maven-publish</code> プラグインは、この <code>enforcedPlatform</code> を理由にアプリケーションの公開を阻止します。 <code>build.gradle</code> ファイルに以下の設定を追加することで、この検証をスキップすることができます。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-groovy">
+<div class="content">
+<div class="title">Groovy DSL</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">tasks.withType(GenerateModuleMetadata).configureEach {
+    suppressedValidationErrors.add('enforced-platform')
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-kotlin">
+<div class="content">
+<div class="title">Kotlin DSL</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">tasks.withType&lt;GenerateModuleMetadata&gt;().configureEach {
+    suppressedValidationErrors.add("enforced-platform")
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-quarkus-builds"><a class="anchor" href="#configuring-quarkus-builds"></a>Quarkusのビルドの設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusのビルドに影響を与える設定ソースは複数あり、優先順位順に説明しています。Quarkusのビルドでは、 <code>prod</code> の設定プロファイルが使用されます:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>システムプロパティ（例： <code>./gradlew -Dquarkus.package.type=fast-jar …​</code> ）</p>
+</li>
+<li>
+<p>システム環境 (例: <code>QUARKUS_PACKAGE_TYPE=fast-jar ./gradlew …​</code> )</p>
+</li>
+<li>
+<p><code>quarkus</code> エクステンションの <code>quarkusBuildProperties</code> を介した設定。 例えば:</p>
+<div class="literalblock">
+<div class="content">
+<pre>quarkus {
+    quarkusBuildProperties {
+        set("package.type", "uber-jar")
+    }
+}</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Gradleプロジェクトプロパティによる設定（例： <code>./gradlew -Pquarkus.package.type=fast-jar</code> )</p>
+</li>
+<li>
+<p>プロジェクトの <code>application.properties</code> 、 <code>application.yaml</code> 、 <code>application.yml</code> ファイル、およびプロジェクトの <code>application-prod.properties</code> 、 <code>application-prod.yaml</code> 、 <code>application-prod.yml</code> ファイルからの設定</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Quarkusプラグインでは、3.0から上記の優先順位が変更されました。古いバージョンのQuarkus Gradleプラグインでは、Gradleビルドの設定よりも <code>application.properties</code> が優先されました。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Quarkus Gradleプラグインは、設定の読み込みと解析に"標準"のQuarkusのメカニズムを使用します。Quarkus 3.0では、 <code>application.properties</code> に加えて、 <code>application.(yaml|yml)</code> のサポートが追加されました。また、3.0では、SmallRye Configで利用できるすべてのメカニズムが、暗黙のうちにQuarkus Gradleプラグインでも利用できるようになっています。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Quarkusのビルドに使用される有効な設定オプションを表示するには、 <code>quarkusShowEffectiveConfig</code> タスクを使用します。 <code>--save-config-properties</code> コマンドラインオプションを指定した場合、設定プロパティはファイル <code>build/&lt;final-name&gt;.quarkus-build.properties</code> にも保存されます。
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="gradle-caching-task-inputs"><a class="anchor" href="#gradle-caching-task-inputs"></a>Gradle キャッシング / タスク入力</h3>
+<div class="paragraph">
+<p>By default, system properties starting with <code>quarkus.</code> and environment variables, including those from <code>~/.env</code>,
+starting  with <code>QUARKUS_</code>, are considered as inputs for the Gradle tasks. This means that only changes to those system
+properties or environment variables will cause Gradle&#8217;s up-to-date to trigger a rebuild. Changes to other system
+properties or environment variables do not change Quarkus' Gradle task inputs and do not trigger an unnecessary rebuild.</p>
+</div>
+<div class="paragraph">
+<p>Configuration properties specified via <code>quarkus.quarkusBuildProperties</code> or via the Quarkus <code>application.*</code>
+configuration files are all considered as Gradle task inputs, in other words: every change in these files causes
+a rebuild.</p>
+</div>
+<div class="paragraph">
+<p>If your Quarkus build references system properties that do not start with <code>quarkus.</code> (or environment variables that
+do not start with <code>QUARKUS_</code>), you must reference those via the Quarkus build extension. For example, if your
+<code>application.properties</code> file references an environment variable like this:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>greeting.message=${FOO_MESSAGE:Hello!}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>it must be explicitly declared as "caching relevant":</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>quarkus {
+   cachingRelevantProperties.add("FOO_MESSAGE")
+   // Note: `cachingRelevantProperties` accepts regular expressions
+}</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="build-workers"><a class="anchor" href="#build-workers"></a>ビルドワーカー</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusアプリケーションのビルドは、GradleのワーカーAPIを使用して、分離されたプロセスで実行されます。これには、QuarkusアプリケーションのビルドとQuarkusのコード生成が含まれます。これは、 <code>quarkus</code> エクステンションと Gradle プロジェクトのプロパティから Quarkus のコード生成/アプリケーションビルダーに設定を適切に渡すために必要です。</p>
+</div>
+<div class="paragraph">
+<p>コード生成やQuarkusビルドを実行するプロセスのJVM設定は、次のように設定できます。詳細については、 <a href="https://docs.gradle.org/current/javadoc/org/gradle/process/JavaForkOptions.html">JavaForkOptions</a> を参照してください。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-groovy">
+<div class="content">
+<div class="title">Groovy DSL</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">plugins {
+    id 'java'
+    id 'io.quarkus'
+}
+
+quarkus {
+    buildForkOptions {
+        maxHeapSize = '2g'
+    }
+    codeGenForkOptions {
+        maxHeapSize = '128m'
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-kotlin">
+<div class="content">
+<div class="title">Kotlin DSL</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">plugins {
+    java
+    id("io.quarkus")
+}
+
+quarkus {
+    buildForkOptions {
+        maxHeapSize = '2g'
+    }
+    codeGenForkOptions {
+        maxHeapSize = '128m'
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cached-build-artifacts"><a class="anchor" href="#cached-build-artifacts"></a>キャッシュされたビルドアーティファクト</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://docs.gradle.org/current/userguide/build_cache.html">Gradleのビルドキャッシュ</a> は、以前に生成した出力を再利用することで、ビルド全体の実行時間を改善する非常に効率的な仕組みです（技術的な詳細は <a href="https://docs.gradle.org/current/userguide/incremental_build.html">Incremental build</a> を参照して下さい）。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusプラグインは、最新のチェックとビルドキャッシュというgradleのメカニズムを活用します。ビルドキャッシュは、ローカル、ローカル <em>＋</em> リモートキャッシュサーバー、またはCI環境で構成されている場合は、 <a href="https://github.com/gradle/gradle-build-action">GradleのGitHubアクション</a> や直接/手動でGitHubの <a href="https://github.com/actions/cache">GitHubのキャッシュ</a> アクションを使用するなど、キャッシュ全体をアーティファクトとして取得し保存する意味でリモートとすることができます。</p>
+</div>
+<div class="paragraph">
+<p>The Quarkus Gradle plugin cares about <em>what</em> is cached <em>in which environment</em> (CI or local development). Big artifacts
+like uber-jars and native binaries are not cached in CI, but are cached in local development environments.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Quarkus Gradleプラグインは、 <code>CI</code> 環境変数が存在する場合、 <em>CI環境</em> を検出します。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>How the various Quarkus package types are cached in non-CI and CI environments is described in the following table.
+Note that even if a task&#8217;s output is not <em>cached</em>, the <em>up-to-date</em> checks still apply.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The Quarkus application build is split across three tasks. The <code>quarkusBuild</code> task is responsible to <em>provide</em>
+a built Quarkus application. The tasks <code>quarkusDependenciesBuild</code> and <code>quarkusAppPartsBuild</code> are considered internal
+tasks (may change at any time w/o prior notice). See below for details.
+</td>
+</tr>
+</table>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 22.2222%;">
+<col style="width: 55.5555%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1112%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Quarkusパッケージタイプ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">備考</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">キャッシング（非CI）</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">キャッシング（CI）</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fast-jar</code>, <code>jar</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Dependency jars are stored unmodified as individual files in the <code>quarkus-app/lib/</code> directory.
+All other files in the <code>quarkus-app/</code> directory are generated.</p>
+<p class="tableblock">The <code>quarkusAppPartsBuild</code> task builds <code>fast-jar</code> package-type applications and allows caching of the <em>generated</em>
+pieces, which is everything except the dependencies in the <code>quarkus-app/lib/</code> directory. The
+<code>quarkusDependenciesBuild</code> task is used to collect the dependencies via Gradle mechanisms. The <code>quarkusBuild</code> task
+then assembles the outputs of the <code>quarkusAppPartsBuild</code> and <code>quarkusDependenciesBuild</code> tasks.</p>
+<p class="tableblock">Note: <code>fast-jar</code> (or <code>-jar</code>) is the default if no package type has been explicitly configured.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✅</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✅</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mutable-jar</code>, <code>uber-jar</code>, <code>native</code>, <code>native-sources</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkusBuild</code> タスクは、Quarkusアプリケーションのビルドを担当します。</p>
+<p class="tableblock"><code>quarkusAppPartsBuild</code> および <code>quarkusDependenciesBuild</code> タスクは <code>uber-jar</code> に対しては何も行いません。</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✅</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">❌</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>legacy-jar</code>, <code>legacy</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>legacy-jar</code> のビルドは、ディレクトリ構造が異なることと、 <code>modified-*.jar</code> のファイルが生成されたとみなされることを除き、 <code>fast-jar</code> のビルドと同様に動作します。</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✅</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✅</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+ローカル開発環境では、より大きなキャッシュアーティファクトを保存（および取得）するコスト（時間）は、Quarkusアプリケーションを再ビルドするコストよりも低くなります。つまり、Quarkus Gradleプラグインは、非CI環境において、uber-jarやネイティブバイナリのような潜在的に大きな成果物をキャッシュすることができます。コードベースのさまざまな状態に対してビルドを実行するCI環境（メインブランチのすべてのコミットに対してCIを実行することを想定）では、ビルドされた（そして大きな）成果物をビルドキャッシュに追加すると、ビルドキャッシュが不必要に大きくなり、例えば、キャッシュできる成果物の総量が10GBに制限されているGitHubでは問題になります。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>背景：Gradleには、ビルドのパフォーマンスを向上させるために、2つの関連するメカニズムが働いています:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Up-to-date checks allow a task&#8217;s execution to be skipped, if the <em>inputs</em> and <em>outputs</em> of the tasks did not change.
+For example, consider a Java compile tasks: if the library dependencies and the source files (the <em>inputs</em>) did not
+change and the compiled class files (the <em>outputs</em>) are still available, compilation can be skipped.</p>
+</li>
+<li>
+<p>ビルドキャッシュは、（キャッシュ可能な）タスクの出力をローカルビルドキャッシュに保存することができます。タスクの <em>出力</em> は、キャッシュから復元することができます。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The benefits of up-to-date checks and the interaction of the build cache come with the cost of modeling the <em>inputs</em>
+and <em>outputs</em>. Inputs are not only files or directories, but also the Java version used during the build, the operating
+system, the working directory, configuration options, and so on. So everything that influences the output of a task
+action must be declared as an input of the task.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="gradle-configuration-cache"><a class="anchor" href="#gradle-configuration-cache"></a>Gradle設定キャッシュ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus Gradleプラグインは、 <a href="https://docs.gradle.org/current/userguide/configuration_cache.html">Gradleの設定キャッシュ</a> を有効にしているビルドで動作しますが、Quarkusタスクでは設定キャッシュは無効になっています。つまり、Quarkusプラグインは、そのようなGradleビルドを壊さないということです。</p>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#project-creation">新規プロジェクトの作成</a>
+<ul class="sectlevel2">
+<li><a href="#custom-test-configuration-profile">JVMモードでのカスタムテスト構成プロファイル</a></li>
+</ul>
+</li>
+<li><a href="#dealing-with-extensions">エクステンションへの対応</a></li>
+<li><a href="#dev-mode">開発モード</a>
+<ul class="sectlevel2">
+<li><a href="#remote-development-mode">リモート開発モード</a></li>
+</ul>
+</li>
+<li><a href="#debugging">デバッグ</a></li>
+<li><a href="#import-in-your-ide">IDEへのインポート</a></li>
+<li><a href="#downloading-dependencies-for-offline-development-and-testing">オフラインでの開発やテストのための依存ファイルのダウンロード</a></li>
+<li><a href="#building-a-native-executable">ネイティブ実行可能ファイルのビルド</a>
+<ul class="sectlevel2">
+<li><a href="#build-a-container-friendly-executable">コンテナーフレンドリーな実行可能ファイルをビルドする</a></li>
+</ul>
+</li>
+<li><a href="#running-native-tests">ネイティブテストの実行</a></li>
+<li><a href="#running-integration-tests">結合テストの実行</a></li>
+<li><a href="#using-fast-jar">fast-jar の使用</a></li>
+<li><a href="#building-uber-jars">UberJar のビルド</a>
+<ul class="sectlevel2">
+<li><a href="#multi-module-gradle">マルチモジュールプロジェクトでの作業</a></li>
+</ul>
+</li>
+<li><a href="#publishing-your-application">アプリケーションの発行</a></li>
+<li><a href="#configuring-quarkus-builds">Quarkusのビルドの設定</a>
+<ul class="sectlevel2">
+<li><a href="#gradle-caching-task-inputs">Gradle キャッシング / タスク入力</a></li>
+</ul>
+</li>
+<li><a href="#build-workers">ビルドワーカー</a></li>
+<li><a href="#cached-build-artifacts">キャッシュされたビルドアーティファクト</a></li>
+<li><a href="#gradle-configuration-cache">Gradle設定キャッシュ</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/cli-tooling">Quarkus コマンドラインインターフェイス (CLI) を使用した Quarkus アプリの構築</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/upx">UPXでネイティブ実行可能ファイルを圧縮</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/continuous-testing">継続的テスト</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/tests-with-coverage">テストカバレッジの測定</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/jreleaser">JReleaser によるパッケージングとリリース</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/maven-tooling">QuarkusとMaven</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/quarkus-maven-plugin">Quarkus Mavenプラグイン</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.8/guides/ide-tooling">お好みのIDEのQuarkus Tools</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/reaugmentation">Quarkusアプリケーションの再オーグメンテーション</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/getting-started-testing">アプリケーションのテスト</a></li>
+      
+        
+        <li class="howto"><a href="/version/3.8/guides/update-quarkus">プロジェクトをQuarkusの最新バージョンに更新</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.8/guides/tooling">ツールの使用</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/podman">Podman と Quarkus の併用</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>PanacheでJakarta RESTリソースを生成する - 3.15 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.15/guides/rest-data-panache" />
+  <meta property="og:title" content="PanacheでJakarta RESTリソースを生成する - 3.15" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/rest-data-panache">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.15/guides/rest-data-panache">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.15/guides/rest-data-panache" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.15/guides/rest-data-panache">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.15/guides/rest-data-panache">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.15/guides/rest-data-panache">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.15/guides/rest-data-panache">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.15/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" selected>3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">PanacheでJakarta RESTリソースを生成する </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>多くのWebアプリケーションは、REST APIを使った単調なCRUDアプリケーションで、書くのが面倒です。このタスクを合理化するために、REST Data with Panache エクステンションは、エンティティーやリポジトリの基本的なCRUDエンドポイントを生成することができます。</p>
+</div>
+<div class="paragraph">
+<p>Currently, this extension supports Hibernate ORM and MongoDB with Panache and can generate CRUD resources that work with <code>application/json</code> and <code>application/hal+json</code> content.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="setting-up-rest-data-with-panache"><a class="anchor" href="#setting-up-rest-data-with-panache"></a>PanacheでRESTデータをセットアップする</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusは、REST Data with Panacheをセットアップするために、以下のエクステンションを提供しています。次の互換性表を参照して、使用している技術に応じて適切なものを使用してください:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. 互換性表</caption>
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">エクステンション</th>
+<th class="tableblock halign-left valign-top">ステータス</th>
+<th class="tableblock halign-left valign-top">Hibernate ORM</th>
+<th class="tableblock halign-left valign-top">RESTEasy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#hr-hibernate-orm">quarkus-hibernate-orm-rest-data-panache</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Stable</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ORM</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Classic and Reactive</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#hr-hibernate-reactive">quarkus-hibernate-reactive-rest-data-panache</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Experimental</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Reactive</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Reactive</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#hr-mongodb">quarkus-mongodb-rest-data-panache</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Experimental</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ORM</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Classic and Reactive</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="hr-hibernate-orm"><a class="anchor" href="#hr-hibernate-orm"></a>Hibernate ORM</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>必要な依存関係を <code>pom.xml</code> に追加します</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Hibernate ORM REST Data with Panache エクステンション ( <code>quarkus-hibernate-orm-rest-data-panache</code> )</p>
+</li>
+<li>
+<p>JDBC ドライバーエクステンション ( <code>quarkus-jdbc-postgresql</code> , <code>quarkus-jdbc-h2</code> , <code>quarkus-jdbc-mariadb</code> , &#8230;&#8203;)</p>
+</li>
+<li>
+<p>RESTEasy JSONシリアライゼーションエクステンションの1つ（このエクステンションは、Quarkus REST（旧RESTEasy Reactive）とRESTEasy Classicの両方をサポートしています。）</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-hibernate-orm-rest-data-panache&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-jdbc-postgresql&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Use this if you are using Quarkus REST --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-rest-jackson&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Use this if you are going to use RESTEasy Classic --&gt;
+&lt;!--
+&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-resteasy-jackson&lt;/artifactId&gt;
+&lt;/dependency&gt;
+--&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-hibernate-orm-rest-data-panache")
+implementation("io.quarkus:quarkus-jdbc-postgresql")
+
+// Use this if you are using Quarkus REST
+implementation("io.quarkus:quarkus-rest-jackson")
+
+// Use this if you are going to use RESTEasy Classic
+// implementation("io.quarkus:quarkus-resteasy-jackson")</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="hibernate-orm-panache">Hibernate ORM with Panache</a> ガイドで説明されているように、Panache エンティティおよび/またはリポジトリを実装します。</p>
+</li>
+<li>
+<p><a href="#hr-generating-resources">リソースの生成</a> のセクションで説明したように、生成のためのインターフェイスを定義します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Panacheを使用したHibernate ORM REST Dataの動作を確認するには、 <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/3.15/hibernate-orm-rest-data-panache-quickstart">hibernate-orm-rest-data-panache-quickstart</a> クイックスタートをご覧ください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hr-hibernate-reactive"><a class="anchor" href="#hr-hibernate-reactive"></a>Hibernate Reactive</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>必要な依存関係を <code>pom.xml</code> に追加します。</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Hibernate ORM REST Data with Panache エクステンション ( <code>quarkus-hibernate-orm-rest-data-panache</code> )</p>
+</li>
+<li>
+<p>Vert.x リアクティブデータベースドライバエクステンション ( <code>quarkus-reactive-pg-client</code>, <code>quarkus-reactive-mysql-client</code>, &#8230;&#8203;)</p>
+</li>
+<li>
+<p>One of the Quarkus REST serialization extensions (<code>quarkus-rest-jackson</code>, <code>quarkus-rest-jsonb</code>, &#8230;&#8203;)</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+        &lt;artifactId&gt;quarkus-hibernate-reactive-rest-data-panache&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+        &lt;artifactId&gt;quarkus-reactive-pg-client&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+   &lt;!-- Use this if you are using REST Jackson for serialization --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+        &lt;artifactId&gt;quarkus-rest-jackson&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Hibernate <a href="hibernate-reactive-panache">Reactive with Panache</a> ガイドの説明に従って、Panacheエンティティやリポジトリを実装します。</p>
+</li>
+<li>
+<p><a href="#hr-generating-resources">リソース生成</a> のセクションで説明したように、生成のためのインターフェイスを定義します。</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hr-mongodb"><a class="anchor" href="#hr-mongodb"></a>MongoDB</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>必要な依存関係を <code>pom.xml</code> に追加します</p>
+<div class="ulist">
+<ul>
+<li>
+<p>MongoDB REST Data with Panache エクステンション ( <code>quarkus-mongodb-rest-data-panache</code> )</p>
+</li>
+<li>
+<p>RESTEasy JSONシリアライゼーションエクステンションの1つ ( <code>quarkus-rest-jackson</code> または <code>quarkus-rest-jsonb</code> )</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-mongodb-rest-data-panache&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Use this if you are using Quarkus REST --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-rest-jackson&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Use this if you are going to use RESTEasy Classic --&gt;
+&lt;!--
+&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-resteasy-jackson&lt;/artifactId&gt;
+&lt;/dependency&gt;
+--&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-mongodb-rest-data-panache")
+
+// Use this if you are using Quarkus REST
+implementation("io.quarkus:quarkus-rest-jackson")
+
+// Use this if you are going to use RESTEasy Classic
+// implementation("io.quarkus:quarkus-resteasy-jackson")</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="mongodb-panache">MongoDB with Panache</a> ガイドで説明されているように、Panacheエンティティやリポジトリを実装します。</p>
+</li>
+<li>
+<p><a href="#hr-generating-resources">リソース生成</a> のセクションで説明したように、生成のためのインターフェイスを定義します。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="hr-generating-resources"><a class="anchor" href="#hr-generating-resources"></a>リソースの生成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>REST Data with Panacheは、アプリケーションに存在するインターフェースに基づいて、Jakarta RESTリソースを生成します。生成したい各エンティティとリポジトリに対して、リソース・インターフェースを提供します。 <em>これらのインターフェイスは実装せず、カスタムメソッドを提供しないようにしてください。</em> ただし、カスタマイズするために、拡張インターフェースからメソッドをオーバーライドすることは可能です（末尾のセクションを参照）。</p>
+</div>
+<div class="sect2">
+<h3 id="panacheentityresource"><a class="anchor" href="#panacheentityresource"></a>PanacheEntityResource</h3>
+<div class="paragraph">
+<p>アプリケーションに <code>PanacheEntity</code> または <code>PanacheEntityBase</code> クラスを拡張したエンティティ (例: <code>Person</code> ) がある場合、REST Data with Panache に指示して、次のインターフェイスで Jakarta REST リソースを生成させることができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public interface PeopleResource extends PanacheEntityResource&lt;Person, Long&gt; {
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="panacherepositoryresource"><a class="anchor" href="#panacherepositoryresource"></a>PanacheRepositoryResource</h3>
+<div class="paragraph">
+<p>アプリケーションにシンプルなエンティティ（例： <code>Person</code> ）と、 <code>PanacheRepository</code> または <code>PanacheRepositoryBase</code> インターフェースを実装するリポジトリ（例： <code>PersonRepository</code> ）がある場合、REST Data with Panache に指示して、次のインターフェイスで Jakarta REST リソースを生成させることができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public interface PeopleResource extends PanacheRepositoryResource&lt;PersonRepository, Person, Long&gt; {
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="panachemongoentityresource"><a class="anchor" href="#panachemongoentityresource"></a>PanacheMongoEntityResource</h3>
+<div class="paragraph">
+<p>アプリケーションに <code>PanacheMongoEntity</code> または <code>PanacheMongoEntityBase</code> クラスを拡張したエンティティ (例: <code>Person</code> ) がある場合、REST Data with Panache に指示して、次のインターフェイスで Jakarta REST リソースを生成させることができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public interface PeopleResource extends PanacheMongoEntityResource&lt;Person, Long&gt; {
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="panachemongorepositoryresource"><a class="anchor" href="#panachemongorepositoryresource"></a>PanacheMongoRepositoryResource</h3>
+<div class="paragraph">
+<p>アプリケーションにシンプルなエンティティ（例： <code>Person</code> ）と、 <code>PanacheMongoRepository</code> または <code>PanacheMongoRepositoryBase</code> インターフェースを実装するリポジトリ（例： <code>PersonRepository</code> ）がある場合、REST Data with Panache に指示して、次のインターフェイスで Jakarta REST リソースを生成させることができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public interface PeopleResource extends PanacheMongoRepositoryResource&lt;PersonRepository, Person, Long&gt; {
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-generated-resource"><a class="anchor" href="#the-generated-resource"></a>生成されたリソース</h3>
+<div class="paragraph">
+<p>生成されるリソースは、エンティティーとリポジトリの両方で機能的に同等となります。唯一の違いは、利用時の特定のデータアクセスパターンとデータストレージです。</p>
+</div>
+<div class="paragraph">
+<p>上記の <code>PeopleResource</code> インターフェイスのいずれかを定義している場合、このエクステンションは特定のデータアクセス戦略を使用してその実装を生成します。
+実装されたクラスは生成された Jakarta REST リソースで使われます：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class PeopleResourceJaxRs { // The actual class name is going to be unique
+    @Inject
+    PeopleResource resource;
+
+    @GET
+    @Path("{id}")
+    @Produces("application/json")
+    public Person get(@PathParam("id") Long id){
+        Person person = resource.get(id);
+        if (person == null) {
+            throw new WebApplicationException(404);
+        }
+        return person;
+    }
+
+    @GET
+    @Produces("application/json")
+    public Response list(@QueryParam("sort") List&lt;String&gt; sortQuery,
+            @QueryParam("page") @DefaultValue("0") int pageIndex,
+            @QueryParam("size") @DefaultValue("20") int pageSize) {
+        Page page = Page.of(pageIndex, pageSize);
+        Sort sort = getSortFromQuery(sortQuery);
+        List&lt;Person&gt; people = resource.list(page, sort);
+        // ... build a response with page links and return a 200 response with a list
+    }
+
+    @GET
+    @Path("/count")
+    public long count() {
+        return resource.count();
+    }
+
+    @Transactional
+    @POST
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response add(Person personToSave) {
+        Person person = resource.add(person);
+        // ... build a new location URL and return 201 response with an entity
+    }
+
+    @Transactional
+    @PUT
+    @Path("{id}")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response update(@PathParam("id") Long id, Person personToSave) {
+        if (resource.get(id) == null) {
+            Person person = resource.update(id, personToSave);
+            return Response.status(204).build();
+        }
+        Person person = resource.update(id, personToSave);
+        // ... build a new location URL and return 201 response with an entity
+    }
+
+    @Transactional
+    @DELETE
+    @Path("{id}")
+    public void delete(@PathParam("id") Long id) {
+        if (!resource.delete(id)) {
+            throw new WebApplicationException(404);
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="resource-customisation"><a class="anchor" href="#resource-customisation"></a>リソースのカスタマイズ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>REST Data with Panacheは、リソースの特定の機能をカスタマイズするために使用できる <code>@ResourceProperties</code> 、 <code>@MethodProperties</code> アノテーションを提供します。</p>
+</div>
+<div class="paragraph">
+<p>リソースインターフェイスで使用することができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ResourceProperties(hal = true, path = "my-people")
+public interface PeopleResource extends PanacheEntityResource&lt;Person, Long&gt; {
+    @MethodProperties(path = "all")
+    List&lt;Person&gt; list(Page page, Sort sort);
+
+    @MethodProperties(exposed = false)
+    boolean delete(Long id);
+}</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="available-options"><a class="anchor" href="#available-options"></a>利用可能なオプション</h3>
+<div class="paragraph">
+<p><code>@ResourceProperties</code></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>exposed</code> - リソースが公開される可能性があるかどうか。各メソッドに対してオーバーライド可能なグローバルリソースプロパティー。デフォルトは <code>true</code> です。</p>
+</li>
+<li>
+<p><code>path</code> - リソースのベースパス。デフォルトのパスは、 <code>resource</code> または <code>controller</code> のサフィックスを含まないハイフン付きの小文字のリソース名です。</p>
+</li>
+<li>
+<p><code>rolesAllowed</code> - リソースへのアクセスが許可されているセキュリティロールのリストです。Quarkus Securityエクステンションが存在する必要があり、存在しない場合は無視されます。デフォルトは空です。</p>
+</li>
+<li>
+<p><code>paged</code> - コレクションのレスポンスをページングするかどうか。最初、最後、前、次のページの URI が存在する場合は、レスポンスヘッダに含まれます。リクエストページのインデックスとサイズは、 <code>page</code> と <code>size</code> のクエリパラメーターから取得され、それぞれのデフォルトは <code>0</code> と <code>20</code> です。デフォルトは <code>true</code> です。</p>
+</li>
+<li>
+<p><code>hal</code> - 標準の <code>application/json</code> レスポンスに加えて、 <code>Accept</code> ヘッダでリクエストされた場合に <code>application/hal+json</code> レスポンスを返す追加のメソッドを生成します。デフォルトは <code>false</code> です。</p>
+</li>
+<li>
+<p><code>halCollectionName</code> - HAL コレクションレスポンスを生成する際に使用されるべき名前です。デフォルトの名前は <code>resource</code> または <code>controller</code> のサフィックスなしのハイフン付き小文字のリソース名です。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>@MethodProperties</code></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>exposed</code> - <code>false</code> に設定されている場合、特定の HTTP Verb を公開しません。デフォルトは <code>true</code> です。</p>
+</li>
+<li>
+<p><code>path</code> - 操作パス (これはリソースベースのパスに追加されます)。デフォルトは空の文字列です。</p>
+</li>
+<li>
+<p><code>rolesAllowed</code> - この操作へのアクセスが許可されているセキュリティロールのリストです。Quarkus Securityエクステンションが存在する必要があり、存在しない場合は無視されます。デフォルトは空です。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="adding-additional-methods-to-the-generated-resource"><a class="anchor" href="#adding-additional-methods-to-the-generated-resource"></a>生成されたリソースへの追加メソッドの追加</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>REST Data with Panache エクステンションによって生成されたリソースに対して、リソースインターフェイスにこれらのメソッドを追加することで、追加メソッドを追加することができます。例:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ResourceProperties
+public interface PeopleResource extends PanacheEntityResource&lt;Person, Long&gt; {
+    @GET
+    @Path("/name/{name}")
+    @Produces("application/json")
+    default List&lt;Person&gt; findByName(@PathParam("name") String name) {
+        return Person.find("name = :name", Collections.singletonMap("name", name)).list();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、このメソッドは、生成されたメソッドとともに、 <code><a href="http://localhost:8080/people/name/Johan" class="bare">http://localhost:8080/people/name/Johan</a></code> で公開されます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="securing-endpoints"><a class="anchor" href="#securing-endpoints"></a>エンドポイントのセキュア化</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>REST Data with Panacheは、リソースインターフェースに定義されたパッケージ <code>jakarta.annotation.security</code> 内のSecurityアノテーションを使用します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.annotation.security.DenyAll;
+import jakarta.annotation.security.RolesAllowed;
+
+@DenyAll
+@ResourceProperties
+public interface PeopleResource extends PanacheEntityResource&lt;Person, Long&gt; {
+    @RolesAllowed("superuser")
+    boolean delete(Long id);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>さらに、リソースの使用が許可されているロールの指定にのみ関心がある場合、 <code>@ResourceProperties</code> および <code>@MethodProperties</code> のアノテーションには、リソースまたは操作へのアクセスが許可されているセキュリティロールをリストアップするフィールド <code>rolesAllowed</code> があります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="query-parameters-to-list-entities"><a class="anchor" href="#query-parameters-to-list-entities"></a>エンティティをリストアップするクエリパラメータ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>REST Data with Panacheは、エンティティのリストを取得するために以下のクエリパラメータをサポートしています:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>page</code> - リスト操作で返されるべきページ番号。これはページ化されたリソースにのみ適用され、0 から始まる番号です。 デフォルトは 0 です。</p>
+</li>
+<li>
+<p><code>size</code> - リスト操作で返されるべきページサイズ。これはページ化されたリソースにのみ適用され、1から始まる数値です。 デフォルトは20です。</p>
+</li>
+<li>
+<p><code>sort</code> - リスト操作の結果をソートするために使われるべきフィールドのカンマ区切りのリスト。フィールドの前に <code>-</code> を付けない限り、フィールドは昇順でソートされます。例えば <code>?sort=name,-age</code> は、名前の昇順、年齢の降順で結果をソートします。</p>
+</li>
+<li>
+<p><code>namedQuery</code> - `@NamedQuery`アノテーションを用いてエンティティレベルで設定されるべき名前付きクエリです。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>たとえば、最初のページで2つの <code>People</code> エンティティを取得したい場合、 <code><a href="http://localhost:8080/people?page=0&amp;size=2" class="bare">http://localhost:8080/people?page=0&amp;size=2</a></code> を呼び出します。応答は次のようになる筈です:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">[
+  {
+    "id": 1,
+    "name": "John Johnson",
+    "birth": "1988-01-10"
+  },
+  {
+    "id": 2,
+    "name": "Peter Peterson",
+    "birth": "1986-11-20"
+  }
+]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>さらに、フィールド名と値を含むクエリパラメータを追加することで、エンティティフィールドでフィルタリングすることも可能です。 <code><a href="http://localhost:8080/people?name=Peter" class="bare">http://localhost:8080/people?name=Peter</a> Peterson</code> を呼び出すと、次が返却されるでしょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">[
+  {
+    "id": 2,
+    "name": "Peter Peterson",
+    "birth": "1986-11-20"
+  }
+]</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+フィールドによるフィルタリングは、String、Boolean、Character、Double、Float、Integer、Long、Short、Byteおよびプリミティブ型にのみ対応しています。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="complex-filtering-to-list-entities-using-namedquery"><a class="anchor" href="#complex-filtering-to-list-entities-using-namedquery"></a>@NamedQueryを使った複雑なフィルタリングによるエンティティのリスト化</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>エンティティのリストアップ時にフィルタリングする名前付きクエリを指定することができます。例えば、エンティティに次のような名前付きクエリを持つことです:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Entity
+@NamedQuery(name = "Person.containsInName", query = "from Person where name like CONCAT('%', CONCAT(:name, '%'))")
+public class Person extends PanacheEntity {
+  String name;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この例では、 <code>name</code> フィールドにテキストを含むすべての人物をリストアップする名前付きクエリを追加しています。</p>
+</div>
+<div class="paragraph">
+<p>次に、使用したい名前付きクエリの名前で生成されたリソースを使用してエンティティを一覧表示するときに、クエリ パラメータ <code>namedQuery</code> を設定できます。 <code><a href="http://localhost:8080/people?namedQuery=Person.containsInName&amp;name=ter" class="bare">http://localhost:8080/people?namedQuery=Person.containsInName&amp;name=ter</a></code> の呼出は、名前に "ter"という文字列が含まれる人物をすべて返します。</p>
+</div>
+<div class="paragraph">
+<p>名前付きクエリの動作の詳細については、 <a href="hibernate-orm-panache#named-queries">Hibernate ORM</a> ガイドまたは <a href="hibernate-reactive-panache#named-queries">Hibernate Reactive</a> ガイドにアクセスしてください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="resource-method-beforeafter-listeners"><a class="anchor" href="#resource-method-beforeafter-listeners"></a>リソースメソッド Before/Afterリスナー</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>REST Data with Panacheは、以下のリソースメソッドフックの購読をサポートします：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Before/After add resource</p>
+</li>
+<li>
+<p>Before/After update resource</p>
+</li>
+<li>
+<p>Before/After delete resource</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>リソースメソッドリスナーを登録するには、インターフェース <code>RestDataResourceMethodListener</code> を実装したBeanを提供する必要があります。例：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+public class PeopleRestDataResourceMethodListener implements RestDataResourceMethodListener&lt;Person&gt; {
+    @Override
+    public void onBeforeAdd(Person person) {
+        System.out.println("Before Save Person: " + person.name);
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="response-body-examples"><a class="anchor" href="#response-body-examples"></a>レスポンスボディの例</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>前述の通り、REST Data with Panache は <code>application/json</code> と <code>application/hal+json</code> のレスポンス コンテンツ タイプをサポートしています。 <code>Person</code> ここでは、データベース内に <code>get</code> レコードが 5 つあると仮定して、 と <code>list</code> 操作を行った場合のレスポンスボディがどのようになるか、いくつかの例を示します。</p>
+</div>
+<div class="sect2">
+<h3 id="get-people1"><a class="anchor" href="#get-people1"></a>GET /people/1</h3>
+<div class="paragraph">
+<p><code>Accept: application/json</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "id": 1,
+  "name": "John Johnson",
+  "birth": "1988-01-10"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Accept: application/hal+json</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "id": 1,
+  "name": "John Johnson",
+  "birth": "1988-01-10",
+  "_links": {
+    "self": {
+      "href": "http://example.com/people/1"
+    },
+    "remove": {
+      "href": "http://example.com/people/1"
+    },
+    "update": {
+      "href": "http://example.com/people/1"
+    },
+    "add": {
+      "href": "http://example.com/people"
+    },
+    "list": {
+      "href": "http://example.com/people"
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="get-peoplepage0size2"><a class="anchor" href="#get-peoplepage0size2"></a>GET /people?page=0&amp;size=2</h3>
+<div class="paragraph">
+<p><code>Accept: application/json</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">[
+  {
+    "id": 1,
+    "name": "John Johnson",
+    "birth": "1988-01-10"
+  },
+  {
+    "id": 2,
+    "name": "Peter Peterson",
+    "birth": "1986-11-20"
+  }
+]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Accept: application/hal+json</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "_embedded": [
+    {
+      "id": 1,
+      "name": "John Johnson",
+      "birth": "1988-01-10",
+      "_links": {
+        "self": {
+          "href": "http://example.com/people/1"
+        },
+        "remove": {
+          "href": "http://example.com/people/1"
+        },
+        "update": {
+          "href": "http://example.com/people/1"
+        },
+        "add": {
+          "href": "http://example.com/people"
+        },
+        "list": {
+          "href": "http://example.com/people"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "name": "Peter Peterson",
+      "birth": "1986-11-20",
+      "_links": {
+        "self": {
+          "href": "http://example.com/people/2"
+        },
+        "remove": {
+          "href": "http://example.com/people/2"
+        },
+        "update": {
+          "href": "http://example.com/people/2"
+        },
+        "add": {
+          "href": "http://example.com/people"
+        },
+        "list": {
+          "href": "http://example.com/people"
+        }
+      }
+    }
+  ],
+  "_links": {
+    "add": {
+      "href": "http://example.com/people"
+    },
+    "list": {
+      "href": "http://example.com/people"
+    },
+    "first": {
+      "href": "http://example.com/people?page=0&amp;size=2"
+    },
+    "last": {
+      "href": "http://example.com/people?page=2&amp;size=2"
+    },
+    "next": {
+      "href": "http://example.com/people?page=1&amp;size=2"
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>両方のレスポンスには、これらのヘッダも含まれています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Link: &lt; <a href="http://example.com/people?page=0&amp;size=2" class="bare">http://example.com/people?page=0&amp;size=2</a> &gt;; rel="first"</p>
+</li>
+<li>
+<p>Link: &lt; <a href="http://example.com/people?page=2&amp;size=2" class="bare">http://example.com/people?page=2&amp;size=2</a> &gt;; rel="last"</p>
+</li>
+<li>
+<p>Link: &lt; <a href="http://example.com/people?page=1&amp;size=2" class="bare">http://example.com/people?page=1&amp;size=2</a> &gt;; rel="next"</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>前のページが存在しないため、 <code>previous</code> リンクヘッダ(および HAL リンク)が含まれません。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="includeexclude-jakarta-rest-classes"><a class="anchor" href="#includeexclude-jakarta-rest-classes"></a>Jakarta RESTクラスのインクルード／エクスクルード</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="using-build-time-conditions"><a class="anchor" href="#using-build-time-conditions"></a>ビルドタイム条件の使用</h3>
+<div class="paragraph">
+<p>Quarkusでは、CDI Beanの場合と同様に、ビルド時の条件によって、Jakarta RESTリソース、プロバイダ、フィーチャーを直接追加または除外できます。
+したがって、REST Data with Panacheインターフェイスにプロファイル条件（ <code>@io.quarkus.arc.profile.IfBuildProfile</code> または <code>@io.quarkus.arc.profile.UnlessBuildProfile</code> ）やプロパティ条件（ <code>io.quarkus.arc.properties.IfBuildProperty</code> または <code>io.quarkus.arc.properties.UnlessBuildProperty</code> ）をアノテーションすることで、生成されるJakarta RESTクラスをどの条件で含めるかを、ビルド時にQuarkusに指示することができます。</p>
+</div>
+<div class="paragraph">
+<p>以下の例では、ビルドプロファイル <code>app1</code> が有効になっている場合に限り、Quarkus は <code>PeopleResource</code> インターフェースから生成されたリソースを含めます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@IfBuildProfile("app1")
+public interface PeopleResource extends PanacheEntityResource&lt;Person, Long&gt; {
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-a-runtime-property"><a class="anchor" href="#using-a-runtime-property"></a>実行時プロパティの使用</h3>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+このオプションは、Quarkus REST Quarkusエクステンションを使用している場合にのみ使用できます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Quarkusでは、 <code>@io.quarkus.resteasy.reactive.server.EndpointDisabled</code> アノテーションを使用して、実行時プロパティの値に基づいて、生成されたJakarta RESTリソースを条件付きで無効にすることもできます。</p>
+</div>
+<div class="paragraph">
+<p>以下の例では、アプリケーションが <code>some.property</code> を <code>"disable"</code> に設定している場合、Quarkus は生成されたリソースを実行時に <code>PeopleResource</code> インターフェースから除外します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@EndpointDisabled(name = "some.property", stringValue = "disable")
+public interface PeopleResource extends PanacheEntityResource&lt;Person, Long&gt; {
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#setting-up-rest-data-with-panache">PanacheでRESTデータをセットアップする</a>
+<ul class="sectlevel2">
+<li><a href="#hr-hibernate-orm">Hibernate ORM</a></li>
+<li><a href="#hr-hibernate-reactive">Hibernate Reactive</a></li>
+<li><a href="#hr-mongodb">MongoDB</a></li>
+</ul>
+</li>
+<li><a href="#hr-generating-resources">リソースの生成</a>
+<ul class="sectlevel2">
+<li><a href="#panacheentityresource">PanacheEntityResource</a></li>
+<li><a href="#panacherepositoryresource">PanacheRepositoryResource</a></li>
+<li><a href="#panachemongoentityresource">PanacheMongoEntityResource</a></li>
+<li><a href="#panachemongorepositoryresource">PanacheMongoRepositoryResource</a></li>
+<li><a href="#the-generated-resource">生成されたリソース</a></li>
+</ul>
+</li>
+<li><a href="#resource-customisation">リソースのカスタマイズ</a>
+<ul class="sectlevel2">
+<li><a href="#available-options">利用可能なオプション</a></li>
+</ul>
+</li>
+<li><a href="#adding-additional-methods-to-the-generated-resource">生成されたリソースへの追加メソッドの追加</a></li>
+<li><a href="#securing-endpoints">エンドポイントのセキュア化</a></li>
+<li><a href="#query-parameters-to-list-entities">エンティティをリストアップするクエリパラメータ</a></li>
+<li><a href="#complex-filtering-to-list-entities-using-namedquery">@NamedQueryを使った複雑なフィルタリングによるエンティティのリスト化</a></li>
+<li><a href="#resource-method-beforeafter-listeners">リソースメソッド Before/Afterリスナー</a></li>
+<li><a href="#response-body-examples">レスポンスボディの例</a>
+<ul class="sectlevel2">
+<li><a href="#get-people1">GET /people/1</a></li>
+<li><a href="#get-peoplepage0size2">GET /people?page=0&amp;size=2</a></li>
+</ul>
+</li>
+<li><a href="#includeexclude-jakarta-rest-classes">Jakarta RESTクラスのインクルード／エクスクルード</a>
+<ul class="sectlevel2">
+<li><a href="#using-build-time-conditions">ビルドタイム条件の使用</a></li>
+<li><a href="#using-a-runtime-property">実行時プロパティの使用</a></li>
+</ul>
+</li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/hibernate-orm-panache">シンプルになったHibernate ORM with Panache</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/hibernate-orm-panache-kotlin">シンプルになったHibernate ORM with PanacheとKotlin</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/mongodb-panache">シンプルになったMongoDB with Panache</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/mongodb-panache-kotlin">シンプルになったMongoDB with PanacheとKotlin</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/hibernate-orm">Hibernate ORMとJakarta Persistenceの使用</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/datasource">Quarkusでデータソースを設定</a></li>
+      
+        
+        <li class="howto"><a href="/version/3.15/guides/security-jpa">Quarkus SecurityとJakarta Persistence</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/hibernate-reactive-panache">シンプルなHibernate Reactive with Panache</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/hibernate-search-orm-elasticsearch">Hibernate ORMとElasticsearch/OpenSearchでHibernate Searchを使用</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/security-jdbc">JDBCと共にSecurityを使用</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/mongodb">MongoDB クライアントの利用</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/security-authorize-web-endpoints-reference">ウェブエンドポイントの認可</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/elasticsearch">Elasticsearchクラスターの実行</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/elasticsearch-dev-services">Dev Services for Elasticsearch</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/redis-dev-services">Dev Services for Redis</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/rest-migration">Quarkus REST（旧RESTEasy Reactive）への移行</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/reactive-sql-clients">リアクティブ SQL クライアント</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/redis-reference">Redis エクステンションのリファレンスガイド</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/resteasy">RESTEasy Classic</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/hibernate-search-standalone-elasticsearch">Elasticsearch/OpenSearch を使用する Standalone モードでの Hibernate Search の使用</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

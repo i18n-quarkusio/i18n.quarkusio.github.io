@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Quarkusでのコンテキスト伝搬 - 2.16 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/2.16/guides/context-propagation" />
+  <meta property="og:title" content="Quarkusでのコンテキスト伝搬 - 2.16" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/context-propagation">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/2.16/guides/context-propagation">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/2.16/guides/context-propagation" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/2.16/guides/context-propagation">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/2.16/guides/context-propagation">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/2.16/guides/context-propagation">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/2.16/guides/context-propagation">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/2.16/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" selected>2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">Quarkusでのコンテキスト伝搬 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>従来のブロッキングコードでは  <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/ThreadLocal.html"><code>ThreadLocal</code></a>変数を使用してコンテキストオブジェクトを格納し、パラメータとして持ち回ることを避けていました。多くのQuarkusのエクステンションは、適切に動作するためにこれらのコンテキストオブジェクトを必要とします。例えば、 <a href="rest-json.html">RESTEasy</a>、 <a href="cdi-reference.html">ArC</a>、 <a href="transaction.html">Transaction</a>などです。</p>
+</div>
+<div class="paragraph">
+<p>リアクティブ/非同期コードを書く場合、「後で」実行されるコードブロックのパイプラインに作業を切り 込まなければならず、実際には、定義したメソッドがreturnされた後に実行されます。そのため、 <code>try/finally</code> ブロックや <code>ThreadLocal</code> 変数は動作しなくなります。なぜならば、呼び出し元が <code>finally</code> ブロックを実行した後に、 リアクティブコードは別のスレッドで実行されるからです。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/eclipse/microprofile-context-propagation">MicroProfile Context Propagation</a> の実装である <a href="https://github.com/smallrye/smallrye-context-propagation">SmallRye Context Propagation</a> は、リアクティブ/非同期設定でQuarkusエクステンションが正しく動作するようにするために作られました。これは、スレッドローカルにあったコンテキスト値を取得し、コードが呼び出されたときにそれらを復元することで動作します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution"><a class="anchor" href="#solution"></a>ソリューション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次の章で紹介する手順に沿って、ステップを踏んでアプリを作成することをお勧めします。ただし、完成した例にそのまま進んでも構いません。</p>
+</div>
+<div class="paragraph">
+<p>Gitレポジトリをクローンするか <code>git clone <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code> 、 <a href="https://github.com/quarkusio/quarkus-quickstarts/archive/2.16.zip">アーカイブ</a> をダウンロードします。</p>
+</div>
+<div class="paragraph">
+<p>このソリューションは <code>context-propagation-quickstart</code> <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/2.16/context-propagation-quickstart">ディレクトリ</a>にあります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="setting-it-up"><a class="anchor" href="#setting-it-up"></a>設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="http://smallrye.io/smallrye-mutiny">Mutiny</a> ( <code>quarkus-mutiny</code> のエクステンション) を使用している場合は、コンテキスト伝播を有効にするために <code>quarkus-smallrye-context-propagation</code> のエクステンションを追加するだけです。</p>
+</div>
+<div class="paragraph">
+<p>つまり、ビルドファイルに以下の依存関係を追加してください:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;!-- RESTEasy Reactive extension if not already included --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-resteasy-reactive&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;!-- Context Propagation extension --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-smallrye-context-propagation&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">// RESTEasy Reactive extension if not already included
+implementation("io.quarkus:quarkus-resteasy-reactive")
+// Context Propagation extension
+implementation("io.quarkus:quarkus-smallrye-context-propagation")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、ArC、RESTEasy、トランザクションを使用している場合は、コンテキスト伝播をすることができます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="usage-example-with-mutiny"><a class="anchor" href="#usage-example-with-mutiny"></a>Mutinyとの使用例</h2>
+<div class="sectionbody">
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="title">Mutiny</div>
+<div class="paragraph">
+<p>このセクションでは、Mutinyのリアクティブ型を使用しています。もしMutinyに慣れていない場合は、まず <a href="mutiny-primer">Mutiny - 直感的なリアクティブプログラミングライブラリ</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><a href="kafka.html">Kafkaトピック</a>から次の3つのアイテムを読み込み、 <a href="hibernate-orm-panache.html">Panacheを使ったHibernate ORM</a>でデータベースに格納してから（すべて同じトランザクションで）、クライアントに返すRESTエンドポイントを書くとしたら、次のようになります:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    // Get the prices stream
+    @Inject
+    @Channel("prices") Publisher&lt;Double&gt; prices;
+
+    @Transactional
+    @GET
+    @Path("/prices")
+    @RestStreamElementType(MediaType.TEXT_PLAIN)
+    public Publisher&lt;Double&gt; prices() {
+        // get the next three prices from the price stream
+        return Multi.createFrom().publisher(prices)
+                .select().first(3)
+                // The items are received from the event loop, so cannot use Hibernate ORM (classic)
+                // Switch to a worker thread, the transaction will be propagated
+                .emitOn(Infrastructure.getDefaultExecutor())
+                .map(price -&gt; {
+                    // store each price before we send them
+                    Price priceEntity = new Price();
+                    priceEntity.value = price;
+                    // here we are all in the same transaction
+                    // thanks to context propagation
+                    priceEntity.persist();
+                    return price;
+                    // the transaction is committed once the stream completes
+                });
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>コンテキストの伝播のための Mutiny サポートのおかげで、これは、そのまま直ぐに動作することに注目してください。3つのアイテムは同じトランザクションを使用して保持され、このトランザクションはストリームが完了するとコミットされます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="usage-example-for-completionstage"><a class="anchor" href="#usage-example-for-completionstage"></a><code>CompletionStage</code> の使用例</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/concurrent/CompletionStage.html"><code>CompletionStage</code></a>を使っている場合は、手動でのコンテキストの伝播が必要です。そのためには、すべてのコンテキストを伝搬する <code>ThreadContext</code> または <code>ManagedExecutor</code> を注入することができます。例えば、ここでは <a href="vertx.html">Vert.x Web Client</a>を使用してStar Warsの人々のリストを取得し、 <a href="hibernate-orm-panache.html">Panacheを使用したHibernate ORM</a>を使用してデータベースに格納し（すべて同じトランザクションで）、 <a href="rest-json.html">JacksonまたはJSON-B</a>を使用してJSONとしてクライアントに返しています:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    @Inject ThreadContext threadContext;
+    @Inject ManagedExecutor managedExecutor;
+    @Inject Vertx vertx;
+
+    @Transactional
+    @GET
+    @Path("/people")
+    public CompletionStage&lt;List&lt;Person&gt;&gt; people() throws SystemException {
+        // Create a REST client to the Star Wars API
+        WebClient client = WebClient.create(vertx,
+                         new WebClientOptions()
+                          .setDefaultHost("swapi.dev")
+                          .setDefaultPort(443)
+                          .setSsl(true));
+        // get the list of Star Wars people, with context capture
+        return threadContext.withContextCapture(client.get("/api/people/").send())
+                .thenApplyAsync(response -&gt; {
+                    JsonObject json = response.bodyAsJsonObject();
+                    List&lt;Person&gt; persons = new ArrayList&lt;&gt;(json.getInteger("count"));
+                    // Store them in the DB
+                    // Note that we're still in the same transaction as the outer method
+                    for (Object element : json.getJsonArray("results")) {
+                        Person person = new Person();
+                        person.name = ((JsonObject) element).getString("name");
+                        person.persist();
+                        persons.add(person);
+                    }
+                    return persons;
+                }, managedExecutor);
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>ThreadContext</code> または <code>ManagedExecutor</code> を使用することで、ほとんどの有用な関数型と <code>CompletionStage</code> をラップしてコンテキストを伝播させることができます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>注入された <code>ManagedExecutor</code> は、Quarkus のスレッドプールを使用しています。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="overriding-which-contexts-are-propagated"><a class="anchor" href="#overriding-which-contexts-are-propagated"></a>どのコンテキストが伝搬されるかをオーバーライドする</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>デフォルトでは、利用可能なすべてのコンテキストが伝搬されます。しかし、この動作をいくつかの方法で上書きすることができます。</p>
+</div>
+<div class="sect2">
+<h3 id="using-configuration"><a class="anchor" href="#using-configuration"></a>設定の使用</h3>
+<div class="paragraph">
+<p>以下の設定プロパティでは、伝搬されるコンテキストのデフォルトセットを指定できます。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">設定キー</th>
+<th class="tableblock halign-left valign-top">説明</th>
+<th class="tableblock halign-left valign-top">デフォルト値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.context.ThreadContext.propagated</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">伝播されたコンテキストのコンマで区切られたセット</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Remaining</code> (すべての非明示的にリスト化されたコンテキスト)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.context.ThreadContext.cleared</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">クリアされたコンテキストのコンマで区切りのセット</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>None</code>（コンテキストなし）。ただし、伝播されたセットとクリアされたセットのどちらにも <code>Remaining</code> が含まれていない場合は、デフォルトで <code>Remaining</code> （明示されていないすべてのコンテキスト）となります</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.context.ThreadContext.unchanged</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">変更されていないコンテキストのコンマで区切られたセット</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>None</code> （コンテキストなし）</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>以下のコンテキストは、Quarkusで設定不要で利用可能か、エクステンションを追加するかによって使用できます:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">コンテキスト名</th>
+<th class="tableblock halign-left valign-top">ネーム定数</th>
+<th class="tableblock halign-left valign-top">説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>None</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/static/org.eclipse.microprofile.context-propagation/microprofile-context-propagation-api/1.2/org/eclipse/microprofile/context/ThreadContext.html#NONE"><code>ThreadContext.NONE</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">コンテキストの空のセットを指定するために使用できますが、値を空に設定しても機能します。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Remaining</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/static/org.eclipse.microprofile.context-propagation/microprofile-context-propagation-api/1.2/org/eclipse/microprofile/context/ThreadContext.html#ALL_REMAINING"><code>ThreadContext.ALL_REMAINING</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">他のセットに明示されていないすべてのコンテキスト</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Transaction</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/static/org.eclipse.microprofile.context-propagation/microprofile-context-propagation-api/1.2/org/eclipse/microprofile/context/ThreadContext.html#TRANSACTION"><code>ThreadContext.TRANSACTION</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JTAトランザクションコンテキスト</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CDI</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/static/org.eclipse.microprofile.context-propagation/microprofile-context-propagation-api/1.2/org/eclipse/microprofile/context/ThreadContext.html#CDI"><code>ThreadContext.CDI</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CDI(ArC)のコンテキスト</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Servlet</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">N/A</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">サーブレットコンテキスト</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>JAX-RS</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">N/A</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RESTEasy Classic コンテキスト</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Application</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/static/org.eclipse.microprofile.context-propagation/microprofile-context-propagation-api/1.2/org/eclipse/microprofile/context/ThreadContext.html#APPLICATION"><code>ThreadContext.APPLICATION</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">現在の <code>ThreadContextClassLoader</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="overriding-the-propagated-contexts-using-annotations"><a class="anchor" href="#overriding-the-propagated-contexts-using-annotations"></a>伝播されたコンテキストをアノテーションで上書き</h3>
+<div class="paragraph">
+<p>Mutinyが使用しているような自動コンテキスト伝搬を、特定のメソッドでオーバーライドするためには <a href="https://javadoc.io/doc/io.smallrye/smallrye-context-propagation-api/latest/io/smallrye/context/api/CurrentThreadContext.html"><code>@CurrentThreadContext</code></a> アノテーションを使用します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    // Get the prices stream
+    @Inject
+    @Channel("prices") Publisher&lt;Double&gt; prices;
+
+    @GET
+    @Path("/prices")
+    @RestStreamElementType(MediaType.TEXT_PLAIN)
+    // Get rid of all context propagation, since we don't need it here
+    @CurrentThreadContext(propagated = {}, unchanged = ThreadContext.ALL_REMAINING)
+    public Publisher&lt;Double&gt; prices() {
+        // get the next three prices from the price stream
+        return Multi.createFrom().publisher(prices)
+                .select().first(3);
+    }</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="overriding-the-propagated-contexts-using-cdi-injection"><a class="anchor" href="#overriding-the-propagated-contexts-using-cdi-injection"></a>CDIインジェクションを用いた伝搬されたコンテキストのオーバーライド</h3>
+<div class="paragraph">
+<p>また、インジェクションポイントに <a href="https://javadoc.io/doc/io.smallrye/smallrye-context-propagation-api/latest/io/smallrye/context/api/ThreadContextConfig.html"><code>@ThreadContextConfig</code></a>アノテーションを使うことでカスタムメイドの <code>ThreadContext</code> を注入することもできます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    // Get the prices stream
+    @Inject
+    @Channel("prices") Publisher&lt;Double&gt; prices;
+    // Get a ThreadContext that doesn't propagate context
+    @Inject
+    @ThreadContextConfig(unchanged = ThreadContext.ALL_REMAINING)
+    SmallRyeThreadContext threadContext;
+
+    @GET
+    @Path("/prices")
+    @RestStreamElementType(MediaType.TEXT_PLAIN)
+    public Publisher&lt;Double&gt; prices() {
+        // Get rid of all context propagation, since we don't need it here
+        try(CleanAutoCloseable ac = SmallRyeThreadContext.withThreadContext(threadContext)){
+            // get the next three prices from the price stream
+            return Multi.createFrom().publisher(prices)
+                    .select().first(3);
+        }
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>同様に、 <a href="https://javadoc.io/doc/io.smallrye/smallrye-context-propagation-api/latest/io/smallrye/context/api/ManagedExecutorConfig.html"><code>@ManagedExecutorConfig</code></a> アノテーションを使用して設定された <code>ManagedExecutor</code> のインスタンスをインジェクトする類似の方法があります:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    // Custom ManagedExecutor with different async limit, queue and no propagation
+    @Inject
+    @ManagedExecutorConfig(maxAsync = 2, maxQueued = 3, cleared = ThreadContext.ALL_REMAINING)
+    ManagedExecutor configuredCustomExecutor;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="sharing-configured-cdi-instances-of-managedexecutor-and-threadcontext"><a class="anchor" href="#sharing-configured-cdi-instances-of-managedexecutor-and-threadcontext"></a>ManagedExecutorとThreadContextの構成されたCDIインスタンスの共有</h3>
+<div class="paragraph">
+<p>同じ <code>ManagedExecutor</code> や <code>ThreadContext</code> を複数の場所に注入し、その容量を共有したい場合、そのインスタンスに <a href="https://javadoc.io/doc/io.smallrye/smallrye-context-propagation-api/latest/io/smallrye/context/api/NamedInstance.html"><code>@NamedInstance</code></a> アノテーションで名前を付けることが出来ます。 <code>@NamedInstance</code> はCDIアノテーションであり、同じ型と名前のすべての注入は、したがって、同じ基礎となるインスタンスを共有します。インスタンスをカスタマイズする必要がある場合は、インジェクションポイントの1つで <code>@ManagedExecutorConfig</code>/ <code>ThreadContextConfig</code> アノテーションを使用して、カスタマイズすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    // Custom configured ManagedExecutor with name
+    @Inject
+    @ManagedExecutorConfig(maxAsync = 2, maxQueued = 3, cleared = ThreadContext.ALL_REMAINING)
+    @NamedInstance("myExecutor")
+    ManagedExecutor sharedConfiguredExecutor;
+
+    // Since this executor has the same name, it will be the same instance as above
+    @Inject
+    @NamedInstance("myExecutor")
+    ManagedExecutor sameExecutor;
+
+    // Custom ThreadContext with a name
+    @Inject
+    @ThreadContextConfig(unchanged = ThreadContext.ALL_REMAINING)
+    @NamedInstance("myContext")
+    ThreadContext sharedConfiguredThreadContext;
+
+    // Given equal value of @NamedInstance, this ThreadContext will be the same as the above one
+    @Inject
+    @NamedInstance("myContext")
+    ThreadContext sameContext;</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="context-propagation-for-cdi"><a class="anchor" href="#context-propagation-for-cdi"></a>CDIのためのコンテキスト伝搬</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>CDI の観点からは、 <code>@RequestScoped</code>, <code>@ApplicationScoped</code>, <code>@Singleton</code> Beanは伝播され、他のスレッドで利用可能です。 <code>@Dependent</code> BeanやカスタムスコープされたBeanは、CDI コンテキスト伝播を介して自動的に伝播されることはありません。</p>
+</div>
+<div class="paragraph">
+<p><code>@ApplicationScoped</code> と <code>@Singleton</code> のBeanは常にアクティブなスコープであり、そのため対処が簡単です - コンテキスト伝播タスクは、CDI コンテナーが動作している限り、これらのBeanで動作します。しかし、 <code>@RequestScoped</code> Beanは話が違います。手動で有効化/無効化すると、HTTP リクエストや他のリクエスト/タスクにバインドされます。この場合、元のスレッドがリクエストの終了に到達すると、コンテキストを終了し、それらのBeanで <code>@PreDestroy</code> を呼び出し、コンテキストからクリアされることに注意しなければなりません。その後、他のスレッドからこれらのBeanにアクセスしようとすると、予期せぬ動作をすることがあります。したがって、コンテキストの伝播を介してリクエストスコープされたBeanを使用するすべてのタスクは、元のリクエストの持続時間を超えないような方法で実行されることを確認することが推奨されます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>上記で説明した動作のため、CDI で Context Propagation を使用する際には <code>@PreDestroy</code> を <code>@RequestScoped</code> Beanで使用しないことをお勧めします。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#solution">ソリューション</a></li>
+<li><a href="#setting-it-up">設定</a></li>
+<li><a href="#usage-example-with-mutiny">Mutinyとの使用例</a></li>
+<li><a href="#usage-example-for-completionstage"><code>CompletionStage</code> の使用例</a></li>
+<li><a href="#overriding-which-contexts-are-propagated">どのコンテキストが伝搬されるかをオーバーライドする</a>
+<ul class="sectlevel2">
+<li><a href="#using-configuration">設定の使用</a></li>
+<li><a href="#overriding-the-propagated-contexts-using-annotations">伝播されたコンテキストをアノテーションで上書き</a></li>
+<li><a href="#overriding-the-propagated-contexts-using-cdi-injection">CDIインジェクションを用いた伝搬されたコンテキストのオーバーライド</a></li>
+<li><a href="#sharing-configured-cdi-instances-of-managedexecutor-and-threadcontext">ManagedExecutorとThreadContextの構成されたCDIインスタンスの共有</a></li>
+</ul>
+</li>
+<li><a href="#context-propagation-for-cdi">CDIのためのコンテキスト伝搬</a></li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

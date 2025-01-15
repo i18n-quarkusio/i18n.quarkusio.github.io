@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Using OpenTelemetry Tracing - main - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/main/guides/opentelemetry-tracing" />
+  <meta property="og:title" content="Using OpenTelemetry Tracing - main" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/opentelemetry-tracing">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/main/guides/opentelemetry-tracing">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/main/guides/opentelemetry-tracing" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/main/guides/opentelemetry-tracing">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/main/guides/opentelemetry-tracing">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/main/guides/opentelemetry-tracing">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/main/guides/opentelemetry-tracing">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/main/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" selected>Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <a class="editlink" href="https://github.com/quarkusio/quarkus/edit/main/docs/src/main/asciidoc/opentelemetry-tracing.adoc">このページを編集</a>
+      
+      <h1 class="text-caps">Using OpenTelemetry Tracing </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、Quarkusアプリケーションで <a href="https://opentelemetry.io/">OpenTelemetry</a> （OTel）を利用して、インタラクティブなWebアプリケーションに分散トレースを提供する方法について説明します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="ulist">
+<ul>
+<li>
+<p>The <a href="opentelemetry">OpenTelemetry Guide</a> is available with signal independent information about the OpenTelemetry extension.</p>
+</li>
+<li>
+<p>If you search more information about OpenTelemetry Metrics, please refer to the <a href="opentelemetry-metrics">OpenTelemetry Metrics Guide</a>.</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>約15分</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 17+がインストールされ、 <code>JAVA_HOME</code> が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.9.9</p>
+</li>
+<li>
+<p>Docker と Docker Compose、または <a href="podman">Podman</a> 、および Docker Compose</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルをビルドしたい場合、MandrelまたはGraalVM（あるいはネイティブなコンテナビルドを使用する場合はDocker）をインストールし、 <a href="building-native-image.html#configuring-graalvm">適切に設定</a>していること</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="architecture"><a class="anchor" href="#architecture"></a>アーキテクチャ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、分散トレースを実証するための簡単なRESTアプリケーションを作成します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution"><a class="anchor" href="#solution"></a>ソリューション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次の章で紹介する手順に沿って、ステップを踏んでアプリを作成することをお勧めします。ただし、すぐに完成した例に飛んでも構いません。</p>
+</div>
+<div class="paragraph">
+<p>Gitレポジトリをクローンするか <code>git clone -b development <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code> 、 <a href="https://github.com/quarkusio/quarkus-quickstarts/archive/development.zip">アーカイブ</a> をダウンロードします。</p>
+</div>
+<div class="paragraph">
+<p>ソリューションは <code>opentelemetry-quickstart</code> <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/development/opentelemetry-quickstart">ディレクトリ</a> にあります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-maven-project"><a class="anchor" href="#creating-the-maven-project"></a>Mavenプロジェクトの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、新しいプロジェクトが必要です。以下のコマンドで新規プロジェクトを作成します。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:opentelemetry-quickstart \
+    --extension='rest,quarkus-opentelemetry' \
+    --no-code
+cd opentelemetry-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus:quarkus-maven-plugin:999-SNAPSHOT:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=opentelemetry-quickstart \
+    -Dextensions='rest,quarkus-opentelemetry' \
+    -DnoCode
+cd opentelemetry-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Windowsユーザーの場合:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>cmdを使用する場合、（バックスラッシュ <code>\</code> を使用せず、すべてを同じ行に書かないでください）。</p>
+</li>
+<li>
+<p>Powershellを使用する場合は、 <code>-D</code> パラメータを二重引用符で囲んでください。例: <code>"-DprojectArtifactId=opentelemetry-quickstart"</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>このコマンドはMavenプロジェクトを生成し、<code>quarkus-opentelemetry</code> エクステンションをインポートします。このエクステンションには、デフォルトのOpenTelemetryサポートと、https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md[OTLP]のgRPC spanエクスポーターが含まれています。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusプロジェクトがすでに設定されている場合、プロジェクトのベースディレクトリで次のコマンドを実行することで、<code>quarkus-opentelemetry</code> エクステンションをプロジェクトに追加できます：</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus extension add opentelemetry</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:add-extension -Dextensions='opentelemetry'</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew addExtension --extensions='opentelemetry'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、ビルドファイルに以下が追加されます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-opentelemetry&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-opentelemetry")</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="examine-the-jakarta-rest-resource"><a class="anchor" href="#examine-the-jakarta-rest-resource"></a>Jakarta REST リソースの調査</h3>
+<div class="paragraph">
+<p><code>src/main/java/org/acme/opentelemetry/TracedResource.java</code> のファイルを開くと、以下の内容が表示されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.opentelemetry;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import org.jboss.logging.Logger;
+
+@Path("/hello")
+public class TracedResource {
+
+    private static final Logger LOG = Logger.getLogger(TracedResource.class);
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String hello() {
+        LOG.info("hello");
+        return "hello";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このアプリケーションには、トレースのためのコードが含まれていないことに注意してください。デフォルトでは、このエンドポイントに送信されたリクエストは、コードの変更を必要とせずにトレースされます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="create-the-configuration"><a class="anchor" href="#create-the-configuration"></a>コンフィグレーションの作成</h3>
+<div class="paragraph">
+<p>By default, the exporters will send out data in batches, using the gRPC protocol and endpoint <code><a href="http://localhost:4317" class="bare">http://localhost:4317</a></code>.</p>
+</div>
+<div class="paragraph">
+<p>デフォルトのプロパティ値を変更する必要がある場合、 <code>src/main/resources/application.properties</code> ファイルを使用して、アプリケーション内でデフォルトの OTLP gRPC Exporter を設定する方法の例を以下に示します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.application.name=myservice <i class="conum" data-value="1"></i><b>(1)</b>
+quarkus.otel.exporter.otlp.endpoint=http://localhost:4317 <i class="conum" data-value="2"></i><b>(2)</b>
+quarkus.otel.exporter.otlp.headers=authorization=Bearer my_secret <i class="conum" data-value="3"></i><b>(3)</b>
+quarkus.log.console.format=%d{HH:mm:ss} %-5p traceId=%X{traceId}, parentId=%X{parentId}, spanId=%X{spanId}, sampled=%X{sampled} [%c{2.}] (%t) %s%e%n  <i class="conum" data-value="4"></i><b>(4)</b>
+
+# Alternative to the console log
+quarkus.http.access-log.pattern="...traceId=%{X,traceId} spanId=%{X,spanId}" <i class="conum" data-value="5"></i><b>(5)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>All telemetry created from the application will include an OpenTelemetry <code>Resource</code> attribute indicating the telemetry was created by the <code>myservice</code> application. If not set, it will default to the artifact id.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>gRPC endpoint to send the telemetry. If not set, it will default to <code><a href="http://localhost:4317" class="bare">http://localhost:4317</a></code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>認証によく使われるオプションのgRPCヘッダー</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>ログメッセージにトレース情報を追加する。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>また、アクセスログにのみトレース情報を記載することもできます。この場合、コンソールログ形式の情報を省略する必要があります。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>We provide signal agnostic configurations for the connection related properties, meaning that you can use the same properties for both tracing and metrics when you set:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.otel.exporter.otlp.endpoint=http://localhost:4317</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you need different configurations for each signal, you can use the specific properties:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.otel.exporter.otlp.traces.endpoint=http://trace-uri:4317 <i class="conum" data-value="1"></i><b>(1)</b>
+quarkus.otel.exporter.otlp.metrics.endpoint=http://metrics-uri:4317 <i class="conum" data-value="2"></i><b>(2)</b>
+quarkus.otel.exporter.otlp.logs.endpoint=http://logs-uri:4317 <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The endpoint for the traces exporter.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The endpoint for the metrics exporter.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The endpoint for the logs exporter.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you need that your spans and logs to be exported directly as they finish
+(e.g. in a serverless environment / application), you can set this property to <code>true</code>.
+This replaces the default batching of data.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.otel.simple=true</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="run-the-application"><a class="anchor" href="#run-the-application"></a>アプリケーションの実行</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>First we need to start a system to visualise the OpenTelemetry data.
+We have 2 options:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Start an all-in-one Grafana OTel LGTM system for traces and metrics.</p>
+</li>
+<li>
+<p>Jaeger system just for traces.</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="grafana-otel-lgtm-option"><a class="anchor" href="#grafana-otel-lgtm-option"></a>Grafana OTel LGTM option</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Take a look at: <a href="observability-devservices-lgtm">Getting Started with Grafana-OTel-LGTM</a>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This features a Quarkus Dev service including a Grafana for visualizing data, Loki to store logs, Tempo to store traces and Prometheus to store metrics. Also provides an OTel collector to receive the data.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jaeger-to-see-traces-option"><a class="anchor" href="#jaeger-to-see-traces-option"></a>Jaeger to see traces option</h3>
+<div class="paragraph">
+<p>Configure and start the <a href="https://opentelemetry.io/docs/collector/">OpenTelemetry Collector</a> to receive, process and export telemetry data to <a href="https://www.jaegertracing.io/">Jaeger</a> that will display the captured traces.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Jaeger-all-in-oneは、Jaegerエージェント、OTelコレクター、クエリサービス/UIを含みます。分離型コレクタをインストールする必要はありません。トレースデータを直接Jaegerに送ることができます（OTLPレシーバーを有効にした後、詳細はこちらの <a href="https://medium.com/jaegertracing/introducing-native-support-for-opentelemetry-in-jaeger-eb661be8183c">ブログエントリ</a> などをご覧ください）。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>docker-compose up -d</code> OpenTelemetry CollectorとJaegerシステムを、以下の <code>docker-compose.yml</code> ファイルを介して起動します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">version: "2"
+services:
+
+  # Jaeger
+  jaeger-all-in-one:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686" # Jaeger UI
+      - "14268:14268" # Receive legacy OpenTracing traces, optional
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+      - "14250:14250" # Receive from external otel-collector, optional
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>オプションのポートは必要ないものは外しておいた方が良いです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="start-the-application"><a class="anchor" href="#start-the-application"></a>Start the application</h3>
+<div class="paragraph">
+<p>これでアプリケーションを実行する準備が整いました。トレーサーの設定に <code>application.properties</code> を使用している場合:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>または、JVM引数でOTLP gRPCエンドポイントを設定する場合:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev -Djvm.args="-Dquarkus.otel.exporter.otlp.traces.endpoint=http://localhost:4317"</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev -Djvm.args="-Dquarkus.otel.exporter.otlp.traces.endpoint=http://localhost:4317"</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev -Djvm.args="-Dquarkus.otel.exporter.otlp.traces.endpoint=http://localhost:4317"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>OpenTelemetry Collector、Jaegerシステム、アプリケーションが動作している状態で、提供されているエンドポイントにリクエストを出すことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ curl http://localhost:8080/hello
+hello</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>最初のリクエストが送信された時点で、ログにトレース情報が表示されるようになります:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">10:49:02 INFO  traceId=, parentId=, spanId=, sampled= [io.quarkus] (main) Installed features: [cdi, opentelemetry, resteasy-client, resteasy, smallrye-context-propagation, vertx]
+10:49:03 INFO  traceId=17ceb8429b9f25b0b879fa1503259456, parentId=3125c8bee75b7ad6, spanId=58ce77c86dd23457, sampled=true [or.ac.op.TracedResource] (executor-thread-1) hello
+10:49:03 INFO  traceId=ad23acd6d9a4ed3d1de07866a52fa2df, parentId=, spanId=df13f5b45cf4d1e2, sampled=true [or.ac.op.TracedResource] (executor-thread-0) hello</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>その後、 <a href="http://localhost:16686">Jaeger UI</a> にアクセスしてトレース情報を確認します。</p>
+</div>
+<div class="paragraph">
+<p><code>CTRL+C</code> を押すか、 <code>q</code> と入力して、アプリケーションを停止してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jdbc"><a class="anchor" href="#jdbc"></a>JDBC</h3>
+<div class="paragraph">
+<p><a href="https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/instrumentation/jdbc/library">JDBCインスツルメンテーション</a>は、アプリケーションによって実行される各JDBCクエリのためにスパンを追加します。これを有効にするには、次の依存関係をビルドファイルに追加します。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.opentelemetry.instrumentation&lt;/groupId&gt;
+    &lt;artifactId&gt;opentelemetry-jdbc&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.opentelemetry.instrumentation:opentelemetry-jdbc")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>専用のJDBCデータソースラッパーを使用するため、データソースのテレメトリーを有効にする必要があります:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># enable tracing
+quarkus.datasource.jdbc.telemetry=true
+
+# configure datasource
+quarkus.datasource.db-kind=postgresql
+quarkus.datasource.jdbc.url=jdbc:postgresql://localhost:5432/mydatabase</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="additional-configuration"><a class="anchor" href="#additional-configuration"></a>追加設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>一部のユースケースでは、OpenTelemetryのカスタム設定が必要になります。 これらのセクションでは、適切に構成するために必要なものについて概説します。</p>
+</div>
+<div class="sect2">
+<h3 id="id-generator"><a class="anchor" href="#id-generator"></a>IDジェネレーター</h3>
+<div class="paragraph">
+<p>OpenTelemetry エクステンションでは、トレースおよびスパンの識別子を作成する際に、デフォルトでランダムな <a href="https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk.md#id-generators">ID ジェネレーター</a>を使用します。</p>
+</div>
+<div class="paragraph">
+<p>ベンダー固有のプロトコルの中には、カスタム ID ジェネレーターを必要とするものがありますが、プロデューサーを作成することで、デフォルトの ID ジェネレーターを上書きすることができます。OpenTelemetryエクステンションは、 <code>IdGenerator</code> CDI Beanを検出し、トレーサープロデューサーを構成する際にそれを使用します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Singleton
+public class CustomConfiguration {
+
+    /** Creates a custom IdGenerator for OpenTelemetry */
+    @Produces
+    @Singleton
+    public IdGenerator idGenerator() {
+        return AwsXrayIdGenerator.getInstance();
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="propagators"><a class="anchor" href="#propagators"></a>プロパゲーター</h3>
+<div class="paragraph">
+<p>OpenTelemetry は、 <a href="https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/context/api-propagators.md">プロパゲーター</a> を介して分野横断的な関心事を伝播し、状態を保存するための基になる"コンテキスト"を共有します 分散トランザクションの存続期間全体にわたってデータにアクセスします。</p>
+</div>
+<div class="paragraph">
+<p>デフォルトでは、OpenTelemetryエクステンションは、 <a href="https://www.w3.org/TR/trace-context/">W3C Trace Context</a>と <a href="https://www.w3.org/TR/baggage/">W3C Baggage</a>プロパゲータを有効にしていますが、 <a href="#configuration-reference">設定リファレンス</a>で説明されている <code>propagators</code> 設定を設定することで、サポートされているOpenTelemetryプロパゲータのいずれかを選択することができます。</p>
+</div>
+<div class="sect3">
+<h4 id="additional-propagators"><a class="anchor" href="#additional-propagators"></a>追加プロパゲーター</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><code>b3</code>, <code>b3multi</code>, <code>jaeger</code>, <code>ottrace</code> のプロパゲータは、プロジェクトに <a href="https://github.com/open-telemetry/opentelemetry-java/tree/main/extensions/trace-propagators">trace-propagators</a>エクステンションを依存関係として追加する必要があります。</p>
+</li>
+</ul>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.opentelemetry&lt;/groupId&gt;
+    &lt;artifactId&gt;opentelemetry-extension-trace-propagators&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.opentelemetry:opentelemetry-extension-trace-propagators")</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>xray</code> プロパゲーターは、お客様のプロジェクトに <a href="https://github.com/open-telemetry/opentelemetry-java-contrib/tree/main/aws-xray-propagator">aws</a> エクステンションを依存関係として追加することを必要とします。</p>
+</li>
+</ul>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.opentelemetry.contrib&lt;/groupId&gt;
+    &lt;artifactId&gt;opentelemetry-aws-xray-propagator&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.opentelemetry.contrib:opentelemetry-aws-xray-propagator")</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="customise-propagator"><a class="anchor" href="#customise-propagator"></a>Customise Propagator</h4>
+<div class="paragraph">
+<p>To customise the propagation header you can implement the <code>TextMapPropagatorCustomizer</code> interface. This can be used, as an example, to restrict propagation of OpenTelemetry trace headers and prevent potentially sensitive data to be sent to third party systems.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">/**
+ * /**
+ * Meant to be implemented by a CDI bean that provides arbitrary customization for the TextMapPropagator
+ * that are to be registered with OpenTelemetry
+ */
+public interface TextMapPropagatorCustomizer {
+
+    TextMapPropagator customize(Context context);
+
+    interface Context {
+        TextMapPropagator propagator();
+
+        ConfigProperties otelConfigProperties();
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="resource"><a class="anchor" href="#resource"></a>リソース</h3>
+<div class="paragraph">
+<p>See the main <a href="opentelemetry#resource">OpenTelemetry Guide resources</a> section.</p>
+</div>
+<div class="sect3">
+<h4 id="end-user-attributes"><a class="anchor" href="#end-user-attributes"></a>End User attributes</h4>
+<div class="paragraph">
+<p>When enabled, Quarkus adds OpenTelemetry End User attributes as Span attributes.
+Before you enable this feature, verify that Quarkus Security extension is present and configured.
+More information about the Quarkus Security can be found in the <a href="security-overview">Quarkus Security overview</a>.</p>
+</div>
+<div class="paragraph">
+<p>The attributes are only added when authentication has already happened on a best-efforts basis.
+Whether the End User attributes are added as Span attributes depends on authentication and authorization configuration of your Quarkus application.
+If you create custom Spans prior to the authentication, Quarkus cannot add the End User attributes to them.
+Quarkus is only able to add the attributes to the Span that is current after the authentication has been finished.
+Another important consideration regarding custom Spans is active CDI request context that is used to propagate Quarkus <code>SecurityIdentity</code>.
+In principle, Quarkus is able to add the End User attributes when the CDI request context has been activated for you before the custom Spans are created.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-application.properties hljs" data-lang="application.properties">quarkus.otel.traces.eusp.enabled=true <i class="conum" data-value="1"></i><b>(1)</b>
+quarkus.http.auth.proactive=true <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Enable the End User Attributes feature so that the <code>SecurityIdentity</code> principal and roles are added as Span attributes.
+The End User attributes are personally identifiable information, therefore make sure you want to export them before you enable this feature.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Optionally enable proactive authentication.
+The best possible results are achieved when proactive authentication is enabled because the authentication happens sooner.
+A good way to determine whether proactive authentication should be enabled in your Quarkus application is to read the Quarkus <a href="security-proactive-authentication">Proactive authentication</a> guide.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+This feature is not supported when a custom <a href="security-customization#jaxrs-security-context">Jakarta REST SecurityContexts</a> is used.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="sampler"><a class="anchor" href="#sampler"></a>サンプラー</h3>
+<div class="paragraph">
+<p>A <a href="https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk.md#sampling">sampler</a> decides whether a trace should be discarded or forwarded, effectively managing noise and reducing overhead by limiting the number of collected traces sent to the collector.</p>
+</div>
+<div class="paragraph">
+<p>Quarkus comes equipped with a <a href="https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk.md#built-in-samplers">built-in sampler</a>, and you also have the option to create your custom sampler.</p>
+</div>
+<div class="paragraph">
+<p>To use the built-in sampler, you can configure it by setting the desired sampler parameters as detailed in the <a href="#configuration-reference">OpenTelemetry 設定リファレンス</a>. As an example, you can configure the sampler to retain 50% of the traces:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-application.properties hljs" data-lang="application.properties"># build time property only:
+quarkus.otel.traces.sampler=traceidratio
+# Runtime property:
+quarkus.otel.traces.sampler.arg=0.5</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>An interesting use case for the sampler is to activate and deactivate tracing export at runtime, according to this example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-application.properties hljs" data-lang="application.properties"># build time property only:
+quarkus.otel.traces.sampler=traceidratio
+# On (default). All traces are exported:
+quarkus.otel.traces.sampler.arg=1.0
+# Off. No traces are exported:
+quarkus.otel.traces.sampler.arg=0.0</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>カスタムサンプラーを使用する必要がある場合、現在2種類の方法があります:</p>
+</div>
+<div class="sect3">
+<h4 id="sampler-cdi-producer"><a class="anchor" href="#sampler-cdi-producer"></a>サンプラー CDI プロデューサー</h4>
+<div class="paragraph">
+<p>You can create a sampler CDI producer. The Quarkus OpenTelemetry extension will detect the <code>Sampler</code> CDI bean and will use it when configuring the Tracer.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Singleton
+public class CustomConfiguration {
+
+    /** Creates a custom sampler for OpenTelemetry */
+    @Produces
+    @Singleton
+    public Sampler sampler() {
+        return JaegerRemoteSampler.builder()
+        .setServiceName("my-service")
+        .build();
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="otel-sampler-spi"><a class="anchor" href="#otel-sampler-spi"></a>OTelサンプラーSPI</h4>
+<div class="paragraph">
+<p>This will use the SPI hooks available with the OTel Autoconfiguration.
+You can create a simple Sampler class:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class CustomSPISampler implements Sampler {
+    @Override
+    public SamplingResult shouldSample(Context context,
+            String s,
+            String s1,
+            SpanKind spanKind,
+            Attributes attributes,
+            List&lt;LinkData&gt; list) {
+        // Do some sampling here
+        return Sampler.alwaysOn().shouldSample(context, s, s1, spanKind, attributes, list);
+    }
+
+    @Override
+    public String getDescription() {
+        return "custom-spi-sampler-description";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then a Sampler Provider:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class CustomSPISamplerProvider implements ConfigurableSamplerProvider {
+    @Override
+    public Sampler createSampler(ConfigProperties configProperties) {
+        return new CustomSPISampler();
+    }
+
+    @Override
+    public String getName() {
+        return "custom-spi-sampler";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Write the SPI loader text file at <code>resources/META-INF/services</code> with name <code>io.opentelemetry.sdk.autoconfigure.spi.traces.ConfigurableSamplerProvider</code> containing the full qualified name of the <code>CustomSPISamplerProvider</code> class.</p>
+</div>
+<div class="paragraph">
+<p>Then activate on the configuration:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.otel.traces.sampler=custom-spi-sampler</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see, CDI is much simpler to work with.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="additional-instrumentation"><a class="anchor" href="#additional-instrumentation"></a>追加の計器</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusエクステンションの中には、トレースが後続の実行に伝搬されることを保証するために追加のコードを必要とするものがあります。これらのセクションでは、プロセスの境界を越えてトレースを伝搬するために必要なことを説明します。</p>
+</div>
+<div class="paragraph">
+<p>このセクションで説明されている計器は、Quarkusでテストされており、標準モードとネイティブモードの両方で動作します。</p>
+</div>
+<div class="sect2">
+<h3 id="cdi"><a class="anchor" href="#cdi"></a>CDI</h3>
+<div class="paragraph">
+<p>Annotating a method in any CDI aware bean with the <code>io.opentelemetry.instrumentation.annotations.WithSpan</code>
+annotation will create a new Span and establish any required relationships with the current Trace context.</p>
+</div>
+<div class="paragraph">
+<p>Annotating a method in any CDI aware bean with the <code>io.opentelemetry.instrumentation.annotations.AddingSpanAttributes</code> will not create a new span but will add annotated method parameters to attributes in the current span.</p>
+</div>
+<div class="paragraph">
+<p>If a method is annotated by mistake with <code>@AddingSpanAttributes</code> and <code>@WithSpan</code> annotations, the <code>@WithSpan</code> annotation will take precedence.</p>
+</div>
+<div class="paragraph">
+<p>Method parameters can be annotated with the <code>io.opentelemetry.instrumentation.annotations.SpanAttribute</code> annotation to
+indicate which method parameters should be part of the span. The parameter name can be customized as well.</p>
+</div>
+<div class="paragraph">
+<p>例:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+class SpanBean {
+    @WithSpan
+    void span() {
+
+    }
+
+    @WithSpan("name")
+    void spanName() {
+
+    }
+
+    @WithSpan(kind = SERVER)
+    void spanKind() {
+
+    }
+
+    @WithSpan
+    void spanArgs(@SpanAttribute(value = "arg") String arg) {
+
+    }
+
+    @AddingSpanAttributes
+    void addArgumentToExistingSpan(@SpanAttribute(value = "arg") String arg) {
+
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="available-opentelemetry-cdi-injections"><a class="anchor" href="#available-opentelemetry-cdi-injections"></a>使用可能なOpenTelemetry CDI依存関係注入</h3>
+<div class="paragraph">
+<p>MicroProfile Telemetry Tracingの仕様に基づき、Quarkusは以下のクラスのCDI依存関係注入をサポートしています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>io.opentelemetry.api.OpenTelemetry</code></p>
+</li>
+<li>
+<p><code>io.opentelemetry.api.trace.Tracer</code></p>
+</li>
+<li>
+<p><code>io.opentelemetry.api.trace.Span</code></p>
+</li>
+<li>
+<p><code>io.opentelemetry.api.baggage.Baggage</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>これらのクラスは、CDIが有効なBeanに注入することができます。例えば、 <code>Tracer</code> は、カスタムスパンを開始するために特に有用です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject
+Tracer tracer;
+
+...
+
+public void tracedWork() {
+    Span span = tracer.spanBuilder("My custom span")
+        .setAttribute("attr", "attr.value")
+        .setParent(Context.current().with(Span.current()))
+        .setSpanKind(SpanKind.INTERNAL)
+        .startSpan();
+
+    // traced work
+
+    span.end();
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="quarkus-messaging-kafka"><a class="anchor" href="#quarkus-messaging-kafka"></a>Quarkus Messaging - Kafka</h3>
+<div class="paragraph">
+<p>When using the Quarkus Messaging extension for Kafka,
+we are able to propagate the span into the Kafka Record with:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">TracingMetadata tm = TracingMetadata.withPrevious(Context.current());
+Message out = Message.of(...).withMetadata(tm);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上記は、生成されている <code>Message</code> に追加できる <code>TracingMetadata</code> オブジェクトを作成し、OpenTelemetry <code>Context</code> を取得して、伝播のために現在のスパンを抽出しています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="quarkus-security-events"><a class="anchor" href="#quarkus-security-events"></a>Quarkus Security Events</h3>
+<div class="paragraph">
+<p>Quarkus supports exporting of the <a href="security-customization#observe-security-events">Security events</a> as OpenTelemetry Span events.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-application.properties hljs" data-lang="application.properties">quarkus.otel.security-events.enabled=true <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Export Quarkus Security events as OpenTelemetry Span events.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="exporters"><a class="anchor" href="#exporters"></a>エクスポーター</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>See the main <a href="opentelemetry#exporters">OpenTelemetry Guide exporters</a> section.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="quarkus-extensions-using-opentelemetry"><a class="anchor" href="#quarkus-extensions-using-opentelemetry"></a>Quarkus core extensions instrumented with OpenTelemetry tracing</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://quarkus.io/extensions/io.quarkus/quarkus-agroal"><code>quarkus-agroal</code></a></p>
+</li>
+<li>
+<p><a href="https://quarkus.io/guides/grpc-getting-started"><code>quarkus-grpc</code></a></p>
+</li>
+<li>
+<p><a href="https://quarkus.io/guides/redis"><code>quarkus-redis-client</code></a></p>
+</li>
+<li>
+<p><a href="https://quarkus.io/extensions/io.quarkus/quarkus-rest-client-jaxrs"><code>quarkus-rest-client-jaxrs</code></a></p>
+</li>
+<li>
+<p><a href="https://quarkus.io/guides/rest"><code>quarkus-rest</code></a></p>
+</li>
+<li>
+<p><a href="https://quarkus.io/guides/resteasy"><code>quarkus-resteasy-jackson</code></a></p>
+</li>
+<li>
+<p><a href="https://quarkus.io/guides/resteasy-client"><code>quarkus-resteasy-client</code></a></p>
+</li>
+<li>
+<p><a href="https://quarkus.io/guides/scheduler"><code>quarkus-scheduler</code></a></p>
+</li>
+<li>
+<p><a href="https://quarkus.io/guides/smallrye-graphql"><code>quarkus-smallrye-graphql</code></a></p>
+</li>
+<li>
+<p><a href="https://quarkus.io/extensions/io.quarkus/quarkus-mongodb-client"><code>quarkus-mongodb-client</code></a></p>
+</li>
+<li>
+<p><a href="https://quarkus.io/extensions/io.quarkus/quarkus-messaging"><code>quarkus-messaging</code></a></p>
+<div class="ulist">
+<ul>
+<li>
+<p>AMQP 1.0</p>
+</li>
+<li>
+<p>RabbitMQ</p>
+</li>
+<li>
+<p>Kafka</p>
+</li>
+<li>
+<p>Pulsar</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><a href="https://quarkus.io/guides/vertx"><code>quarkus-vertx</code></a> (http リクエスト)</p>
+</li>
+<li>
+<p><a href="websockets-next-reference"><code>websockets-next</code></a></p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="disable-parts-of-the-automatic-tracing"><a class="anchor" href="#disable-parts-of-the-automatic-tracing"></a>Disable parts of the automatic tracing</h3>
+<div class="paragraph">
+<p>Automatic tracing instrumentation parts can be disabled by setting <code>quarkus.otel.instrument.*</code> properties to <code>false</code>.</p>
+</div>
+<div class="paragraph">
+<p>例:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.otel.instrument.grpc=false
+quarkus.otel.instrument.messaging=false
+quarkus.otel.instrument.resteasy-client=false
+quarkus.otel.instrument.rest=false
+quarkus.otel.instrument.resteasy=false</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="disabling-traces-for-app-endpoints"><a class="anchor" href="#disabling-traces-for-app-endpoints"></a>Disabling Specific Traces for Application Endpoints</h3>
+<div class="paragraph">
+<p>You can use the <code>quarkus.otel.traces.suppress-application-uris</code> property to exclude specific endpoints from being traced.</p>
+</div>
+<div class="sect3">
+<h4 id="example-configuration"><a class="anchor" href="#example-configuration"></a>設定例</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># application.properties
+quarkus.otel.traces.suppress-application-uris=trace,ping,people*</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This configuration will:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Disable tracing for the <code>/trace</code> URI.</p>
+</li>
+<li>
+<p>Disable tracing for the <code>/ping</code> URI.</p>
+</li>
+<li>
+<p>Disable tracing for the <code>/people</code> URI and all subpaths, such as <code>/people/1</code> and <code>/people/1/cars</code>.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you are using <code>quarkus.http.root-path</code>, ensure you include the root path in the configuration.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration-reference"><a class="anchor" href="#configuration-reference"></a>OpenTelemetry 設定リファレンス</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>See the main <a href="opentelemetry#configuration-reference">OpenTelemetry Guide configuration</a> reference.</p>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#architecture">アーキテクチャ</a></li>
+<li><a href="#solution">ソリューション</a></li>
+<li><a href="#creating-the-maven-project">Mavenプロジェクトの作成</a>
+<ul class="sectlevel2">
+<li><a href="#examine-the-jakarta-rest-resource">Jakarta REST リソースの調査</a></li>
+<li><a href="#create-the-configuration">コンフィグレーションの作成</a></li>
+</ul>
+</li>
+<li><a href="#run-the-application">アプリケーションの実行</a>
+<ul class="sectlevel2">
+<li><a href="#grafana-otel-lgtm-option">Grafana OTel LGTM option</a></li>
+<li><a href="#jaeger-to-see-traces-option">Jaeger to see traces option</a></li>
+<li><a href="#start-the-application">Start the application</a></li>
+<li><a href="#jdbc">JDBC</a></li>
+</ul>
+</li>
+<li><a href="#additional-configuration">追加設定</a>
+<ul class="sectlevel2">
+<li><a href="#id-generator">IDジェネレーター</a></li>
+<li><a href="#propagators">プロパゲーター</a></li>
+<li><a href="#resource">リソース</a></li>
+<li><a href="#sampler">サンプラー</a></li>
+</ul>
+</li>
+<li><a href="#additional-instrumentation">追加の計器</a>
+<ul class="sectlevel2">
+<li><a href="#cdi">CDI</a></li>
+<li><a href="#available-opentelemetry-cdi-injections">使用可能なOpenTelemetry CDI依存関係注入</a></li>
+<li><a href="#quarkus-messaging-kafka">Quarkus Messaging - Kafka</a></li>
+<li><a href="#quarkus-security-events">Quarkus Security Events</a></li>
+</ul>
+</li>
+<li><a href="#exporters">エクスポーター</a></li>
+<li><a href="#quarkus-extensions-using-opentelemetry">Quarkus core extensions instrumented with OpenTelemetry tracing</a>
+<ul class="sectlevel2">
+<li><a href="#disable-parts-of-the-automatic-tracing">Disable parts of the automatic tracing</a></li>
+<li><a href="#disabling-traces-for-app-endpoints">Disabling Specific Traces for Application Endpoints</a></li>
+</ul>
+</li>
+<li><a href="#configuration-reference">OpenTelemetry 設定リファレンス</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same extensions</h3>
+      <ul class="related-content">
+      
+        
+        <li class="tutorial"><a href="/version/main/guides/telemetry-opentracing-to-otel-tutorial">OpenTracingからOpenTelemetry tracingへの移行</a></li>
+      
+        
+        <li class="reference"><a href="/version/main/guides/opentelemetry">Using OpenTelemetry</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/opentelemetry-logging">Using OpenTelemetry Logging</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/opentelemetry-metrics">Using OpenTelemetry Metrics</a></li>
+      </ul>
+    </div>
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="tutorial"><a href="/version/main/guides/telemetry-opentracing-to-otel-tutorial">OpenTracingからOpenTelemetry tracingへの移行</a></li>
+      
+        
+        <li class="reference"><a href="/version/main/guides/opentelemetry">Using OpenTelemetry</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/opentelemetry-logging">Using OpenTelemetry Logging</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/opentelemetry-metrics">Using OpenTelemetry Metrics</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/centralized-log-management">ログの一元管理（Graylog、Logstash、Fluentd）</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/main/guides/telemetry-micrometer-tutorial">マイクロメータを用いたメトリクスの収集</a></li>
+      
+        
+        <li class="reference"><a href="/version/main/guides/logging">ロギング設定</a></li>
+      
+        
+        <li class="reference"><a href="/version/main/guides/management-interface-reference">マネジメントインターフェースリファレンス</a></li>
+      
+        
+        <li class="reference"><a href="/version/main/guides/telemetry-micrometer">Micrometerメトリクス</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/observability-devservices">Observability Dev Services</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/smallrye-health">SmallRye Health</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/smallrye-metrics">SmallRye Metrics</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/jfr">Using Java Flight Recorder</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

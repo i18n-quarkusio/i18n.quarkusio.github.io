@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>ベーシック認証によるQuarkusアプリケーションの保護 - 2.16 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/2.16/guides/security-basic-authentication-tutorial" />
+  <meta property="og:title" content="ベーシック認証によるQuarkusアプリケーションの保護 - 2.16" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/security-basic-authentication-tutorial">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/2.16/guides/security-basic-authentication-tutorial">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/2.16/guides/security-basic-authentication-tutorial" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/2.16/guides/security-basic-authentication-tutorial">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/2.16/guides/security-basic-authentication-tutorial">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/2.16/guides/security-basic-authentication-tutorial">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/2.16/guides/security-basic-authentication-tutorial">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/2.16/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" selected>2.16</option>
+        
+        
+        
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">ベーシック認証によるQuarkusアプリケーションの保護 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Secure your Quarkus application endpoints by combining <a href="security-built-in-authentication-support-concept#basic-auth">Quarkus built-in basic HTTP authentication</a> with the JPA identity provider to enable role-based access control (RBAC).
+The JPA <code>IdentityProvider</code> creates a <code>SecurityIdentity</code> instance, which is used during user authentication to verify and authorize access requests making your Quarkus application secure.</p>
+</div>
+<div class="paragraph">
+<p>このチュートリアルでは、Quarkusでより高度なセキュリティメカニズムを実装するための準備、たとえば、OpenID Connect（OIDC）認証メカニズムの使用方法について説明します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>約15分</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 11+ がインストールされ、 <code>JAVA_HOME</code>  が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.8.6</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルをビルドしたい場合、MandrelまたはGraalVM（あるいはネイティブなコンテナビルドを使用する場合はDocker）をインストールし、 <a href="building-native-image.html#configuring-graalvm">適切に設定</a>していること</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-build"><a class="anchor" href="#what-you-will-build"></a>何を構築するか</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このチュートリアルでは、以下のエンドポイントを提供するアプリケーションを構築する方法を説明します:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">エンドポイント</th>
+<th class="tableblock halign-left valign-top">説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/public</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/public</code> エンドポイントには匿名でアクセスすることができます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/admin</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/admin</code> のエンドポイントは RBAC で保護されており、 <code>admin</code> のロールを付与されたユーザーのみがアクセスすることができます。
+このエンドポイントでは、アクセス制約を宣言的に課すために <code>@RolesAllowed</code> アノテーションが使用されています。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/users/me</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/api/users/me</code> のエンドポイントは RBAC で保護されており、 <code>user</code> のロールを付与されたユーザーのみがアクセスすることができます。ユーザーに関する詳細情報を含む JSON ドキュメントがレスポンスとして返されます。</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>コードを確かめるだけなら、次のいずれかの方法で、完成例まで早送りすることができます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/quarkusio/quarkus-quickstarts/archive/2.16.zip">アーカイブ</a>をダウンロードする。</p>
+</li>
+<li>
+<p>Gitリポジトリをクローンする: <code>git clone <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>ソリューションは <code>security-jpa-quickstart</code> <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/2.16/security-jpa-quickstart">ディレクトリー</a> にあります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-a-maven-project"><a class="anchor" href="#create-a-maven-project"></a>1. Maven プロジェクトの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus セキュリティでセキュリティソースを JPA エンティティにマッピングするには、このチュートリアルで使用する Maven プロジェクト に <code>security-jpa</code> エクステンションが含まれていることを確認します。 <code>security-jpa</code> エクステンションを持つ新しい Maven プロジェクトを作成するか、既存の Maven プロジェクト にエクステンションを追加します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>まず、新しいプロジェクトが必要です。以下のコマンドで新規プロジェクトを作成します:</p>
+</li>
+</ul>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:security-jpa-quickstart \
+    --stream=2.16 \
+    --extension='security-jpa,jdbc-postgresql,resteasy-reactive,hibernate-orm-panache' \
+    --no-code
+cd security-jpa-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p><em>Quarkus CLIのインストール方法や使用方法については、 <a href="cli-tooling">Quarkus CLIガイド</a> を参照してください。</em></p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:2.16.12.Final:create \
+    -DplatformVersion=2.16 \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=security-jpa-quickstart \
+    -Dextensions='security-jpa,jdbc-postgresql,resteasy-reactive,hibernate-orm-panache' \
+    -DnoCode
+cd security-jpa-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>ユーザー ID の保存には <a href="hibernate-orm-panache">Hibernate ORM with Panache</a> が使用されていますが、<a href="hibernate-orm">Hibernate ORM</a> を使用することも可能です。また、お好みのデータベースコネクタライブラリを追加する必要があります。 このチュートリアルの例では、ID ストアに PostgreSQL データベースを使用しています。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>既存の Maven プロジェクトに <code>security-jpa</code> エクステンションを追加するには、プロジェクトのベースディレクトリで次のコマンドを実行します:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus extension add 'security-jpa'</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:add-extension -Dextensions='security-jpa'</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew addExtension --extensions='security-jpa'</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="verification"><a class="anchor" href="#verification"></a>1.1. 検証</h3>
+<div class="paragraph">
+<p>どちらかのコマンドを実行すると、ビルドファイルに以下のようなXMLが追加されます。:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-security-jpa&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-security-jpa")</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="write-the-application"><a class="anchor" href="#write-the-application"></a>2. アプリケーションの記述</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>まず、すべてのユーザーがアプリケーションにアクセスできるように、 <code>/api/public</code> エンドポイントを実装しましょう。 次のコードスニペットのように、通常のJAX-RSリソースをJavaソースコードに追加してください:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.jpa;
+
+import javax.annotation.security.PermitAll;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+@Path("/api/public")
+public class PublicResource {
+
+    @GET
+    @PermitAll
+    @Produces(MediaType.TEXT_PLAIN)
+    public String publicResource() {
+        return "public";
+   }
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p><code>api/admin</code> エンドポイントのソースコードも同様ですが、代わりに <code>@RolesAllowed</code> アノテーションを使用して、 <code>admin</code> ロールを与えられたユーザのみがエンドポイントにアクセスできることを確認します。 JAX-RS リソースを追加して、以下の <code>@RolesAllowed</code> アノテーションを付けます:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.jpa;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+@Path("/api/admin")
+public class AdminResource {
+
+    @GET
+    @RolesAllowed("admin")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String adminResource() {
+         return "admin";
+    }
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>最後に、 <code>/api/users/me</code> エンドポイントを考えてみましょう。下のソースコードを見ればわかるように、 <code>user</code> の役割を持つユーザのみを信頼しています。現在認証されている <code>Principal</code> へのアクセスを得るために <code>SecurityContext</code> を使用しており、ユーザーの名前を返します。この情報はデータベースから読み込まれます。</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.jpa;
+
+import javax.annotation.security.RolesAllowed;
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.SecurityContext;
+
+@Path("/api/users")
+public class UserResource {
+
+    @GET
+    @RolesAllowed("user")
+    @Path("/me")
+    public String me(@Context SecurityContext securityContext) {
+        return securityContext.getUserPrincipal().getName();
+    }
+}</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="define-the-user-entity"><a class="anchor" href="#define-the-user-entity"></a>2.1. ユーザーエンティティーの定義</h3>
+<div class="paragraph">
+<p>次のコードで説明するように、<code>user</code> エンティティにアノテーションを追加することで、セキュリティ情報をどのようにモデルに格納したいかを記述することができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.jpa;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.elytron.security.common.BcryptUtil;
+import io.quarkus.security.jpa.Password;
+import io.quarkus.security.jpa.Roles;
+import io.quarkus.security.jpa.UserDefinition;
+import io.quarkus.security.jpa.Username;
+
+@Entity
+@Table(name = "test_user")
+@UserDefinition <i class="conum" data-value="1"></i><b>(1)</b>
+public class User extends PanacheEntity {
+    @Username <i class="conum" data-value="2"></i><b>(2)</b>
+    public String username;
+    @Password <i class="conum" data-value="3"></i><b>(3)</b>
+    public String password;
+    @Roles <i class="conum" data-value="4"></i><b>(4)</b>
+    public String role;
+
+    /**
+     * Adds a new user to the database
+     * @param username the username
+     * @param password the unencrypted password (it will be encrypted with bcrypt)
+     * @param role the comma-separated roles
+     */
+    public static void add(String username, String password, String role) { <i class="conum" data-value="5"></i><b>(5)</b>
+        User user = new User();
+        user.username = username;
+        user.password = BcryptUtil.bcryptHash(password);
+        user.role = role;
+        user.persist();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>security-jpa</code> エクステンションは、 <code>@UserDefinition</code> でアノテーションされた単一のエンティティーがある場合にのみ初期化されます。</p>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>アノテーション <code>@UserDefinition</code> は単一のエンティティに存在する必要があり、通常の Hibernate ORM エンティティまたは Panache 付き Hibernate ORM エンティティのいずれかにすることができます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>ユーザー名に使用されるフィールドを示します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>パスワードに使用するフィールドを示します。デフォルトではbcryptハッシュ化されたパスワードを使用しますが、プレーンテキストまたはカスタムパスワード用に設定することも可能です。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>ここでは対象のプリンシパル表現属性に追加されたロールのコンマ区切りリストを示します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>この方法では、パスワードを適切なbcryptハッシュでハッシュしながらユーザーを追加することができます。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configure-the-application"><a class="anchor" href="#configure-the-application"></a>2.2. アプリケーションの設定</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Enable <a href="security-built-in-authentication-support-concept#basic-auth">Quarkus built-in basic HTTP authentication</a> by setting the <code>quarkus.http.auth.basic</code> property to <code>true</code>:</p>
+<div class="paragraph">
+<p><code>quarkus.http.auth.basic=true</code></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>When secure access is required and no other authentication mechanisms are enabled, <a href="security-built-in-authentication-support-concept#basic-auth">Quarkus built-in basic HTTP authentication</a> is the fallback authentication mechanism.
+Therefore, in this tutorial, you do not need to set the property <code>quarkus.http.auth.basic=true</code>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>少なくとも1つのデータソースを設定し、 <code>security-jpa</code> エクステンションがデータベースにアクセスできるようにします。</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.auth.basic=true
+
+quarkus.datasource.db-kind=postgresql
+quarkus.datasource.username=quarkus
+quarkus.datasource.password=quarkus
+quarkus.datasource.jdbc.url=jdbc:postgresql:security_jpa
+
+quarkus.hibernate-orm.database.generation=drop-and-create</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>データベースをユーザーとロールで初期化するには、次のコードで説明するように <code>Startup</code> クラスを実装します:</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>このチュートリアルでは、PostgreSQL データベースを ID ストアに使用します。Hibernate ORM は起動時にデータベーススキーマを自動的に作成します (運用時にはこれを変更します)。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.jpa;
+
+import javax.enterprise.event.Observes;
+import javax.inject.Singleton;
+import javax.transaction.Transactional;
+
+import io.quarkus.runtime.StartupEvent;
+
+
+@Singleton
+public class Startup {
+    @Transactional
+    public void loadUsers(@Observes StartupEvent evt) {
+        // reset and load all test users
+        User.deleteAll();
+        User.add("admin", "admin", "admin");
+        User.add("user", "user", "user");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これでアプリケーションは保護され、ユーザーIDは指定されたデータベースから提供されるようになりました。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>本番環境では、プレーンテキストのパスワードは保存しないでください。 そのため、 <code>security-jpa</code> はデフォルトで bcrypt でハッシュ化したパスワードを使用します。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="test-your-application"><a class="anchor" href="#test-your-application"></a>3. アプリケーションのテスト</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="use-dev-services-for-postgresql-to-test-your-application"><a class="anchor" href="#use-dev-services-for-postgresql-to-test-your-application"></a>3.1. Dev Services for PostgreSQLを使用してアプリケーションをテストする</h3>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>アプリケーションを実稼働モードで動作させる前に、統合テストを追加してみましょう。</p>
+</div>
+<div class="paragraph">
+<p>JVMとネイティブモードでのアプリケーションの統合テストには、 <a href="https://quarkus.io/guides/dev-services#databases">Dev Services for PostgreSQL</a> を使用します。</p>
+</div>
+<div class="paragraph">
+<p>以下のプロパティ構成は、PostgreSQLのテストを本番環境( <code>prod</code> )モードのみで実行できるようにする方法を示しています。このシナリオでは、 <code>Dev Services for PostgreSQL</code> が <code>PostgreSQL</code> テストコンテナを起動し、構成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">%prod.quarkus.datasource.db-kind=postgresql
+%prod.quarkus.datasource.username=quarkus
+%prod.quarkus.datasource.password=quarkus
+%prod.quarkus.datasource.jdbc.url=jdbc:postgresql:elytron_security_jpa
+
+quarkus.hibernate-orm.database.generation=drop-and-create</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>プロファイルの接頭辞に <code>%prod.</code> を付けると、データソースのプロパティは <code>Dev Services for PostgreSQL</code> からは見えなくなり、本番モードで動作するアプリケーションからのみ表示されるようになります。</p>
+</div>
+<div class="paragraph">
+<p>統合テストを書くには、次のコードサンプルを使用します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.elytron.security.jpa;
+
+import static io.restassured.RestAssured.get;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.core.Is.is;
+
+import org.apache.http.HttpStatus;
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.test.junit.QuarkusTest;
+
+@QuarkusTest
+public class JpaSecurityRealmTest {
+
+    @Test
+    void shouldAccessPublicWhenAnonymous() {
+        get("/api/public")
+                .then()
+                .statusCode(HttpStatus.SC_OK);
+
+    }
+
+    @Test
+    void shouldNotAccessAdminWhenAnonymous() {
+        get("/api/admin")
+                .then()
+                .statusCode(HttpStatus.SC_UNAUTHORIZED);
+
+    }
+
+    @Test
+    void shouldAccessAdminWhenAdminAuthenticated() {
+        given()
+                .auth().preemptive().basic("admin", "admin")
+                .when()
+                .get("/api/admin")
+                .then()
+                .statusCode(HttpStatus.SC_OK);
+
+    }
+
+    @Test
+    void shouldNotAccessUserWhenAdminAuthenticated() {
+        given()
+                .auth().preemptive().basic("admin", "admin")
+                .when()
+                .get("/api/users/me")
+                .then()
+                .statusCode(HttpStatus.SC_FORBIDDEN);
+    }
+
+    @Test
+    void shouldAccessUserAndGetIdentityWhenUserAuthenticated() {
+        given()
+                .auth().preemptive().basic("user", "user")
+                .when()
+                .get("/api/users/me")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .body(is("user"));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このコードサンプルからわかるように、テストコードからテストコンテナーを起動する必要はありません。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>アプリケーションを開発モードで起動すると、 <code>Dev Services for PostgreSQL</code> が <code>PostgreSQL</code> <code>devmode</code> コンテナを起動し、アプリケーションの開発を開始することができるようになります。 アプリケーションの開発中に、<a href="continuous-testing">継続的テスト</a> の機能を使って、テストを一つずつ追加して実行することも可能です。 <code>Dev Services for PostgreSQL</code> は、 <code>devmode</code> コンテナと衝突しない独立した <code>PostgreSQL</code> テストコンテナを提供することで、開発中のテストをサポートします。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="use-curl-or-a-browser-to-test-your-application"><a class="anchor" href="#use-curl-or-a-browser-to-test-your-application"></a>3.2. <code>curl</code> またはブラウザを使用して、アプリケーションをテストします</h3>
+<div class="paragraph">
+<p>下記の例のように、PostgreSQL サーバーを起動します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker run --rm=true --name security-getting-started -e POSTGRES_USER=quarkus \
+           -e POSTGRES_PASSWORD=quarkus -e POSTGRES_DB=elytron_security_jpa \
+           -p 5432:5432 postgres:14.1</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="compile-and-run-the-application"><a class="anchor" href="#compile-and-run-the-application"></a>3.3. アプリケーションのコンパイルと実行</h3>
+<div class="paragraph">
+<p>次のいずれかの方法で、Quarkusアプリケーションをコンパイルして実行します:</p>
+</div>
+<div class="sect3">
+<h4 id="jvm-mode"><a class="anchor" href="#jvm-mode"></a>3.3.1. JVM モード</h4>
+<div class="paragraph">
+<p>アプリケーションをコンパイルします:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>アプリケーションの実行:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">java -jar target/quarkus-app/quarkus-run.jar</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="native-mode"><a class="anchor" href="#native-mode"></a>3.3.2. ネイティブモード</h4>
+<div class="paragraph">
+<p>アプリケーションをコンパイルします:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build --native</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install -Dnative</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build -Dquarkus.package.type=native</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>アプリケーションの実行:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./target/security-jpa-quickstart-runner</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="access-and-test-the-application-security"><a class="anchor" href="#access-and-test-the-application-security"></a>3.4. アプリケーションのセキュリティへのアクセスおよびテスト</h3>
+<div class="paragraph">
+<p>アプリケーションの実行中は、以下の <code>curl</code> コマンドのいずれかを使用して、アプリケーションにアクセスできます。また、ブラウザを使用して同じエンドポイントURLにアクセスすることもできます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>保護されたリソースを匿名で攻撃してみましょう:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ curl -i -X GET http://localhost:8080/api/public
+HTTP/1.1 200 OK
+Content-Length: 6
+Content-Type: text/plain;charset=UTF-8
+
+public%</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>保護されたリソースを匿名で攻撃してみましょう:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ curl -i -X GET http://localhost:8080/api/admin
+HTTP/1.1 401 Unauthorized
+Content-Length: 14
+Content-Type: text/html;charset=UTF-8
+WWW-Authenticate: Basic
+
+Not authorized%</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>ブラウザーを使って保護されたリソースに匿名で接続すると、認証情報を入力するよう促すBasic認証フォームが表示されます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>認証されたユーザーとして保護されたエンドポイントに接続します:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ curl -i -X GET -u admin:admin http://localhost:8080/api/admin
+HTTP/1.1 200 OK
+Content-Length: 5
+Content-Type: text/plain;charset=UTF-8
+
+admin%</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="results"><a class="anchor" href="#results"></a>3.5. 結果</h3>
+<div class="paragraph">
+<p>許可されたユーザーの資格情報、例えば <code>admin:admin</code> を提供すると、JPA セキュリティエクステンションはそのユーザーのロールを認証してロードします。 <code>admin</code> ユーザーは保護されたリソースへのアクセスを許可されます。</p>
+</div>
+<div class="paragraph">
+<p>リソースが <code>@RolesAllowed("user")</code> で保護されている場合、次のシェルの例で説明するように、ユーザー <code>admin</code> は "user" ロールに割り当てられていないため、リソースへのアクセスは許可されません:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ curl -i -X GET -u admin:admin http://localhost:8080/api/users/me
+HTTP/1.1 403 Forbidden
+Content-Length: 34
+Content-Type: text/html;charset=UTF-8
+
+Forbidden%</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>最後に、ユーザ名 <code>user</code> が認証され、セキュリティコンテキストには、例えばユーザ名などの主要な詳細が含まれます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ curl -i -X GET -u user:user http://localhost:8080/api/users/me
+HTTP/1.1 200 OK
+Content-Length: 4
+Content-Type: text/plain;charset=UTF-8
+
+user%</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="quarkus-security-jpa-information"><a class="anchor" href="#quarkus-security-jpa-information"></a>Quarkus Security JPA 情報</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>セキュリティクイックスタートプロジェクトの実行とテストに成功したので、Quarkus SecurityとJPA IDストアのセキュリティ機能を理解していくための準備ができました。</p>
+</div>
+<div class="sect2">
+<h3 id="supported-model-types"><a class="anchor" href="#supported-model-types"></a>サポートされているモデルの種類</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>@UserDefinition</code> クラスは JPA エンティティーである必要があります(Panache を使用しているかどうかは問いません)。</p>
+</li>
+<li>
+<p><code>@Username</code> と <code>@Password</code> フィールドの型は <code>String</code> でなければなりません。</p>
+</li>
+<li>
+<p><code>@Roles</code> フィールドは <code>String</code> か <code>Collection&lt;String&gt;</code> のいずれかのタイプであるか、または <code>Collection&lt;X&gt;</code> である必要があります。 <code>X</code> はエンティティークラスで、 <code>@RolesValue</code> アノテーションが付与された <code>String</code> フィールドが 1 つあります。</p>
+</li>
+<li>
+<p>各 <code>String</code> role 要素の型は、カンマで区切られたロールのリストとして解析されます。</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="storing-roles-in-another-entity"><a class="anchor" href="#storing-roles-in-another-entity"></a>別のエンティティーにロールを格納する</h3>
+<div class="paragraph">
+<p>次のサンプルを使用して、別のエンティティ内にロールを格納します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@UserDefinition
+@Table(name = "test_user")
+@Entity
+public class User extends PanacheEntity {
+    @Username
+    public String name;
+
+    @Password
+    public String pass;
+
+    @ManyToMany
+    @Roles
+    public List&lt;Role&gt; roles = new ArrayList&lt;&gt;();
+}
+
+@Entity
+public class Role extends PanacheEntity {
+
+    @ManyToMany(mappedBy = "roles")
+    public List&lt;ExternalRolesUserEntity&gt; users;
+
+    @RolesValue
+    public String role;
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="password-storage-and-hashing"><a class="anchor" href="#password-storage-and-hashing"></a>パスワードの保存とハッシュ化</h3>
+<div class="paragraph">
+<p>デフォルトでは、<a href="https://en.wikipedia.org/wiki/Crypt_&#169;">Modular Crypt Format</a> (MCF) のもと、<a href="https://en.wikipedia.org/wiki/Bcrypt">bcrypt</a> を用いてパスワードの保存とハッシュ化が行われます。</p>
+</div>
+<div class="paragraph">
+<p>このようなハッシュ化されたパスワードを作成する必要がある場合は、便利な <code>String BcryptUtil.bcryptHash(String password)</code> 関数を用意しています。デフォルトでは、ランダムなソルトを作成して 10 回の繰り返しでハッシュ化します (繰り返しとソルトを指定することもできます)。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+MCFを使う場合、ハッシュアルゴリズム、反復回数、ソルトはすべてハッシュ値に格納されるため、専用のカラムは必要ありません。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>また、例えば <code>@Password(value = PasswordType.CUSTOM, provider = CustomPasswordProvider.class)</code> といった形で別のハッシュアルゴリズムを使ってパスワードを保存することもできます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@UserDefinition
+@Table(name = "test_user")
+@Entity
+public class CustomPasswordUserEntity {
+    @Id
+    @GeneratedValue
+    public Long id;
+
+    @Column(name = "username")
+    @Username
+    public String name;
+
+    @Column(name = "password")
+    @Password(value = PasswordType.CUSTOM, provider = CustomPasswordProvider.class)
+    public String pass;
+
+    @Roles
+    public String role;
+}
+
+public class CustomPasswordProvider implements PasswordProvider {
+    @Override
+    public Password getPassword(String pass) {
+        byte[] digest = DatatypeConverter.parseHexBinary(pass);
+        return SimpleDigestPassword.createRaw(SimpleDigestPassword.ALGORITHM_SIMPLE_DIGEST_SHA_256, digest);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+警告: テスト環境などでは <code>@Password(PasswordType.CLEAR)</code> を使ってパスワードをクリアテキストで保存することもできますが、本番では絶対にしないことを強くお勧めします。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="whats-next"><a class="anchor" href="#whats-next"></a>次のステップ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Congratulations!
+You have learned how to create and test a secure Quarkus application by combining the <a href="security-built-in-authentication-support-concept#basic-auth">Quarkus built-in basic HTTP authentication</a> with the JPA identity provider.</p>
+</div>
+<div class="paragraph">
+<p>このチュートリアルを完了したら、Quarkus のより高度なセキュリティメカニズムをいくつか検討してください。 次の情報を使用して、 <code>OpenID Connect</code> を安全に使用して、Quarkusのエンドポイントに安全なシングルサインオンアクセスを提供する方法について学びます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="security-openid-connect">Quarkus - OpenID Connect (OIDC) を使用した、ベアラートークン認可によるサービスアプリケーションの保護</a></p>
+</li>
+<li>
+<p><a href="security-openid-connect-web-authentication">Quarkus - OpenID Connect を使用した、認可コードフローによる Web アプリケーションの保護</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="references"><a class="anchor" href="#references"></a>参照</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="security-overview-concept">Quarkus Security 概要</a></p>
+</li>
+<li>
+<p><a href="security-openid-connect">Quarkus - OpenID Connect (OIDC) を使用した、ベアラートークン認可によるサービスアプリケーションの保護</a></p>
+</li>
+<li>
+<p><a href="security-openid-connect-web-authentication">Quarkus - OpenID Connect を使用した、認可コードフローによる Web アプリケーションの保護</a></p>
+</li>
+<li>
+<p><a href="hibernate-orm-panache">PanacheでシンプルになったHibernate ORM</a></p>
+</li>
+<li>
+<p><a href="hibernate-orm">Hibernate ORMとJPAの使用</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#what-you-will-build">何を構築するか</a></li>
+<li><a href="#create-a-maven-project">1. Maven プロジェクトの作成</a>
+<ul class="sectlevel2">
+<li><a href="#verification">1.1. 検証</a></li>
+</ul>
+</li>
+<li><a href="#write-the-application">2. アプリケーションの記述</a>
+<ul class="sectlevel2">
+<li><a href="#define-the-user-entity">2.1. ユーザーエンティティーの定義</a></li>
+<li><a href="#configure-the-application">2.2. アプリケーションの設定</a></li>
+</ul>
+</li>
+<li><a href="#test-your-application">3. アプリケーションのテスト</a>
+<ul class="sectlevel2">
+<li><a href="#use-dev-services-for-postgresql-to-test-your-application">3.1. Dev Services for PostgreSQLを使用してアプリケーションをテストする</a></li>
+<li><a href="#use-curl-or-a-browser-to-test-your-application">3.2. <code>curl</code> またはブラウザを使用して、アプリケーションをテストします</a></li>
+<li><a href="#compile-and-run-the-application">3.3. アプリケーションのコンパイルと実行</a></li>
+<li><a href="#access-and-test-the-application-security">3.4. アプリケーションのセキュリティへのアクセスおよびテスト</a></li>
+<li><a href="#results">3.5. 結果</a></li>
+</ul>
+</li>
+<li><a href="#quarkus-security-jpa-information">Quarkus Security JPA 情報</a>
+<ul class="sectlevel2">
+<li><a href="#supported-model-types">サポートされているモデルの種類</a></li>
+<li><a href="#storing-roles-in-another-entity">別のエンティティーにロールを格納する</a></li>
+<li><a href="#password-storage-and-hashing">パスワードの保存とハッシュ化</a></li>
+</ul>
+</li>
+<li><a href="#whats-next">次のステップ</a></li>
+<li><a href="#references">参照</a></li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

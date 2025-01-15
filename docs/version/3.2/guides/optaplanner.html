@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>OptaPlanner - OptaPlanner での AI を使用したスケジュールの最適化 - 3.2 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.2/guides/optaplanner" />
+  <meta property="og:title" content="OptaPlanner - OptaPlanner での AI を使用したスケジュールの最適化 - 3.2" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/optaplanner">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.2/guides/optaplanner">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.2/guides/optaplanner" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.2/guides/optaplanner">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.2/guides/optaplanner">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.2/guides/optaplanner">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.2/guides/optaplanner">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.2/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <option value="3.2" selected>3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">OptaPlanner - OptaPlanner での AI を使用したスケジュールの最適化 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、 <a href="https://www.optaplanner.org/">OptaPlanner</a> の制約解決人工知能 (AI) を使用して Quarkus アプリケーションを作成するプロセスについて説明します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-build"><a class="anchor" href="#what-you-will-build"></a>何を構築するか</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>生徒と教師の時間割を最適化する REST アプリケーションを作成します。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/optaplanner-time-table-app-screenshot.png" alt="optaplanner time table app screenshot">
+</div>
+</div>
+<div class="paragraph">
+<p>サービスは、ハードおよびソフトスケジューリング <em>制約</em> に従い、AI を使用して自動的に <code>Lesson</code> インスタンスを <code>Timeslot</code> および <code>Room</code> インスタンスに割り当てます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>教室は同時に最大 1 つのレッスンを持つことができます。</p>
+</li>
+<li>
+<p>教師は同時に最大 1 つのレッスンを教えることができます。</p>
+</li>
+<li>
+<p>生徒は同時に最大 1 つのレッスンに参加できます。</p>
+</li>
+<li>
+<p>教師はすべてのレッスンを同じ教室で教えることを好みます。</p>
+</li>
+<li>
+<p>教師は連続してレッスンを教えることを好み、レッスン間に空き時間があることを嫌います。</p>
+</li>
+<li>
+<p>生徒は連続して同じテーマのレッスンに出席することを嫌います。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>数学的に言えば、学校の時間割は <em>NP-hard</em> な問題です。これは、スケーリングが難しいことを意味します。考えられるすべての組み合わせを総当たり攻撃で繰り返すだけでは、スーパーコンピューターであっても重要なデータセットだけで数百万年かかります。幸い、OptaPlanner などの AI 制約ソルバーには、妥当な時間内に最適に近いソリューションを提供できる高度なアルゴリズムがあります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution"><a class="anchor" href="#solution"></a>ソリューション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次の章で紹介する手順に沿って、ステップを踏んでアプリを作成することをお勧めします。ただし、完成した例にそのまま進んでも構いません。</p>
+</div>
+<div class="paragraph">
+<p>Gitレポジトリをクローンするか <code>git clone -b 3.2 <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code> 、 <a href="https://github.com/quarkusio/quarkus-quickstarts/archive/3.2.zip">アーカイブ</a> をダウンロードします。</p>
+</div>
+<div class="paragraph">
+<p>The solution is located in <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/3.2/optaplanner-quickstart">the <code>optaplanner-quickstart</code> directory</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ざっと 30 minutes</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 11+ がインストールされ、 <code>JAVA_HOME</code>  が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.9.3</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-build-file-and-the-dependencies"><a class="anchor" href="#the-build-file-and-the-dependencies"></a>ビルドファイルと依存関係</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://code.quarkus.io/">code.quarkus.io</a> を使用して、Maven または Gradle 用に次のエクステンションを備えたアプリケーションを生成します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>RESTEasy Reactive (<code>quarkus-resteasy-reactive</code>)</p>
+</li>
+<li>
+<p>RESTEasy Reactive Jackson (<code>quarkus-resteasy-reactive-jackson</code>)</p>
+</li>
+<li>
+<p>OptaPlanner (<code>optaplanner-quarkus</code>)</p>
+</li>
+<li>
+<p>OptaPlanner Jackson (<code>optaplanner-quarkus-jackson</code>)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>または、コマンドラインから生成します。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:optaplanner-quickstart \
+    --extension='resteasy-reactive,resteasy-reactive-jackson,optaplanner-quarkus,optaplanner-quarkus-jackson' \
+    --no-code
+cd optaplanner-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:3.2.12.Final:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=optaplanner-quickstart \
+    -Dextensions='resteasy-reactive,resteasy-reactive-jackson,optaplanner-quarkus,optaplanner-quarkus-jackson' \
+    -DnoCode
+cd optaplanner-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>これには、ビルドファイルの次の依存関係が含まれます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependencyManagement&gt;
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;io.quarkus.platform&lt;/groupId&gt;
+            &lt;artifactId&gt;quarkus-bom&lt;/artifactId&gt;
+            &lt;version&gt;3.2.12.Final&lt;/version&gt;
+            &lt;type&gt;pom&lt;/type&gt;
+            &lt;scope&gt;import&lt;/scope&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;io.quarkus.platform&lt;/groupId&gt;
+            &lt;artifactId&gt;quarkus-optaplanner-bom&lt;/artifactId&gt;
+            &lt;version&gt;3.2.12.Final&lt;/version&gt;
+            &lt;type&gt;pom&lt;/type&gt;
+            &lt;scope&gt;import&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/dependencyManagement&gt;
+&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+        &lt;artifactId&gt;quarkus-resteasy-reactive&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+        &lt;artifactId&gt;quarkus-resteasy-reactive-jackson&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.optaplanner&lt;/groupId&gt;
+        &lt;artifactId&gt;optaplanner-quarkus&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.optaplanner&lt;/groupId&gt;
+        &lt;artifactId&gt;optaplanner-quarkus-jackson&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+
+    &lt;dependency&gt;
+        &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+        &lt;artifactId&gt;quarkus-junit5&lt;/artifactId&gt;
+        &lt;scope&gt;test&lt;/scope&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">dependencies {
+    implementation enforcedPlatform("io.quarkus.platform:quarkus-bom:3.2.12.Final")
+    implementation enforcedPlatform("io.quarkus.platform:quarkus-optaplanner-bom:3.2.12.Final")
+    implementation 'io.quarkus:quarkus-resteasy-reactive'
+    implementation 'io.quarkus:quarkus-resteasy-reactive-jackson'
+    implementation 'org.optaplanner:optaplanner-quarkus'
+    implementation 'org.optaplanner:optaplanner-quarkus-jackson'
+
+    testImplementation 'io.quarkus:quarkus-junit5'
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="model-the-domain-objects"><a class="anchor" href="#model-the-domain-objects"></a>ドメインオブジェクトのモデル化</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>目標は、各レッスンをタイムスロットと教室に割り当てることです。次のクラスを作成します。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/optaplanner-time-table-class-diagram-pure.png" alt="optaplanner time table class diagram pure">
+</div>
+</div>
+<div class="sect2">
+<h3 id="timeslot"><a class="anchor" href="#timeslot"></a>タイムスロット</h3>
+<div class="paragraph">
+<p><code>Timeslot</code> クラスは、たとえば <code>月曜日 10:30 - 11:30</code> または <code>火曜日 13:30 - 14:30</code> のように、レッスンが行われる時間の間隔を表します。簡単にするために、すべてのタイムスロットは同じ時間間隔で、昼食やその他の休憩時間のタイムスロットはありません。</p>
+</div>
+<div class="paragraph">
+<p>高校の時間割は毎週同じものが繰り返されるため、タイムスロットに日付はありません。したがって、 <a href="https://docs.optaplanner.org/latestFinal/optaplanner-docs/html_single/index.html#continuousPlanning">継続的な計画作成</a> は必要ありません。</p>
+</div>
+<div class="paragraph">
+<p><code>src/main/java/org/acme/optaplanner/domain/Timeslot.java</code> クラスを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.optaplanner.domain;
+
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+
+public class Timeslot {
+
+    private DayOfWeek dayOfWeek;
+    private LocalTime startTime;
+    private LocalTime endTime;
+
+    public Timeslot() {
+    }
+
+    public Timeslot(DayOfWeek dayOfWeek, LocalTime startTime, LocalTime endTime) {
+        this.dayOfWeek = dayOfWeek;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
+    public DayOfWeek getDayOfWeek() {
+        return dayOfWeek;
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    @Override
+    public String toString() {
+        return dayOfWeek + " " + startTime;
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>解決する間は <code>Timeslot</code> インスタンスは変更されないため、<code>Timeslot</code> は_問題の事実_と呼ばれます。このようなクラスに、OptaPlanner 固有のアノテーションは必要ありません。</p>
+</div>
+<div class="paragraph">
+<p><code>toString()</code> メソッドは出力を短く保つため、後で示すように、OptaPlanner の <code>DEBUG</code> または <code>TRACE</code> のログは読みやすくなっています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="room"><a class="anchor" href="#room"></a>教室</h3>
+<div class="paragraph">
+<p><code>Room</code> クラスは、<code>Room A</code> や <code>Room B</code> のように、レッスンが実施される場所を表します。わかりやすくするために、すべての教室に定員制限はなく、すべてのレッスンに対応できます。</p>
+</div>
+<div class="paragraph">
+<p><code>src/main/java/org/acme/optaplanner/domain/Room.java</code> クラスを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.optaplanner.domain;
+
+public class Room {
+
+    private String name;
+
+    public Room() {
+    }
+
+    public Room(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>解決の間、<code>Room</code> インスタンスは変更されないため、`Room`も_問題の事実_です。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="lesson"><a class="anchor" href="#lesson"></a>レッスン</h3>
+<div class="paragraph">
+<p><code>Lesson</code> クラスで表されるレッスンでは、<code>Math by A.Turing for 9th grade</code> または <code>Chemistry by M.Curie for 10th grade</code> のように、教師は生徒グループにいずれかの教科を教えます。同じ教師が週に複数回、その教科を同じ生徒グループに教える場合、<code>id</code> のみ異なる複数の <code>Lesson</code> インスタンスがあります。たとえば、9 年生には週に 6 回の数学の授業があります。</p>
+</div>
+<div class="paragraph">
+<p>解決中に、OptaPlanner は <code>Lesson</code> クラスの <code>timeslot</code> フィールドと <code>room</code> フィールドを変更し、各レッスンをタイムスロットと教室に割り当てます。OptaPlanner はこれらのフィールドを変更するため、 <code>Lesson</code> は <em>プランニングエンティティー</em> です。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/optaplanner-time-table-class-diagram-annotated.png" alt="optaplanner time table class diagram annotated">
+</div>
+</div>
+<div class="paragraph">
+<p>前の図のほとんどのフィールドには、オレンジ色のフィールドを除いて、入力データが含まれています。レッスンの <code>timeslot</code> フィールドと <code>room</code> フィールドは、入力データでは割り当てられておらず (<code>null</code>)、出力データでは割り当てられています (非 <code>null</code>)。OptaPlanner は、解決中にこれらのフィールドを変更します。このようなフィールドは、プランニング変数と呼ばれます。OptaPlanner がそれらを認識するためには、<code>timeslot</code> フィールドと <code>room</code> フィールドの両方に <code>@PlanningVariable</code> アノテーションが必要です。それらを含むクラス <code>Lesson</code> には、 <code>@PlanningEntity</code> アノテーションが必要です。</p>
+</div>
+<div class="paragraph">
+<p><code>src/main/java/org/acme/optaplanner/domain/Lesson.java</code> クラスを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.optaplanner.domain;
+
+import org.optaplanner.core.api.domain.entity.PlanningEntity;
+import org.optaplanner.core.api.domain.lookup.PlanningId;
+import org.optaplanner.core.api.domain.variable.PlanningVariable;
+
+@PlanningEntity
+public class Lesson {
+
+    @PlanningId
+    private Long id;
+
+    private String subject;
+    private String teacher;
+    private String studentGroup;
+
+    @PlanningVariable
+    private Timeslot timeslot;
+    @PlanningVariable
+    private Room room;
+
+    public Lesson() {
+    }
+
+    public Lesson(Long id, String subject, String teacher, String studentGroup) {
+        this.id = id;
+        this.subject = subject;
+        this.teacher = teacher;
+        this.studentGroup = studentGroup;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public String getTeacher() {
+        return teacher;
+    }
+
+    public String getStudentGroup() {
+        return studentGroup;
+    }
+
+    public Timeslot getTimeslot() {
+        return timeslot;
+    }
+
+    public void setTimeslot(Timeslot timeslot) {
+        this.timeslot = timeslot;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
+
+    @Override
+    public String toString() {
+        return subject + "(" + id + ")";
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Lesson</code> クラスには <code>@PlanningEntity</code> アノテーションがあり、このクラスには 1 つ以上のプランニング変数が含まれているため、OptaPlanner はこのクラスが解決中に変更されることを認識しています。</p>
+</div>
+<div class="paragraph">
+<p><code>timeslot</code> フィールドには <code>@PlanningVariable</code> アノテーションがあるので、OptaPlanner はその値を変更することができることを知っています。このフィールドに割り当てるTimeslotインスタンスの候補を見つけるために、OptaPlannerは変数タイプを使用して、List&lt;Timeslot&gt;から選択することを提供する値域プロバイダーに接続します。</p>
+</div>
+<div class="paragraph">
+<p>同じ理由で、<code>room</code> フィールドにも <code>@PlanningVariable</code> アノテーションがあります。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>任意制約解決のユースケースの <code>@PlanningVariable</code> フィールドを初めて決定する場合、それは簡単ではありません。一般的な落とし穴を避けるために、 <a href="https://docs.optaplanner.org/latestFinal/optaplanner-docs/html_single/index.html#domainModelingGuide">ドメインのモデル化ガイドライン</a> をお読みください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="define-the-constraints-and-calculate-the-score"><a class="anchor" href="#define-the-constraints-and-calculate-the-score"></a>制約の定義とスコアの計算</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><em>スコア</em> は、特定のソリューションの品質を表します。スコアが高ければ品質が高いことを表しています。OptaPlanner は使用できる時間内に見つかった最高スコアのソリューションを最良のソリューションとして探します。それは <em>最適な</em> ソリューションかもしれません。</p>
+</div>
+<div class="paragraph">
+<p>このユースケースにはハードとソフトの制約があるため、スコアを表すためには <code>HardSoftScore</code> クラスを使用します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ハード制約を破ってはいけません。例: <em>教室は同時に最大 1 つのレッスンを持つことができます。</em></p>
+</li>
+<li>
+<p>ソフト制約を破ってはいけません。例: <em>教師は 1 つの教室で教えることを好みます。</em></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>ハード制約は、他のハード制約に対して重み付けされます。ソフト制約も、他のソフト制約に対して重み付けされます。<strong>それぞれの重みに関係なく、ハード制約は常にソフト制約の重みを上回ります</strong>。</p>
+</div>
+<div class="paragraph">
+<p>スコアを計算するには、<code>EasyScoreCalculator</code> クラスを実装します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class TimeTableEasyScoreCalculator implements EasyScoreCalculator&lt;TimeTable, HardSoftScore&gt; {
+
+    @Override
+    public HardSoftScore calculateScore(TimeTable timeTable) {
+        List&lt;Lesson&gt; lessonList = timeTable.getLessonList();
+        int hardScore = 0;
+        for (Lesson a : lessonList) {
+            for (Lesson b : lessonList) {
+                if (a.getTimeslot() != null &amp;&amp; a.getTimeslot().equals(b.getTimeslot())
+                        &amp;&amp; a.getId() &lt; b.getId()) {
+                    // A room can accommodate at most one lesson at the same time.
+                    if (a.getRoom() != null &amp;&amp; a.getRoom().equals(b.getRoom())) {
+                        hardScore--;
+                    }
+                    // A teacher can teach at most one lesson at the same time.
+                    if (a.getTeacher().equals(b.getTeacher())) {
+                        hardScore--;
+                    }
+                    // A student can attend at most one lesson at the same time.
+                    if (a.getStudentGroup().equals(b.getStudentGroup())) {
+                        hardScore--;
+                    }
+                }
+            }
+        }
+        int softScore = 0;
+        // Soft constraints are only implemented in the optaplanner-quickstarts code
+        return HardSoftScore.of(hardScore, softScore);
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>残念ながら、増分ではないため、<strong>それはうまくスケーリングされません</strong>。レッスンが異なるタイムスロットまたは教室に割り当てられるたびに、すべてのレッスンが再評価されて新しいスコアが計算されます。</p>
+</div>
+<div class="paragraph">
+<p>代わりに、<code>src/main/java/org/acme/optaplanner/solutioner/TimeTableConstraintProvider.java</code> クラスを作成して、増分スコア計算を実行します。これは、JavaStreams と SQL に触発された OptaPlanner の ConstraintStreamAPI を使用します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.optaplanner.solver;
+
+import org.acme.optaplanner.domain.Lesson;
+import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
+import org.optaplanner.core.api.score.stream.Constraint;
+import org.optaplanner.core.api.score.stream.ConstraintFactory;
+import org.optaplanner.core.api.score.stream.ConstraintProvider;
+import org.optaplanner.core.api.score.stream.Joiners;
+
+public class TimeTableConstraintProvider implements ConstraintProvider {
+
+    @Override
+    public Constraint[] defineConstraints(ConstraintFactory constraintFactory) {
+        return new Constraint[] {
+                // Hard constraints
+                roomConflict(constraintFactory),
+                teacherConflict(constraintFactory),
+                studentGroupConflict(constraintFactory),
+                // Soft constraints are only implemented in the optaplanner-quickstarts code
+        };
+    }
+
+    Constraint roomConflict(ConstraintFactory constraintFactory) {
+        // A room can accommodate at most one lesson at the same time.
+
+        // Select a lesson ...
+        return constraintFactory
+                .forEach(Lesson.class)
+                // ... and pair it with another lesson ...
+                .join(Lesson.class,
+                        // ... in the same timeslot ...
+                        Joiners.equal(Lesson::getTimeslot),
+                        // ... in the same room ...
+                        Joiners.equal(Lesson::getRoom),
+                        // ... and the pair is unique (different id, no reverse pairs) ...
+                        Joiners.lessThan(Lesson::getId))
+                // ... then penalize each pair with a hard weight.
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Room conflict");
+    }
+
+    Constraint teacherConflict(ConstraintFactory constraintFactory) {
+        // A teacher can teach at most one lesson at the same time.
+        return constraintFactory.forEach(Lesson.class)
+                .join(Lesson.class,
+                        Joiners.equal(Lesson::getTimeslot),
+                        Joiners.equal(Lesson::getTeacher),
+                        Joiners.lessThan(Lesson::getId))
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Teacher conflict");
+    }
+
+    Constraint studentGroupConflict(ConstraintFactory constraintFactory) {
+        // A student can attend at most one lesson at the same time.
+        return constraintFactory.forEach(Lesson.class)
+                .join(Lesson.class,
+                        Joiners.equal(Lesson::getTimeslot),
+                        Joiners.equal(Lesson::getStudentGroup),
+                        Joiners.lessThan(Lesson::getId))
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Student group conflict");
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>ConstraintProvider</code> は、のスケーリングは <code>EasyScoreCalculator</code> より桁違いに優れており、<em>O</em>(n²) ではなく <em>O </em>(n) です。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="gather-the-domain-objects-in-a-planning-solution"><a class="anchor" href="#gather-the-domain-objects-in-a-planning-solution"></a>プランニングソリューションでドメインオブジェクトを収集します</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>TimeTable</code> は、単一データセットのすべての <code>Timeslot</code>、<code>Room</code>、および <code>Lesson</code> インスタンスをラップします。さらに、これにはすべてのレッスンが含まれており、各レッスンには特定のプランニング変数があるため、これは <em>plannning solution</em> であり、スコアがあります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>レッスンがまだ割り当てられていない場合、それは <em>uninitialized</em> ソリューションです。たとえば、スコアが <code>-4init/0hard/0soft</code> のソリューションです。</p>
+</li>
+<li>
+<p>ハード制約を破る場合、それは <em>infeasible</em> ソリューションです。たとえば、スコアが <code>-2hard/-3soft</code> のソリューションです。</p>
+</li>
+<li>
+<p>すべてのハード制約に準拠している場合、それは <em>feasible</em> ソリューションです。たとえば、スコアが <code>0hard/-7soft</code> のソリューションです。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>src/main/java/org/acme/optaplanner/domain/TimeTable.java</code> クラスを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.optaplanner.domain;
+
+import java.util.List;
+
+import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
+import org.optaplanner.core.api.domain.solution.PlanningScore;
+import org.optaplanner.core.api.domain.solution.PlanningSolution;
+import org.optaplanner.core.api.domain.solution.ProblemFactCollectionProperty;
+import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
+import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
+
+@PlanningSolution
+public class TimeTable {
+
+    @ValueRangeProvider
+    @ProblemFactCollectionProperty
+    private List&lt;Timeslot&gt; timeslotList;
+    @ValueRangeProvider
+    @ProblemFactCollectionProperty
+    private List&lt;Room&gt; roomList;
+    @PlanningEntityCollectionProperty
+    private List&lt;Lesson&gt; lessonList;
+
+    @PlanningScore
+    private HardSoftScore score;
+
+    public TimeTable() {
+    }
+
+    public TimeTable(List&lt;Timeslot&gt; timeslotList, List&lt;Room&gt; roomList, List&lt;Lesson&gt; lessonList) {
+        this.timeslotList = timeslotList;
+        this.roomList = roomList;
+        this.lessonList = lessonList;
+    }
+
+    public List&lt;Timeslot&gt; getTimeslotList() {
+        return timeslotList;
+    }
+
+    public List&lt;Room&gt; getRoomList() {
+        return roomList;
+    }
+
+    public List&lt;Lesson&gt; getLessonList() {
+        return lessonList;
+    }
+
+    public HardSoftScore getScore() {
+        return score;
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>TimeTable</code> クラスに <code>@PlanningSolution</code> アノテーションがあるため、OptaPlanner はこのクラスにすべての入力データと出力データが含まれていると認識します。</p>
+</div>
+<div class="paragraph">
+<p>具体的には、このクラスは問題の入力です。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>すべてのタイムスロットを含む <code>timeslotList</code> フィールド</p>
+<div class="ulist">
+<ul>
+<li>
+<p>解決中に変更されないため、これは問題の事実のリストです。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>すべての教室を含む <code>roomList</code> フィールド</p>
+<div class="ulist">
+<ul>
+<li>
+<p>解決中に変更されないため、これは問題の事実のリストです。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>すべてのレッスンを含む <code>lessonList</code> フィールド</p>
+<div class="ulist">
+<ul>
+<li>
+<p>解決中に変更されるため、これはプランニングエンティティーのリストです。</p>
+</li>
+<li>
+<p>各 <code>レッスン</code> の:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>timeslot</code> フィールドと <code>room</code> フィールドの値は、通常の場合はまだ <code>null</code> であるため割り当てられていません。それはプランニング変数です。</p>
+</li>
+<li>
+<p><code>subject</code>、<code>Teacher</code>、<code>studentGroup</code> などの他のフィールドが入力されます。これらのフィールドは、問題のプロパティーです。</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>ただし、このクラスはソリューションの出力でもあります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>解決した後、各 <code>Lesson</code> インスタンスに null 以外の <code>timeslot</code> フィールドと <code>room</code> フィールドがある <code>lessonList</code> フィールド</p>
+</li>
+<li>
+<p>出力ソリューションの品質を表す <code>score</code> フィールド (例: <code>0hard/-5soft</code>)</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="the-value-range-providers"><a class="anchor" href="#the-value-range-providers"></a>値の範囲プロバイダー</h3>
+<div class="paragraph">
+<p><code>timeslotList</code> フィールドは、値域プロバイダーです。これは <code>Timeslot</code> インスタンスを保持し、OptaPlanner が <code>timeslot</code> フィールドの <code>Lesson</code> インスタンスに割り当てるために選択することができます。 <code>timeslotList</code> フィールドには <code>@ValueRangeProvider</code> アノテーションがあり、計画変数の型と値域プロバイダーが返す型を一致させて、 <code>@PlanningVariable</code> と <code>@ValueRangeProvider</code> を接続します。</p>
+</div>
+<div class="paragraph">
+<p>同じロジックに従って、<code>roomList</code> フィールドにも <code>@ValueRangeProvider</code> アノテーションがあります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-problem-fact-and-planning-entity-properties"><a class="anchor" href="#the-problem-fact-and-planning-entity-properties"></a>問題の事実とプランニングエンティティーのプロパティー</h3>
+<div class="paragraph">
+<p>さらに、OptaPlanner は、変更できる <code>Lesson</code> インスタンスと、<code>TimeTableConstraintProvider</code> がスコア計算に使用する <code>Timeslot</code> および <code>Room</code> インスタンスを取得する方法を知る必要があります。</p>
+</div>
+<div class="paragraph">
+<p><code>timeslotList</code> フィールドと <code>roomList</code> フィールドには <code>@ProblemFactCollectionProperty</code> アノテーションがあるため、<code>TimeTableConstraintProvider</code> はこれらのインスタンス_から_選択できます。</p>
+</div>
+<div class="paragraph">
+<p><code>lessonList</code> には <code>@PlanningEntityCollectionProperty</code> アノテーションがあるため、OptaPlanner は解決中にそれらを変更でき、<code>TimeTableConstraintProvider</code> はそれら_から_も選択できます。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-the-solver-service"><a class="anchor" href="#create-the-solver-service"></a>ソルバーサービスの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>これで、すべてをまとめて REST サービスを作成する準備が整いました。ただし、REST スレッドの planning problem を解決すると、HTTP タイムアウトの問題が発生します。したがって、Quarkus エクステンションは <code>SolverManager</code> インスタンスを挿入します。これにより、別のスレッドプールでソルバーが実行され、複数のデータセットを並行して解決できます。</p>
+</div>
+<div class="paragraph">
+<p><code>src/main/java/org/acme/optaplanner/rest/TimeTableResource.java</code> クラスを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.optaplanner.rest;
+
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+
+import org.acme.optaplanner.domain.TimeTable;
+import org.optaplanner.core.api.solver.SolverJob;
+import org.optaplanner.core.api.solver.SolverManager;
+
+@Path("/timeTable")
+public class TimeTableResource {
+
+    @Inject
+    SolverManager&lt;TimeTable, UUID&gt; solverManager;
+
+    @POST
+    @Path("/solve")
+    public TimeTable solve(TimeTable problem) {
+        UUID problemId = UUID.randomUUID();
+        // Submit the problem to start solving
+        SolverJob&lt;TimeTable, UUID&gt; solverJob = solverManager.solve(problemId, problem);
+        TimeTable solution;
+        try {
+            // Wait until the solving ends
+            solution = solverJob.getFinalBestSolution();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new IllegalStateException("Solving failed.", e);
+        }
+        return solution;
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>分かりやすくするために、この最初の実装はソルバーが終了するのを待ちますが、それでも HTTP タイムアウトが発生する可能性があります。_完全な_実装では、HTTP タイムアウトはさらにスムーズに回避されます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="set-the-termination-time"><a class="anchor" href="#set-the-termination-time"></a>終了時刻の設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>終了設定または終了イベントがない場合、ソルバーは永久に実行されます。これを回避するには、解決時間を 5 秒に制限します。これは、HTTP タイムアウトを回避するのに十分な短さです。</p>
+</div>
+<div class="paragraph">
+<p><code>src/main/resources/application.properties</code> ファイルを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># The solver runs only for 5 seconds to avoid an HTTP timeout in this simple implementation.
+# It's recommended to run for at least 5 minutes ("5m") otherwise.
+quarkus.optaplanner.solver.termination.spent-limit=5s</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="run-the-application"><a class="anchor" href="#run-the-application"></a>アプリケーションの実行</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>最初にアプリケーションを起動します。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="try-the-application"><a class="anchor" href="#try-the-application"></a>アプリケーションの試行</h3>
+<div class="paragraph">
+<p>これでアプリケーションが実行されたため、REST サービスをテストできます。任意の REST クライアントを使用できます。次の例では、Linux コマンド <code>curl</code> を使用して POST 要求を送信します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ curl -i -X POST http://localhost:8080/timeTable/solve -H "Content-Type:application/json" -d '{"timeslotList":[{"dayOfWeek":"MONDAY","startTime":"08:30:00","endTime":"09:30:00"},{"dayOfWeek":"MONDAY","startTime":"09:30:00","endTime":"10:30:00"}],"roomList":[{"name":"Room A"},{"name":"Room B"}],"lessonList":[{"id":1,"subject":"Math","teacher":"A. Turing","studentGroup":"9th grade"},{"id":2,"subject":"Chemistry","teacher":"M. Curie","studentGroup":"9th grade"},{"id":3,"subject":"French","teacher":"M. Curie","studentGroup":"10th grade"},{"id":4,"subject":"History","teacher":"I. Jones","studentGroup":"10th grade"}]}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>約 5 秒後に、<code>application.properties</code> で定義された終了時間に応じて、サービスは次の例のような出力を返します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">HTTP/1.1 200
+Content-Type: application/json
+...
+
+{"timeslotList":...,"roomList":...,"lessonList":[{"id":1,"subject":"Math","teacher":"A. Turing","studentGroup":"9th grade","timeslot":{"dayOfWeek":"MONDAY","startTime":"08:30:00","endTime":"09:30:00"},"room":{"name":"Room A"}},{"id":2,"subject":"Chemistry","teacher":"M. Curie","studentGroup":"9th grade","timeslot":{"dayOfWeek":"MONDAY","startTime":"09:30:00","endTime":"10:30:00"},"room":{"name":"Room A"}},{"id":3,"subject":"French","teacher":"M. Curie","studentGroup":"10th grade","timeslot":{"dayOfWeek":"MONDAY","startTime":"08:30:00","endTime":"09:30:00"},"room":{"name":"Room B"}},{"id":4,"subject":"History","teacher":"I. Jones","studentGroup":"10th grade","timeslot":{"dayOfWeek":"MONDAY","startTime":"09:30:00","endTime":"10:30:00"},"room":{"name":"Room B"}}],"score":"0hard/0soft"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>アプリケーションが 4 つのレッスンすべてを 2 つのタイムスロットのいずれか 1 つと、2 つの教室のいずれか 1 つに割り当てていることに注意してください。また、すべてのハード制約に準拠していることにも注意してください。たとえば、M. Curie の 2 つのレッスンは異なるタイムスロットにあります。</p>
+</div>
+<div class="paragraph">
+<p>サーバー側では、<code>info</code> ログに OptaPlanner が 5 秒間で何をしたかが示されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">... Solving started: time spent (33), best score (-8init/0hard/0soft), environment mode (REPRODUCIBLE), random (JDK with seed 0).
+... Construction Heuristic phase (0) ended: time spent (73), best score (0hard/0soft), score calculation speed (459/sec), step total (4).
+... Local Search phase (1) ended: time spent (5000), best score (0hard/0soft), score calculation speed (28949/sec), step total (28398).
+... Solving ended: time spent (5000), best score (0hard/0soft), score calculation speed (28524/sec), phase total (2), environment mode (REPRODUCIBLE).</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="test-the-application"><a class="anchor" href="#test-the-application"></a>アプリケーションのテスト</h3>
+<div class="paragraph">
+<p>優れたアプリケーションには、テストカバレッジが含まれます。</p>
+</div>
+<div class="sect3">
+<h4 id="test-the-constraints"><a class="anchor" href="#test-the-constraints"></a>制約のテスト</h4>
+<div class="paragraph">
+<p>各制約を個別にテストするには、単体テストで <code>ConstraintVerifier</code> を使用します。各制約のコーナーケースを他のテストとは別にテストします。これにより、適切なテストカバレッジで新しい制約を追加する際のメンテナーンスが軽減されます。</p>
+</div>
+<div class="paragraph">
+<p>ビルドファイルに <code>optaplanner-test</code> 依存関係を追加します。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.optaplanner&lt;/groupId&gt;
+    &lt;artifactId&gt;optaplanner-test&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">testImplementation("org.optaplanner:optaplanner-test")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>src/test/java/org/acme/optaplanner/solutioner/TimeTableConstraintProviderTest.java</code> クラスを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.optaplanner.solver;
+
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+
+import jakarta.inject.Inject;
+
+import io.quarkus.test.junit.QuarkusTest;
+import org.acme.optaplanner.domain.Lesson;
+import org.acme.optaplanner.domain.Room;
+import org.acme.optaplanner.domain.TimeTable;
+import org.acme.optaplanner.domain.Timeslot;
+import org.junit.jupiter.api.Test;
+import org.optaplanner.test.api.score.stream.ConstraintVerifier;
+
+@QuarkusTest
+class TimeTableConstraintProviderTest {
+
+    private static final Room ROOM = new Room("Room1");
+    private static final Timeslot TIMESLOT1 = new Timeslot(DayOfWeek.MONDAY, LocalTime.of(9,0), LocalTime.NOON);
+    private static final Timeslot TIMESLOT2 = new Timeslot(DayOfWeek.TUESDAY, LocalTime.of(9,0), LocalTime.NOON);
+
+    @Inject
+    ConstraintVerifier&lt;TimeTableConstraintProvider, TimeTable&gt; constraintVerifier;
+
+    @Test
+    void roomConflict() {
+        Lesson firstLesson = new Lesson(1, "Subject1", "Teacher1", "Group1");
+        Lesson conflictingLesson = new Lesson(2, "Subject2", "Teacher2", "Group2");
+        Lesson nonConflictingLesson = new Lesson(3, "Subject3", "Teacher3", "Group3");
+
+        firstLesson.setRoom(ROOM);
+        firstLesson.setTimeslot(TIMESLOT1);
+
+        conflictingLesson.setRoom(ROOM);
+        conflictingLesson.setTimeslot(TIMESLOT1);
+
+        nonConflictingLesson.setRoom(ROOM);
+        nonConflictingLesson.setTimeslot(TIMESLOT2);
+
+        constraintVerifier.verifyThat(TimeTableConstraintProvider::roomConflict)
+                .given(firstLesson, conflictingLesson, nonConflictingLesson)
+                .penalizesBy(1);
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このテストは、制約 <code>TimeTableConstraintProvider::roomConflict</code> が、同じ教室に 3 つのレッスンが指定され、2 つのレッスンのタイムスロットが同じ場合に、一致の重み <code>1</code> でペナルティを課すことを確認します。したがって、制約の重みが <code>10hard</code> の場合、スコアは <code>-10hard</code> 減少します。</p>
+</div>
+<div class="paragraph">
+<p>制約の重みは本番環境に入る前に定期的に変更されるため、<code>ConstraintVerifier</code> は (その制約の重みが <code>ConstraintProvider</code> にハードコーディングされている場合でも) テスト中は制約の重みを無視することに注意してください。このように、制約の重みを微調整してもユニットテストが中断されることはありません。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="test-the-solver"><a class="anchor" href="#test-the-solver"></a>ソルバーのテスト</h4>
+<div class="paragraph">
+<p>JUnit テストでは、テストデータセットを生成し、それを <code>TimeTableResource</code> に送信して解決します。</p>
+</div>
+<div class="paragraph">
+<p><code>src/test/java/org/acme/optaplanner/rest/TimeTableResourceTest.java</code> クラスを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.optaplanner.rest;
+
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.inject.Inject;
+
+import io.quarkus.test.junit.QuarkusTest;
+import org.acme.optaplanner.domain.Room;
+import org.acme.optaplanner.domain.Timeslot;
+import org.acme.optaplanner.domain.Lesson;
+import org.acme.optaplanner.domain.TimeTable;
+import org.acme.optaplanner.rest.TimeTableResource;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@QuarkusTest
+public class TimeTableResourceTest {
+
+    @Inject
+    TimeTableResource timeTableResource;
+
+    @Test
+    @Timeout(600_000)
+    public void solve() {
+        TimeTable problem = generateProblem();
+        TimeTable solution = timeTableResource.solve(problem);
+        assertFalse(solution.getLessonList().isEmpty());
+        for (Lesson lesson : solution.getLessonList()) {
+            assertNotNull(lesson.getTimeslot());
+            assertNotNull(lesson.getRoom());
+        }
+        assertTrue(solution.getScore().isFeasible());
+    }
+
+    private TimeTable generateProblem() {
+        List&lt;Timeslot&gt; timeslotList = new ArrayList&lt;&gt;();
+        timeslotList.add(new Timeslot(DayOfWeek.MONDAY, LocalTime.of(8, 30), LocalTime.of(9, 30)));
+        timeslotList.add(new Timeslot(DayOfWeek.MONDAY, LocalTime.of(9, 30), LocalTime.of(10, 30)));
+        timeslotList.add(new Timeslot(DayOfWeek.MONDAY, LocalTime.of(10, 30), LocalTime.of(11, 30)));
+        timeslotList.add(new Timeslot(DayOfWeek.MONDAY, LocalTime.of(13, 30), LocalTime.of(14, 30)));
+        timeslotList.add(new Timeslot(DayOfWeek.MONDAY, LocalTime.of(14, 30), LocalTime.of(15, 30)));
+
+        List&lt;Room&gt; roomList = new ArrayList&lt;&gt;();
+        roomList.add(new Room("Room A"));
+        roomList.add(new Room("Room B"));
+        roomList.add(new Room("Room C"));
+
+        List&lt;Lesson&gt; lessonList = new ArrayList&lt;&gt;();
+        lessonList.add(new Lesson(101L, "Math", "B. May", "9th grade"));
+        lessonList.add(new Lesson(102L, "Physics", "M. Curie", "9th grade"));
+        lessonList.add(new Lesson(103L, "Geography", "M. Polo", "9th grade"));
+        lessonList.add(new Lesson(104L, "English", "I. Jones", "9th grade"));
+        lessonList.add(new Lesson(105L, "Spanish", "P. Cruz", "9th grade"));
+
+        lessonList.add(new Lesson(201L, "Math", "B. May", "10th grade"));
+        lessonList.add(new Lesson(202L, "Chemistry", "M. Curie", "10th grade"));
+        lessonList.add(new Lesson(203L, "History", "I. Jones", "10th grade"));
+        lessonList.add(new Lesson(204L, "English", "P. Cruz", "10th grade"));
+        lessonList.add(new Lesson(205L, "French", "M. Curie", "10th grade"));
+        return new TimeTable(timeslotList, roomList, lessonList);
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このテストは、解決した後、すべてのレッスンがタイムスロットと教室に割り当てられていることを確認します。また、実行可能なソリューション (厳しい制約が破られていない) が見つかったことを確認します。</p>
+</div>
+<div class="paragraph">
+<p>テストプロパティーを <code>src/main/resources/application.properties</code> ファイルに追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.optaplanner.solver.termination.spent-limit=5s
+
+# Effectively disable spent-time termination in favor of the best-score-limit
+%test.quarkus.optaplanner.solver.termination.spent-limit=1h
+%test.quarkus.optaplanner.solver.termination.best-score-limit=0hard/*soft</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>通常、ソルバーは 200 ミリ秒未満で実行可能なソリューションを見つけます。<code>application.properties</code> は、実行可能なソリューション (<code>0hard/* soft</code>) が見つかり次第すぐに終了するように、テスト中にソルバーの終了を上書きすることに注意してください。これにより、ユニットテストが任意のハードウェアで実行される可能性があるため、ソルバー時間をハードコーディングする必要がなくなります。このアプローチにより、低速マシンでも実行可能なソリューションを見つけるのに十分な時間、テストが実行されます。ただし、高速マシンであっても、厳密に必要な時間より 1 ミリ秒も長く実行されることはありません。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="logging"><a class="anchor" href="#logging"></a>ロギング</h3>
+<div class="paragraph">
+<p><code>ConstraintProvider</code> に制約を追加するときは、同じ時間で解決した後、<code>info</code> ログでの_スコア計算速度_に注意してパフォーマンスへの影響を評価してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">... Solving ended: ..., score calculation speed (29455/sec), ...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>OptaPlanner が内部で問題をどのように解決しているかを理解するには、<code>application.properties</code> ファイルまたは <code>-D</code> システムプロパティーのロギングを変更します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.log.category."org.optaplanner".level=debug</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>debug</code> ロギングを使用して、すべての <em>ステップ</em> を表示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">... Solving started: time spent (67), best score (-20init/0hard/0soft), environment mode (REPRODUCIBLE), random (JDK with seed 0).
+...     CH step (0), time spent (128), score (-18init/0hard/0soft), selected move count (15), picked move ([Math(101) {null -&gt; Room A}, Math(101) {null -&gt; MONDAY 08:30}]).
+...     CH step (1), time spent (145), score (-16init/0hard/0soft), selected move count (15), picked move ([Physics(102) {null -&gt; Room A}, Physics(102) {null -&gt; MONDAY 09:30}]).
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>trace</code> ロギングを使用して、すべての <em>ステップ</em> と、ステップごとのすべての <em>動き</em> を表示します。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="summary"><a class="anchor" href="#summary"></a>まとめ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>これで、 <a href="https://www.optaplanner.org/">OptaPlanner</a> を使用して Quarkus アプリケーションを開発しました。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="further-improvements-database-and-ui-integration"><a class="anchor" href="#further-improvements-database-and-ui-integration"></a>さらなる改善: データベースと UI の統合</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次に、データベースと UI の統合を追加しましょう。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>Timeslot</code>、<code>Room</code>、<code>Lesson</code> を <a href="hibernate-orm-panache">Hibernate および Panache</a> を使用してデータベースに保存します。</p>
+</li>
+<li>
+<p><a href="rest-json">REST で公開します</a> 。</p>
+</li>
+<li>
+<p><code>TimeTableResource</code> を調整して、単一のトランザクションで <code>TimeTable</code> インスタンスを読み書きし、適切にそれらを使用します。</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.optaplanner.rest;
+
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+
+import io.quarkus.panache.common.Sort;
+import org.acme.optaplanner.domain.Lesson;
+import org.acme.optaplanner.domain.Room;
+import org.acme.optaplanner.domain.TimeTable;
+import org.acme.optaplanner.domain.Timeslot;
+import org.optaplanner.core.api.score.ScoreManager;
+import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
+import org.optaplanner.core.api.solver.SolverManager;
+import org.optaplanner.core.api.solver.SolverStatus;
+
+@Path("/timeTable")
+public class TimeTableResource {
+
+    public static final Long SINGLETON_TIME_TABLE_ID = 1L;
+
+    @Inject
+    SolverManager&lt;TimeTable, Long&gt; solverManager;
+    @Inject
+    ScoreManager&lt;TimeTable, HardSoftScore&gt; scoreManager;
+
+    // To try, open http://localhost:8080/timeTable
+    @GET
+    public TimeTable getTimeTable() {
+        // Get the solver status before loading the solution
+        // to avoid the race condition that the solver terminates between them
+        SolverStatus solverStatus = getSolverStatus();
+        TimeTable solution = findById(SINGLETON_TIME_TABLE_ID);
+        scoreManager.updateScore(solution); // Sets the score
+        solution.setSolverStatus(solverStatus);
+        return solution;
+    }
+
+    @POST
+    @Path("/solve")
+    public void solve() {
+        solverManager.solveAndListen(SINGLETON_TIME_TABLE_ID,
+                this::findById,
+                this::save);
+    }
+
+    public SolverStatus getSolverStatus() {
+        return solverManager.getSolverStatus(SINGLETON_TIME_TABLE_ID);
+    }
+
+    @POST
+    @Path("/stopSolving")
+    public void stopSolving() {
+        solverManager.terminateEarly(SINGLETON_TIME_TABLE_ID);
+    }
+
+    @Transactional
+    protected TimeTable findById(Long id) {
+        if (!SINGLETON_TIME_TABLE_ID.equals(id)) {
+            throw new IllegalStateException("There is no timeTable with id (" + id + ").");
+        }
+        // Occurs in a single transaction, so each initialized lesson references the same timeslot/room instance
+        // that is contained by the timeTable's timeslotList/roomList.
+        return new TimeTable(
+                Timeslot.listAll(Sort.by("dayOfWeek").and("startTime").and("endTime").and("id")),
+                Room.listAll(Sort.by("name").and("id")),
+                Lesson.listAll(Sort.by("subject").and("teacher").and("studentGroup").and("id")));
+    }
+
+    @Transactional
+    protected void save(TimeTable timeTable) {
+        for (Lesson lesson : timeTable.getLessonList()) {
+            // TODO this is awfully naive: optimistic locking causes issues if called by the SolverManager
+            Lesson attachedLesson = Lesson.findById(lesson.getId());
+            attachedLesson.setTimeslot(lesson.getTimeslot());
+            attachedLesson.setRoom(lesson.getRoom());
+        }
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>わかりやすくするために、このコードは 1 つの <code>TimeTable</code> インスタンスのみを処理しますが、簡単にマルチテナンシーを有効にして、異なる高校の複数の <code>TimeTable</code> インスタンスを並行処理できます。</p>
+</div>
+<div class="paragraph">
+<p><code>getTimeTable()</code> メソッドは、データベースから最新のタイムテーブルを返します。<code>ScoreManager</code> (自動的に挿入されます) を使用してそのタイムテーブルのスコアを計算するため、UI でスコアを表示できます。</p>
+</div>
+<div class="paragraph">
+<p><code>solve()</code> メソッドは、現在のタイムテーブルを解決し、タイムスロットと教室の割り当てをデータベースに保存するジョブを開始します。<code>SolverManager.solveAndListen()</code> メソッドを使用して、中間の最適ソリューションをリッスンし、それに応じてデータベースを更新します。これにより、バックエンドが解決している間も、UI に進行状況を表示できます。</p>
+</div>
+</li>
+<li>
+<p><code>TimeTableResourceTest</code> インスタンスを適切に調整します。これで、<code>solve()</code> メソッドがすぐに返されます。ソルバーが解決を完了するまで、最新のソリューションをポーリングします。</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.optaplanner.rest;
+
+import jakarta.inject.Inject;
+
+import io.quarkus.test.junit.QuarkusTest;
+import org.acme.optaplanner.domain.Lesson;
+import org.acme.optaplanner.domain.TimeTable;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+import org.optaplanner.core.api.solver.SolverStatus;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@QuarkusTest
+public class TimeTableResourceTest {
+
+    @Inject
+    TimeTableResource timeTableResource;
+
+    @Test
+    @Timeout(600_000)
+    public void solveDemoDataUntilFeasible() throws InterruptedException {
+        timeTableResource.solve();
+        TimeTable timeTable = timeTableResource.getTimeTable();
+        while (timeTable.getSolverStatus() != SolverStatus.NOT_SOLVING) {
+            // Quick polling (not a Test Thread Sleep anti-pattern)
+            // Test is still fast on fast machines and doesn't randomly fail on slow machines.
+            Thread.sleep(20L);
+            timeTable = timeTableResource.getTimeTable();
+        }
+        assertFalse(timeTable.getLessonList().isEmpty());
+        for (Lesson lesson : timeTable.getLessonList()) {
+            assertNotNull(lesson.getTimeslot());
+            assertNotNull(lesson.getRoom());
+        }
+        assertTrue(timeTable.getScore().isFeasible());
+    }
+
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>これらの REST メソッドに魅力的な Web UI を構築して、タイムテーブルを視覚化します。</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Take a look at <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/3.2/optaplanner-quickstart">the quickstart source code</a> to see how this all turns out.</p>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#what-you-will-build">何を構築するか</a></li>
+<li><a href="#solution">ソリューション</a></li>
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#the-build-file-and-the-dependencies">ビルドファイルと依存関係</a></li>
+<li><a href="#model-the-domain-objects">ドメインオブジェクトのモデル化</a>
+<ul class="sectlevel2">
+<li><a href="#timeslot">タイムスロット</a></li>
+<li><a href="#room">教室</a></li>
+<li><a href="#lesson">レッスン</a></li>
+</ul>
+</li>
+<li><a href="#define-the-constraints-and-calculate-the-score">制約の定義とスコアの計算</a></li>
+<li><a href="#gather-the-domain-objects-in-a-planning-solution">プランニングソリューションでドメインオブジェクトを収集します</a>
+<ul class="sectlevel2">
+<li><a href="#the-value-range-providers">値の範囲プロバイダー</a></li>
+<li><a href="#the-problem-fact-and-planning-entity-properties">問題の事実とプランニングエンティティーのプロパティー</a></li>
+</ul>
+</li>
+<li><a href="#create-the-solver-service">ソルバーサービスの作成</a></li>
+<li><a href="#set-the-termination-time">終了時刻の設定</a></li>
+<li><a href="#run-the-application">アプリケーションの実行</a>
+<ul class="sectlevel2">
+<li><a href="#try-the-application">アプリケーションの試行</a></li>
+<li><a href="#test-the-application">アプリケーションのテスト</a></li>
+<li><a href="#logging">ロギング</a></li>
+</ul>
+</li>
+<li><a href="#summary">まとめ</a></li>
+<li><a href="#further-improvements-database-and-ui-integration">さらなる改善: データベースと UI の統合</a></li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

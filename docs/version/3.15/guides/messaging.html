@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Quarkus Messagingエクステンション - 3.15 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.15/guides/messaging" />
+  <meta property="og:title" content="Quarkus Messagingエクステンション - 3.15" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/messaging">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.15/guides/messaging">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.15/guides/messaging" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.15/guides/messaging">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.15/guides/messaging">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.15/guides/messaging">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.15/guides/messaging">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.15/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" selected>3.15</option>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">Quarkus Messagingエクステンション </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>イベント駆動型メッセージングシステムは、ほとんどの最新アプリケーションのバックボーンになっています。
+これにより、メッセージ駆動型マイクロサービスや複雑なデータストリーミングパイプラインのビルドが可能になります。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus では、主要なメッセージングテクノロジーと簡単に同期できるように設計された包括的なメッセージングエクステンションスイートを提供しています。
+これにより、開発者はコアアプリケーションロジックの作成に集中できるようになり、個々の API やメッセージングインフラストラクチャーの複雑さを詳しく調べる必要がなくなります。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/messaging-quarkus.png" alt="Quarkus Messaging">
+</div>
+</div>
+<div class="paragraph">
+<p>このページでは、すべてのメッセージングエクステンションに共通する機能と開発モデルに焦点を当てています。</p>
+</div>
+<div class="paragraph">
+<p>これらのエクステンションの一部は、コア Quarkus リポジトリーで管理されています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>メッセージング</strong>: コアエクステンションは、メッセージングアプリケーションを開発するための基本的な概念と API を定義します。</p>
+</li>
+<li>
+<p><a href="kafka"><strong>Messaging - Kafka Connector</strong></a></p>
+</li>
+<li>
+<p><a href="pulsar"><strong>Messaging - Pulsar Connector</strong></a></p>
+</li>
+<li>
+<p><a href="rabbitmq-reference"><strong>Messaging - RabbitMQ Connector</strong></a></p>
+</li>
+<li>
+<p><a href="amqp-reference"><strong>Messaging - AMQP 1.0 Connector</strong></a></p>
+</li>
+<li>
+<p><strong>Messaging - MQTT Connector</strong></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>いくつかのエクステンションはコミュニティーによって提供され、維持されています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://camel.apache.org/camel-quarkus/3.8.x/reference/extensions/smallrye-reactive-messaging.html">Camel SmallRye Reactive Messaging</a></p>
+</li>
+<li>
+<p>リンク:https://docs.quarkiverse.io/quarkus-reactive-messsaging-nats-jetstream/dev/index.html[Nats Jetstream Connector]</p>
+</li>
+<li>
+<p>リンク:https://solacelabs.github.io/solace-quarkus/[Solace Messaging Connector]</p>
+</li>
+<li>
+<p>リンク:https://quarkus.io/extensions/io.quarkiverse.reactivemessaging.http/quarkus-reactive-messaging-http/[Reactive HTTP および WebSocket Connector]</p>
+</li>
+<li>
+<p>AWS SQS Connector</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>JMS Connector</strong> や <strong>Google PubSub Connector</strong> などの他のコネクターでは、同じレベルのインテグレーションのメリットが得られず、セットアップには手動での設定がさらに必要となります。</p>
+</div>
+<div class="paragraph">
+<p>一方、メッセージング関連のエクステンションの中には、低レベルのプロバイダー固有のインテグレーションを提案するものもあります。
+このページで説明されているサポートレベルには、これらの低レベルのエクステンションは含まれません。
+以下は、この種のエクステンションの一部を含むリストです。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>リンク:https://quarkus.io/guides/kafka-streams[Kafka Streams エクステンション]</p>
+</li>
+<li>
+<p>リンク:https://docs.quarkiverse.io/quarkus-rabbitmq-client/dev/index.html[RabbitMQ Client]</p>
+</li>
+<li>
+<p>リンク:https://docs.quarkiverse.io/quarkus-hivemq-client/dev/index.html[HiveMQ Client]</p>
+</li>
+<li>
+<p>リンク:https://docs.quarkiverse.io/quarkus-artemis/dev/quarkus-artemis-jms.html[Artemis Core &amp; JMS]</p>
+</li>
+<li>
+<p>リンク:https://docs.quarkiverse.io/quarkus-google-cloud-services/main/pubsub.html[Google Cloud Pubsub]</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="quarkus-messaging-development-model"><a class="anchor" href="#quarkus-messaging-development-model"></a>Quarkus Messaging 開発モデル</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus は、基盤となるブローカーテクノロジーがメッセージキューイングまたはイベントストリーミングを使用するかどうかに関係なく、メッセージの公開、消費、および処理のための統一モデルを確立することで、メッセージ駆動型アプリケーションの開発を簡素化します。
+MicroProfile Reactive Messaging 仕様に基づいてビルドされた Quarkus Messaging エクステンションは、シームレスかつ確実にこれらのテクノロジーと統合します。
+重要なのは、これらの機能を活用するために、リアクティブプログラミングを習熟していることが前提条件ではないという点です。</p>
+</div>
+<div class="paragraph">
+<p>Reactive Messaging 仕様は、イベント駆動型およびメッセージ駆動型のアプリケーションを実装するための CDI ベースのプログラミングモデルを定義します。
+少数のアノテーションセットを使用することで、CDI Bean はメッセージブローカーとの対話を実装するための設定要素になります。
+これらのやり取りは、アプリケーションコンポーネントがメッセージを読み書きする <em>チャネル</em> を通じて行われます。</p>
+</div>
+<div class="paragraph">
+<p><em>チャネル</em> は一意の名前で識別され、一連のアノテーションを使用して宣言されます。</p>
+</div>
+<div class="sect2">
+<h3 id="incoming-and-outgoing-annotations"><a class="anchor" href="#incoming-and-outgoing-annotations"></a><code>@Incoming</code> および <code>@Outgoing</code> アノテーション</h3>
+<div class="paragraph">
+<p><code>@Incoming</code> および <code>@Outgoing</code> メソッドアノテーションは、メッセージブローカーからのメッセージの消費とメッセージブローカーへのメッセージの生成を可能にする <em>チャネル</em> を定義します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.enterprise.context.ApplicationScoped;
+
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
+
+@ApplicationScoped
+public class MessageProcessingBean {
+
+   @Incoming("source")
+   @Outgoing("sink")
+   public String process(String consumedPayload) {
+       // Process the incoming message payload and return an updated payload
+       return consumedPayload.toUpperCase();
+   }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>@Outgoing</code> は、メッセージを生成するメソッドで単独で使用できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.enterprise.context.ApplicationScoped;
+
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Message;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
+
+@ApplicationScoped
+public class MessageGeneratorBean {
+
+   @Outgoing("sink")
+   public Multi&lt;String&gt; generate() {
+       return Multi.createFrom().items("a", "b", "c");
+   }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>@Incoming</code> は、メッセージを消費するために単独で使用できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.enterprise.context.ApplicationScoped;
+
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Message;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
+
+@ApplicationScoped
+public class MessageProcessingBean {
+
+   @Incoming("source")
+   public void process(String consumedPayload) {
+       // process the payload
+       consumedPayload.toUpperCase();
+   }
+
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>コードから直接 <code>@Incoming</code> や <code>@Outgoing</code> のアノテーションが付けられたメソッドを呼び出してはならない点に注意してください。
+これらはフレームワークによって呼び出されます。
+ユーザーコードがそれらを呼び出すと、期待どおりの結果は得られません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>サポートされるメソッド署名の詳細は、リンク:https://smallrye.io/smallrye-reactive-messaging/latest/concepts/signatures/[SmallRye Reactive Messaging – サポートされる署名] を参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="emitters-and-channel-annotation"><a class="anchor" href="#emitters-and-channel-annotation"></a>Emitter と <code>@Channel</code> アノテーション</h3>
+<div class="paragraph">
+<p>アプリケーションでは、多くの場合、メッセージングをアプリケーションの他の部分と組み合わせる必要があります。たとえば、HTTP エンドポイントからメッセージを生成したり、消費されたメッセージをレスポンスとしてストリーミングしたりする必要があります。</p>
+</div>
+<div class="paragraph">
+<p>命令型コードから特定のチャネルにメッセージを送信するには、<code>@Channel</code> アノテーションで識別される <code>Emitter</code> オブジェクトを注入する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
+
+@ApplicationScoped
+@Path("/")
+public class MyImperativeBean {
+
+   @Channel("prices")
+   Emitter&lt;Double&gt; emitter;
+
+   @GET
+   @Path("/send")
+   public CompletionStage&lt;Void&gt; send(double d) {
+       return emitter.send(d);
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>@Channel</code> アノテーションを使用すると、ペイロードまたはメッセージを送信するチャネルを指定できます。
+<code>Emitter</code> を使用すると、チャネルに送信されたメッセージをバッファリングできます。</p>
+</div>
+<div class="paragraph">
+<p>さらに制御するには、リンク:https://smallrye.io/smallrye-mutiny/latest/[Mutiny] APIs を使用して、<code>MutinyEmitter</code> エミッターインターフェイスを使用できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.smallrye.mutiny.Multi;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.MutinyEmitter;
+
+@ApplicationScoped
+@Path("/")
+public class MyImperativeBean {
+
+   @Channel("prices")
+   MutinyEmitter&lt;Double&gt; emitter;
+
+   @GET
+   @Path("/send")
+   public void send(double d) {
+       emitter.sendAndAwait(d);
+   }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>@Channel</code> アノテーションは、着信チャネルからのメッセージストリームを注入するためにも使用できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.reactive.messaging.Channel;
+
+@ApplicationScoped
+@Path("/")
+public class SseResource {
+
+    @Channel("prices")
+    Multi&lt;Double&gt; prices;
+
+    @GET
+    @Path("/prices")
+    @RestStreamElementType(MediaType.TEXT_PLAIN)
+    public Multi&lt;Double&gt; stream() {
+        return prices;
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>@Channel</code> でメッセージを消費する場合、アプリケーションコードがストリームへのサブスクライブを行います。
+上記の例では、Quarkus REST (旧称 RESTEasy Reactive) エンドポイントがサブスクリプションを処理します。</p>
+</div>
+<div class="paragraph">
+<p>エミッターとチャネルの詳細は、リンク:https://smallrye.io/smallrye-reactive-messaging/latest/concepts/emitter/[SmallRye Reactive Messaging – エミッターとチャネル] のドキュメントを参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="messages-and-metadata"><a class="anchor" href="#messages-and-metadata"></a>メッセージとメタデータ</h3>
+<div class="paragraph">
+<p><code>Message</code> はペイロードを包むエンベロープです。
+上記の例ではペイロードのみが使用されていましたが、Quarkus Messaging ではすべてのペイロードが内部的に <code>Message</code> でラップされています。</p>
+</div>
+<div class="paragraph">
+<p><code>Message&lt;T&gt;</code> インターフェイスは、確認応答 (ack) および否定応答 (nack) 用に <code>&lt;T&gt;</code> タイプのペイロードを <code>Metadata</code>、
+任意のオブジェクトと非同期アクションのセットに関連付けます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.reactive.messaging.Message;
+
+@Incoming("source")
+@Outgoing("sink")
+public Message&lt;String&gt; process(Message&lt;String&gt; consumed) {
+    // Access the metadata
+    MyMetadata my = consumed.getMetadata(MyMetadata.class).get();
+    // Process the incoming message and return an updated message
+    return consumed.withPayload(consumed.getPayload().toUpperCase());
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>メッセージの処理または受信が成功すると、ブローカーに確認応答が返されます。
+メッセージ間の確認応答は連鎖しており、メッセージを処理する際には、
+発信メッセージの確認は、着信メッセージの確認をトリガーします。
+ほとんどの場合、確認応答と否定応答は自動的に管理され、コネクターを使用するとチャネルごとに異なるストラテジーを設定できます。
+したがって、通常は <code>Message</code> インターフェイスと直接やり取りする必要はありません。
+高度なユースケースでのみ、Message と直接処理する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>一方、<code>Metadata</code> にアクセスすることは、多くの場合実用的です。
+コネクターは、メッセージヘッダー、プロパティー、およびその他のコネクター固有の情報にアクセスできるように、特定のメタデータオブジェクトをメッセージに追加します。
+コネクター固有のメタデータにアクセスするために、<code>Message</code> インターフェイスを操作する必要はありません。
+ペイロードパラメーターの後に、メタデータオブジェクトをメソッドパラメーターとして挿入するだけになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.reactive.messaging.Metadata;
+@Incoming("source")
+@Outgoing("sink")
+public String process(String payload, MyMetadata my) {
+    // Access the metadata
+    Map&lt;String, Object&gt; props = my.getProperties();
+    // Process the payload and return an updated payload
+    return payload.toUpperCase();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>コネクターに応じて、処理方法で使用できるペイロードタイプが異なります。
+カスタム <code>MessageConverter</code> を実装して、ペイロードをアプリケーションで受け入れられる型に変換できます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="channel-configuration"><a class="anchor" href="#channel-configuration"></a>チャネル設定</h3>
+<div class="paragraph">
+<p>チャネル属性は、<code>mp.messaging.incoming.&lt;channel-name&gt;</code> および <code>mp.messaging.outgoing.&lt;channel-name&gt;</code> 設定プロパティーを使用して設定できます。</p>
+</div>
+<div class="paragraph">
+<p>たとえば、カスタムデシリアライザーを使用して <code>my-topic</code> トピックからのメッセージを消費するように Kafka コネクターを設定するには、以下のようにします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.incoming.source.connector=smallrye-kafka
+mp.messaging.incoming.source.topic=my-topic
+mp.messaging.incoming.source.value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+mp.messaging.incoming.source.auto.offset.reset=earliest</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>connector</code> 属性はすべてのチャネルに必須であり、使用するコネクターを指定します。
+クラスパスにコネクターが 1 つしかない場合は、Quarkus が自動的にコネクターを選択するため、この設定を省略できます。</p>
+</div>
+<div class="paragraph">
+<p>グローバルチャネル属性は、コネクター名を使用して設定できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.connector.smallrye-kafka.bootstrap.servers=localhost:9092</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>コネクター固有の属性は、コネクターのドキュメントに記載されています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="channel-wiring-and-messaging-patterns"><a class="anchor" href="#channel-wiring-and-messaging-patterns"></a>チャネルワイヤリングとメッセージングパターン</h3>
+<div class="paragraph">
+<p>起動時に、Quarkus は宣言されたチャネルを分析してそれらをワイヤリングし、すべてのチャネルが接続されていることを確認します。
+具体的には、各チャネルは、別のチャネルのメッセージの <em>リアクティブストリーム</em> に接続されたメッセージの <em>リアクティブストリーム</em> を作成します。
+リアクティブストリームプロトコルに準拠し、チャネル間でバックプレッシャーメカニズムが適用され、アプリケーションリソースの使用を制御し、過剰なコミットやシステムの一部への過負荷を防ぐことができます。</p>
+</div>
+<div class="paragraph">
+<p>その一方で、ランタイム時にプログラムで新しいチャネルを作成することはできません。
+ただし、すべてではないにしても、ほとんどのメッセージングおよびインテグレーションユースケースを実装できるパターンは多数あります。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>一部のメッセージングテクノロジーでは、コンシューマーがトピックまたはキューのセットをサブスクライブし、プロデューサーがメッセージベースで特定のトピックにメッセージを送信できます。
+ランタイム時にクライアントを動的に設定および作成する必要があることが確実な場合は、低レベルのクライアントを直接使用することを検討する必要があります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="internal-channels"><a class="anchor" href="#internal-channels"></a>内部チャネル</h4>
+<div class="paragraph">
+<p>ユースケースによっては、メッセージングパターンを使用して同じアプリケーション内でメッセージを転送すると便利です。
+チャネルをメッセージングバックエンド、つまりコネクターに接続しない場合は、すべてがアプリケーション内部で行われます。
+そして、ストリームはメソッドを連鎖することで作成されます。
+各チェーンは引き続きリアクティブストリームで、バックプレッシャープロトコルが適用されます。</p>
+</div>
+<div class="paragraph">
+<p>フレームワークは、プロデューサー/コンシューマーチェーンが完全であることを確認します。
+つまり、アプリケーションがメッセージをインターナルチャネルに書き込む場合 (<code>@Outgoing</code> のみを持つメソッド、または <code>Emitter</code> を使用)、
+アプリケーション内からメッセージを消費する必要もあります (<code>@Incoming</code> のみを持つメソッド、またはアンマネージドストリームを使用)。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="enabledisable-channels"><a class="anchor" href="#enabledisable-channels"></a>チャネルを有効化/無効化</h4>
+<div class="paragraph">
+<p>定義されたすべてのチャネルはデフォルトで有効化されていますが、以下の設定でチャネルを無効化することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.incoming.my-channel.enabled=false</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これを Quarkus ビルドプロファイルと一緒に使用して、ターゲット環境などのビルド時の条件に基づいてチャネルを有効化/無効化することができます。
+チャネルを無効化するときは、以下の 2 つの点を確認する必要があります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>無効化されたチャネルの使用方法が、ビルド時にフィルタリングできる Bean 内に設定されていること。</p>
+</li>
+<li>
+<p>このチャネルがなくても、残りのチャネルが引き続き正常に動作すること。</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+@IfBuildProfile("my-profile")
+public class MyProfileBean {
+
+    @Outgoing("my-channel")
+    public Multi&lt;String&gt; generate() {
+        return Multi.createFrom().items("a", "b", "c");
+    }
+
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="multiple-outgoings-and-broadcast"><a class="anchor" href="#multiple-outgoings-and-broadcast"></a>Multiple Outgoings と <code>@Broadcast</code></h4>
+<div class="paragraph">
+<p>デフォルトでは、チャネルで送信されるメッセージは単一のコンシューマーにのみディスパッチされます。
+複数のコンシューマーが存在するとエラーとみなされ、デプロイメント時に報告されます。</p>
+</div>
+<div class="paragraph">
+<p><code>@Broadcast</code> アノテーションはこの動作を変更し、チャネルを通過するメッセージがすべてのコンシューマーにディスパッチされることを示します。
+<code>@Broadcast</code> は <code>@Outgoing</code> アノテーションと一緒に使用する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.reactive.messaging.Broadcast;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
+
+@Incoming("in")
+@Outgoing("out")
+@Broadcast
+public int increment(int i) {
+    return i + 1;
+}
+
+@Incoming("out")
+public void consume1(int i) {
+    //...
+}
+
+@Incoming("out")
+public void consume2(int i) {
+    //...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>@Broadcast</code> と同様に、同じメソッドで <code>@Outgoing</code> アノテーションを複数回使用して、このメソッドが複数のチャネルにメッセージを生成することを示すことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
+
+@Incoming("in")
+@Outgoing("out1")
+@Outgoing("out2")
+public String process(String s) {
+    // send messages from channel in to both channels out1 and out2
+    return s.toUpperCase();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Multiple Outgoings を使用すると、単一のメッセージが複数のターゲットチャネルによって処理されるファンアウトパターンを実装する場合に役立ちます。</p>
+</div>
+<div class="paragraph">
+<p>処理メソッドから <code>Targeted</code> を返すことで、メッセージを複数の送信先に選択的にディスパッチできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Incoming("in")
+@Outgoing("out1")
+@Outgoing("out2")
+@Outgoing("out3")
+public Targeted process(double price) {
+    // send messages from channel-in to both channel-out1 and channel-out2
+    Targeted targeted = Targeted.of("out1", "Price: " + price, "out2", "Quote: " + price);
+    if (price &gt; 90.0) {
+        return targeted.with("out3", price);
+    }
+    return targeted;
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="multiple-incomings-and-merge"><a class="anchor" href="#multiple-incomings-and-merge"></a>Multiple Incomings と <code>@Merge</code></h4>
+<div class="paragraph">
+<p>デフォルトでは、単一のプロデューサーがチャネル内でメッセージを送信できます。
+複数のプロデューサーが存在するとエラーとみなされ、デプロイメント時に報告されます。
+<code>@Merge</code> アノテーションはこの動作を変更し、チャネルに複数のプロデューサーが存在する可能性があることを示します。
+<code>@Merge</code> は <code>@Incoming</code> アノテーションと一緒に使用する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Incoming("in1")
+@Outgoing("out")
+public int increment(int i) {
+    return i + 1;
+}
+
+@Incoming("in2")
+@Outgoing("out")
+public int multiply(int i) {
+    return i * 2;
+}
+
+@Incoming("out")
+@Merge
+public void getAll(int i) {
+    //...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>@Merge</code> と同様に、同じメソッドで <code>@Incoming</code> アノテーションを複数回使用して、メソッドが複数のチャネルからのメッセージを消費することを示すことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Incoming("in1")
+@Incoming("in2")
+public String process(String s) {
+    // get messages from channel-1 and channel-2
+    return s.toUpperCase();
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="stream-processing"><a class="anchor" href="#stream-processing"></a>ストリーム処理</h4>
+<div class="paragraph">
+<p>一部の高度なシナリオでは、個々のメッセージではなく、メッセージのストリームを直接操作できます。</p>
+</div>
+<div class="paragraph">
+<p>着信署名と発信署名でリンク:https://smallrye.io/smallrye-mutiny/latest/[Mutiny APIs] を使用すると、メッセージのストリームを処理できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.smallrye.mutiny.Multi;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
+
+@ApplicationScoped
+public class StreamProcessor {
+
+    @Incoming("source")
+    @Outgoing("sink")
+    public Multi&lt;String&gt; process(Multi&lt;String&gt; in) {
+        return in.map(String::toUpperCase);
+    }
+
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="execution-model"><a class="anchor" href="#execution-model"></a>実行モデル</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus Messaging は、Quarkus の <a href="quarkus-reactive-architecture#engine">リアクティブエンジン</a> の上に配置され、リンク:https://vertx.io/[Eclipse Vert.x] を活用して処理用にメッセージをディスパッチします。
+以下の 3 つの実行モードをサポートしています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>イベントループ</strong>: メッセージが Vert.x I/O スレッドにディスパッチされます。
+イベントループではブロッキング操作を実行しないでください。</p>
+</li>
+<li>
+<p><strong>ワーカースレッド</strong>: メッセージはワーカースレッドプールにディスパッチされます。</p>
+</li>
+<li>
+<p><strong>仮想スレッド</strong>: メッセージは仮想スレッドにディスパッチされます (Java 21 以降が必要です)。
+仮想スレッドはプールされないため、メッセージごとに新しい仮想スレッドが作成されます。
+詳細は、専用の <a href="messaging-virtual-threads">Quarkus Virtual Thread サポート</a> ガイドを参照してください。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Quarkus はメソッド署名に基づいてデフォルトの実行モードを選択します。
+メソッド署名が <em>synchronous</em> の場合、メッセージは <strong>ワーカースレッド</strong> にディスパッチされ、それ以外の場合はデフォルトで <strong>イベントループ</strong> にディスパッチされます。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">メソッドシグネチャ</th>
+<th class="tableblock halign-left valign-top">デフォルトの実行モード</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">@Incoming("source")
+void process(String payload)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ワークスレッド</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">@Incoming("source")
+Uni&lt;Void&gt; process(String payload)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">イベントループ</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">@Incoming("source")
+CompletionStage&lt;Void&gt; process(Message&lt;String&gt; message)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">イベントループ</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">@Incoming("source")
+@Outgoing("sink")
+Multi&lt;R&gt; process(Multi&lt;T&gt; in)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ストリーム処理メソッドは起動時に実行され、各メッセージはイベントループにディスパッチされます。</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>アノテーションを使用すると、実行モデルを細かく制御できます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>リンク:https://javadoc.io/doc/io.smallrye.reactive/smallrye-reactive-messaging-api/latest/io/smallrye/reactive/messaging/annotations/Blocking.html [<code>@Blocking</code>] は、メソッドをワーカースレッドプールで強制的に実行します。
+ワーカースレッドのデフォルトプールは、すべてのチャネル間で共有されます。
+<code>@Blocking("my-custom-pool")</code> を使用すると、カスタムスレッドプールを使用してチャネルを設定できます。
+設定プロパティー <code>smallrye.messaging.worker.my-custom-pool.max-concurrency</code> は、プール内のスレッドの最大数を指定します。
+ブロッキング処理の詳細は、リンク:http://smallrye.io/smallrye-reactive-messaging/4.8.0/concepts/blocking/[SmallRye Reactive Messaging のドキュメント] を参照してください。</p>
+</li>
+<li>
+<p><code>@NonBlocking</code> は、メソッドをイベントループスレッドで強制的に実行します。</p>
+</li>
+<li>
+<p><code>@RunOnVirtualThread</code> は、メソッドを仮想スレッド上で強制的に実行します。
+仮想スレッドの軽量な性質を活用するために、<code>@RunOnVirtualThread</code> アノテーションが付けられたメソッドのデフォルトの最大同時実行数は 1024 です。
+これは、<code>smallrye.messaging.worker.&lt;virtual-thread&gt;.max-concurrency</code> 設定プロパティーを設定することで変更できます。
+または、<code>@Blocking("my-custom-pool")</code> アノテーションと一緒に使用することで変更できます。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>@Transactional</code> アノテーションの存在は、実行をブロックすることを意味します。</p>
+</div>
+<div class="paragraph">
+<p>メッセージングアプリケーションでは、生成および消費されるメッセージは順序付けられたイベントのストリームを構成します。
+これは、(トピックまたはキュー内に) ブローカーによって強制されるか、
+アプリケーションの受付および発行の順序によって強制されます。
+この順序を維持するために、Quarkus Messaging はデフォルトでメッセージを順番にディスパッチします。
+<code>@Blocking(ordered = false)`または `@RunOnVirtualThread</code> アノテーションを使用して、この動作をオーバーライドできます。</p>
+</div>
+<div class="sect2">
+<h3 id="incoming-channel-concurrency"><a class="anchor" href="#incoming-channel-concurrency"></a>着信チャネルの同時実行</h3>
+<div class="paragraph">
+<p>一部のコネクターは、着信チャネルの同時実行レベルの設定をサポートしています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.incoming.my-channel.concurrency=4</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、内部的に着信チャネルのコピーが 4 つ作成され、同じ処理方法にワイヤリングされます。
+これは、ブローカーテクノロジーによっては、異なるコピーで受信されたメッセージの部分的な順序を保持したまま、
+複数のメッセージを同時に処理することでアプリケーションのスループットを向上させる際に役立つ場合があります。
+たとえば、複数のコンシューマーが異なるトピックパーティションを消費できる Kafka の場合がこれに該当します。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="health-checks"><a class="anchor" href="#health-checks"></a>ヘルスチェック</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Together with the SmallRye Health extension, Quarkus Messaging extensions provide health check support per channel.
+The implementation of <em>startup</em>, <em>readiness</em> and <em>liveness</em> checks depends on the connector.
+Some connectors allow configuring the health check behavior or disabling them completely or per channel.</p>
+</div>
+<div class="paragraph">
+<p>チャネルのヘルスチェックは、<code>quarkus.messaging.health.&lt;channel-name&gt;.enabled</code> を使用して無効化できます。またはヘルスチェックタイプごとに無効化できます。
+(例: <code>quarkus.messaging.health.&lt;channel-name&gt;.liveness.enabled</code>)</p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.messaging.health.enabled</code> 設定プロパティーを <code>false</code> に設定すると、メッセージングのヘルスチェックが完全に無効になります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="observability"><a class="anchor" href="#observability"></a>Observability</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="micrometer-metrics"><a class="anchor" href="#micrometer-metrics"></a>Micrometerメトリクス</h3>
+<div class="paragraph">
+<p>Quarkus Messaging エクステンションは、メッセージングシステムのヘルスを監視するためのシンプルかつ便利なメトリクスを提供します。
+<a href="telemetry-micrometer">Micrometer エクステンション</a> はこれらのメトリクスを公開します。</p>
+</div>
+<div class="paragraph">
+<p><code>channel</code> タグで識別されるチャネルごとに、以下のメトリクスを収集できます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus.messaging.message.count</code> : 生成または受信したメッセージの数</p>
+</li>
+<li>
+<p><code>quarkus.messaging.message.acks</code> : 正常に処理されたメッセージの数</p>
+</li>
+<li>
+<p><code>quarkus.messaging.message.failures</code> : 処理に失敗したメッセージの数</p>
+</li>
+<li>
+<p><code>quarkus.messaging.message.duration</code> : メッセージの処理時間</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>下位互換性のため、チャネルメトリクスはデフォルトでは有効化されていませんが、<code>smallrye.messaging.observation.enabled=true</code> で有効化することができます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="opentelemetry-tracing"><a class="anchor" href="#opentelemetry-tracing"></a>OpenTelemetry Tracing</h3>
+<div class="paragraph">
+<p>一部の Quarkus Messaging コネクターは、OpenTelemetry Tracing とすぐに統合されます。
+<a href="opentelemetry">OpenTelemetry エクステンション</a> が存在する場合、発信メッセージは現在のトレース範囲を伝播します。
+着信チャネルでは、受信したメッセージにトレース情報が含まれている場合、メッセージ処理はメッセージスパンを親として継承します。</p>
+</div>
+<div class="paragraph">
+<p>次の設定を使用して、特定のチャネルのトレースを無効にすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.incoming.data.tracing-enabled=false</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="tls-configuration"><a class="anchor" href="#tls-configuration"></a>TLS Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Some messaging extensions integrate with the <a href="./tls-registry-reference">Quarkus TLS Registry</a> to configure the underlying client.
+To configure the TLS on a channel, you need to provide the named TLS configuration to the <code>tls-configuration-name</code> property:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.tls.my-tls-config.trust-store=truststore.jks
+quarkus.tls.my-tls-config.trust-store-password=secret
+mp.messaging.incoming.my-channel.tls-configuration-name=my-tls-config</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Or you can configure it globally on all channels of a connector:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.connector.smallrye-pulsar.tls-configuration-name=my-tls-config</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Currently, the following messaging extensions support configuration through the Quarkus TLS Registry:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Kafka: Provides the <code>ssl.engine.factory.class</code> property for the Kafka client.</p>
+</li>
+<li>
+<p>Pulsar: Only mTLS authentication is supported.</p>
+</li>
+<li>
+<p>RabbitMQ</p>
+</li>
+<li>
+<p>AMQP 1.0</p>
+</li>
+<li>
+<p>MQTT</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing"><a class="anchor" href="#testing"></a>テスト</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="testing-with-dev-services"><a class="anchor" href="#testing-with-dev-services"></a>Dev Services を使用したテスト</h3>
+<div class="paragraph">
+<p>ほとんどの Quarkus Messaging エクステンションは、アプリケーションの開発とテストを簡素化する Dev Service を提供します。
+Dev Service は、Quarkus Messaging エクステンションですぐに使用できるように設定されたブローカーインスタンスを作成します。</p>
+</div>
+<div class="paragraph">
+<p>During testing Quarkus creates a separate broker instance to run the tests against it.</p>
+</div>
+<div class="paragraph">
+<p>プラットフォームエクステンションによって提供される Dev Services のリストを含む Dev Services の詳細は、<a href="dev-services">Dev Services</a> ガイドを参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="testing-with-inmemoryconnector"><a class="anchor" href="#testing-with-inmemoryconnector"></a>InMemoryConnector を使用したテスト</h3>
+<div class="paragraph">
+<p>ブローカーを起動せずにアプリケーションをテストすると便利です。
+これを実現するには、コネクターで管理しているチャンネルを <em>in-memory</em> に <em>切り替え</em> できます。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+このアプローチは、JVM テストでのみ機能します。インジェクションには対応していないため、ネイティブテストには使用できません。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>以下のサンプルアプリケーションをテストするとします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Message;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+@ApplicationScoped
+public class MyMessagingApplication {
+
+    @Inject
+    @Channel("words-out")
+    Emitter&lt;String&gt; emitter;
+
+    public void sendMessage(String out) {
+        emitter.send(out);
+    }
+
+    @Incoming("words-in")
+    @Outgoing("uppercase")
+    public Message&lt;String&gt; toUpperCase(Message&lt;String&gt; message) {
+        return message.withPayload(message.getPayload().toUpperCase());
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>まず、以下のテスト依存関係をアプリケーションに追加します。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.smallrye.reactive&lt;/groupId&gt;
+    &lt;artifactId&gt;smallrye-reactive-messaging-in-memory&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">testImplementation("io.smallrye.reactive:smallrye-reactive-messaging-in-memory")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、以下のように Quarkus Test Resource を作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class InMemoryConnectorLifecycleManager implements QuarkusTestResourceLifecycleManager {
+
+    @Override
+    public Map&lt;String, String&gt; start() {
+        Map&lt;String, String&gt; env = new HashMap&lt;&gt;();
+        Map&lt;String, String&gt; props1 = InMemoryConnector.switchIncomingChannelsToInMemory("words-in");   <i class="conum" data-value="1"></i><b>(1)</b>
+        Map&lt;String, String&gt; props2 = InMemoryConnector.switchOutgoingChannelsToInMemory("uppercase");  <i class="conum" data-value="2"></i><b>(2)</b>
+        Map&lt;String, String&gt; props3 = InMemoryConnector.switchOutgoingChannelsToInMemory("words-out");  <i class="conum" data-value="3"></i><b>(3)</b>
+        env.putAll(props1);
+        env.putAll(props2);
+        env.putAll(props3);
+        return env;  <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+
+    @Override
+    public void stop() {
+        InMemoryConnector.clear();  <i class="conum" data-value="5"></i><b>(5)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>着信チャネルl <code>words-in</code> (消費されたメッセージ)  をin-memory に切り替えます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>発信チャネル <code>words-out</code> (生成されたメッセージ) を in-memory に切り替えます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>発信チャネル <code>uppercase</code> (処理済みメッセージ) を in-memory に切り替えます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>インメモリーチャネルを使用するためのアプリケーション設定に必要なすべてのプロパティを含む <code>Map</code> をビルドして返します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>テストが停止したら、<code>InMemoryConnector</code> をクリアします (受信したメッセージと送信したメッセージをすべて破棄してください)。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>上記で作成したテストリソースを使用して <code>@QuarkusTest</code> を作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.junit.QuarkusTest;
+import io.smallrye.reactive.messaging.memory.InMemoryConnector;
+import io.smallrye.reactive.messaging.memory.InMemorySink;
+import io.smallrye.reactive.messaging.memory.InMemorySource;
+
+import org.eclipse.microprofile.reactive.messaging.spi.Connector;
+import org.junit.jupiter.api.Test;
+
+import jakarta.inject.Inject;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.awaitility.Awaitility.await;
+
+@QuarkusTest
+@QuarkusTestResource(InMemoryConnectorLifecycleManager.class)
+class MyMessagingApplicationTest {
+
+    @Inject
+    @Connector("smallrye-in-memory")
+    InMemoryConnector connector; <i class="conum" data-value="1"></i><b>(1)</b>
+
+    @Inject
+    MyMessagingApplication app;
+
+    @Test
+    void test() {
+        InMemorySink&lt;String&gt; wordsOut = connector.sink("words-out"); <i class="conum" data-value="2"></i><b>(2)</b>
+        InMemorySource&lt;String&gt; wordsIn = connector.source("words-in"); <i class="conum" data-value="3"></i><b>(3)</b>
+        InMemorySink&lt;String&gt; uppercaseOut = connector.sink("uppercase"); <i class="conum" data-value="4"></i><b>(4)</b>
+
+        app.sendMessage("Hello"); <i class="conum" data-value="5"></i><b>(5)</b>
+        assertEquals("Hello", wordsOut.received().get(0).getPayload()); <i class="conum" data-value="6"></i><b>(6)</b>
+
+        wordsIn.send("Bonjour"); <i class="conum" data-value="7"></i><b>(7)</b>
+        await().untilAsserted(() -&gt; assertEquals("BONJOUR", uppercaseOut.received().get(0).getPayload())); <i class="conum" data-value="8"></i><b>(8)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@Connector</code> または <code>@Any</code> 修飾子を使用して、テストクラスに in-memory コネクターを注入します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>発信チャネルの取得 (<code>words-out</code>) - テストリソース内でチャネルが in-memory に切り替えられている必要があります。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>着信チャネルの取得 (<code>words-in</code>)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>発信チャネルの取得 (<code>uppercase</code>)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>注入されたアプリケーション Bean を使用して <code>sendMessage</code> メソッドを呼び出し、チャネル <code>words-out</code> を持つエミッターを使用してメッセージを送信します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>アプリケーションによって生成されたメッセージを確認するには、<code>words-out</code> in-memory チャネルの <code>received</code> メソッドを使用します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>メッセージを送信するには、<code>words-in</code> in-memory チャネルの <code>send</code> メソッドを使用します。
+アプリケーションはこのメッセージを処理し、<code>uppercase</code> チャネルにメッセージを送信します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>アプリケーションによって生成されたメッセージを確認するには、<code>uppercase</code> チャネルの <code>received</code> メソッドを使用します。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>in-memory コネクターはテスト目的のみに使用されます。
+in-memory コネクターを使用する際に考慮すべき注意事項がいくつかあります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>in-memory コネクターは、<code>InMemorySource#send</code> メソッドを使用して送信されたオブジェクト (ペイロードまたは設定されたメッセージ) のみを送信します。
+アプリケーションメソッドによって受信されるメッセージには、コネクター固有のメタデータは含まれません。</p>
+</li>
+<li>
+<p>デフォルトでは、in-memory チャネルは、ユニットテストのメインスレッドとなる <code>InMemorySource#send</code> メソッドの呼び出し元スレッドでメッセージをディスパッチします。
+ただし、他のほとんどのコネクターは、個別の複製された Vert.x コンテキストでコンテキスト伝播ディスパッチメッセージを処理します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>quarkus-test-vertx</code> 依存関係は <code>@io.quarkus.test.vertx.RunOnVertxContext</code> アノテーションを提供します。これをテストメソッドで使用すると、Vert.x コンテキストでテストが実行されます。</p>
+</div>
+<div class="paragraph">
+<p>テストがコンテキストの伝播に依存している場合は、<code>run-on-vertx-context</code> 属性を使用して in-memory コネクターチャネルを設定し、メッセージや確認応答などのイベントを Vert.x コンテキストにディスパッチできます。
+あるいは、<code>InMemorySource#runOnVertxContext</code> メソッドを使用して、この動作を切り替えることもできます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="going-further"><a class="anchor" href="#going-further"></a>さらに詳しく</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、Quarkus Messaging エクステンションの一般的な原則について説明します。</p>
+</div>
+<div class="paragraph">
+<p>さらに詳しく知りたい場合は、リンク:http://smallrye.io/smallrye-reactive-messaging/[SmallRye Reactive Messaging] のドキュメントを参照してください。
+これには、それぞれのコンセプトなどに関する詳細なドキュメントが含まれています。</p>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#quarkus-messaging-development-model">Quarkus Messaging 開発モデル</a>
+<ul class="sectlevel2">
+<li><a href="#incoming-and-outgoing-annotations"><code>@Incoming</code> および <code>@Outgoing</code> アノテーション</a></li>
+<li><a href="#emitters-and-channel-annotation">Emitter と <code>@Channel</code> アノテーション</a></li>
+<li><a href="#messages-and-metadata">メッセージとメタデータ</a></li>
+<li><a href="#channel-configuration">チャネル設定</a></li>
+<li><a href="#channel-wiring-and-messaging-patterns">チャネルワイヤリングとメッセージングパターン</a></li>
+</ul>
+</li>
+<li><a href="#execution-model">実行モデル</a>
+<ul class="sectlevel2">
+<li><a href="#incoming-channel-concurrency">着信チャネルの同時実行</a></li>
+</ul>
+</li>
+<li><a href="#health-checks">ヘルスチェック</a></li>
+<li><a href="#observability">Observability</a>
+<ul class="sectlevel2">
+<li><a href="#micrometer-metrics">Micrometerメトリクス</a></li>
+<li><a href="#opentelemetry-tracing">OpenTelemetry Tracing</a></li>
+</ul>
+</li>
+<li><a href="#tls-configuration">TLS Configuration</a></li>
+<li><a href="#testing">テスト</a>
+<ul class="sectlevel2">
+<li><a href="#testing-with-dev-services">Dev Services を使用したテスト</a></li>
+<li><a href="#testing-with-inmemoryconnector">InMemoryConnector を使用したテスト</a></li>
+</ul>
+</li>
+<li><a href="#going-further">さらに詳しく</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/kafka">Apache Kafka リファレンスガイド</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/pulsar">Apache Pulsar リファレンス・ガイド</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/pulsar-dev-services">Dev Services for Pulsar</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/rabbitmq-dev-services">Dev Services for RabbitMQ</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/kafka-getting-started">Apache Kafkaを使用したQuarkusメッセージング入門</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/pulsar-getting-started">Apache PulsarによるQuarkusメッセージングの開始</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/rabbitmq">RabbitMQを使用したQuarkusメッセージング入門</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/messaging-virtual-threads">Reactive MessagingによるQuarkus仮想スレッドのサポート</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/rabbitmq-reference">リアクティブメッセージング RabbitMQ コネクターのリファレンスドキュメント</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/amqp-dev-services">Dev Services for AMQP</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/apicurio-registry-dev-services">Dev Services for Apicurio Registry</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/kafka-dev-services">Dev Services for Kafka</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/amqp">AMQP 1.0を使用したQuarkusのメッセージング入門</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/kafka-dev-ui">Kafka Dev UI</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/amqp-reference">リアクティブメッセージング AMQP1.0 コネクターリファレンスドキュメント</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/kafka-streams">Apache Kafka ストリームの使用</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/kafka-schema-registry-avro"> Schema RegistryとAvroと共にApache Kafkaを使用</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/kafka-schema-registry-json-schema">スキーマレジストリとJSONスキーマと共にApache Kafkaを使用する</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/jms">JMSの使用</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/reactive-event-bus">イベントバスの使用</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

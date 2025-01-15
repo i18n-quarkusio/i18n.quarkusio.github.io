@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>スケジューラーリファレンスガイド - 3.15 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.15/guides/scheduler-reference" />
+  <meta property="og:title" content="スケジューラーリファレンスガイド - 3.15" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/scheduler-reference">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.15/guides/scheduler-reference">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.15/guides/scheduler-reference" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.15/guides/scheduler-reference">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.15/guides/scheduler-reference">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.15/guides/scheduler-reference">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.15/guides/scheduler-reference">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.15/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" selected>3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">スケジューラーリファレンスガイド </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>最近のアプリケーションでは、特定のタスクを定期的に実行する必要があることがよくあります。Quarkusには、2つのスケジューラエクステンションがあります。 <code>quarkus-scheduler</code> エクステンションは、APIと軽量のインメモリスケジューラー実装を提供します。 <code>quarkus-quartz</code> エクステンションは、 <code>quarkus-scheduler</code> エクステンションのAPIを実装し、Quartzライブラリに基づくスケジューラ実装を含んでいます。 <code>quarkus-quartz</code> が必要になるのは、永続タスクやクラスタリングなど、より高度なスケジューリングのユースケースだけです。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+プロジェクトに <code>quarkus-quartz</code> 依存関係を追加すると、 <code>quarkus-scheduler</code> エクステンションからの軽量スケジューラーの実装は自動的に無効になります。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="scheduled-methods"><a class="anchor" href="#scheduled-methods"></a>1. スケジュールされたメソッド</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>@io.quarkus.scheduler.Scheduled</code> でアノテーションされたメソッドは、自動的に呼び出しがスケジュールされます。スケジュールされたメソッドは、abstractやprivateであってはなりません。静的または非静的であっても大丈夫です。スケジュールされたメソッドには、 <code>@jakarta.transaction.Transactional</code> や <code>@org.eclipse.microprofile.metrics.annotation.Counted</code> のようなインターセプターバインディングをアノテーションすることができます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+スコープを持たないBeanクラスで、 <code>@Scheduled</code> でアノテーションされた非静的メソッドが少なくとも一つ宣言されている場合、 <code>@Singleton</code> が使用されます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>さらに、アノテーションされたメソッドは <code>void</code> を返し、パラメーターを宣言しないか、 <code>io.quarkus.scheduler.ScheduledExecution</code> 型のパラメーターを 1 つだけ宣言する必要があります。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+アノテーションは繰り返し可能なので、1つのメソッドを複数回スケジュールすることができます。
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="inheritance-of-metadata"><a class="anchor" href="#inheritance-of-metadata"></a>1.1. Inheritance of metadata</h3>
+<div class="paragraph">
+<p>A subclass never inherits the metadata of a <code>@Scheduled</code> method declared on a superclass.
+For example, suppose the class <code>org.amce.Foo</code> is extended by the class <code>org.amce.Bar</code>.
+If <code>Foo</code> declares a non-static method annotated with <code>@Scheduled</code> then <code>Bar</code> does not inherit the metadata of the scheduled method.
+In the following example, the <code>everySecond()</code> method is only invoked upon the instance of <code>Foo</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class Foo {
+
+   @Scheduled(every = "1s")
+   void everySecond() {
+     // ..do something
+   }
+}
+
+@Singleton
+class Bar extends Foo {
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cdi-events"><a class="anchor" href="#cdi-events"></a>1.2. CDI events</h3>
+<div class="paragraph">
+<p>Some CDI events are fired synchronously and asynchronously when specific events occur.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">タイプ</th>
+<th class="tableblock halign-left valign-top">Event description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.quarkus.scheduler.SuccessfulExecution</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An execution of a scheduled job completed successfully.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.quarkus.scheduler.FailedExecution</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An execution of a scheduled job completed with an exception.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.quarkus.scheduler.SkippedExecution</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An execution of a scheduled job was skipped.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.quarkus.scheduler.SchedulerPaused</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The scheduler was paused.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.quarkus.scheduler.SchedulerResumed</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The scheduler was resumed.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.quarkus.scheduler.ScheduledJobPaused</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A scheduled job was paused.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.quarkus.scheduler.ScheduledJobResumed</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A scheduled job was resumed.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="triggers"><a class="anchor" href="#triggers"></a>1.3. トリガー</h3>
+<div class="paragraph">
+<p>トリガーは、 <code>@Scheduled#cron()</code> 属性または <code>@Scheduled#every()</code> 属性によって定義されます。両方が指定されている場合、cron 式が優先されます。何も指定されていない場合、ビルドは <code>IllegalStateException</code> で失敗します。</p>
+</div>
+<div class="sect3">
+<h4 id="cron"><a class="anchor" href="#cron"></a>1.3.1. CRON</h4>
+<div class="paragraph">
+<p>CRONトリガーは、cronライクな式で定義されています。例えば <code>"0 15 10 * * ?"</code> は毎日午前10時15分に起動します。</p>
+</div>
+<div class="listingblock">
+<div class="title">CRONトリガーの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Scheduled(cron = "0 15 10 * * ?")
+void fireAt1015AmEveryDay() { }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>CRON 式で使用される構文は <code>quarkus.scheduler.cron-type</code> プロパティーによって制御されます。 値は <code>cron4j</code> , <code>quartz</code> , <code>unix</code> および <code>spring</code> のいづれかです。<code>quartz</code> がデフォルトで使用されます。</p>
+</div>
+<div class="paragraph">
+<p><code>cron</code> 属性は、デフォルト値やネストされたプロパティ式を含む <a href="config-reference#using_property_expressions">プロパティ式</a> をサポートしています。(なお、"{property.path}"スタイルの表現もサポートされていますが、プロパティ式の完全な機能は提供されていません)。</p>
+</div>
+<div class="listingblock">
+<div class="title">CRON設定プロパティーの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Scheduled(cron = "${myMethod.cron.expr}")
+void myMethod() { }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>特定のスケジュールメソッドを無効にしたい場合は、そのcron式を <code>"off"</code> または <code>"disabled"</code> に設定します。</p>
+</div>
+<div class="listingblock">
+<div class="title">application.properties</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">myMethod.cron.expr=disabled</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>プロパティ式では、そのプロパティが構成されていない場合に使用されるデフォルト値を定義することができます。</p>
+</div>
+<div class="listingblock">
+<div class="title">デフォルト値が <code>0 0 15 ? * MON *</code> のCRON設定プロパティーの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Scheduled(cron = "${myMethod.cron.expr:0 0 15 ? * MON *}")
+void myMethod() { }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>プロパティ <code>myMethod.cron.expr</code> が未定義または <code>null</code> の場合は、デフォルト値（ <code>0 0 15 ? * MON *</code> ）が使用されます。</p>
+</div>
+<div class="sect4">
+<h5 id="time-zones"><a class="anchor" href="#time-zones"></a>1.3.1.1. タイムゾーン</h5>
+<div class="paragraph">
+<p>cron式は、デフォルトのタイムゾーンのコンテキストで評価されます。しかし、cron式を特定のタイムゾーンに関連付けることも可能です。</p>
+</div>
+<div class="listingblock">
+<div class="title">タイムゾーンの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Scheduled(cron = "0 15 10 * * ?", timeZone = "Europe/Prague") <i class="conum" data-value="1"></i><b>(1)</b>
+void myMethod() { }</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>タイムゾーンIDは、 <code>java.time.ZoneId#of(String)</code> を使って解析されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The <code>timeZone</code> attribute supports <a href="config-reference#property-expressions">Property Expressions</a> including default values and nested
+Property Expressions.</p>
+</div>
+<div class="listingblock">
+<div class="title">タイムゾーン設定プロパティの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Scheduled(cron = "0 15 10 * * ?", timeZone = "{myMethod.timeZone}")
+void myMethod() { }</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="intervals"><a class="anchor" href="#intervals"></a>1.3.2. インターバル</h4>
+<div class="paragraph">
+<p>An interval trigger defines a period between invocations.
+The period expression is based on the ISO-8601 duration format <code>PnDTnHnMn.nS</code> and the value of <code>@Scheduled#every()</code> is parsed with <code>java.time.Duration#parse(CharSequence)</code>.
+However, if an expression starts with a digit and ends with <code>d</code>, <code>P</code> prefix will be added automatically. If the expression only starts with a digit, <code>PT</code> prefix is added automatically.
+So for example, <code>15m</code> can be used instead of <code>PT15M</code> and is parsed as "15 minutes".</p>
+</div>
+<div class="listingblock">
+<div class="title">インターバルトリガーの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Scheduled(every = "15m")
+void every15Mins() { }</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+A value less than one second may not be supported by the underlying scheduler implementation. In that case a warning message is logged during build and application start.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>every</code> 属性は、デフォルト値やネストされたプロパティ式を含む <a href="config-reference#property-expressions">プロパティ式</a> をサポートしています。(なお、 <code>"{property.path}"</code> スタイル式はサポートされていますが、プロパティ式の完全な機能は提供されていません)。</p>
+</div>
+<div class="listingblock">
+<div class="title">インターバル設定プロパティーの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Scheduled(every = "${myMethod.every.expr}")
+void myMethod() { }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Intervals は、その値を <code>"off"</code> または <code>"disabled"</code> に設定することで無効にすることができます。そのため、例えば、デフォルト値 <code>"off"</code> のプロパティ式は、そのConfig Propertyが設定されていない場合、トリガーを無効にするために使用することができます。</p>
+</div>
+<div class="listingblock">
+<div class="title">デフォルト値のあるインターバル設定プロパティーの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Scheduled(every = "${myMethod.every.expr:off}")
+void myMethod() { }</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="identity"><a class="anchor" href="#identity"></a>1.4. アイデンティティ</h3>
+<div class="paragraph">
+<p>デフォルトでは、スケジュールされた各メソッドに対して一意の ID が生成されます。このIDはログメッセージやデバッグ中に使用されます。時には、明示的な id を指定することが便利な場合もあります。</p>
+</div>
+<div class="listingblock">
+<div class="title">アイデンティティの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Scheduled(identity = "myScheduledMethod")
+void myMethod() { }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>identity</code> 属性は、デフォルト値やネストされたプロパティ式を含む <a href="config-reference.html#using_property_expressions">プロパティ式</a>をサポートしています。(なお、 <code>"{property.path}"</code> スタイル式はサポートされていますが、プロパティ式の完全な機能は提供されていません)。</p>
+</div>
+<div class="listingblock">
+<div class="title">インターバル設定プロパティーの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Scheduled(identity = "${myMethod.identity.expr}")
+void myMethod() { }</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="delayed-execution"><a class="anchor" href="#delayed-execution"></a>1.5. 遅延実行</h3>
+<div class="paragraph">
+<p><code>@Scheduled</code> では、トリガーが発報を開始時刻を遅らせるための2つの方法を提供しています。</p>
+</div>
+<div class="paragraph">
+<p><code>@Scheduled#delay()</code> と <code>@Scheduled#delayUnit()</code> は初期遅延を一緒に形成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Scheduled(every = "2s", delay = 2, delayUnit = TimeUnit.HOUR) <i class="conum" data-value="1"></i><b>(1)</b>
+void everyTwoSeconds() { }</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>アプリケーション開始から2時間後に初めてトリガーが発射されます。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+最終的な値は常に1秒単位で丸められます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>@Scheduled#delayed()</code> is a text alternative to the properties above.
+The period expression is based on the ISO-8601 duration format <code>PnDTnHnMn.nS</code> and the value is parsed with <code>java.time.Duration#parse(CharSequence)</code>.
+However, if an expression starts with a digit and ends with <code>d</code>, <code>P</code> prefix will be added automatically. If the expression only starts with a digit, <code>PT</code> prefix is added automatically.
+So for example, <code>15s</code> can be used instead of <code>PT15S</code> and is parsed as "15 seconds".</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Scheduled(every = "2s", delayed = "2h")
+void everyTwoSeconds() { }</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>@Scheduled#delay()</code> がゼロよりも大きい値に設定されている場合、 <code>@Scheduled#delayed()</code> の値は無視されます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>@Scheduled#delay()</code> と比較した場合の主な利点は、値が設定可能であることです。 <code>delay</code> 属性は、デフォルト値やネストされたプロパティ式を含む <a href="config-reference.html#using_property_expressions">プロパティ式</a>をサポートしています。(なお、 <code>"{property.path}"</code> スタイルの表現はサポートされていますが、プロパティ式の完全な機能は提供されていません)。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Scheduled(every = "2s", delayed = "${myMethod.delay.expr}") <i class="conum" data-value="1"></i><b>(1)</b>
+void everyTwoSeconds() { }</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>遅延の設定には、configプロパティー <code>myMethod.delay.expr</code> を使用します。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="concurrent_execution"><a class="anchor" href="#concurrent_execution"></a>1.6. 同時実行</h3>
+<div class="paragraph">
+<p>デフォルトでは、スケジュールされたメソッドは同時に実行することができます。それにもかかわらず、 <code>@Scheduled#concurrentExecution()</code> を通じて同時実行を処理するための戦略を指定することが可能です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import static io.quarkus.scheduler.Scheduled.ConcurrentExecution.SKIP;
+
+@Scheduled(every = "1s", concurrentExecution = SKIP) <i class="conum" data-value="1"></i><b>(1)</b>
+void nonConcurrent() {
+  // we can be sure that this method is never executed concurrently
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>同時実行はスキップされます。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+スケジュールされたメソッドの実行がスキップされると、 <code>io.quarkus.scheduler.SkippedExecution</code> のタイプのCDIイベントが発生します。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+同じアプリケーションインスタンス内での実行のみが考慮されることに注意してください。この機能は、クラスター間での動作を意図したものではありません。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="conditional_execution"><a class="anchor" href="#conditional_execution"></a>1.7. 条件付き実行</h3>
+<div class="paragraph">
+<p>You can define the logic to skip any execution of a scheduled method via <code>@Scheduled#skipExecutionIf()</code>.
+The specified class must implement <code>io.quarkus.scheduler.Scheduled.SkipPredicate</code> and the execution is skipped if the result of the <code>test()</code> method is <code>true</code>.
+The class must either represent a CDI bean or declare a public no-args constructor.
+In case of CDI, there must be exactly one bean that has the specified class in its set of bean types, otherwise the build fails.
+Furthermore, the scope of the bean must be active during execution of the job.
+If the scope is <code>@Dependent</code> then the bean instance belongs exclusively to the specific scheduled method and is destroyed when the application is shut down.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class Jobs {
+
+   @Scheduled(every = "1s", skipExecutionIf = MyPredicate.class) <i class="conum" data-value="1"></i><b>(1)</b>
+   void everySecond() {
+     // do something every second...
+   }
+}
+
+@Singleton <i class="conum" data-value="2"></i><b>(2)</b>
+class MyPredicate implements SkipPredicate {
+
+   @Inject
+   MyService service;
+
+   boolean test(ScheduledExecution execution) {
+       return !service.isStarted(); <i class="conum" data-value="3"></i><b>(3)</b>
+   }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>MyPredicate.class</code> の Bean インスタンスは、実行をスキップすべきかどうかを評価するために使用されます。Beanタイプのセットに指定されたクラスを持つBeanが正確に1つ存在する必要があり、そうでない場合はビルドが失敗します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Beanのスコープは，実行中にアクティブでなければならない。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>Jobs.everySecond()</code> は、 <code>MyService.isStarted()</code> が <code>true</code> を返すまでスキップされます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>なお、これは以下のコードと同等のものです:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class Jobs {
+
+   @Inject
+   MyService service;
+
+   @Scheduled(every = "1s")
+   void everySecond() {
+     if (service.isStarted()) {
+        // do something every second...
+     }
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>主なアイデアは、スケジュールされたビジネスメソッドの外で実行をスキップするロジックを維持することで、再利用やリファクタリングが容易にできるようにすることです。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+スケジュールされたメソッドの実行がスキップされると、 <code>io.quarkus.scheduler.SkippedExecution</code> のタイプのCDIイベントが発生します。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+To skip the scheduled executions while the application is starting up/shutting down, you can make use of the <code>io.quarkus.scheduler.Scheduled.ApplicationNotRunning</code> skip predicate.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="non-blocking-methods"><a class="anchor" href="#non-blocking-methods"></a>1.8. ノンブロッキング方式</h3>
+<div class="paragraph">
+<p>デフォルトでは、スケジュールされたメソッドは、ブロックするタスクのメインエクゼキュータ上で実行されます。そのため、Vert.xイベントループ上で実行するように設計された技術（Hibernate Reactiveなど）は、メソッド本体内で使用することができません。このため、 <code>java.util.concurrent.CompletionStage&lt;Void&gt;</code> または <code>io.smallrye.mutiny.Uni&lt;Void&gt;</code> を返す、あるいは <code>@io.smallrye.common.annotation.NonBlocking</code> でアノテーションされたスケジュール型メソッドは、代わりに Vert.x のイベントループで実行されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class Jobs {
+
+   @Scheduled(every = "1s")
+   Uni&lt;Void&gt; everySecond() { <i class="conum" data-value="1"></i><b>(1)</b>
+     // ...do something async
+   }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>リターンタイプ <code>Uni&lt;Void&gt;</code> は、Vert.xのイベントループでメソッドを実行するようにスケジューラに指示します。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="how-to-use-multiple-scheduler-implementations"><a class="anchor" href="#how-to-use-multiple-scheduler-implementations"></a>1.9. How to use multiple scheduler implementations</h3>
+<div class="paragraph">
+<p>In some cases, it might be useful to choose a scheduler implementation used to execute a scheduled method.
+However, only one <code>Scheduler</code> implementation is used for all scheduled methods by default.
+For example, the <code>quarkus-quartz</code> extension provides an implementation that supports clustering but it also removes the simple in-memory implementation from the game.
+Now, if clustering is enabled then it&#8217;s not possible to define a scheduled method that would be executed locally on a single node.
+Nevertheless, if you set the <code>quarkus.scheduler.use-composite-scheduler</code> config property to <code>true</code> then a composite <code>Scheduler</code> is used instead.
+This means that multiple scheduler implementations are kept running side by side.
+Furthermore, it&#8217;s possible to chose a specific implementation used to execute a scheduled method using <code>@Scheduled#executeWith()</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class Jobs {
+
+   @Scheduled(cron = "0 15 10 * * ?") <i class="conum" data-value="1"></i><b>(1)</b>
+   void fireAt10AmEveryDay() { }
+
+   @Scheduled(every = "1s", executeWith = Scheduled.SIMPLE) <i class="conum" data-value="2"></i><b>(2)</b>
+   void everySecond() { }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>If the <code>quarkus-quartz</code> extension is present then this method will be executed with the Quartz-specific scheduler.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>If <code>quarkus.scheduler.use-composite-scheduler=true</code> is set then this method will be executed with the simple in-memory implementation provided by the <code>quarkus-scheduler</code> extension.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="scheduler"><a class="anchor" href="#scheduler"></a>2. スケジューラー</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusは、 <code>io.quarkus.scheduler.Scheduler</code> 型のビルトインBeanを提供しており、これを注入してスケジューラーを一時停止/再開するために使用することができます。</p>
+</div>
+<div class="listingblock">
+<div class="title">スケジューラーインジェクションの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.scheduler.Scheduler;
+
+class MyService {
+
+   @Inject
+   Scheduler scheduler;
+
+   void ping() {
+      scheduler.pause(); <i class="conum" data-value="1"></i><b>(1)</b>
+      scheduler.pause("myIdentity"); <i class="conum" data-value="2"></i><b>(2)</b>
+      if (scheduler.isRunning()) {
+         throw new IllegalStateException("This should never happen!");
+      }
+      scheduler.resume("myIdentity"); <i class="conum" data-value="3"></i><b>(3)</b>
+      scheduler.resume(); <i class="conum" data-value="4"></i><b>(4)</b>
+      scheduler.getScheduledJobs(); <i class="conum" data-value="5"></i><b>(5)</b>
+      Trigger jobTrigger = scheduler.getScheduledJob("myIdentity"); <i class="conum" data-value="6"></i><b>(6)</b>
+      if (jobTrigger != null &amp;&amp; jobTrigger.isOverdue()){ <i class="conum" data-value="7"></i><b>(7)</b>
+        // the job is late to the party.
+      }
+   }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>すべてのトリガーを一時停止します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>スケジュールされた特定のメソッドをそのIDで一時停止する</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>スケジュールされた特定のメソッドを、そのIDで再開する</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>スケジューラーを再開します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>スケジューラーを再開します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>スケジュールされた特定のメソッドを、そのIDで再開する。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>isOverdue()の猶予期間は、quarkus.scheduler.overdue-grace-periodを使用して設定することができます</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+CDIイベントは、スケジューラーやスケジュールされたジョブが一時停止/再開されたときに、同期および非同期で発生します。ペイロードはそれぞれ <code>io.quarkus.scheduler.SchedulerPaused</code> , <code>io.quarkus.scheduler.SchedulerResumed</code> , <code>io.quarkus.scheduler.ScheduledJobPaused</code> , <code>io.quarkus.scheduler.ScheduledJobResumed</code> です。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="programmatic_scheduling"><a class="anchor" href="#programmatic_scheduling"></a>3. プログラムスケジューリング</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>注入された <code>io.quarkus.scheduler.Scheduler</code> は、プログラム的にジョブをスケジュールするために使用することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="title">プログラムスケジューリング</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.scheduler.Scheduler;
+
+@ApplicationScoped
+class MyJobs {
+
+    @Inject
+    Scheduler scheduler;
+
+    void addMyJob() { <i class="conum" data-value="1"></i><b>(1)</b>
+        scheduler.newJob("myJob")
+            .setCron("0/5 * * * * ?")
+            .setTask(executionContext -&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+                // do something important every 5 seconds
+            })
+            .schedule(); <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+
+    void removeMyJob() {
+        scheduler.unscheduleJob("myJob"); <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>これは、 <code>@Scheduled(identity = "myJob", cron = "0/5 * * * * ?")</code> でアノテーションされたメソッドに代わるプログラム的な代替です。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>ビジネスロジックはコールバックで定義されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>JobDefinition#schedule()</code> メソッドが呼び出されると、ジョブがスケジュールされます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>プログラムによって追加されたジョブも削除することができます。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+デフォルトでは、 <code>@Scheduled</code> ビジネスメソッドが見つからない限り、スケジューラは開始されません。「純粋な」プログラムによるスケジューリングでは、 <code>quarkus.scheduler.start-mode=forced</code> を使ってスケジューラを強制的に起動させる必要があるかもしれません。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If the <a href="quartz">Quartz extension</a> is present and the DB store type is used then it&#8217;s not possible to pass a task instance to the job definition and a task class must be used instead. The Quartz API can be also used to schedule a job programmatically.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>In certain cases, a more fine-grained approach might be needed which is why Quarkus also exposes <code>java.util.concurrent.ScheduledExecutorService</code> and <code>java.util.concurrent.ExecutorService</code> that can be injected as CDI beans.
+However, these executors are used by other Quarkus extensions and therefore should be approached with caution. Furthermore, users are never allowed to shut these executors down manually.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class JobScheduler {
+
+   @Inject
+   ScheduledExecutorService executor;
+
+   void everySecondWithDelay() {
+       Runnable myRunnable = createMyRunnable();
+       executor.scheduleAtFixedRate(myRunnable, 3, 1, TimeUnit.SECONDS);
+   }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="scheduled-methods-and-testing"><a class="anchor" href="#scheduled-methods-and-testing"></a>4. スケジュールされたメソッドとテスト</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>テストを実行する際には、スケジューラーを無効にすることが望ましいことがよくあります。スケジューラーは、ランタイム設定プロパティー <code>quarkus.scheduler.enabled</code> を通じて無効にすることができます。 <code>false</code> に設定すると、アプリケーションにスケジュールされたメソッドが含まれていても、 スケジューラーは起動しません。特定の <a href="getting-started-testing.html#testing_different_profiles">テストプロファイル</a> に対してスケジューラーを無効にすることもできます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="metrics"><a class="anchor" href="#metrics"></a>5. メトリクス</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>quarkus.scheduler.metrics.enabled</code> が <code>true</code> に設定されていて、metrics エクステンションが存在する場合、いくつかの基本的なメトリクスがすぐに公開されます。</p>
+</div>
+<div class="paragraph">
+<p><a href="telemetry-micrometer">Micrometer エクステンション</a> が存在する場合、すべての <code>@Scheduled</code> メソッドに <code>@io.micrometer.core.annotation.Timed</code> インターセプター・バインディングが自動的に追加され (すでに存在する場合を除く)、 <code>scheduled.methods</code> という名前の <code>io.micrometer.core.instrument.Timer</code> と <code>scheduled.methods.running</code> という名前の <code>io.micrometer.core.instrument.LongTaskTimer</code> が登録されます。宣言するクラスの修飾子名と <code>@Scheduled</code> メソッド名がタグとして使用されます。</p>
+</div>
+<div class="paragraph">
+<p><a href="smallrye-metrics">SmallRye Metrics エクステンション</a>が存在する場合、 <code>@org.eclipse.microprofile.metrics.annotation.Timed</code> インターセプターバインディングがすべての <code>@Scheduled</code> メソッドに自動的に追加され（すでに存在している場合を除く）、 <code>org.eclipse.microprofile.metrics.Timer</code> が各 <code>@Scheduled</code> メソッドに対して作成されます。名前は、宣言したクラスの完全修飾名と <code>@Scheduled</code> メソッドの名前で構成されます。タイマーには、タグ <code>scheduled=true</code> が付いています。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="opentelemetry-tracing"><a class="anchor" href="#opentelemetry-tracing"></a>6. OpenTelemetry Tracing</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If <code>quarkus.scheduler.tracing.enabled</code> is set to <code>true</code> and the <a href="opentelemetry">OpenTelemetry extension</a> is present then every job execution, either defined with the <code>@Scheduled</code> annotation or scheduled programmatically, automatically creates a span named after the job&#8217;s <a href="#identity">アイデンティティ</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="virtual_threads"><a class="anchor" href="#virtual_threads"></a>7. 仮想スレッド上で @Scheduled メソッドを実行</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>@Scheduled</code> でアノテーションされたメソッドは、 <code>@RunOnVirtualThread</code> でアノテーションすることもできます。 
+この場合、メソッドは仮想スレッド上で呼び出されます。</p>
+</div>
+<div class="paragraph">
+<p>メソッドは <code>void</code> を返す必要があり、Java ランタイムは仮想スレッドのサポートを提供する必要があります。
+詳細については、 <a href="./virtual-threads">仮想スレッドガイド</a> をお読みください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration-reference"><a class="anchor" href="#configuration-reference"></a>8. 設定リファレンス</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="ビルド時に固定"></i></span>ビルド時に固定される構成プロパティ - 他のすべての構成プロパティは実行時にオーバーライド可能 <input type="search" id="config-search-0" placeholder="FILTER CONFIGURATION" disabled></p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference searchable configuration-reference-all-rows">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><span class="header-title">Configuration property</span></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-scheduler_quarkus-scheduler-cron-type"></a> <span class="property-path"><a href="#quarkus-scheduler_quarkus-scheduler-cron-type"><code>quarkus.scheduler.cron-type</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-1" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The syntax used in CRON expressions.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30309">QUARKUS_SCHEDULER_CRON_TYPE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30309" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><code>cron4j</code>, <code>quartz</code>, <code>unix</code>, <code>spring</code>, <code>spring53</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>quartz</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-scheduler_quarkus-scheduler-metrics-enabled"></a> <span class="property-path"><a href="#quarkus-scheduler_quarkus-scheduler-metrics-enabled"><code>quarkus.scheduler.metrics.enabled</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-2" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Scheduled task metrics will be enabled if a metrics extension is present and this value is true.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30310">QUARKUS_SCHEDULER_METRICS_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30310" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-scheduler_quarkus-scheduler-tracing-enabled"></a> <span class="property-path"><a href="#quarkus-scheduler_quarkus-scheduler-tracing-enabled"><code>quarkus.scheduler.tracing.enabled</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-3" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Controls whether tracing is enabled. If set to true and the OpenTelemetry extension is present, tracing will be enabled, creating automatic Spans for each scheduled task.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30311">QUARKUS_SCHEDULER_TRACING_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30311" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-scheduler_quarkus-scheduler-use-composite-scheduler"></a> <span class="property-path"><a href="#quarkus-scheduler_quarkus-scheduler-use-composite-scheduler"><code>quarkus.scheduler.use-composite-scheduler</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-4" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>By default, only one <code>Scheduler</code> implementation is used. If set to <code>true</code> then a composite <code>Scheduler</code> that delegates to all running implementations is used.</p>
+</div>
+<div class="paragraph">
+<p>Scheduler implementations will be started depending on the value of <code>quarkus.scheduler.start-mode</code>, i.e. the scheduler is not started unless a relevant <code>io.quarkus.scheduler.Scheduled</code> business method is found.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30312">QUARKUS_SCHEDULER_USE_COMPOSITE_SCHEDULER</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30312" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-scheduler_quarkus-scheduler-enabled"></a> <span class="property-path"><a href="#quarkus-scheduler_quarkus-scheduler-enabled"><code>quarkus.scheduler.enabled</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-5" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If schedulers are enabled.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30313">QUARKUS_SCHEDULER_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30313" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-scheduler_quarkus-scheduler-overdue-grace-period"></a> <span class="property-path"><a href="#quarkus-scheduler_quarkus-scheduler-overdue-grace-period"><code>quarkus.scheduler.overdue-grace-period</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-6" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Scheduled task will be flagged as overdue if next execution time is exceeded by this period.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30314">QUARKUS_SCHEDULER_OVERDUE_GRACE_PERIOD</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30314" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-{summaryTableId}"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>1S</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-scheduler_quarkus-scheduler-start-mode"></a> <span class="property-path"><a href="#quarkus-scheduler_quarkus-scheduler-start-mode"><code>quarkus.scheduler.start-mode</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-7" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Scheduler can be started in different modes. By default, the scheduler is not started unless a <code>io.quarkus.scheduler.Scheduled</code> business method is found.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30315">QUARKUS_SCHEDULER_START_MODE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30315" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><span class="asciidoc-tooltip-wrapper"><code>normal</code><span class="asciidoc-tooltip">The scheduler is not started unless a <code>io.quarkus.scheduler.Scheduled</code> business method is found.</span></span>, <span class="asciidoc-tooltip-wrapper"><code>forced</code><span class="asciidoc-tooltip">The scheduler will be started even if no scheduled business methods are found.  This is necessary for "pure" programmatic scheduling.</span></span>, <span class="asciidoc-tooltip-wrapper"><code>halted</code><span class="asciidoc-tooltip">Just like the <code>forced</code> mode but the scheduler will not start triggering jobs until <code>Scheduler#resume()</code> is called.  This can be useful to run some initialization logic that needs to be performed before the scheduler starts.</span></span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+</tbody>
+</table>
+<div id="duration-note-anchor-quarkus-scheduler_quarkus-scheduler" class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">期間フォーマットについて</div>
+<div class="paragraph">
+<p>To write duration values, use the standard <code>java.time.Duration</code> format.
+See the <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html#parse(java.lang.CharSequence)">Duration#parse() Java API documentation</a> for more information.</p>
+</div>
+<div class="paragraph">
+<p>数字で始まる簡略化した書式を使うこともできます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値のみの場合は、秒単位の時間を表します。</p>
+</li>
+<li>
+<p>数値の後に <code>ms</code> が続く場合は、ミリ秒単位の時間を表します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>その他の場合は、簡略化されたフォーマットが解析のために <code>java.time.Duration</code> フォーマットに変換されます：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値の後に <code>h</code> 、 <code>m</code> 、 <code>s</code> が続く場合は、その前に <code>PT</code> が付けられます。</p>
+</li>
+<li>
+<p>数値の後に <code>d</code> が続く場合は、その前に <code>P</code> が付けられます。</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#scheduled-methods">1. スケジュールされたメソッド</a>
+<ul class="sectlevel2">
+<li><a href="#inheritance-of-metadata">1.1. Inheritance of metadata</a></li>
+<li><a href="#cdi-events">1.2. CDI events</a></li>
+<li><a href="#triggers">1.3. トリガー</a></li>
+<li><a href="#identity">1.4. アイデンティティ</a></li>
+<li><a href="#delayed-execution">1.5. 遅延実行</a></li>
+<li><a href="#concurrent_execution">1.6. 同時実行</a></li>
+<li><a href="#conditional_execution">1.7. 条件付き実行</a></li>
+<li><a href="#non-blocking-methods">1.8. ノンブロッキング方式</a></li>
+<li><a href="#how-to-use-multiple-scheduler-implementations">1.9. How to use multiple scheduler implementations</a></li>
+</ul>
+</li>
+<li><a href="#scheduler">2. スケジューラー</a></li>
+<li><a href="#programmatic_scheduling">3. プログラムスケジューリング</a></li>
+<li><a href="#scheduled-methods-and-testing">4. スケジュールされたメソッドとテスト</a></li>
+<li><a href="#metrics">5. メトリクス</a></li>
+<li><a href="#opentelemetry-tracing">6. OpenTelemetry Tracing</a></li>
+<li><a href="#virtual_threads">7. 仮想スレッド上で @Scheduled メソッドを実行</a></li>
+<li><a href="#configuration-reference">8. 設定リファレンス</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same extensions</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/scheduler">定期的なタスクのスケジューリング</a></li>
+      </ul>
+    </div>
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/scheduler">定期的なタスクのスケジューリング</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/quartz">Quartzによる定期的なタスクのスケジューリング</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

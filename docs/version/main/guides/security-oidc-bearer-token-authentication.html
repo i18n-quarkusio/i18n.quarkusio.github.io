@@ -1,0 +1,2519 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>OpenID Connect (OIDC) ベアラートークン認証 - main - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/main/guides/security-oidc-bearer-token-authentication" />
+  <meta property="og:title" content="OpenID Connect (OIDC) ベアラートークン認証 - main" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/security-oidc-bearer-token-authentication">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/main/guides/security-oidc-bearer-token-authentication">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/main/guides/security-oidc-bearer-token-authentication" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/main/guides/security-oidc-bearer-token-authentication">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/main/guides/security-oidc-bearer-token-authentication">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/main/guides/security-oidc-bearer-token-authentication">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/main/guides/security-oidc-bearer-token-authentication">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/main/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" selected>Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        
+        
+        
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <a class="editlink" href="https://github.com/quarkusio/quarkus/edit/main/docs/src/main/asciidoc/security-oidc-bearer-token-authentication.adoc">このページを編集</a>
+      
+      <h1 class="text-caps">OpenID Connect (OIDC) ベアラートークン認証 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus OpenID Connect（OIDC）エクステンションを使用することで、ベアラートークン認証を使って、アプリケーション内のJakarta REST（旧称JAX-RS）エンドポイントへのHTTPアクセスを保護できます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="overview-of-the-bearer-token-authentication-mechanism-in-quarkus"><a class="anchor" href="#overview-of-the-bearer-token-authentication-mechanism-in-quarkus"></a>Quarkusのベアラートークン認証メカニズムの概要</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusは、Quarkus OpenID Connect（OIDC）エクステンションを通じて、ベアラートークン認証メカニズムをサポートしています。</p>
+</div>
+<div class="paragraph">
+<p>ベアラートークンは、 <a href="https://www.keycloak.org">Keycloak</a> などのOIDCやOAuth2.0に準拠した認可サーバーで発行されます。</p>
+</div>
+<div class="paragraph">
+<p>ベアラ・トークン認証とは、ベアラ・トークンの存在と有効性に基づいて HTTP 要求を認可するプロセスです。
+ベアラートークンは呼び出しの主体に関する情報を提供し、HTTP リソースにアクセスできるかどうかを決定するために使われます。</p>
+</div>
+<div class="paragraph">
+<p>以下の図に、Quarkusのベアラートークン認証メカニズムの概要を示します：</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="./images/security-bearer-token-authorization-mechanism-1.png" alt="Bearer token authentication" width="60%">
+</div>
+<div class="title">Figure 1. Quarkus のベアラー認証メカニズムとシングルページアプリケーション</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Quarkus サービスが、OIDC プロバイダーから検証キーを取得します。
+検証キーは、ベアラーアクセストークンの署名を検証するために使用されます。</p>
+</li>
+<li>
+<p>Quarkus ユーザーが、シングルページアプリケーション (SPA) にアクセスします。</p>
+</li>
+<li>
+<p>シングルページアプリケーションが、認可コードフローを使用してユーザーを認証し、OIDC プロバイダーからトークンを取得します。</p>
+</li>
+<li>
+<p>シングルページアプリケーションが、アクセストークンを使用して、Quarkus サービスからサービスデータを取得します。</p>
+</li>
+<li>
+<p>Quarkus サービスが、検証キーを使用してベアラーアクセストークンの署名を検証し、トークンの有効期限やその他のクレームをチェックします。トークンが有効であればリクエストの続行を許可し、シングルページアプリケーションにサービスレスポンスを返します。</p>
+</li>
+<li>
+<p>シングルページアプリケーションが、Quarkus ユーザーに同じデータを返します。</p>
+</li>
+</ol>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="./images/security-bearer-token-authorization-mechanism-2.png" alt="Bearer token authentication" width="60%">
+</div>
+<div class="title">Figure 2. JavaまたはコマンドラインクライアントによるQuarkusのベアラートークン認証メカニズム</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Quarkus サービスが、OIDC プロバイダーから検証キーを取得します。
+検証キーは、ベアラーアクセストークンの署名を検証するために使用されます。</p>
+</li>
+<li>
+<p>クライアントが、<code>client_credentials</code> かパスワードグラントを使用して、OIDC プロバイダーからアクセストークンを取得します。client_credentials には、クライアント ID とシークレットが必要です。パスワードグラントには、クライアント ID、シークレット、ユーザー名、およびパスワードが必要です。</p>
+</li>
+<li>
+<p>クライアントがアクセストークンを使用して、Quarkus サービスからサービスデータを取得します。</p>
+</li>
+<li>
+<p>Quarkus サービスが、検証キーを使用してベアラーアクセストークンの署名を検証し、トークンの有効期限やその他のクレームをチェックします。トークンが有効であればリクエストの続行を許可し、サービスレスポンスをクライアントに返します。</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>OIDC 認可コードフローを使用してユーザーを認証および認可する必要がある場合は、Quarkus の <a href="security-oidc-code-flow-authentication">Web アプリケーションを保護するための OpenID Connect 認可コードフローメカニズム</a> ガイドを参照してください。
+また、Keycloak とベアラートークンを使用する場合は、Quarkus <a href="security-keycloak-authorization">Keycloak を使用した認可の一元化</a> ガイドを参照してください。</p>
+</div>
+<div class="paragraph">
+<p>To learn about how you can protect service applications by using OIDC Bearer token authentication, see the following tutorial:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="security-oidc-bearer-token-authentication-tutorial">Protect a service application by using OpenID Connect (OIDC) Bearer token authentication</a>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>マルチテナントをサポートする方法については、Quarkus <a href="security-openid-connect-multitenancy">OpenID Connect マルチテナンシーの使用</a> ガイドを参照してください。</p>
+</div>
+<div class="sect2">
+<h3 id="accessing-jwt-claims"><a class="anchor" href="#accessing-jwt-claims"></a>JWT クレームへのアクセス</h3>
+<div class="paragraph">
+<p>JWT トークンクレームにアクセスする必要がある場合は、<code>JsonWebToken</code> を注入できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.openid.connect;
+
+import org.eclipse.microprofile.jwt.JsonWebToken;
+import jakarta.inject.Inject;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/api/admin")
+public class AdminResource {
+
+    @Inject
+    JsonWebToken jwt;
+
+    @GET
+    @RolesAllowed("admin")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String admin() {
+        return "Access for subject " + jwt.getSubject() + " is granted";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>JsonWebToken</code> の注入は、<code>@ApplicationScoped</code>、<code>@Singleton</code>、および <code>@RequestScoped</code> スコープでサポートされています。
+ただし、個々のクレームが単純型として挿入される場合は、<code>@RequestScoped</code> を使用する必要があります。
+詳細は、Quarkus の「JWT RBAC の使用」ガイドの <a href="security-jwt#supported-injection-scopes">サポートされている注入スコープ</a> セクションを参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="bearer-token-user-info"><a class="anchor" href="#bearer-token-user-info"></a><code>UserInfo</code></h3>
+<div class="paragraph">
+<p>OIDC <code>UserInfo</code> エンドポイントから UserInfo JSON オブジェクトをリクエストする必要がある場合は、<code>quarkus.oidc.authentication.user-info-required=true</code> を設定します。
+OIDC プロバイダーの <code>UserInfo</code> エンドポイントにリクエストが送信され、<code>io.quarkus.oidc.UserInfo</code> (単純な <code>javax.json.JsonObject</code> ラッパー) オブジェクトが作成されます。
+<code>io.quarkus.oidc.UserInfo</code> は、<code>SecurityIdentity</code> <code>userinfo</code> 属性として注入またはアクセスできます。</p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.oidc.authentication.user-info-required</code> is automatically enabled if one of these conditions is met:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>if <code>quarkus.oidc.roles.source</code> is set to <code>userinfo</code> or <code>quarkus.oidc.token.verify-access-token-with-user-info</code> is set to <code>true</code> or <code>quarkus.oidc.authentication.id-token-required</code> is set to <code>false</code>, the current OIDC tenant must support a UserInfo endpoint in these cases.</p>
+</li>
+<li>
+<p>if <code>io.quarkus.oidc.UserInfo</code> injection point is detected but only if the current OIDC tenant supports a UserInfo endpoint.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="bearer-token-config-metadata"><a class="anchor" href="#bearer-token-config-metadata"></a>設定メタデータ</h3>
+<div class="paragraph">
+<p>現在のテナントの検出された <a href="https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata">OpenID Connect 設定メタデータ</a> は、<code>io.quarkus.oidc.OidcConfigurationMetadata</code> で表され、<code>SecurityIdentity</code> <code>configuration-metadata</code> 属性として注入またはアクセスできます。</p>
+</div>
+<div class="paragraph">
+<p>エンドポイントがパブリックの場合、デフォルトのテナントの <code>OidcConfigurationMetadata</code> が注入されます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="token-claims-and-security-identity-roles"><a class="anchor" href="#token-claims-and-security-identity-roles"></a>トークンクレームと SecurityIdentity ロール</h3>
+<div class="paragraph">
+<p><code>SecurityIdentity</code> ロールは、次のように、検証済みの JWT アクセストークンからマッピングすることができます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus.oidc.roles.role-claim-path</code> プロパティーが設定されており、一致する配列または文字列のクレームが見つかった場合、そのクレームからロールが抽出されます。
+たとえば、<code>customroles</code>、<code>customroles/array</code>、<code>scope</code>、<code>"http://namespace-qualified-custom-claim"/roles</code>、<code>"http://namespace-qualified-roles"</code> などです。</p>
+</li>
+<li>
+<p><code>groups</code> クレームが利用可能な場合は、その値が使用されます。</p>
+</li>
+<li>
+<p><code>realm_access/roles</code> または <code>resource_access/client_id/roles</code> (<code>client_id</code> は <code>quarkus.oidc.client-id</code> プロパティーの値) クレームが利用可能な場合は、その値が使用されます。
+このチェックは、Keycloak が発行するトークンをサポートします。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>たとえば、次の JWT トークンには、ロールが含まれている <code>roles</code> 配列を含む複雑な <code>groups</code> クレームがあります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+    "iss": "https://server.example.com",
+    "sub": "24400320",
+    "upn": "jdoe@example.com",
+    "preferred_username": "jdoe",
+    "exp": 1311281970,
+    "iat": 1311280970,
+    "groups": {
+        "roles": [
+          "microprofile_jwt_user"
+        ],
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>microprofile_jwt_user</code> ロールは、<code>SecurityIdentity</code> ロールにマップする必要があります。これは、<code>quarkus.oidc.roles.role-claim-path=groups/roles</code> 設定で実行できます。</p>
+</div>
+<div class="paragraph">
+<p>トークンが不透明 (バイナリー) の場合は、リモートトークンイントロスペクションレスポンスの <code>scope</code> プロパティーが使用されます。</p>
+</div>
+<div class="paragraph">
+<p><code>UserInfo</code> がロールのソースである場合は、<code>quarkus.oidc.authentication.user-info-required=true</code> および <code>quarkus.oidc.roles.source=userinfo</code> を設定し、必要に応じて <code>quarkus.oidc.roles.role-claim-path</code> を設定します。</p>
+</div>
+<div class="paragraph">
+<p>さらに、カスタムの <code>SecurityIdentityAugmentor</code> を使用してロールを追加することもできます。
+詳細は、Quarkus の「セキュリティーに関するヒントとコツ」ガイドの <a href="security-customization#security-identity-customization">セキュリティーアイデンティティーのカスタマイズ</a> セクションを参照してください。</p>
+</div>
+<div class="paragraph">
+<p>また、<a href="security-authorize-web-endpoints-reference#map-security-identity-roles">HTTP セキュリティーポリシー</a> を使用して、トークンクレームから作成された <code>SecurityIdentity</code> ロールをデプロイメント固有のロールにマップすることもできます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="token-scopes-and-security-identity-permissions"><a class="anchor" href="#token-scopes-and-security-identity-permissions"></a>トークンのスコープと SecurityIdentity の権限</h3>
+<div class="paragraph">
+<p><code>SecurityIdentity</code> 権限は、<code>io.quarkus.security.StringPermission</code> の形式で、<a href="#token-claims-and-security-identity-roles">source of the roles</a> のスコープパラメーターから、同じクレームセパレーターを使用してマッピングされます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.util.List;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+import org.eclipse.microprofile.jwt.Claims;
+import org.eclipse.microprofile.jwt.JsonWebToken;
+
+import io.quarkus.security.PermissionsAllowed;
+
+@Path("/service")
+public class ProtectedResource {
+
+    @Inject
+    JsonWebToken accessToken;
+
+    @PermissionsAllowed("email") <i class="conum" data-value="1"></i><b>(1)</b>
+    @GET
+    @Path("/email")
+    public Boolean isUserEmailAddressVerifiedByUser() {
+        return accessToken.getClaim(Claims.email_verified.name());
+    }
+
+    @PermissionsAllowed("orders_read") <i class="conum" data-value="2"></i><b>(2)</b>
+    @GET
+    @Path("/order")
+    public List&lt;Order&gt; listOrders() {
+        return List.of(new Order("1"));
+    }
+
+    public static class Order {
+        String id;
+        public Order() {
+        }
+        public Order(String id) {
+            this.id = id;
+        }
+        public String getId() {
+            return id;
+        }
+        public void setId() {
+            this.id = id;
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>OpenID Connect スコープ <code>email</code> を持つリクエストのみにアクセスが許可されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>読み取りアクセスは、<code>orders_read</code> スコープを持つクライアントリクエストに制限されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>io.quarkus.security.PermissionsAllowed</code> アノテーションの詳細は、「Web エンドポイントの認可」ガイドの <a href="security-authorize-web-endpoints-reference#permission-annotation">権限アノテーション</a> セクションを参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="bearer-token-token-verification-introspection"><a class="anchor" href="#bearer-token-token-verification-introspection"></a>トークン検証・イントロスペクション</h3>
+<div class="paragraph">
+<p>トークンが JWT トークンの場合、デフォルトでは、OIDC プロバイダーの JWK エンドポイントから取得されたローカルの <code>JsonWebKeySet</code> の <code>JsonWebKey</code> (JWK) キーを使用してトークンが検証されます。
+トークンのキー識別子 (<code>kid</code>) ヘッダー値は、一致する JWK キーを検出するために使用されます。
+一致する <code>JWK</code> がローカルに存在しない場合は、JWK エンドポイントから現在のキーセットが取得され、<code>JsonWebKeySet</code> が更新されます。
+<code>JsonWebKeySet</code> の更新は、<code>quarkus.oidc.token.forced-jwk-refresh-interval</code> の有効期限が切れた後にのみ繰り返すことができます。
+デフォルトの有効期限は 10 分です。
+一致する <code>JWK</code> が更新後に利用できない場合は、JWT トークンが OIDC プロバイダーのトークンイントロスペクションエンドポイントに送信されます。</p>
+</div>
+<div class="paragraph">
+<p>トークンが不透明である場合、つまりバイナリートークンまたは暗号化された JWT トークンである場合、そのトークンは常に OIDC プロバイダーのトークンイントロスペクションエンドポイントに送信されます。</p>
+</div>
+<div class="paragraph">
+<p>JWT トークンのみを使用しており、一致する <code>JsonWebKey</code> が常に使用可能であることが予想される場合 (たとえば、キーセットを更新した後)、次の例に示すように、トークンイントロスペクションを無効にする必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.token.allow-jwt-introspection=false
+quarkus.oidc.token.allow-opaque-token-introspection=false</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>場合によっては、JWT トークンをイントロスペクションのみで検証しなければならないことがあります。これは、イントロスペクションエンドポイントアドレスのみを設定することで強制できます。
+次のプロパティー設定は、これを Keycloak を使用して実現する方法の例を示しています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.auth-server-url=http://localhost:8180/realms/quarkus
+quarkus.oidc.discovery-enabled=false
+# Token Introspection endpoint: http://localhost:8180/realms/quarkus/protocol/openid-connect/tokens/introspect
+quarkus.oidc.introspection-path=/protocol/openid-connect/tokens/introspect</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>JWT トークンのイントロスペクションをリモートで実施することを間接的に強制することには、利点と欠点があります。
+利点は、2 つのリモート呼び出し (リモート OIDC メタデータディスカバリー呼び出しと、それに続く使用されない検証キーを取得するための別のリモート呼び出し) が不要になることです。
+欠点は、ユーザーがイントロスペクションエンドポイントアドレスを確認して、手動で設定する必要があることです。</p>
+</div>
+<div class="paragraph">
+<p>別の方法としては、デフォルトオプションである OIDC メタデータディスカバリーを許可しながら、リモート JWT イントロスペクションのみを実行するよう要求する方法があります。次の例を参照してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.auth-server-url=http://localhost:8180/realms/quarkus
+quarkus.oidc.token.require-jwt-introspection-only=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この方法の利点は、設定がよりシンプルで理解しやすいことです。
+欠点は、検証キーが取得されない場合でも、イントロスペクションエンドポイントアドレスを検出するためにリモート OIDC メタデータディスカバリー呼び出しが必要になることです。</p>
+</div>
+<div class="paragraph">
+<p><code>io.quarkus.oidc.TokenIntrospection</code> (シンプルな <code>jakarta.json.JsonObject</code> ラッパーオブジェクト) が作成されます。
+このオブジェクトは、JWT または不透明トークンどちらかのイントロスペクションが成功した場合、<code>SecurityIdentity</code> <code>introspection</code> 属性として注入またはアクセスできます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="bearer-token-token-introspection-userinfo-cache"><a class="anchor" href="#bearer-token-token-introspection-userinfo-cache"></a>トークンのイントロスペクションと <code>UserInfo</code> キャッシュ</h3>
+<div class="paragraph">
+<p>不透明アクセストークンは、すべてリモートでイントロスペクトする必要があります。
+場合によっては、JWT アクセストークンをイントロスペクトする必要もあります。
+<code>UserInfo</code> も必要な場合は、OIDC プロバイダーへの後続のリモート呼び出しで同じアクセストークンが使用されます。
+したがって、<code>UserInfo</code> が必要で、現在のアクセストークンが不透明トークンである場合、そのトークンごとに 2 つのリモート呼び出しが行われます。1 つのリモート呼び出しはトークンをイントロスペクトするためのもので、もう 1 つは <code>UserInfo</code> を取得するためのものです。
+トークンが JWT の場合は、トークンをイントロスペクトする必要がなければ、<code>UserInfo</code> を取得するための 1 つのリモート呼び出しだけで済みます。</p>
+</div>
+<div class="paragraph">
+<p>場合によっては、着信ベアラーまたはコードフローアクセストークンごとに最大 2 つのリモート呼び出しを行うコストが問題になります。</p>
+</div>
+<div class="paragraph">
+<p>本番環境の場合は、トークンイントロスペクションと <code>UserInfo</code> データを短期間 (たとえば 3 分から 5 分) キャッシュすることを検討してください。</p>
+</div>
+<div class="paragraph">
+<p><code>quarkus-oidc</code> は、<code>quarkus.oidc.TokenIntrospectionCache</code> および <code>quarkus.oidc.UserInfoCache</code> インターフェイスを提供します。
+これらは <code>@ApplicationScoped</code> キャッシュ実装に使用できます。次の例に示すように、<code>@ApplicationScoped</code> キャッシュ実装を使用して、<code>quarkus.oidc.TokenIntrospection</code> オブジェクトや <code>quarkus.oidc.UserInfo</code> オブジェクトを保存および取得します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+@Alternative
+@Priority(1)
+public class CustomIntrospectionUserInfoCache implements TokenIntrospectionCache, UserInfoCache {
+...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>各 OIDC テナントは、<code>quarkus.oidc.TokenIntrospection</code> データ、<code>quarkus.oidc.UserInfo</code> データ、またはその両方の保存を許可または拒否できます。これには、ブール値の <code>quarkus.oidc."tenant".allow-token-introspection-cache</code> プロパティーと <code>quarkus.oidc."tenant".allow-user-info-cache</code> プロパティーを使用します。</p>
+</div>
+<div class="paragraph">
+<p>さらに、<code>quarkus-oidc</code> は、<code>quarkus.oidc.TokenIntrospectionCache</code> と <code>quarkus.oidc.UserInfoCache</code> の両方のインターフェイスを実装する、シンプルなデフォルトのメモリーベースのトークンキャッシュを提供します。</p>
+</div>
+<div class="paragraph">
+<p>デフォルトの OIDC トークンキャッシュは、次のように設定すると、有効にできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># 'max-size' is 0 by default, so the cache can be activated by setting 'max-size' to a positive value:
+quarkus.oidc.token-cache.max-size=1000
+# 'time-to-live' specifies how long a cache entry can be valid for and will be used by a cleanup timer:
+quarkus.oidc.token-cache.time-to-live=3M
+# 'clean-up-timer-interval' is not set by default, so the cleanup timer can be activated by setting 'clean-up-timer-interval':
+quarkus.oidc.token-cache.clean-up-timer-interval=1M</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>デフォルトのキャッシュは、トークンをキーとして使用します。各エントリーには、<code>TokenIntrospection</code>、<code>UserInfo</code>、またはその両方が含まれます。
+最大で <code>max-size</code> 個のエントリーのみが保持されます。
+新しいエントリーを追加するときにキャッシュがすでにいっぱいになっている場合は、期限切れのエントリーを 1 つ削除して領域を確保する試みが行われます。
+さらに、クリーンアップタイマーを有効にすると、期限切れのエントリーが定期的にチェックされ、削除されます。</p>
+</div>
+<div class="paragraph">
+<p>デフォルトのキャッシュ実装を試すことも、カスタムのキャッシュ実装を登録することもできます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="bearer-token-jwt-claim-verification"><a class="anchor" href="#bearer-token-jwt-claim-verification"></a>JSON Web トークンのクレーム検証</h3>
+<div class="paragraph">
+<p>ベアラーの JWT トークンの署名が検証され、その <code>expires at</code> (<code>exp</code>) クレームがチェックされると、次に <code>iss</code> (<code>issuer</code>) クレーム値が検証されます。</p>
+</div>
+<div class="paragraph">
+<p>デフォルトでは、<code>iss</code> クレーム値は、既知のプロバイダー設定で検出された <code>issuer</code> プロパティーと比較されます。
+ただし、<code>quarkus.oidc.token.issuer</code> プロパティーが設定されている場合は、代わりにそのプロパティーと <code>iss</code> クレーム値が比較されます。</p>
+</div>
+<div class="paragraph">
+<p>場合によっては、この <code>iss</code> クレーム検証がうまくいかないことがあります。
+たとえば、検出された <code>issuer</code> プロパティーには内部の HTTP/IP アドレスが含まれているのに、トークン <code>iss</code> クレーム値には外部の HTTP/IP アドレスが含まれている場合などです。
+または、検出された <code>issuer</code> プロパティーにはテンプレートテナント変数が含まれているのに、トークン <code>iss</code> クレーム値には完全なテナント固有の発行者の値が含まれている場合などです。</p>
+</div>
+<div class="paragraph">
+<p>このような場合は、<code>quarkus.oidc.token.issuer=any</code> を設定して発行者の検証をスキップすることを検討してください。
+発行者の検証のスキップは、他の方法を利用できない場合にのみ行ってください。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Keycloak を使用していて、ホストアドレスが異なるために発行者検証エラーが発生する場合は、Keycloak に <code>KEYCLOAK_FRONTEND_URL</code> プロパティーを設定して、同じホストアドレスを使用してください。</p>
+</li>
+<li>
+<p>マルチテナントデプロイメントで <code>iss</code> プロパティーがテナント固有のものである場合は、<code>SecurityIdentity</code> <code>tenant-id</code> 属性を使用して、エンドポイントまたはカスタム Jakarta フィルターで発行者が正しいことを確認します。
+以下に例を示します。</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.inject.Inject;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
+
+import org.eclipse.microprofile.jwt.JsonWebToken;
+import io.quarkus.oidc.OidcConfigurationMetadata;
+import io.quarkus.security.identity.SecurityIdentity;
+
+@Provider
+public class IssuerValidator implements ContainerRequestFilter {
+    @Inject
+    OidcConfigurationMetadata configMetadata;
+
+    @Inject JsonWebToken jwt;
+    @Inject SecurityIdentity identity;
+
+    public void filter(ContainerRequestContext requestContext) {
+        String issuer = configMetadata.getIssuer().replace("{tenant-id}", identity.getAttribute("tenant-id"));
+        if (!issuer.equals(jwt.getIssuer())) {
+            requestContext.abortWith(Response.status(401).build());
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>トークンの <code>aud</code> (<code>audience</code>) クレーム値を検証するために、<code>quarkus.oidc.token.audience</code> プロパティーを使用することを検討してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jose4j-validator"><a class="anchor" href="#jose4j-validator"></a>Jose4j Validator</h3>
+<div class="paragraph">
+<p>You can register a custom <a href="https://www.javadoc.io/doc/org.bitbucket.b_c/jose4j/latest/org/jose4j/jwt/consumer/class-use/Validator.html">Jose4j Validator</a> to customize the JWT claim verification process, before <code>org.eclipse.microprofile.jwt.JsonWebToken</code> is initialized.
+For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.openid.connect;
+
+import static org.eclipse.microprofile.jwt.Claims.iss;
+
+import io.quarkus.arc.Unremovable;
+import jakarta.enterprise.context.ApplicationScoped;
+
+import org.jose4j.jwt.MalformedClaimException;
+import org.jose4j.jwt.consumer.JwtContext;
+import org.jose4j.jwt.consumer.Validator;
+
+@Unremovable
+@ApplicationScoped
+public class IssuerValidator implements Validator { <i class="conum" data-value="1"></i><b>(1)</b>
+
+    @Override
+    public String validate(JwtContext jwtContext) throws MalformedClaimException {
+        if (jwtContext.getJwtClaims().hasClaim(iss.name())
+                &amp;&amp; "my-issuer".equals(jwtContext.getJwtClaims().getClaimValueAsString(iss.name()))) {
+            return "wrong issuer"; <i class="conum" data-value="2"></i><b>(2)</b>
+        }
+        return null; <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Register Jose4j Validator to verify JWT tokens for all OIDC tenants.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Return the claim verification error description.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Return <code>null</code> to confirm that this Validator has successfully verified the token.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Use a <code>@quarkus.oidc.TenantFeature</code> annotation to bind a custom Validator to a specific OIDC tenant only.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="single-page-applications"><a class="anchor" href="#single-page-applications"></a>シングルページ・アプリケーション</h3>
+<div class="paragraph">
+<p>シングルページアプリケーション (SPA) は、通常、<code>XMLHttpRequest</code> (XHR) と OIDC プロバイダーが提供する JavaScript ユーティリティーコードを使用してベアラートークンを取得し、Quarkus <code>service</code> アプリケーションにアクセスします。</p>
+</div>
+<div class="paragraph">
+<p>たとえば、Keycloak を使用する場合は、<code>keycloak.js</code> を使用してユーザーを認証し、SPA から期限切れのトークンを更新できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;keycloak-spa&lt;/title&gt;
+    &lt;script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"&gt;&lt;/script&gt;
+    &lt;script src="http://localhost:8180/js/keycloak.js"&gt;&lt;/script&gt;
+    &lt;script&gt;
+        var keycloak = new Keycloak();
+        keycloak.init({onLoad: 'login-required'}).success(function () {
+            console.log('User is now authenticated.');
+        }).error(function () {
+            window.location.reload();
+        });
+        function makeAjaxRequest() {
+            axios.get("/api/hello", {
+                headers: {
+                    'Authorization': 'Bearer ' + keycloak.token
+                }
+            })
+            .then( function (response) {
+                console.log("Response: ", response.status);
+            }).catch(function (error) {
+                console.log('refreshing');
+                keycloak.updateToken(5).then(function () {
+                    console.log('Token refreshed');
+                }).catch(function () {
+                    console.log('Failed to refresh token');
+                    window.location.reload();
+                });
+            });
+    }
+    &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;button onclick="makeAjaxRequest()"&gt;Request&lt;/button&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cross-origin-resource-sharing"><a class="anchor" href="#cross-origin-resource-sharing"></a>クロスオリジンリソース共有</h3>
+<div class="paragraph">
+<p>別のドメインで実行されているシングルページアプリケーションから OIDC <code>service</code> アプリケーションを使用する予定の場合は、クロスオリジンリソース共有 (CORS) を設定する必要があります。
+詳細は、「クロスオリジンリソース共有」ガイドの <a href="security-cors#cors-filter">CORS フィルター</a> セクションを参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="provider-endpoint-configuration"><a class="anchor" href="#provider-endpoint-configuration"></a>プロバイダーエンドポイント設定</h3>
+<div class="paragraph">
+<p>OIDC <code>service</code> アプリケーションは、OIDC プロバイダーのトークン、<code>JsonWebKey</code> (JWK) セット、場合によっては <code>UserInfo</code> やイントロスペクションのエンドポイントアドレスを確認する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>デフォルトでは、設定された <code>quarkus.oidc.auth-server-url</code> に <code>/.well-known/openid-configuration</code> パスを追加することで検出されます。</p>
+</div>
+<div class="paragraph">
+<p>ディスカバリーエンドポイントが利用できない場合や、ディスカバリーエンドポイントのラウンドトリップのコストを節約する場合は、検出を無効にして、エンドポイントアドレスを相対パス値で設定することができます。
+以下に例を示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.auth-server-url=http://localhost:8180/realms/quarkus
+quarkus.oidc.discovery-enabled=false
+# Token endpoint: http://localhost:8180/realms/quarkus/protocol/openid-connect/token
+quarkus.oidc.token-path=/protocol/openid-connect/token
+# JWK set endpoint: http://localhost:8180/realms/quarkus/protocol/openid-connect/certs
+quarkus.oidc.jwks-path=/protocol/openid-connect/certs
+# UserInfo endpoint: http://localhost:8180/realms/quarkus/protocol/openid-connect/userinfo
+quarkus.oidc.user-info-path=/protocol/openid-connect/userinfo
+# Token Introspection endpoint: http://localhost:8180/realms/quarkus/protocol/openid-connect/tokens/introspect
+quarkus.oidc.introspection-path=/protocol/openid-connect/tokens/introspect</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="token-propagation"><a class="anchor" href="#token-propagation"></a>トークンの伝播</h3>
+<div class="paragraph">
+<p>For information about bearer access token propagation to the downstream services, see the <a href="security-openid-connect-client-reference#token-propagation-rest">Token propagation</a> section of the Quarkus "OpenID Connect (OIDC) and OAuth2 client and filters reference" guide.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jwt-token-certificate-chain"><a class="anchor" href="#jwt-token-certificate-chain"></a>JWT token certificate chain</h3>
+<div class="paragraph">
+<p>In some cases, JWT bearer tokens have an <code>x5c</code> header which represents an X509 certificate chain whose leaf certificate contains a public key that must be used to verify this token&#8217;s signature.
+Before this public key can be accepted to verify the signature, the certificate chain must be validated first.
+The certificate chain validation involves several steps:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Confirm that every certificate but the root one is signed by the parent certificate.</p>
+</li>
+<li>
+<p>Confirm the chain&#8217;s root certificate is also imported in the truststore.</p>
+</li>
+<li>
+<p>Validate the chain&#8217;s leaf certificate. If a common name of the leaf certificate is configured then a common name of the chain&#8217;s leaf certificate must match it. Otherwise the chain&#8217;s leaf certificate must also be avaiable in the truststore, unless one or more custom <code>TokenCertificateValidator</code> implementations are registered.</p>
+</li>
+<li>
+<p><code>quarkus.oidc.TokenCertificateValidator</code> can be used to add a custom certificate chain validation step. It can be used by all tenants expecting tokens with the certificate chain or bound to specific OIDC tenants with the <code>@quarkus.oidc.TenantFeature</code> annotation.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>For example, here is how you can configure Quarkus OIDC to verify the token&#8217;s certificate chain, without using <code>quarkus.oidc.TokenCertificateValidator</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.certificate-chain.trust-store-file=truststore-rootcert.p12 <i class="conum" data-value="1"></i><b>(1)</b>
+quarkus.oidc.certificate-chain.trust-store-password=storepassword
+quarkus.oidc.certificate-chain.leaf-certificate-name=www.quarkusio.com <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The truststore must contain the certificate chain&#8217;s root certificate.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The certificate chain&#8217;s leaf certificate must have a common name equal to <code>www.quarkusio.com</code>. If this property is not configured then the truststore must contain the certificate chain&#8217;s leaf certificate unless one or more custom <code>TokenCertificateValidator</code> implementations are registered.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>You can add a custom certificate chain validation step by registering a custom <code>quarkus.oidc.TokenCertificateValidator</code>, for example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.it.keycloak;
+
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.List;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+import io.quarkus.arc.Unremovable;
+import io.quarkus.oidc.OidcTenantConfig;
+import io.quarkus.oidc.TokenCertificateValidator;
+import io.quarkus.oidc.runtime.TrustStoreUtils;
+import io.vertx.core.json.JsonObject;
+
+@ApplicationScoped
+@Unremovable
+public class BearerGlobalTokenChainValidator implements TokenCertificateValidator {
+
+    @Override
+    public void validate(OidcTenantConfig oidcConfig, List&lt;X509Certificate&gt; chain, String tokenClaims) throws CertificateException {
+        String rootCertificateThumbprint = TrustStoreUtils.calculateThumprint(chain.get(chain.size() - 1));
+        JsonObject claims = new JsonObject(tokenClaims);
+        if (!rootCertificateThumbprint.equals(claims.getString("root-certificate-thumbprint"))) { <i class="conum" data-value="1"></i><b>(1)</b>
+            throw new CertificateException("Invalid root certificate");
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Confirm that the certificate chain&#8217;s root certificate is bound to the custom JWT token&#8217;s claim.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="oidc-provider-client-authentication"><a class="anchor" href="#oidc-provider-client-authentication"></a>OIDCプロバイダーのクライアント認証</h3>
+<div class="paragraph">
+<p><code>quarkus.oidc.runtime.OidcProviderClient</code> は、OIDC プロバイダーへのリモートリクエストが必要な場合に使用されます。
+ベアラートークンのイントロスペクションが必要な場合は、<code>OidcProviderClient</code> が OIDC プロバイダーに対して認証する必要があります。
+サポートされている認証オプションの詳細は、Quarkus の「Web アプリケーションを保護するための OpenID Connect 認可コードフローメカニズム」ガイドの <a href="security-oidc-code-flow-authentication#oidc-provider-client-authentication">OIDC プロバイダーのクライアント認証</a> セクションを参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="bearer-token-integration-testing"><a class="anchor" href="#bearer-token-integration-testing"></a>テスト</h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><a href="security-keycloak-authorization">Keycloak 認証</a> を必要とする Quarkus OIDC サービスエンドポイントをテストする必要がある場合は、<a href="security-keycloak-authorization#testing">Keycloak 認証のテスト</a> セクションに従ってください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>次の依存関係をテストプロジェクトに追加することで、テストを開始できます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.rest-assured&lt;/groupId&gt;
+    &lt;artifactId&gt;rest-assured&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-junit5&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">testImplementation("io.rest-assured:rest-assured")
+testImplementation("io.quarkus:quarkus-junit5")</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="bearer-token-integration-testing-keycloak-devservices"><a class="anchor" href="#bearer-token-integration-testing-keycloak-devservices"></a>Dev Services for Keycloak</h4>
+<div class="paragraph">
+<p>Keycloak に対する結合テストには、<a href="security-openid-connect-dev-services">Dev Services for Keycloak</a> を使用することを推奨します。
+<code>Dev Services for Keycloak</code> は、テストコンテナーを起動して初期化します。次に、<code>quarkus</code> レルムと <code>quarkus-app</code> クライアント (<code>secret</code> シークレット) を作成し、<code>alice</code> (<code>admin</code> および <code>user</code> ロール) および <code>bob</code> (<code>user</code> ロール) ユーザーを追加します。これらのプロパティーはすべてカスタマイズできます。</p>
+</div>
+<div class="paragraph">
+<p>まず、次の依存関係を追加します。この依存関係は、アクセストークンを取得するテストで使用できるユーティリティークラス <code>io.quarkus.test.keycloak.client.KeycloakTestClient</code> を提供します。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-test-keycloak-server&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">testImplementation("io.quarkus:quarkus-test-keycloak-server")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、<code>application.properties</code> 設定ファイルを準備します。
+空の <code>application.properties</code> ファイルから開始できます。<code>Dev Services for Keycloak</code> が <code>quarkus.oidc.auth-server-url</code> を登録し、その参照先として実行中のテストコンテナー、<code>quarkus.oidc.client-id=quarkus-app</code>、および <code>quarkus.oidc.credentials.secret=secret</code> を設定するためです。</p>
+</div>
+<div class="paragraph">
+<p>ただし、必要な <code>quarkus-oidc</code> プロパティーをすでに設定している場合は、次の例に示すように、<code>quarkus.oidc.auth-server-url</code> を <code>Dev Services for Keycloak</code> の <code>prod</code> プロファイルに関連付けるだけで、コンテナーを起動できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">%prod.quarkus.oidc.auth-server-url=http://localhost:8180/realms/quarkus</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>テストを実行する前にカスタムレルムファイルを Keycloak にインポートする必要がある場合は、次のように <code>Dev Services for Keycloak</code> を設定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">%prod.quarkus.oidc.auth-server-url=http://localhost:8180/realms/quarkus
+quarkus.keycloak.devservices.realm-path=quarkus-realm.json</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>最後に、次の例に示すようにテストを記述します。このテストは JVM モードで実行されます。</p>
+</div>
+<div class="listingblock">
+<div class="title">JVM モードで実行されるテストの例:</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.openid.connect;
+
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.keycloak.client.KeycloakTestClient;
+import io.restassured.RestAssured;
+import org.junit.jupiter.api.Test;
+
+@QuarkusTest
+public class BearerTokenAuthenticationTest {
+
+    KeycloakTestClient keycloakClient = new KeycloakTestClient();
+
+    @Test
+    public void testAdminAccess() {
+        RestAssured.given().auth().oauth2(getAccessToken("alice"))
+                .when().get("/api/admin")
+                .then()
+                .statusCode(200);
+        RestAssured.given().auth().oauth2(getAccessToken("bob"))
+                .when().get("/api/admin")
+                .then()
+                .statusCode(403);
+    }
+
+    protected String getAccessToken(String userName) {
+        return keycloakClient.getAccessToken(userName);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">ネイティブモードで実行されるテストの例:</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.openid.connect;
+
+import io.quarkus.test.junit.QuarkusIntegrationTest;
+
+@QuarkusIntegrationTest
+public class NativeBearerTokenAuthenticationIT extends BearerTokenAuthenticationTest {
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Dev Services for Keycloak の初期化と設定の詳細は、<a href="security-openid-connect-dev-services">Dev Services for Keycloak</a> ガイドを参照してください。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="bearer-token-integration-testing-wiremock"><a class="anchor" href="#bearer-token-integration-testing-wiremock"></a>WireMock</h4>
+<div class="paragraph">
+<p>テストプロジェクトに以下の依存関係を追加します。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-test-oidc-server&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">testImplementation("io.quarkus:quarkus-test-oidc-server")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>REST テストエンドポイントを準備し、<code>application.properties</code> を設定します。
+以下に例を示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># keycloak.url is set by OidcWiremockTestResource
+quarkus.oidc.auth-server-url=${keycloak.url:replaced-by-test-resource}/realms/quarkus/
+quarkus.oidc.client-id=quarkus-service-app
+quarkus.oidc.application-type=service</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>最後にテストコードを記述します。
+以下に例を示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import static org.hamcrest.Matchers.equalTo;
+
+import java.util.Set;
+
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.oidc.server.OidcWiremockTestResource;
+import io.restassured.RestAssured;
+import io.smallrye.jwt.build.Jwt;
+
+@QuarkusTest
+@QuarkusTestResource(OidcWiremockTestResource.class)
+public class BearerTokenAuthorizationTest {
+
+    @Test
+    public void testBearerToken() {
+        RestAssured.given().auth().oauth2(getAccessToken("alice", Set.of("user")))
+            .when().get("/api/users/me")
+            .then()
+            .statusCode(200)
+            // The test endpoint returns the name extracted from the injected `SecurityIdentity` principal.
+            .body("userName", equalTo("alice"));
+    }
+
+    private String getAccessToken(String userName, Set&lt;String&gt; groups) {
+        return Jwt.preferredUserName(userName)
+                .groups(groups)
+                .issuer("https://server.example.com")
+                .audience("https://service.example.com")
+                .sign();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>quarkus-test-oidc-server</code> エクステンションは、<code>JSON Web Key</code> (<code>JWK</code>) フォーマットの署名 RSA 秘密鍵ファイルを含んでおり、<code>smallrye.jwt.sign.key.location</code> 設定プロパティーでそのファイルを参照します。
+このエクステンションを使用すると、引数なしの <code>sign()</code> 操作を使用してトークンに署名できます。</p>
+</div>
+<div class="paragraph">
+<p><code>OidcWiremockTestResource</code> を使用して <code>quarkus-oidc</code> <code>service</code> アプリケーションをテストすると、通信チャネルも WireMock HTTP スタブに対してテストされるため、最大のカバレッジを得ることができます。
+<code>OidcWiremockTestResource</code> でまだサポートされていない WireMock スタブを使用してテストを実行する必要がある場合は、次の例に示すように、テストクラスに <code>WireMockServer</code> インスタンスを挿入できます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>OidcWiremockTestResource</code> は、Docker コンテナーに対する <code>@QuarkusIntegrationTest</code> では機能しません。WireMock サーバーが、テストを実行する JVM で実行されるためです。その JVM には、Quarkus アプリケーションを実行する Docker コンテナーからはアクセスできません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.it.keycloak;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.matching;
+import static org.hamcrest.Matchers.equalTo;
+
+import org.junit.jupiter.api.Test;
+
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
+
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.oidc.server.OidcWireMock;
+import io.restassured.RestAssured;
+
+@QuarkusTest
+public class CustomOidcWireMockStubTest {
+
+    @OidcWireMock
+    WireMockServer wireMockServer;
+
+    @Test
+    public void testInvalidBearerToken() {
+        wireMockServer.stubFor(WireMock.post("/auth/realms/quarkus/protocol/openid-connect/token/introspect")
+                .withRequestBody(matching(".*token=invalid_token.*"))
+                .willReturn(WireMock.aResponse().withStatus(400)));
+
+        RestAssured.given().auth().oauth2("invalid_token").when()
+                .get("/api/users/me/bearer")
+                .then()
+                .statusCode(401)
+                .header("WWW-Authenticate", equalTo("Bearer"));
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="integration-testing-oidc-test-client"><a class="anchor" href="#integration-testing-oidc-test-client"></a><code>OidcTestClient</code></h4>
+<div class="paragraph">
+<p>SaaS OIDC プロバイダー (<code>Auth0</code> など) を使用していて、テスト (開発) ドメインに対してテストを実行したり、リモート Keycloak テストレルムに対してテストを実行したりする場合、<code>quarkus.oidc.auth-server-url</code> がすでに設定されていれば、<code>OidcTestClient</code> を使用できます。</p>
+</div>
+<div class="paragraph">
+<p>たとえば、次のような設定があるとします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">%test.quarkus.oidc.auth-server-url=https://dev-123456.eu.auth0.com/
+%test.quarkus.oidc.client-id=test-auth0-client
+%test.quarkus.oidc.credentials.secret=secret</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To start, add the same dependency, <code>quarkus-test-oidc-server</code>, as described in the <a href="#bearer-token-integration-testing-wiremock">WireMock</a> section.</p>
+</div>
+<div class="paragraph">
+<p>次に、以下のようにテストコードを記述します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import org.junit.jupiter.api.AfterAll;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.is;
+
+import java.util.Map;
+
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.oidc.client.OidcTestClient;
+
+@QuarkusTest
+public class GreetingResourceTest {
+
+    static OidcTestClient oidcTestClient = new OidcTestClient();
+
+    @AfterAll
+    public static void close() {
+        oidcTestClient.close();
+    }
+
+    @Test
+    public void testHelloEndpoint() {
+        given()
+          .auth().oauth2(getAccessToken("alice", "alice"))
+          .when().get("/hello")
+          .then()
+             .statusCode(200)
+             .body(is("Hello, Alice"));
+    }
+
+    private String getAccessToken(String name, String secret) {
+        return oidcTestClient.getAccessToken(name, secret,
+            Map.of("audience", "https://dev-123456.eu.auth0.com/api/v2/",
+	           "scope", "profile"));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このテストコードは、クライアント ID が <code>test-auth0-client</code> のアプリケーションを登録し、パスワードが <code>alice</code> のユーザー <code>alice</code> を作成したテスト <code>Auth0</code> ドメインから <code>password</code> グラントを使用してトークンを取得します。
+このようなテストを機能させるには、テスト <code>Auth0</code> アプリケーションで <code>password</code> グラントが有効になっている必要があります。
+このサンプルコードでは、追加のパラメーターを渡す方法も示しています。<code>Auth0</code> の場合、これらは <code>audience</code> および <code>scope</code> パラメーターです。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="bearer-token-integration-testing-keycloak"><a class="anchor" href="#bearer-token-integration-testing-keycloak"></a><code>KeycloakTestResourceLifecycleManager</code></h4>
+<div class="paragraph">
+<p>Keycloak との結合テストには <code>KeycloakTestResourceLifecycleManager</code> を使用することもできます。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Use <a href="#bearer-token-integration-testing-keycloak-devservices">Dev Services for Keycloak</a> instead of <code>KeycloakTestResourceLifecycleManager</code> for integration testing with Keycloak, unless you have specific requirements for using <code>KeycloakTestResourceLifecycleManager</code>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>まず、以下の依存関係を追加します：</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-test-keycloak-server&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">testImplementation("io.quarkus:quarkus-test-keycloak-server")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これは、Keycloak コンテナーを起動する <code>io.quarkus.test.common.QuarkusTestResourceLifecycleManager</code> の実装である <code>io.quarkus.test.keycloak.server.KeycloakTestResourceLifecycleManager</code> を提供します。</p>
+</div>
+<div class="paragraph">
+<p>Maven Surefire プラグインを次のように設定します。または、ネイティブイメージテストの <code>maven.failsafe.plugin</code> と同様に設定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;plugin&gt;
+    &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt;
+    &lt;configuration&gt;
+        &lt;systemPropertyVariables&gt;
+            &lt;!-- Or, alternatively, configure 'keycloak.version' --&gt;
+            &lt;keycloak.docker.image&gt;${keycloak.docker.image}&lt;/keycloak.docker.image&gt;
+            &lt;!--
+              Disable HTTPS if required:
+              &lt;keycloak.use.https&gt;false&lt;/keycloak.use.https&gt;
+            --&gt;
+        &lt;/systemPropertyVariables&gt;
+    &lt;/configuration&gt;
+&lt;/plugin&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>REST テストエンドポイントを準備し、次の例に示すように <code>application.properties</code> を設定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># keycloak.url is set by KeycloakTestResourceLifecycleManager
+quarkus.oidc.auth-server-url=${keycloak.url:replaced-by-test-resource}/realms/quarkus/
+quarkus.oidc.client-id=quarkus-service-app
+quarkus.oidc.credentials=secret
+quarkus.oidc.application-type=service</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>最後にテストコードを記述します。
+以下に例を示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import static io.quarkus.test.keycloak.server.KeycloakTestResourceLifecycleManager.getAccessToken;
+import static org.hamcrest.Matchers.equalTo;
+
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.keycloak.server.KeycloakTestResourceLifecycleManager;
+import io.restassured.RestAssured;
+
+@QuarkusTest
+@QuarkusTestResource(KeycloakTestResourceLifecycleManager.class)
+public class BearerTokenAuthorizationTest {
+
+    @Test
+    public void testBearerToken() {
+        RestAssured.given().auth().oauth2(getAccessToken("alice"))
+            .when().get("/api/users/preferredUserName")
+            .then()
+            .statusCode(200)
+            // The test endpoint returns the name extracted from the injected SecurityIdentity Principal
+            .body("userName", equalTo("alice"));
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<div class="title">まとめ</div>
+<p>上記の例では、<code>KeycloakTestResourceLifecycleManager</code> が <code>alice</code> と <code>admin</code> の 2 人のユーザーを登録します。
+デフォルトでは、* ユーザー <code>alice</code> には <code>user</code> ロールがあります。このロールは、<code>keycloak.token.user-roles</code> システムプロパティーを使用してカスタマイズできます。
+* ユーザー <code>admin</code> には <code>user</code> と <code>admin</code> の両方のロールがあります。これらのロールは、<code>keycloak.token.admin-roles</code> システムプロパティーを使用してカスタマイズできます。</p>
+</div>
+<div class="paragraph">
+<p>デフォルトでは、<code>KeycloakTestResourceLifecycleManager</code> は HTTPS を使用して Keycloak インスタンスを初期化します。これは <code>keycloak.use.https=false</code> を使用して無効にできます。
+デフォルトのレルム名は <code>quarkus</code> で、クライアント ID は <code>quarkus-service-app</code> です。
+これらの値をカスタマイズする場合は、<code>keycloak.realm</code> および <code>keycloak.service.client</code> システムプロパティーを設定します。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="integration-testing-public-key"><a class="anchor" href="#integration-testing-public-key"></a>ローカル公開鍵</h4>
+<div class="paragraph">
+<p>次の例に示すように、<code>quarkus-oidc</code> <code>service</code> アプリケーションをテストするために、ローカルのインライン公開鍵を使用できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.client-id=test
+quarkus.oidc.public-key=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlivFI8qB4D0y2jy0CfEqFyy46R0o7S8TKpsx5xbHKoU1VWg6QkQm+ntyIv1p4kE1sPEQO73+HY8+Bzs75XwRTYL1BmR1w8J5hmjVWjc6R2BTBGAYRPFRhor3kpM6ni2SPmNNhurEAHw7TaqszP5eUF/F9+KEBWkwVta+PZ37bwqSE4sCb1soZFrVz/UT/LF4tYpuVYt3YbqToZ3pZOZ9AX2o1GCG3xwOjkc4x0W7ezbQZdC9iftPxVHR8irOijJRRjcPDtA6vPKpzLl6CyYnsIYPd99ltwxTHjr3npfv/3Lw50bAkbT4HeLFxTx4flEoZLKO/g0bAoV2uqBhkA9xnQIDAQAB
+
+smallrye.jwt.sign.key.location=/privateKey.pem</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To generate JWT tokens, copy <code>privateKey.pem</code> from the <code>integration-tests/oidc-tenancy</code> in the <code>main</code> Quarkus repository and use a test code similar to the one in the preceding <a href="#bearer-token-integration-testing-wiremock">WireMock</a> section.
+You can use your own test keys, if preferred.</p>
+</div>
+<div class="paragraph">
+<p>この方法では、WireMock 方法と比較してカバレッジが制限されます。
+たとえば、リモート通信コードはカバーされません。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="bearer-token-integration-testing-security-annotation"><a class="anchor" href="#bearer-token-integration-testing-security-annotation"></a>TestSecurity アノテーション</h4>
+<div class="paragraph">
+<p><code>@TestSecurity</code> および <code>@OidcSecurity</code> アノテーションを使用して、<code>service</code> アプリケーションエンドポイントのコードをテストできます。このコードは、次の注入のいずれか 1 つまたは 3 つすべてに依存します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>JsonWebToken</code></p>
+</li>
+<li>
+<p><code>UserInfo</code></p>
+</li>
+<li>
+<p><code>OidcConfigurationMetadata</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>まず、以下の依存関係を追加します：</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-test-security-oidc&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">testImplementation("io.quarkus:quarkus-test-security-oidc")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次の例に示すようにテストコードを記述します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import static org.hamcrest.Matchers.is;
+import org.junit.jupiter.api.Test;
+import io.quarkus.test.common.http.TestHTTPEndpoint;
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
+import io.quarkus.test.security.oidc.Claim;
+import io.quarkus.test.security.oidc.ConfigMetadata;
+import io.quarkus.test.security.oidc.OidcSecurity;
+import io.quarkus.test.security.oidc.UserInfo;
+import io.restassured.RestAssured;
+
+@QuarkusTest
+@TestHTTPEndpoint(ProtectedResource.class)
+public class TestSecurityAuthTest {
+
+    @Test
+    @TestSecurity(user = "userOidc", roles = "viewer")
+    public void testOidc() {
+        RestAssured.when().get("test-security-oidc").then()
+                .body(is("userOidc:viewer"));
+    }
+
+    @Test
+    @TestSecurity(user = "userOidc", roles = "viewer")
+    @OidcSecurity(claims = {
+            @Claim(key = "email", value = "user@gmail.com")
+    }, userinfo = {
+            @UserInfo(key = "sub", value = "subject")
+    }, config = {
+            @ConfigMetadata(key = "issuer", value = "issuer")
+    })
+    public void testOidcWithClaimsUserInfoAndMetadata() {
+        RestAssured.when().get("test-security-oidc-claims-userinfo-metadata").then()
+                .body(is("userOidc:viewer:user@gmail.com:subject:issuer"));
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このコード例で使用されている <code>ProtectedResource</code> クラスは次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+import io.quarkus.oidc.OidcConfigurationMetadata;
+import io.quarkus.oidc.UserInfo;
+import io.quarkus.security.Authenticated;
+
+import org.eclipse.microprofile.jwt.JsonWebToken;
+
+@Path("/service")
+@Authenticated
+public class ProtectedResource {
+
+    @Inject
+    JsonWebToken accessToken;
+    @Inject
+    UserInfo userInfo;
+    @Inject
+    OidcConfigurationMetadata configMetadata;
+
+    @GET
+    @Path("test-security-oidc")
+    public String testSecurityOidc() {
+        return accessToken.getName() + ":" + accessToken.getGroups().iterator().next();
+    }
+
+    @GET
+    @Path("test-security-oidc-claims-userinfo-metadata")
+    public String testSecurityOidcWithClaimsUserInfoMetadata() {
+        return accessToken.getName() + ":" + accessToken.getGroups().iterator().next()
+                + ":" + accessToken.getClaim("email")
+                + ":" + userInfo.getString("sub")
+                + ":" + configMetadata.get("issuer");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>@TestSecurity</code> アノテーションは常に使用する必要があります。
+その <code>user</code> プロパティーは <code>JsonWebToken.getName()</code> として返され、その <code>roles</code> プロパティーは <code>JsonWebToken.getGroups()</code> として返されます。
+<code>@OidcSecurity</code> アノテーションは任意です。これを使用すると、追加のトークンクレームと <code>UserInfo</code> および <code>OidcConfigurationMetadata</code> プロパティーを設定できます。
+さらに、<code>quarkus.oidc.token.issuer</code> プロパティーが設定されている場合、<code>OidcConfigurationMetadata</code> <code>issuer</code> プロパティー値として使用されます。</p>
+</div>
+<div class="paragraph">
+<p>不透明トークンを使用する場合は、次のコード例に示す方法でトークンをテストできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import static org.hamcrest.Matchers.is;
+import org.junit.jupiter.api.Test;
+import io.quarkus.test.common.http.TestHTTPEndpoint;
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
+import io.quarkus.test.security.oidc.OidcSecurity;
+import io.quarkus.test.security.oidc.TokenIntrospection;
+import io.restassured.RestAssured;
+
+@QuarkusTest
+@TestHTTPEndpoint(ProtectedResource.class)
+public class TestSecurityAuthTest {
+
+    @Test
+    @TestSecurity(user = "userOidc", roles = "viewer")
+    @OidcSecurity(introspectionRequired = true,
+        introspection = {
+            @TokenIntrospection(key = "email", value = "user@gmail.com")
+        }
+    )
+    public void testOidcWithClaimsUserInfoAndMetadata() {
+        RestAssured.when().get("test-security-oidc-opaque-token").then()
+                .body(is("userOidc:viewer:userOidc:viewer:user@gmail.com"));
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このコード例で使用されている <code>ProtectedResource</code> クラスは次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+import io.quarkus.oidc.TokenIntrospection;
+import io.quarkus.security.Authenticated;
+import io.quarkus.security.identity.SecurityIdentity;
+
+@Path("/service")
+@Authenticated
+public class ProtectedResource {
+
+    @Inject
+    SecurityIdentity securityIdentity;
+    @Inject
+    TokenIntrospection introspection;
+
+    @GET
+    @Path("test-security-oidc-opaque-token")
+    public String testSecurityOidcOpaqueToken() {
+        return securityIdentity.getPrincipal().getName() + ":" + securityIdentity.getRoles().iterator().next()
+            + ":" + introspection.getString("username")
+            + ":" + introspection.getString("scope")
+            + ":" + introspection.getString("email");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>@TestSecurity</code>、<code>user</code>、および <code>roles</code> 属性は、<code>TokenIntrospection</code>、<code>username</code>、および <code>scope</code> プロパティーとして使用できます。
+<code>io.quarkus.test.security.oidc.TokenIntrospection</code> を使用して、<code>email</code> などの追加のイントロスペクションレスポンスプロパティーを追加します。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>@TestSecurity</code> と <code>@OidcSecurity</code> は、メタアノテーションで組み合わせることができます。次の例を参照してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ ElementType.METHOD })
+    @TestSecurity(user = "userOidc", roles = "viewer")
+    @OidcSecurity(introspectionRequired = true,
+        introspection = {
+            @TokenIntrospection(key = "email", value = "user@gmail.com")
+        }
+    )
+    public @interface TestSecurityMetaAnnotation {
+
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これは、複数のテスト方法で同じセキュリティー設定セットを使用する必要がある場合に特に便利です。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="check-errors-in-the-logs"><a class="anchor" href="#check-errors-in-the-logs"></a>ログでのエラーの確認</h3>
+<div class="paragraph">
+<p>トークン検証エラーの詳細を確認するには、<code>io.quarkus.oidc.runtime.OidcProvider</code> および <code>TRACE</code> レベルのロギングを有効にします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.log.category."io.quarkus.oidc.runtime.OidcProvider".level=TRACE
+quarkus.log.category."io.quarkus.oidc.runtime.OidcProvider".min-level=TRACE</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>OidcProvider</code> クライアント初期化エラーの詳細を確認するには、次のように <code>io.quarkus.oidc.runtime.OidcRecorder</code> および <code>TRACE</code> レベルのロギングを有効にします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.log.category."io.quarkus.oidc.runtime.OidcRecorder".level=TRACE
+quarkus.log.category."io.quarkus.oidc.runtime.OidcRecorder".min-level=TRACE</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="external-and-internal-access-to-oidc-providers"><a class="anchor" href="#external-and-internal-access-to-oidc-providers"></a>OIDC プロバイダーへの外部および内部アクセス</h3>
+<div class="paragraph">
+<p>OIDC プロバイダーおよびその他のエンドポイントの外部からアクセス可能なトークンは、自動検出された URL や <code>quarkus.oidc.auth-server-url</code> 内部 URL を基準に設定された URL とは異なる HTTP(S) URL を持っている可能性があります。
+たとえば、SPA が外部トークンエンドポイントアドレスからトークンを取得し、それをベアラートークンとして Quarkus に送信するとします。
+その場合、エンドポイントから発行者の検証の失敗が報告される可能性があります。</p>
+</div>
+<div class="paragraph">
+<p>このような場合に Keycloak を使用する場合は、<code>KEYCLOAK_FRONTEND_URL</code> システムプロパティーを外部からアクセス可能なベース URL に設定して Keycloak を起動してください。
+他の OIDC プロバイダーを使用する場合は、プロバイダーのドキュメントを参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-client-id"><a class="anchor" href="#using-client-id"></a><code>client-id</code> プロパティーの使用</h3>
+<div class="paragraph">
+<p><code>quarkus.oidc.client-id</code> プロパティーは、現在のベアラートークンをリクエストした OIDC クライアントを特定します。
+OIDC クライアントは、ブラウザーで実行される SPA アプリケーション、または Quarkus <code>service</code> アプリケーションにアクセストークンを伝播する Quarkus <code>web-app</code> コンフィデンシャルクライアントアプリケーションです。</p>
+</div>
+<div class="paragraph">
+<p>このプロパティーは、<code>service</code> アプリケーションがトークンをリモートでイントロスペクトすることが予想される場合に必要です。これは、不透明トークンの場合は常に当てはまります。
+このプロパティーは、ローカル JSON Web Token (JWT) 検証の場合にのみ省略可能です。</p>
+</div>
+<div class="paragraph">
+<p>エンドポイントがリモートイントロスペクションエンドポイントへのアクセスを必要としない場合でも、<code>quarkus.oidc.client-id</code> プロパティーを設定することを推奨します。
+これは、<code>client-id</code> が設定されている場合、それを使用してトークンオーディエンスを検証できるためです。
+また、トークンの検証が失敗した場合にも client-id がログに含まれるため、特定のクライアントに発行されたトークンのトレーサビリティーが向上し、より長い期間にわたる分析が可能になります。</p>
+</div>
+<div class="paragraph">
+<p>たとえば、OIDC プロバイダーでトークンオーディエンスを設定する場合は、次の設定パターンを検討してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># Set client-id
+quarkus.oidc.client-id=quarkus-app
+# Token audience claim must contain 'quarkus-app'
+quarkus.oidc.token.audience=${quarkus.oidc.client-id}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>quarkus.oidc.client-id</code> を設定したが、いずれかの OIDC プロバイダーエンドポイントへのリモートアクセスがエンドポイントに必要ない場合 (イントロスペクション、トークンの取得など)、<code>quarkus.oidc.credentials</code> または同様のプロパティーを使用してクライアントシークレットを設定しないでください。その場合、クライアントシークレットは使用されないためです。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Quarkus <code>web-app</code> アプリケーションには、常に <code>quarkus.oidc.client-id</code> プロパティーが必要です。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="mutual-tls-token-binding"><a class="anchor" href="#mutual-tls-token-binding"></a>Mutual TLS token binding</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://datatracker.ietf.org/doc/html/rfc8705">RFC8705</a> describes a mechanism for binding access tokens to Mutual TLS (mTLS) client authentication certificates.
+It requires that a client certificate&#8217;s SHA256 thumbprint matches a JWT token or token introspection confirmation <code>x5t#S256</code> certificate thumbprint.</p>
+</div>
+<div class="paragraph">
+<p>For example, see <a href="https://datatracker.ietf.org/doc/html/rfc8705#section-3.1">JWT Certificate Thumbprint Confirmation Method</a> and <a href="https://datatracker.ietf.org/doc/html/rfc8705#section-3.2">Confirmation Method for Token Introspection</a> sections of <a href="https://datatracker.ietf.org/doc/html/rfc8705">RFC8705</a>.</p>
+</div>
+<div class="paragraph">
+<p>MTLS token binding supports a <code>holder of key</code> concept, and can be used to confirm that the current access token was issued to the current authenticated client who presents this token.</p>
+</div>
+<div class="paragraph">
+<p>When you use both mTLS and OIDC bearer authentication mechanisms, you can enforce that the access tokens must be certificate bound with a single property, after configuring your Quarkus endpoint and Quarkus OIDC to require the use of mTLS.</p>
+</div>
+<div class="paragraph">
+<p>例えば、以下のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.auth-server-url=${your_oidc_provider_url}
+quarkus.oidc.token.binding.certificate=true <i class="conum" data-value="1"></i><b>(1)</b>
+quarkus.oidc.tls.tls-configuration-name=oidc-client-tls <i class="conum" data-value="2"></i><b>(2)</b>
+
+quarkus.tls.oidc-client-tls.key-store.p12.path=target/certificates/oidc-client-keystore.p12 <i class="conum" data-value="2"></i><b>(2)</b>
+quarkus.tls.oidc-client-tls.key-store.p12.password=password
+quarkus.tls.oidc-client-tls.trust-store.p12.path=target/certificates/oidc-client-truststore.p12
+quarkus.tls.oidc-client-tls.trust-store.p12.password=password
+
+quarkus.http.tls-configuration-name=oidc-server-mtls <i class="conum" data-value="3"></i><b>(3)</b>
+quarkus.tls.oidc-server-mtls.key-store.p12.path=target/certificates/oidc-keystore.p12
+quarkus.tls.oidc-server-mtls.key-store.p12.password=password
+quarkus.tls.oidc-server-mtls.trust-store.p12.path=target/certificates/oidc-server-truststore.p12
+quarkus.tls.oidc-server-mtls.trust-store.p12.password=password</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Require that bearer access tokens must be bound to the client certificates.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>TLS registry configuration for Quarkus OIDC be able to communicate with the OIDC provider over MTLS</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>TLS registry configuration requiring external clients to authenticate to the Quarkus endpoint over MTLS</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The above configuration is sufficient to require that OIDC bearer tokens are bound to the client certificates.</p>
+</div>
+<div class="paragraph">
+<p>Next, if you need to access both mTLS and OIDC bearer security identities, consider enabling <a href="security-authentication-mechanisms#combining-authentication-mechanisms">Inclusive authentication</a> with <code>quarkus.http.auth.inclusive=true</code>.</p>
+</div>
+<div class="paragraph">
+<p>Now you can access both MTLS and OIDC security identities as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.it.oidc;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+import org.eclipse.microprofile.jwt.JsonWebToken;
+import io.quarkus.security.Authenticated;
+import io.quarkus.security.credential.CertificateCredential;
+import io.quarkus.security.identity.SecurityIdentity;
+
+@Path("/service")
+@Authenticated
+public class OidcMtlsEndpoint {
+
+    @Inject
+    SecurityIdentity mtlsIdentity; <i class="conum" data-value="1"></i><b>(1)</b>
+
+    @Inject
+    JsonWebToken oidcAccessToken; <i class="conum" data-value="2"></i><b>(2)</b>
+
+    @GET
+    public String getIdentities() {
+        var cred = identity.getCredential(CertificateCredential.class).getCertificate();
+        return "Identities: " + cred.getSubjectX500Principal().getName().split(",")[0]
+                + ", " + accessToken.getName();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>SecurityIdentity</code> always represents the primary mTLS authentication when mTLS is used and an inclusive authentication is enabled.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>OIDC security identity is also available because enabling an inclusive authentication requires all registered mechanisms to produce the security identity.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="authentication-after-an-http-request-has-completed"><a class="anchor" href="#authentication-after-an-http-request-has-completed"></a>HTTP リクエストが完了した後の認証</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>場合によっては、アクティブな HTTP リクエストコンテキストが存在しない場合に、特定のトークンの <code>SecurityIdentity</code> を作成する必要があります。
+<code>quarkus-oidc</code> エクステンションは、トークンを <code>SecurityIdentity</code> インスタンスに変換するための <code>io.quarkus.oidc.TenantIdentityProvider</code> を提供します。
+たとえば、HTTP リクエストが完了した後にトークンを検証する必要がある状況の 1 つとして、<a href="vertx#event-bus">Vert.x イベントバス</a> を使用してメッセージを処理する場合があります。
+以下の例では、さまざまな CDI リクエストコンテキスト内で 'product-order' メッセージを使用しています。
+したがって、注入された <code>SecurityIdentity</code> は、検証されたアイデンティティーを正しく表さず、匿名になります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.quickstart.oidc;
+
+import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import io.vertx.core.eventbus.EventBus;
+
+@Path("order")
+public class OrderResource {
+
+    @Inject
+    EventBus eventBus;
+
+    @POST
+    public void order(String product, @HeaderParam(AUTHORIZATION) String bearer) {
+        String rawToken = bearer.substring("Bearer ".length()); <i class="conum" data-value="1"></i><b>(1)</b>
+        eventBus.publish("product-order", new Product(product, rawToken));
+    }
+
+    public static class Product {
+         public String product;
+         public String customerAccessToken;
+         public Product() {
+         }
+         public Product(String product, String customerAccessToken) {
+             this.product = product;
+             this.customerAccessToken = customerAccessToken;
+         }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>この時点では、プロアクティブ認証が無効な場合、トークンは検証されません。</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.quickstart.oidc;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+import io.quarkus.oidc.AccessTokenCredential;
+import io.quarkus.oidc.Tenant;
+import io.quarkus.oidc.TenantIdentityProvider;
+import io.quarkus.security.identity.SecurityIdentity;
+import io.quarkus.vertx.ConsumeEvent;
+import io.smallrye.common.annotation.Blocking;
+
+@ApplicationScoped
+public class OrderService {
+
+    @Tenant("tenantId")
+    @Inject
+    TenantIdentityProvider identityProvider;
+
+    @Inject
+    TenantIdentityProvider defaultIdentityProvider; <i class="conum" data-value="1"></i><b>(1)</b>
+
+    @Blocking
+    @ConsumeEvent("product-order")
+    void processOrder(OrderResource.Product product) {
+        AccessTokenCredential tokenCredential = new AccessTokenCredential(product.customerAccessToken);
+        SecurityIdentity securityIdentity = identityProvider.authenticate(tokenCredential).await().indefinitely(); <i class="conum" data-value="2"></i><b>(2)</b>
+        ...
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>For the default tenant, the <code>Tenant</code> qualifier is optional.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>トークンの検証を実行し、トークンを <code>SecurityIdentity</code> に変換します。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>When the provider is used during an HTTP request, the tenant configuration can be resolved as described in
+the <a href="security-openid-connect-multitenancy">Using OpenID Connect Multi-Tenancy</a> guide.
+However, when there is no active HTTP request, you must select the tenant explicitly with the <code>io.quarkus.oidc.Tenant</code> qualifier.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><a href="security-openid-connect-multitenancy#tenant-config-resolver">動的テナント設定解決</a> は現在サポートされていません。
+動的テナントを必要とする認証は失敗します。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="bearer-token-oidc-request-filters"><a class="anchor" href="#bearer-token-oidc-request-filters"></a>OIDCリクエストフィルター</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can filter OIDC requests made by Quarkus to the OIDC provider by registering one or more <code>OidcRequestFilter</code> implementations, which can update or add new request headers, and log requests.
+For more information, see <a href="security-oidc-code-flow-authentication#code-flow-oidc-request-filters">OIDC request filters</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="bearer-token-oidc-response-filters"><a class="anchor" href="#bearer-token-oidc-response-filters"></a>OIDC response filters</h3>
+<div class="paragraph">
+<p>You can filter responses from the OIDC providers by registering one or more <code>OidcResponseFilter</code> implementations, which can check the response status, headers and body in order to log them or perform other actions.</p>
+</div>
+<div class="paragraph">
+<p>You can have a single filter intercepting all the OIDC responses, or use an <code>@OidcEndpoint</code> annotation to apply this filter to the specific endpoint responses only. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.it.keycloak;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+import io.quarkus.arc.Unremovable;
+import io.quarkus.logging.Log;
+import io.quarkus.oidc.common.OidcEndpoint;
+import io.quarkus.oidc.common.OidcEndpoint.Type;
+import io.quarkus.oidc.common.OidcResponseFilter;
+import io.quarkus.oidc.common.runtime.OidcConstants;
+import io.quarkus.oidc.runtime.OidcUtils;
+
+@ApplicationScoped
+@Unremovable
+@OidcEndpoint(value = Type.DISCOVERY) <i class="conum" data-value="1"></i><b>(1)</b>
+public class DiscoveryEndpointResponseFilter implements OidcResponseFilter {
+
+    @Override
+    public void filter(OidcResponseContext rc) {
+        String contentType = rc.responseHeaders().get("Content-Type"); <i class="conum" data-value="2"></i><b>(2)</b>
+        if (contentType.equals("application/json") {
+            String tenantId = rc.requestProperties().get(OidcUtils.TENANT_ID_ATTRIBUTE); <i class="conum" data-value="3"></i><b>(3)</b>
+            String metadata = rc.responseBody().toString(); <i class="conum" data-value="4"></i><b>(4)</b>
+            Log.debugf("Tenant %s OIDC metadata: %s", tenantId, metadata);
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>このフィルターを、OIDC 検出エンドポイントのみを対象とするリクエストに制限します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Check the response <code>Content-Type</code> header.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use <code>OidcRequestContextProperties</code> request properties to get the tenant id.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Get the response data as String.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="programmatic-oidc-start-up"><a class="anchor" href="#programmatic-oidc-start-up"></a>Programmatic OIDC start-up</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>OIDC tenants can be created programmatically like in the example below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.it.oidc;
+
+import io.quarkus.oidc.Oidc;
+import jakarta.enterprise.event.Observes;
+
+public class OidcStartup {
+
+    void observe(@Observes Oidc oidc) {
+        oidc.createServiceApp("http://localhost:8180/realms/quarkus");
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The code above is a programmatic equivalent to the following configuration in the <code>application.properties</code> file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.auth-server-url=http://localhost:8180/realms/quarkus</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Should you need to configure more OIDC tenant properties, use the <code>OidcTenantConfig</code> builder like in the example below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.it.oidc;
+
+import io.quarkus.oidc.Oidc;
+import io.quarkus.oidc.OidcTenantConfig;
+import jakarta.enterprise.event.Observes;
+
+public class OidcStartup {
+
+    void createDefaultTenant(@Observes Oidc oidc) {
+        var defaultTenant = OidcTenantConfig
+                .authServerUrl("http://localhost:8180/realms/quarkus")
+                .token().requireJwtIntrospectionOnly().end()
+                .build();
+        oidc.create(defaultTenant);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For more complex setup involving multiple tenants please see the <a href="security-openid-connect-multitenancy#programmatic-startup">Programmatic OIDC start-up for multitenant application</a>
+section of the OpenID Connect Multi-Tenancy guide.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="references"><a class="anchor" href="#references"></a>参照</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="security-oidc-configuration-properties-reference">OIDC設定プロパティリファレンス</a></p>
+</li>
+<li>
+<p><a href="security-oidc-bearer-token-authentication-tutorial">OIDCベアラートークン認証によるサービスアプリケーションの保護</a></p>
+</li>
+<li>
+<p><a href="https://www.keycloak.org/documentation.html">Keycloak ドキュメント</a></p>
+</li>
+<li>
+<p><a href="https://openid.net/connect/">OpenID Connect</a></p>
+</li>
+<li>
+<p><a href="https://tools.ietf.org/html/rfc7519">JSON Web Token</a></p>
+</li>
+<li>
+<p><a href="security-openid-connect-client-reference">OpenID ConnectおよびOAuth2クライアントとフィルターのリファレンスガイド</a></p>
+</li>
+<li>
+<p><a href="security-openid-connect-dev-services">Dev Services for Keycloak</a></p>
+</li>
+<li>
+<p><a href="security-jwt-build">JSONウェブトークン (JWT) のビルド、署名、暗号化</a></p>
+</li>
+<li>
+<p><a href="security-authentication-mechanisms#oidc-jwt-oauth2-comparison">OpenID Connect、SmallRye JWT、OAuth2の認証メカニズムの選択</a></p>
+</li>
+<li>
+<p><a href="security-authentication-mechanisms#combining-authentication-mechanisms">認証メカニズムの組み合わせ</a></p>
+</li>
+<li>
+<p><a href="security-overview">Quarkus Securityの概要</a></p>
+</li>
+<li>
+<p><a href="security-keycloak-admin-client">Quarkus Keycloak Adminクライアント</a></p>
+</li>
+<li>
+<p><a href="security-openid-connect-multitenancy">OpenID Connect マルチテナンシーの使用</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#overview-of-the-bearer-token-authentication-mechanism-in-quarkus">Quarkusのベアラートークン認証メカニズムの概要</a>
+<ul class="sectlevel2">
+<li><a href="#accessing-jwt-claims">JWT クレームへのアクセス</a></li>
+<li><a href="#bearer-token-user-info"><code>UserInfo</code></a></li>
+<li><a href="#bearer-token-config-metadata">設定メタデータ</a></li>
+<li><a href="#token-claims-and-security-identity-roles">トークンクレームと SecurityIdentity ロール</a></li>
+<li><a href="#token-scopes-and-security-identity-permissions">トークンのスコープと SecurityIdentity の権限</a></li>
+<li><a href="#bearer-token-token-verification-introspection">トークン検証・イントロスペクション</a></li>
+<li><a href="#bearer-token-token-introspection-userinfo-cache">トークンのイントロスペクションと <code>UserInfo</code> キャッシュ</a></li>
+<li><a href="#bearer-token-jwt-claim-verification">JSON Web トークンのクレーム検証</a></li>
+<li><a href="#jose4j-validator">Jose4j Validator</a></li>
+<li><a href="#single-page-applications">シングルページ・アプリケーション</a></li>
+<li><a href="#cross-origin-resource-sharing">クロスオリジンリソース共有</a></li>
+<li><a href="#provider-endpoint-configuration">プロバイダーエンドポイント設定</a></li>
+<li><a href="#token-propagation">トークンの伝播</a></li>
+<li><a href="#jwt-token-certificate-chain">JWT token certificate chain</a></li>
+<li><a href="#oidc-provider-client-authentication">OIDCプロバイダーのクライアント認証</a></li>
+<li><a href="#bearer-token-integration-testing">テスト</a></li>
+<li><a href="#check-errors-in-the-logs">ログでのエラーの確認</a></li>
+<li><a href="#external-and-internal-access-to-oidc-providers">OIDC プロバイダーへの外部および内部アクセス</a></li>
+<li><a href="#using-client-id"><code>client-id</code> プロパティーの使用</a></li>
+</ul>
+</li>
+<li><a href="#mutual-tls-token-binding">Mutual TLS token binding</a></li>
+<li><a href="#authentication-after-an-http-request-has-completed">HTTP リクエストが完了した後の認証</a></li>
+<li><a href="#bearer-token-oidc-request-filters">OIDCリクエストフィルター</a>
+<ul class="sectlevel2">
+<li><a href="#bearer-token-oidc-response-filters">OIDC response filters</a></li>
+</ul>
+</li>
+<li><a href="#programmatic-oidc-start-up">Programmatic OIDC start-up</a></li>
+<li><a href="#references">参照</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same extensions</h3>
+      <ul class="related-content">
+      
+        
+        <li class="concepts"><a href="/version/main/guides/security-openid-connect-providers">よく知られたOpenID Connect プロバイダーの設定</a></li>
+      
+        
+        <li class="howto"><a href="/version/main/guides/security-openid-connect-dev-services">OpenID Connect (OIDC)のDev ServicesとDev UI</a></li>
+      
+        
+        <li class="reference"><a href="/version/main/guides/security-oidc-configuration-properties-reference">OpenID Connect (OIDC) 設定プロパティ</a></li>
+      
+        
+        <li class="concepts"><a href="/version/main/guides/security-oidc-code-flow-authentication">Web アプリケーションを保護するための OpenID Connect 認可コードフローメカニズム</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/main/guides/security-oidc-bearer-token-authentication-tutorial">OpenID Connect（OIDC）ベアラートークン認証によるサービスアプリケーションの保護</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/main/guides/security-oidc-code-flow-authentication-tutorial">Quarkus - 認可コードフローのOpenID Connectを使用してWebアプリケーションを保護</a></li>
+      
+        
+        <li class="howto"><a href="/version/main/guides/security-keycloak-authorization">OpenID Connect (OIDC)とKeycloakを使用した認可の一元化</a></li>
+      
+        
+        <li class="howto"><a href="/version/main/guides/security-openid-connect-multitenancy">OpenID Connect (OIDC)のマルチテナンシーの使用</a></li>
+      </ul>
+    </div>
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="tutorial"><a href="/version/main/guides/security-oidc-bearer-token-authentication-tutorial">OpenID Connect（OIDC）ベアラートークン認証によるサービスアプリケーションの保護</a></li>
+      
+        
+        <li class="concepts"><a href="/version/main/guides/security-oidc-code-flow-authentication">Web アプリケーションを保護するための OpenID Connect 認可コードフローメカニズム</a></li>
+      
+        
+        <li class="howto"><a href="/version/main/guides/security-keycloak-authorization">OpenID Connect (OIDC)とKeycloakを使用した認可の一元化</a></li>
+      
+        
+        <li class="howto"><a href="/version/main/guides/security-openid-connect-dev-services">OpenID Connect (OIDC)のDev ServicesとDev UI</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/main/guides/security-oidc-code-flow-authentication-tutorial">Quarkus - 認可コードフローのOpenID Connectを使用してWebアプリケーションを保護</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/security-keycloak-admin-client">Keycloak Admin Clientの使用</a></li>
+      
+        
+        <li class="concepts"><a href="/version/main/guides/security-authentication-mechanisms">Quarkusの認証メカニズム</a></li>
+      
+        
+        <li class="concepts"><a href="/version/main/guides/security-basic-authentication">Basic認証</a></li>
+      
+        
+        <li class="concepts"><a href="/version/main/guides/security-openid-connect-providers">よく知られたOpenID Connect プロバイダーの設定</a></li>
+      
+        
+        <li class="howto"><a href="/version/main/guides/security-basic-authentication-howto">ベーシック認証の有効化</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/main/guides/security-getting-started-tutorial">Basic認証とJakarta Persistenceを使ったセキュリティ入門</a></li>
+      
+        
+        <li class="reference"><a href="/version/main/guides/security-openid-connect-client-reference">OpenID Connect (OIDC) と OAuth2 クライアントおよびフィルター</a></li>
+      
+        
+        <li class="reference"><a href="/version/main/guides/security-openid-connect-client-registration">OpenID Connect (OIDC) and OAuth2 dynamic client registration</a></li>
+      
+        
+        <li class="reference"><a href="/version/main/guides/security-oidc-configuration-properties-reference">OpenID Connect (OIDC) 設定プロパティ</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/main/guides/security-openid-connect-client">OpenID Connectクライアントとトークン伝搬クイックスタート</a></li>
+      
+        
+        <li class="concepts"><a href="/version/main/guides/security-proactive-authentication">プロアクティブ認証</a></li>
+      
+        
+        <li class="howto"><a href="/version/main/guides/security-openid-connect-multitenancy">OpenID Connect (OIDC)のマルチテナンシーの使用</a></li>
+      
+        
+        <li class="reference"><a href="/version/main/guides/security-authorize-web-endpoints-reference">ウェブエンドポイントの認可</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/security-jwt-build">Build, sign, and encrypt JSON Web Tokens</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/security-csrf-prevention">クロスサイトリクエストフォージェリー対策</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

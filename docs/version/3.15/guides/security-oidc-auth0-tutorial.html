@@ -1,0 +1,2147 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Auth0 OpenID Connectプロバイダーを使用したQuarkus Webアプリケーションの保護 - 3.15 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.15/guides/security-oidc-auth0-tutorial" />
+  <meta property="og:title" content="Auth0 OpenID Connectプロバイダーを使用したQuarkus Webアプリケーションの保護 - 3.15" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/security-oidc-auth0-tutorial">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.15/guides/security-oidc-auth0-tutorial">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.15/guides/security-oidc-auth0-tutorial" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.15/guides/security-oidc-auth0-tutorial">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.15/guides/security-oidc-auth0-tutorial">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.15/guides/security-oidc-auth0-tutorial">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.15/guides/security-oidc-auth0-tutorial">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.15/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" selected>3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">Auth0 OpenID Connectプロバイダーを使用したQuarkus Webアプリケーションの保護 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="security-architecture">Quarkus Security</a> は、<code>quarkus-oidc</code> エクステンションを使用して包括的な OpenId Connect (OIDC) および OAuth2 のサポートを提供し、<a href="security-oidc-code-flow-authentication">認可コードフロー</a> と <a href="security-oidc-bearer-token-authentication">ベアラートークン</a> の認証メカニズムをサポートします。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusを使用すると、<a href="https://www.keycloak.org/documentation">Keycloak</a>、<a href="https://developer.okta.com/">Okta</a>、<a href="https://auth0.com/docs/">Auth0</a>、およびその他の <a href="security-openid-connect-providers">有名なソーシャル OIDC や OAuth2 プロバイダー</a> などの OIDC プロバイダーを簡単に設定できます。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus OpenID Connect エクステンション (<code>quarkus-oidc</code>) と <a href="https://auth0.com/docs/">Auth0</a> OIDC プロバイダーを使用して、API エンドポイントを保護する方法について説明します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>作業を始める前に、次のドキュメントを確認してください。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://auth0.com/docs/">Auth0 のドキュメントサイト</a></p>
+</li>
+<li>
+<p><a href="security-oidc-code-flow-authentication">Web アプリケーションの保護に使用する Quarkus OpenID Connect 認可コードフローメカニズム</a></p>
+</li>
+<li>
+<p><a href="security-oidc-bearer-token-authentication">Quarkus OpenID Connect (OIDC) ベアラートークン認証</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-an-auth0-application"><a class="anchor" href="#create-an-auth0-application"></a>Auth0 アプリケーションの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Auth0 ダッシュボードに移動し、通常の Web アプリケーションを作成します。
+例えば、<code>QuarkusAuth0</code> という Auth0 アプリケーションを作成します。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-create-application.png" alt="Create Auth0 application">
+</div>
+</div>
+<div class="paragraph">
+<div class="title">結果</div>
+<p>Auth0 アプリケーションは、クライアント ID、シークレット、HTTPS ベースのドメインを使用して作成されます。
+次の手順で Quarkus 設定を完了するために必要となるため、これらのプロパティーをメモしておいてください。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-created-application.png" alt="Created Auth0 application">
+</div>
+</div>
+<div class="paragraph">
+<p>次に、そのまま Auth0 ダッシュボードでアプリケーションにユーザーを追加します。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-add-user.png" alt="Add Auth0 application users">
+</div>
+</div>
+<div class="paragraph">
+<p>これで Auth0 アプリケーションの作成と設定が完了しました。次は、Quarkus エンドポイントの作成と設定を行います。
+その後、Auth0 アプリケーションの設定と更新を行います。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-a-quarkus-application"><a class="anchor" href="#create-a-quarkus-application"></a>Quarkus アプリケーションの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次の Maven コマンドを使用して、Quarkus OIDC エクステンションを使用して保護できる Quarkus REST (旧称 RESTEasy Reactive) アプリケーションを作成します。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:quarkus-auth0 \
+    --extension='rest,oidc' \
+    --no-code
+cd quarkus-auth0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:3.15.2:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=quarkus-auth0 \
+    -Dextensions='rest,oidc' \
+    -DnoCode
+cd quarkus-auth0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Windowsユーザーの場合:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>cmdを使用する場合、（バックスラッシュ <code>\</code> を使用せず、すべてを同じ行に書かないでください）。</p>
+</li>
+<li>
+<p>Powershellを使用する場合は、 <code>-D</code> パラメータを二重引用符で囲んでください。例: <code>"-DprojectArtifactId=quarkus-auth0"</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>アプリケーションワークスペースを作成し、お気に入りの IDE にインポートします。
+ここでは、認証されたユーザーのみアクセス可能な Jakarta REST エンドポイントを追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import org.eclipse.microprofile.jwt.JsonWebToken;
+
+import io.quarkus.oidc.IdToken;
+import io.quarkus.security.Authenticated;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/hello")
+public class GreetingResource {
+
+    @Inject
+    @IdToken                                        <i class="conum" data-value="1"></i><b>(1)</b>
+    JsonWebToken idToken;
+
+    @GET
+    @Authenticated                                  <i class="conum" data-value="2"></i><b>(2)</b>
+    @Produces(MediaType.TEXT_PLAIN)
+    public String hello() {
+        return "Hello, " + idToken.getName();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>注入された <code>JsonWebToken</code> (JWT) Bean には <code>@IdToken</code> 修飾子があります。これは、アクセストークンではなく OIDC <code>ID トークン</code> であることを意味します。
+<code>IdToken</code> は、OIDC 認可コードフローで認証された現行ユーザーに関する情報をクレームの形式で提供します。これらのクレームには、<code>JsonWebToken</code> API を使用してアクセスできます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>io.quarkus.security.Authenticated</code> アノテーションが <code>hello()</code> メソッドに追加されました。これにより、認証されたユーザーのみアクセス可能になります。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>認可コードフロー中に取得したアクセストークンは、ID トークンとともに直接エンドポイントにより使用されるのではなく、現在認証されているユーザーに代わってダウンストリームサービスにアクセスする場合にのみ使用されます。
+アクセストークンについては、このチュートリアルの後半で詳しく説明します。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>前の手順で作成した Auth0 アプリケーションのプロパティーを使用して、Quarkus の <code>application.properties</code> ファイルで OIDC を設定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-configuration hljs" data-lang="configuration"># Make sure the application domain is prefixed with 'https://'
+quarkus.oidc.auth-server-url=https://dev-3ve0cgn7.us.auth0.com
+quarkus.oidc.application-type=web-app
+quarkus.oidc.client-id=sKQu1dXjHB6r0sra0Y1YCqBZKWXqCkly
+quarkus.oidc.credentials.secret=${client-secret}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この手順を完了すると、Auth0 アプリケーションのドメイン、クライアント ID、シークレットを使用するように Quarkus が設定されます。
+<code>quarkus.oidc.application-type=web-app</code> プロパティーを設定することで、OIDC 認証コードフローを使用するように Quarkus に指示が出されますが、他の方法を使用することもできます。これについてはチュートリアルの後半で説明します。</p>
+</div>
+<div class="paragraph">
+<p>エンドポイントアドレスは http://localhost:8080/hello になります。これは、Auth0 アプリケーションで許可されたコールバック URL として登録する必要があります。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-allowed-callback.png" alt="Auth0 allowed callback URL">
+</div>
+</div>
+<div class="paragraph">
+<p>この手順を完了すると、ブラウザーから Quarkus http://localhost:8080/hello エンドポイントにアクセスすると、認証が完了した後に Auth0 によって同じアドレスにリダイレクトされます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>デフォルトでは、Quarkus は現在のリクエストパスをコールバックパスとして自動的に使用します。
+ただし、Quarkus の <code>quarkus.oidc.authentication.redirect-path</code> プロパティーを設定することで、デフォルトの動作をオーバーライドし、特定のコールバックパスを設定できます。</p>
+</div>
+<div class="paragraph">
+<p>ほとんどの実稼働環境では、アプリケーションの URL 空間が大きくなり、複数のエンドポイントアドレスが利用可能になります。
+その場合は、次の設定例のように、専用のコールバック (リダイレクト) パスを設定し、この URL をプロバイダーのダッシュボードに登録できます。</p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.oidc.authentication.redirect-path=/authenticated-welcome</code></p>
+</div>
+<div class="paragraph">
+<p>この例では、Quarkus は Auth0 からのリダイレクトを受け入れ、認可コードフローを完了し、セッション Cookie を作成した後、<code>/authenticated-welcome</code> を呼び出します。
+認証に成功したユーザーは、再度認証することなく、保護されたアプリケーションスペースの他の部分にもアクセスできます。たとえば、エンドポイントコールバックメソッドは、JAX-RS API を使用して、セッション Cookie が検証される保護されたアプリケーションの他の部分にユーザーをリダイレクトできます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>これで、エンドポイントのテストを開始する準備が完了しました。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="test-the-quarkus-endpoint"><a class="anchor" href="#test-the-quarkus-endpoint"></a>Quarkus エンドポイントのテスト</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus を開発モードで起動します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ mvn quarkus:dev</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>このチュートリアルの中で、手動で Quarkus を開発モードで起動する必要があるのはこの手順のみです。
+このチュートリアルの他のセクションでは、設定とコード更新の手順は Quarkus により自動的に監視および処理され、アプリケーションを手動で再起動する必要はありません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>ブラウザーを開き、http://localhost:8080/hello にアクセスします。</p>
+</div>
+<div class="paragraph">
+<p>Auth0 にリダイレクトされ、ログインするように求められます。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-login.png" alt="Auth0 Login">
+</div>
+</div>
+<div class="paragraph">
+<p>次に、<code>QuarkusAuth0</code> アプリケーションによるアカウントへのアクセスを認可します。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-authorize.png" alt="Auth0 Authorize">
+</div>
+</div>
+<div class="paragraph">
+<p>最後に、Quarkus エンドポイントにリダイレクトされ、次のレスポンスが返されます。
+<code>Hello, auth0|60e5a305e8da5a006aef5471</code></p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>現行のユーザー名は返されないことに注意してください。
+この動作が発生する理由は、"OpenID Connect (OIDC) の開発サービスと UI" ガイドの <a href="security-openid-connect-dev-services#dev-ui-all-oidc-providers">すべての OpenID Connect プロバイダーの Dev UI</a> セクションと次のセクションで説明されているとおり、OIDC Dev UI を使用して確認できます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="looking-at-auth0-tokens-in-the-oidc-dev-ui"><a class="anchor" href="#looking-at-auth0-tokens-in-the-oidc-dev-ui"></a>OIDC Dev UI で Auth0 トークンを確認する</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus は優れた <a href="dev-ui">Dev UI</a> エクスペリエンスを提供します。
+具体的には、Quarkus は、Keycloak コンテナーを使用して OIDC エンドポイントを開発およびテストするための組込サポートを提供します。
+Quarkus の <code>quarkus.oidc.auth-server-url</code> 設定プロパティーに OIDC プロバイダーのアドレスが指定されていない場合、<a href="security-openid-connect-dev-services#dev-services-for-keycloak">DevService for Keycloak</a> が自動的に起動され、使用されます。</p>
+</div>
+<div class="paragraph">
+<p>プロバイダーがすでに設定されている場合は、引き続き Quarkus OIDC Dev UI を使用できます。
+設定を更新するには、次の手順を実行します。</p>
+</div>
+<div class="paragraph">
+<p>まず、次のように Quarkus アプリケーションタイプを <code>web-app</code> から <code>hybrid</code> に変更します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-configuration hljs" data-lang="configuration">quarkus.oidc.auth-server-url=https://dev-3ve0cgn7.us.auth0.com
+quarkus.oidc.application-type=hybrid <i class="conum" data-value="1"></i><b>(1)</b>
+quarkus.oidc.client-id=sKQu1dXjHB6r0sra0Y1YCqBZKWXqCkly
+quarkus.oidc.credentials.secret=${client-secret}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>現在 OIDC Dev UI は、<code>SPA</code> (シングルページアプリケーション) モードのみサポートしています。そのため、アプリケーションタイプは <code>hybrid</code> に変更されます。
+OIDC Dev UI シングルページアプリケーションは、独自の Java Script を使用して、OIDC プロバイダーに対してユーザーを認証し、アクセストークンをベアラートークンとして使用して、Quarkus エンドポイントにサービスとしてアクセスします。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>通常、Quarkus は <code>ベアラー</code> トークン認証をサポートするために <code>quarkus.oidc.application-type=service</code> で設定する必要がありますが、<code>hybrid</code> アプリケーションタイプもサポートしているため、認可コードとベアラートークンの両方のフローを同時にサポートできます。</p>
+</div>
+<div class="paragraph">
+<p>また、OIDC Dev UI へのコールバックを許可するように Auth0 アプリケーションを設定する必要もあります。
+次の URL 形式を使用します。</p>
+</div>
+<div class="paragraph">
+<p><code><a href="http://localhost:8080/q/dev-ui/io.quarkus.quarkus-oidc/${provider-name}-provider" class="bare">http://localhost:8080/q/dev-ui/io.quarkus.quarkus-oidc/${provider-name}-provider</a></code></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>この例では、<code>${provider -name}</code> は <code>auth0</code> です</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-allowed-callbacks.png" alt="Auth0 Allowed Callbacks">
+</div>
+</div>
+<div class="paragraph">
+<p>これでAuth0でOIDC Dev UIを使う準備ができました。</p>
+</div>
+<div class="paragraph">
+<p>ブラウザセッションで <a href="http://localhost:8080/q/dev/" class="bare">http://localhost:8080/q/dev/</a> を開きます。以下のように、Auth0 プロバイダ SPA にリンクする OpenId Connect カードが表示されます：</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-devui.png" alt="Auth0 DevUI">
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Auth0 provider</strong>、<strong>Login into Single Page Application</strong> の順にクリックします。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-devui-login-to-spa.png" alt="Auth0 DevUI Login to SPA">
+</div>
+</div>
+<div class="paragraph">
+<p>ログインのために Auth0 にリダイレクトされます。
+その後、次のように、OIDC Dev UI ダッシュボードにリダイレクトされます。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-devui-dashboard-without-name.png" alt="Auth0 DevUI Dashboard Without Name">
+</div>
+</div>
+<div class="paragraph">
+<p>ここでは、エンコードおよびデコードされた ID トークンとアクセストークンを確認し、それをクリップボードにコピーしたり、サービスエンドポイントのテストに使用したりできます。後でエンドポイントをテストしますが、ここではまず ID トークンを確認します。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-idtoken-without-name.png" alt="Auth0 IdToken without name">
+</div>
+</div>
+<div class="paragraph">
+<p>ご覧のとおりユーザー名を表すクレームはありませんが、<code>sub</code> (subject) クレームを確認すると、その値が、ブラウザーから直接 Quarkus エンドポイントにアクセスした際にレスポンスとして取得した値 (<code>auth0|60e5a305e8da5a006aef5471</code>) と一致することがわかります。</p>
+</div>
+<div class="paragraph">
+<p>これを修正するには、認証プロセス中に標準の OIDC <code>profile</code> スコープを要求するように Quarkus を設定します。これにより、ID トークンにさらに多くの情報が含まれるようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-configuration hljs" data-lang="configuration">quarkus.oidc.auth-server-url=https://dev-3ve0cgn7.us.auth0.com
+quarkus.oidc.application-type=hybrid
+quarkus.oidc.client-id=sKQu1dXjHB6r0sra0Y1YCqBZKWXqCkly
+quarkus.oidc.credentials.secret=${client-secret}
+
+quarkus.oidc.authentication.scopes=profile <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>デフォルトの <code>openid</code> スコープに加え、<code>profile</code> スコープを要求します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><a href="http://localhost:8080/q/dev/" class="bare">http://localhost:8080/q/dev/</a> に戻り、<code>Auth0</code> へのログインプロセスを繰り返して ID トークンを再度確認すると、<code>name</code> クレームを含む ID トークンが表示されるはずです。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-idtoken-with-name.png" alt="Auth0 IdToken with name">
+</div>
+</div>
+<div class="paragraph">
+<p>ブラウザーから Quarkus エンドポイントに直接アクセスすると、名前が返されるはずです。しかし、ブラウザーの Cookie キャッシュをクリアして <a href="http://localhost:8080/hello" class="bare">http://localhost:8080/hello</a> にアクセスしても、再度 <code>Hello, auth0|60e5a305e8da5a006aef5471</code> が返されます。何が間違っているのでしょうか?</p>
+</div>
+<div class="paragraph">
+<p>答えは、<code>org.eclipse.microprofile.jwt.JsonWebToken#getName()</code> 実装の詳細にあります。 <a href="https://github.com/eclipse/microprofile-jwt-auth">MicroProfile MP JWT RBAC の仕様</a> によると、この実装は MP JWT 固有の <code>upn</code> クレームをチェックし、次に <code>preferred_username</code> を試行し、最後に <code>sub</code> を試行します。これが、ID トークンに <code>name</code> クレームが含まれていても、レスポンスとして <code>Hello, auth0|60e5a305e8da5a006aef5471</code> が返される理由です。これは、エンドポイント <code>hello()</code> メソッドの実装を、特定のクレーム値を返すように変更することで、簡単に修正できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import org.eclipse.microprofile.jwt.JsonWebToken;
+
+import io.quarkus.oidc.IdToken;
+import io.quarkus.security.Authenticated;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/hello")
+public class GreetingResource {
+
+    @Inject
+    @IdToken
+    JsonWebToken idToken;
+
+    @GET
+    @Authenticated
+    @Produces(MediaType.TEXT_PLAIN)
+    public String hello() {
+        return "Hello, " + idToken.getClaim("name");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次にブラウザーのキャッシュをクリアして <a href="http://localhost:8080/hello" class="bare">http://localhost:8080/hello</a> にアクセスすると、ユーザー名が返されます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="logout-support"><a class="anchor" href="#logout-support"></a>ログアウトのサポート</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Auth0を使用してQuarkusにサインインしたユーザーは、ユーザーによるログアウトをサポートしたいと思うでしょう。Quarkusでは、 <a href="https://quarkus.io/guides/security-oidc-code-flow-authentication#logout-and-expiration">ローカルセッションのログアウトだけでなく、RP-initiated Logoutやその他の標準的なOIDCログアウトメカニズム</a> もサポートしています。</p>
+</div>
+<div class="paragraph">
+<p>現在のところ、Auth0は標準化されたOIDC RP-initiated logoutをサポートしておらず、発見可能なメタデータにセッション終了エンドポイントURLを提供していないが、標準的なものとほぼ同じ動作をする独自のログアウトメカニズムを提供しています。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus OIDC を使用するとこれを簡単にサポートできます。Auth0 のセッション終了エンドポイント URL を設定し、Quarkus で、<code>client-id</code> クエリーパラメーターとログアウト後の URL の両方を、<code>returnTo</code> クエリーパラメーターとしてAuth0 への RRP-initated logoutリダイレクトリクエストに含める必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-configuration hljs" data-lang="configuration">quarkus.oidc.auth-server-url=https://dev-3ve0cgn7.us.auth0.com
+quarkus.oidc.application-type=hybrid
+quarkus.oidc.client-id=sKQu1dXjHB6r0sra0Y1YCqBZKWXqCkly
+quarkus.oidc.credentials.secret=${client-secret}
+quarkus.oidc.authentication.scopes=openid,profile
+
+quarkus.oidc.end-session-path=v2/logout <i class="conum" data-value="1"></i><b>(1)</b>
+quarkus.oidc.logout.post-logout-uri-param=returnTo <i class="conum" data-value="2"></i><b>(2)</b>
+quarkus.oidc.logout.extra-params.client_id=${quarkus.oidc.client-id} <i class="conum" data-value="3"></i><b>(3)</b>
+quarkus.oidc.logout.path=/logout <i class="conum" data-value="4"></i><b>(4)</b>
+quarkus.oidc.logout.post-logout-path=/hello/post-logout <i class="conum" data-value="5"></i><b>(5)</b>
+
+quarkus.http.auth.permission.authenticated.paths=/logout
+quarkus.http.auth.permission.authenticated.policy=authenticated <i class="conum" data-value="6"></i><b>(6)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Auth0 はメタデータにセッション終了 URL を含めないため、Auth0 セッション終了エンドポイント URL を手動で設定して補完します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Auth0 は標準の <code>post_logout_redirect_uri</code> クエリーパラメーターを認識せず、代わりに <code>returnTo</code> パラメーターを期待します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Auth0 はログアウトリクエストで <code>client-id</code> を期待します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>/logout</code> パスへの認証済みリクエストは、RP 主導型ログアウトリクエストとして処理されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>これは、ログアウトしたユーザーが返されるパブリックリソースです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td><code>/logout</code> パスが保護されているようにして下さい。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>ここでは、Auth0 セッション終了エンドポイント URL をカスタマイズし、Quarkus に対して、<code><a href="http://localhost:8080/logout" class="bare">http://localhost:8080/logout</a></code> リクエストが現在認証されているユーザーのログアウトをトリガーする必要があることを示しました。<code>/logout</code> パスについては、それが <code>virtual</code> であり、JAX-RS エンドポイントのどのメソッドでもサポートされていないことに留意する必要があります。これが理由で、Quarkus OIDC が <code>/logout</code> リクエストに反応するためには、設定でこのパスに直接 <code>authenticated</code> <a href="https://quarkus.io/guides/security-authorize-web-endpoints-reference#authorization-using-configuration">HTTP セキュリティーポリシー</a> をアタッチする必要があります。</p>
+</div>
+<div class="paragraph">
+<p>また、ログアウトしたユーザーをパブリック <code>/hello/post-logout</code> リソースに返すように Quarkus を設定しました。このパスは、Auth0 固有の <code>returnTo</code> クエリーパラメーターとしてログアウトリクエストに含まれています。Quarkus アプリケーションの <code>client-id</code> もログアウト URL に含まれています。</p>
+</div>
+<div class="paragraph">
+<p>ログアウト後のリダイレクトを受け入れるようにエンドポイントを更新します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import org.eclipse.microprofile.jwt.JsonWebToken;
+
+import io.quarkus.oidc.IdToken;
+import io.quarkus.security.Authenticated;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/hello")
+public class GreetingResource {
+
+    @Inject
+    @IdToken
+    JsonWebToken idToken;
+
+    @GET
+    @Authenticated
+    @Produces(MediaType.TEXT_PLAIN)
+    public String hello() {
+        return "Hello, " + idToken.getClaim("name");
+    }
+
+    @GET
+    @Path("post-logout")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String postLogout() {
+        return "You were logged out";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>パブリック <code>/hello/post-logout</code> リソースメソッドが追加されたことに注意してください。</p>
+</div>
+<div class="paragraph">
+<p>ログアウトをテストする前に、ユーザーがログアウトした後の Quarkus へのリダイレクトを許可するように、<code>Auth0</code> アプリケーションが設定されていることを確認します。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-allowed-logout.png" alt="Auth0 Allowed Logout">
+</div>
+</div>
+<div class="paragraph">
+<p>ここで、ブラウザーの Cookie キャッシュをクリアし、http://localhost:8080/hello にアクセスし、Auth0 で Quarkus にログインしてユーザー名を取得し、<code><a href="http://localhost:8080/logout" class="bare">http://localhost:8080/logout</a></code> に移動します。ブラウザーには、<code>You were logged out</code> というメッセージが表示されます。</p>
+</div>
+<div class="paragraph">
+<p>次に、http://localhost:8080/q/dev/ に移動し、Dev UI SPA から Auth0 にログインします。<code>Logged in as Sergey Beryozkin</code> というテキストの横に、ログアウトを表す記号が表示され、OIDC Dev UI からもログアウトが可能になったことがわかります。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-devui-dashboard-with-name.png" alt="Auth0 Dashboard with name and Logout">
+</div>
+</div>
+<div class="paragraph">
+<p>OIDC DevUI からのログアウトが機能するためには、Auth0 アプリケーションの許可されたログアウトコールバックのリストを更新して、OIDC DevUI エンドポイントを含める必要があります。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-allowed-logouts.png" alt="Auth0 Allowed Logouts">
+</div>
+</div>
+<div class="paragraph">
+<p>次に、OIDC Dev UI から直接ログアウトし、新しいユーザーとしてログインします。必要に応じて、登録済みの Auth0 アプリケーションにさらにユーザーを追加します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="role-based-access-control"><a class="anchor" href="#role-based-access-control"></a>ロールベースのアクセスコントロール</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>Auth0</code> を使用して認証されたユーザーが Quarkus エンドポイントにアクセスできることを確認しました。</p>
+</div>
+<div class="paragraph">
+<p>次の手順では、ロールベースのアクセス制御 (RBAC) を導入して、<code>admin</code> など特定のロールを持つユーザーのみがエンドポイントにアクセスできるようにします。</p>
+</div>
+<div class="paragraph">
+<p>以下の <a href="#permission-based-access-control">権限ベースのアクセス制御</a> セクションも参照してください。</p>
+</div>
+<div class="paragraph">
+<p>デフォルトで、Auth0 トークンにはロールを含むクレームは含まれていないため、まず、トークンにロールを追加するカスタムアクションを使用して、<code>Auth0</code> アプリケーションの <code>Login</code> フローをカスタマイズする必要があります。<code>Auth0</code> ダッシュボードで <code>Actions/Flows/Login</code> を選択し、<code>Add Action/Build Custom</code> を選択し、<code>AddRoleClaim</code> という名前を付けます。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-add-role-action.png" alt="Auth0 Add Role Action">
+</div>
+</div>
+<div class="paragraph">
+<p>そこに次のアクションスクリプトを追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">exports.onExecutePostLogin = async (event, api) =&gt; {
+  const namespace = 'https://quarkus-security.com';
+  if (event.authorization) {
+    api.idToken.setCustomClaim(`${namespace}/roles`, event.authorization.roles);
+    api.accessToken.setCustomClaim(`${namespace}/roles`, event.authorization.roles);
+  }
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>カスタム Auth0 クレームは namespace で修飾される必要があるため、ロールを含むクレームの名前は <a href="https://quarkus-security.com/roles" class="bare">https://quarkus-security.com/roles</a> になります。前のセクションで分析した ID トークンのコンテンツを確認すると、このクレームがどのように表現されているかがわかります。以下はその例です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "https://quarkus-security.com/roles": [
+      "admin"
+  ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Auth0</code> ログインフロー図は次のようになります。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-login-flow.png" alt="Auth0 Login Flow">
+</div>
+</div>
+<div class="paragraph">
+<p><code>Auth0</code> アプリケーションに登録されているユーザーに、<code>admin</code> などのロールを追加する必要があります。</p>
+</div>
+<div class="paragraph">
+<p><code>admin</code> ロールを作成します。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-create-role.png" alt="Auth0 Create Role">
+</div>
+</div>
+<div class="paragraph">
+<p>それを登録済みユーザーに追加します。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-add-role-to-user.png" alt="Auth0 Add Role to User">
+</div>
+</div>
+<div class="paragraph">
+<p>次に、Quarkus エンドポイントを更新して、<code>admin</code> ロールを持つユーザーのみがエンドポイントにアクセスできるようにします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import org.eclipse.microprofile.jwt.JsonWebToken;
+
+import io.quarkus.oidc.IdToken;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/hello")
+public class GreetingResource {
+
+    @Inject
+    @IdToken
+    JsonWebToken idToken;
+
+    @GET
+    @RolesAllowed("admin")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String hello() {
+        return "Hello, " + idToken.getClaim("name");
+    }
+
+    @GET
+    @Path("post-logout")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String postLogout() {
+        return "You were logged out";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><a href="http://localhost:8080/hello" class="bare">http://localhost:8080/hello</a> を開き、Auth0 に対して認証すると <code>403</code> が発生します。ここでは、Quarkus OIDC が <code>Auth0</code> トークンのどのクレームがロール情報を表しているか認識していないため、<code>403</code> が発生します。デフォルトでは <code>groups</code> クレームがチェックされますが、ここでは Auth0 トークンに "https://quarkus-security.com/roles" クレームがあることが期待されます。</p>
+</div>
+<div class="paragraph">
+<p>RBAC を適用するためにどのクレームをチェックする必要があるかを Quarkus OIDC に指示して修正します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-configuration hljs" data-lang="configuration">quarkus.oidc.auth-server-url=https://dev-3ve0cgn7.us.auth0.com
+quarkus.oidc.application-type=hybrid
+quarkus.oidc.authentication.scopes=profile
+quarkus.oidc.client-id=sKQu1dXjHB6r0sra0Y1YCqBZKWXqCkly
+quarkus.oidc.credentials.secret=${client-secret}
+
+quarkus.oidc.roles.role-claim-path="https://quarkus-security.com/roles" <i class="conum" data-value="1"></i><b>(1)</b>
+
+# Logout
+quarkus.oidc.end-session-path=v2/logout
+quarkus.oidc.logout.post-logout-uri-param=returnTo
+quarkus.oidc.logout.extra-params.client_id=${quarkus.oidc.client-id}
+quarkus.oidc.logout.path=/logout
+quarkus.oidc.logout.post-logout-path=/hello/post-logout
+quarkus.http.auth.permission.authenticated.paths=/logout
+quarkus.http.auth.permission.authenticated.policy=authenticated</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>カスタムロールクレームを指します。クレームは namespace で修飾されているため、ロールクレームへのパスは二重引用符で囲まれます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>ブラウザーの Cookie キャッシュをクリアし、再度 <a href="http://localhost:8080/hello" class="bare">http://localhost:8080/hello</a> にアクセスし、Auth0 に対して認証して期待されるユーザー名を取得します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="opaque-access-tokens"><a class="anchor" href="#opaque-access-tokens"></a>不透明 Auth0 アクセストークンを使用して Quarkus にアクセスする</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>このセクションでは主に、Auth0 JWT アクセストークンではなく、<code>不透明</code> ベアラー Auth0 アクセストークンを受け入れるように Quarkus を調整する方法を説明します。なぜなら、認可コードフローで発行される Auth0 アクセストークンはデフォルトで不透明であり、すでに ID トークンで提供されている現行ユーザーの情報に加え、<code>UserInfo</code> をリクエストするためにしか使用できないためです。多くの OIDC および OAuth2 プロバイダーは不透明アクセストークンしか発行しないため、不透明トークンの検証方法を理解すると役立ちます。</p>
+</div>
+<div class="paragraph">
+<p>Auth0 と Quarkus を設定して認可コードアクセストークンを JWT フォーマットで発行し、サービスエンドポイントに伝播させる方法の詳細は、<a href="#token-propagation">アクセストークンのマイクロサービスへの伝搬</a> セクションと<a href="#jwt-access-tokens">JWT形式のアクセストークン</a> セクションを参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>これまで、OIDC 認可コードフローを使用して Quarkus エンドポイントのみをテストしてきました。このフローでは、ブラウザーを使用して Quarkus エンドポイントにアクセスし、Quarkus 自体が認可コードフローを管理します。ユーザーは Auth0 にリダイレクトされてログインし、Quarkus に再度リダイレクトされます。その後 Quarkus が ID トークン、アクセストークン、およびリフレッシュトークンのコードを交換してフローを完了し、ユーザー認証の成功を表す ID トークンを処理します。この時点でアクセストークンは使用されません。前述のとおり、Quarkus が認可コードフローでアクセストークンを使用するのは、認証済の現行ユーザーに代わってダウンストリームサービスにアクセスする場合に限られます。</p>
+</div>
+<div class="paragraph">
+<p>しかし、開発した Quarkus エンドポイントも <code>ベアラー</code> アクセストークンを受け入れる必要があると想像してみてください。このエンドポイントにそれを伝播している他の Quarkus エンドポイントかもしれませんし、アクセストークンを使用して Quarkus エンドポイントにアクセスする SPA かもしれません。その場合、すでに ID トークンの分析に使用した Quarkus OIDC DevUI SPA は、SPA が使用できるアクセストークンを使用して Quarkus エンドポイントをテストするのに最適です。</p>
+</div>
+<div class="paragraph">
+<p>再度 <a href="http://localhost:8080/q/dev-ui" class="bare">http://localhost:8080/q/dev-ui</a> にアクセスし、<code>OpenId Connect</code> カードを選択して Auth0 にログインし、アクセストークンの内容を確認します。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-devui-accesstoken.png" alt="Auth0 DevUI Access Token">
+</div>
+</div>
+<div class="paragraph">
+<p>このアクセストークンは、<code>JWS</code> (署名済み) フォーマットではなく <code>JWE</code> (暗号化済み) フォーマットであるため、前述の ID トークンとは異なり Quarkus が直接検証することはできません。デコードされたトークンヘッダーを見ると、Auth0 のみが知る秘密鍵で直接暗号化されているため、Quakus はその内容を復号化できないことがわかります。このアクセストークンは Quarkus から見ると <code>不透明</code> であり、Quarkus は Auth0 の公開非対称検証キーを使用してこれを検証することはできません。</p>
+</div>
+<div class="paragraph">
+<p>確認するには、<code>Test Service</code> 領域の <code>Service Address</code> として <code>/hello</code> を入力して <code>With Access Token</code> を押すと、HTTP <code>401</code> ステータスが表示されます。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-devui-test-accesstoken-401.png" alt="Auth0 Dev UI Test Access token 401">
+</div>
+</div>
+<div class="paragraph">
+<p>Quarkus がこのようなアクセストークンを受け入れるには、2 つのオプションのいずれかを使用できなければなりません。
+最初のオプションは、プロバイダーのイントロスペクションエンドポイントを使用して、不透明トークンをリモートでイントロスペクトします。通常、トークンイントロスペクションは <code>OAuth2</code> レベルでサポートされ、<code>OIDC</code> は <code>OAuth2</code> 上に構築されているため、Keycloak などの一部の OIDC プロバイダーもトークンイントロスペクションをサポートします。ただし、Auth0 はトークンイントロスペクションをサポートしません。確認するには、公開されている Auth0 メタデータを確認し、設定済みの Auth0 プロバイダーのアドレスに <code>/.well-known/openid-configuration</code> を追加し、その結果として得られる URL <code><a href="https://dev-3ve0cgn7.us.auth0.com/.well-known/openid-configuration" class="bare">https://dev-3ve0cgn7.us.auth0.com/.well-known/openid-configuration</a></code> を開きます。これにより、Auth0 にイントロスペクションエンドポイントがないことがわかります。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-well-known-config.png" alt="Auth0 Well Known Config">
+</div>
+</div>
+<div class="paragraph">
+<p>この場合は、別のオプションを使用できます。つまり、アクセストークンを使用して Auth0 から <code>UserInfo</code> を取得し、間接的にアクセストークンを検証するというもう 1 つのオプションを使用して、不透明な Auth0 トークンを受け入れ、検証できます。OIDC プロバイダーは <code>UserInfo</code> を発行する前にアクセストークンを検証する必要があり、Auth0 には <code>UserInfo</code> エンドポイントがあるため、このオプションが機能します。</p>
+</div>
+<div class="paragraph">
+<p>ここで、アクセストークンを使用して <code>UserInfo</code> を取得することでアクセストークンの検証行うことをリクエストするように、Quarkus を設定してみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-configuration hljs" data-lang="configuration">quarkus.oidc.auth-server-url=https://dev-3ve0cgn7.us.auth0.com
+quarkus.oidc.application-type=hybrid
+quarkus.oidc.authentication.scopes=profile
+quarkus.oidc.client-id=sKQu1dXjHB6r0sra0Y1YCqBZKWXqCkly
+quarkus.oidc.credentials.secret=${client-secret}
+
+# Point to the custom roles claim
+quarkus.oidc.roles.role-claim-path="https://quarkus-security.com/roles"
+
+# Logout
+quarkus.oidc.end-session-path=v2/logout
+quarkus.oidc.logout.post-logout-uri-param=returnTo
+quarkus.oidc.logout.extra-params.client_id=${quarkus.oidc.client-id}
+quarkus.oidc.logout.path=/logout
+quarkus.oidc.logout.post-logout-path=/hello/post-logout
+quarkus.http.auth.permission.authenticated.paths=/logout
+quarkus.http.auth.permission.authenticated.policy=authenticated
+
+quarkus.oidc.token.verify-access-token-with-user-info=true <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>アクセストークンを使用して <code>UserInfo</code> をリクエストすることで、アクセストークンを間接的に検証します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>ID token</code> ではなく <code>UserInfo</code> を期待するように、エンドポイントコードを更新します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import io.quarkus.oidc.UserInfo;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/hello")
+public class GreetingResource {
+
+    @Inject
+    UserInfo userInfo;
+
+    @GET
+    @RolesAllowed("admin")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String hello() {
+        return "Hello, " + userInfo.getName();
+    }
+
+    @GET
+    @Path("post-logout")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String postLogout() {
+        return "You were logged out";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このコードは、認可コードフローとベアラーアクセストークンフローの両方で機能するようになります。</p>
+</div>
+<div class="paragraph">
+<p>アクセストークンを確認した OIDC Dev UI に移動し、<code>Test Service</code> 領域の <code>Service Address</code> として <code>/hello</code> を入力し、<code>With Access Token</code> を押すと <code>200</code> が返されます。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-devui-test-accesstoken-200.png" alt="Auth0 Dev UI Test Access token">
+</div>
+</div>
+<div class="paragraph">
+<p>実際に動作することを確認するには、<code>@RolesAllowed("user")</code> でのみ <code>user</code> ロールを許可するようにテストエンドポイントを更新します。その後、OIDC Dev UI からエンドポイントに再度アクセスすると、HTTP <code>403</code> エラーが発生します。コードを <code>@RolesAllowed ("admin")</code> に戻すと、HTTP <code>200</code> ステータスが再び表示されます。</p>
+</div>
+<div class="paragraph">
+<p>不透明アクセストークンを間接的に検証する場合、それを使用して <code>UserInfo</code> をリクエストすると、Quarkus はロール情報のソースとして <code>UserInfo</code> を使用します (存在する場合)。その結果、Auth0 は <code>UserInfo</code> レスポンスに以前に作成されたカスタムロールクレームも含めます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>このセクションの冒頭で言及したとおり、このセクションの主な目的は、Quarkus による不透明アクセストークンの検証方法を説明することです。一般的には、フロントエンドの JAX-RS エンドポイントまたは SPA が UserInfo の取得を信頼できるサービスに委譲することを望まない限り、<code>UserInfo</code> の取得を許可することのみを目的とするアクセストークンをサービスに伝播することは回避するべきです。</p>
+</div>
+<div class="paragraph">
+<p>Auth0 アクセストークンの推奨される使用方法については、次の <a href="#token-propagation">アクセストークンのマイクロサービスへの伝搬</a> セクションと<a href="#jwt-access-tokens">JWT形式のアクセストークン</a> セクション を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>通常、リモートサービスにアクセスするにはアクセストークンを使用しますが、OIDC DevUI SPA ダッシュボードには ID トークンを使用してテストするオプションもあります。このオプションは、SPA がエンドポイントに委譲して、SPA が使用するために ID トークンからいくつかの情報を検証および取得するケースをエミュレートするためにのみ使用できます。その場合も、ID トークンは OIDC DevUI によってベアラートークンとしてエンドポイントに送信されます。ほとんどの場合は、アクセストークンを使用してテストすることが推奨されます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>テストするサービスパスを手動で入力する代わりに、OIDC DevUI の SwaggerUI または GraphQL を使用してサービスをテストできます。
+たとえば以下をアプリケーションの pom に追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+   &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+   &lt;artifactId&gt;quarkus-smallrye-openapi&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>OIDC Dev UI に Swagger リンクが表示されます。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-devui-testservice-swagger.png" alt="Auth0 Dev UI Test with Swagger">
+</div>
+</div>
+<div class="paragraph">
+<p>Swagger リンクをクリックして、サービスのテストを開始します。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="token-propagation"><a class="anchor" href="#token-propagation"></a>アクセストークンのマイクロサービスへの伝搬</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>OIDC 認可コードフローを使用し、ID トークンと UserInfo の両方を使用してユーザー情報にアクセスできるようになりました。一般的な次のタスクは、現在の Auth0 アクセストークンを伝播して、現行の認証済みユーザー代わってダウンストリームサービスにアクセスすることです。</p>
+</div>
+<div class="paragraph">
+<p>実際、注入された <code>UserInfo</code> を示す最後のサンプルコードは、具体的なアクセストークンを伝播した例です。この場合、Quarkus は Auth0 アクセストークンを Auth0 <code>UserInfo</code> エンドポイントに伝播して <code>UserInfo</code> を取得します。Quarkus は、ユーザーが何もしなくてもこれを実行します。</p>
+</div>
+<div class="paragraph">
+<p>しかし、アクセストークンを一部のカスタムサービスに伝播させる場合はどうでしょうか。Quarkus では、認可コードフローとベアラートークンフローの両方で非常に簡単にこれを実現できます。ベアラートークンアクセスを必要とするサービスを呼び出すための REST クライアントインターフェイスを作成し、それにアノテーション <code>@AccessToken</code> を付けるだけで、Auth0 ベアラーアクセストークンとしてフロントエンドエンドポイントに到着するアクセストークン、または Auth0 認可コードフローの完了後に Quarkus が取得したアクセストークンが、ターゲットマイクロサービスに伝播されます。これ以上簡単にはならないぐらい簡単です。</p>
+</div>
+<div class="paragraph">
+<p>For examples of propagating access tokens, see the following sections in this tutorial.
+For more information about token propagation, see <a href="security-openid-connect-client-reference#token-propagation-rest">OIDC token propagation</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="jwt-access-tokens"><a class="anchor" href="#jwt-access-tokens"></a>JWT形式のアクセストークン</h3>
+<div class="paragraph">
+<p>Quarkus OIDC による <a href="#opaque-access-tokens">不透明 Auth0 アクセストークンを使用して Quarkus にアクセスする</a> の処理方法を詳しく見てきました。しかし、UserInfo の確認以外の操作を現行の認証済みユーザーに代わって実行するマイクロサービスに、Auth0 の不透明トークンを伝播することは回避する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>フロントエンドの Quarkus アプリケーションが認可コードフローのアクセストークンを伝播してアクセスするマイクロサービスは、Auth0 ダッシュボードでは <code>API</code> として表されます。これを <code>Applications/APIs</code> に追加してみましょう。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-api.png" alt="Auth0 API">
+</div>
+</div>
+<div class="paragraph">
+<p>作成された <code>QuarkusAuth0API</code> の <code><a href="https://quarkus-auth0" class="bare">https://quarkus-auth0</a></code> 識別子は、この API の <code>audience</code> として機能します。Auth0 への認可コードフローリダイレクトでこのオーディエンスをクエリーパラメーターとして提供すると、Auth0 は必ず JWT フォーマットでアクセストークンを発行するようになります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="api-microservice"><a class="anchor" href="#api-microservice"></a>APIマイクロサービス</h3>
+<div class="paragraph">
+<p>OIDC トークンの伝播と REST クライアントをサポートするために、以下の依存関係をプロジェクトに追加します：</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-rest-client-jackson&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+   &lt;artifactId&gt;quarkus-rest-client-oidc-token-propagation&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>ApiEchoService</code> サービスクラスを作成する：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import io.quarkus.security.Authenticated;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/echo")
+public class ApiEchoService {
+
+    @POST
+    @Authenticated
+    @Produces(MediaType.TEXT_PLAIN)
+    public String echoUserName(String username) {
+        return username;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これを、Auth0 から公開検証キーのみを取得する OIDC <code>service</code> アプリケーションとして設定します。
+このマイクロサービスの設定は、次の 1 行のみとなるはずです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-configuration hljs" data-lang="configuration">quarkus.oidc.auth-server-url=https://dev-3ve0cgn7.us.auth0.com</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これだけで、OIDC <code>service</code> アプリケーションは Auth0 公開検証キーを取得し、それを使用して JWT フォーマットの Auth0 アクセストークンを検証できます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>このチュートリアルでは、認可コードとベアラートークン認証フローの両方を処理できる OIDC <code>hybrid</code> アプリケーションをすでに設定しています。実稼働環境ではマイクロサービスを別のサーバーとして実行しますが、ここではわかりやすくするために、<code>ApiEchoService</code> を <code>quarkus.oidc.auth-server-url=https://dev-3ve0cgn7.us.auth0.com</code> のみを含む独自の設定を持つ 2 番目のサーバーとして起動する必要はありません。そのため、Auth0 開発テナントアドレスがすでに設定されている現行の設定が再利用されます。</p>
+</div>
+<div class="paragraph">
+<p><code>hybrid</code> OIDC アプリケーションタイプでは、<code>GreetingResource</code> への <code><a href="http://localhost:8080/hello" class="bare">http://localhost:8080/hello</a></code> リクエストによって認可コードフローが開始されます。一方で、、<code>GreetingResource</code> によって開始された <code>ApiEchoService</code> への <code><a href="http://localhost:8080/echo" class="bare">http://localhost:8080/echo</a></code> リクエストによって、認可コードフロートークンが伝播され、ベアラー JWT アクセストークンとして <code>ApiEchoService</code> によって受け入れられます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>次に、<code>ApiEchoService</code> を表す REST クライアントインターフェイスを追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import io.quarkus.oidc.token.propagation.AccessToken;
+
+@RegisterRestClient
+@AccessToken <i class="conum" data-value="1"></i><b>(1)</b>
+@Path("/echo")
+public interface ApiEchoServiceClient {
+
+    @POST
+    @Produces(MediaType.TEXT_PLAIN)
+    String echoUserName(String username);
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>アクセストークンを HTTP <code>Authorization: Bearer accesstoken</code> ヘッダーとして伝播します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>さらに、前に作成した Quarkus フロントエンドアプリケーション <code>GreetingResource</code> の設定を更新して、認可コードフローの (ID トークンではなく) アクセストークンに <code>ApiEchoService</code> をターゲットとする <code>aud</code> (オーディエンス) クレームを組み込むようにリクエストし、<code>ApiEchoService</code> REST クライアントのベース URL を設定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-configuration hljs" data-lang="configuration">quarkus.oidc.auth-server-url=https://dev-3ve0cgn7.us.auth0.com
+quarkus.oidc.application-type=hybrid
+quarkus.oidc.authentication.scopes=profile
+quarkus.oidc.authentication.extra-params.audience=https://quarkus-auth0 <i class="conum" data-value="1"></i><b>(1)</b>
+quarkus.oidc.client-id=sKQu1dXjHB6r0sra0Y1YCqBZKWXqCkly
+quarkus.oidc.credentials.secret=${client-secret}
+
+# Point to the custom roles claim
+quarkus.oidc.roles.role-claim-path="https://quarkus-security.com/roles"
+
+# Logout
+quarkus.oidc.end-session-path=v2/logout
+quarkus.oidc.logout.post-logout-uri-param=returnTo
+quarkus.oidc.logout.extra-params.client_id=${quarkus.oidc.client-id}
+quarkus.oidc.logout.path=/logout
+quarkus.oidc.logout.post-logout-path=/hello/post-logout
+quarkus.http.auth.permission.authenticated.paths=/logout
+quarkus.http.auth.permission.authenticated.policy=authenticated
+
+quarkus.oidc.token.verify-access-token-with-user-info=true
+
+org.acme.ApiEchoServiceClient/mp-rest/url=http://localhost:${port} <i class="conum" data-value="2"></i><b>(2)</b>
+
+quarkus.test.native-image-profile=test
+%prod.port=8080
+%dev.port=8080
+%test.port=8081</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Quarkus から Auth0 への認可コードフローのリダイレクト中に、追加の <code>audience</code> クエリーパラメーターを Auth0 認可エンドポイントに渡します。
+これにより、アクセストークンが JWT フォーマットで発行され、<code><a href="https://quarkus-auth0" class="bare">https://quarkus-auth0</a></code> を含む <code>aud</code> (オーディエンス) クレームが確実に組み込まれます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>ApiEchoServiceClient</code> が <code>ApiEchoService</code> エンドポイントを指すようにします。<code>org.acme.ApiEchoServiceClient/mp-rest/url=http://localhost:${port}</code> プロパティーは、開発モード、テストモード、本番モードの使用中に正しい URL が構築されるようにパラメーター化されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>最後に、<code>ApiEchoService</code> がユーザー名をエコーするようにリクエストするように、<code>GreetingResource</code> を更新します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import io.quarkus.oidc.UserInfo;
+import io.quarkus.security.Authenticated;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+
+@Path("/hello")
+public class GreetingResource {
+    @Inject
+    @RestClient
+    ApiEchoServiceClient echoClient; <i class="conum" data-value="1"></i><b>(1)</b>
+
+    @Inject
+    UserInfo userInfo;
+
+    @GET
+    @RolesAllowed("admin")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String hello() {
+        return "Hello, " + echoClient.echoUserName(userInfo.getName()); <i class="conum" data-value="2"></i><b>(2)</b>
+    }
+
+    @GET
+    @Path("post-logout")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String postLogout() {
+        return "You were logged out";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>ApiEchoServiceClient</code> REST クライアントを注入します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>ApiEchoServiceClient</code> を使用してユーザー名をエコーします。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>ブラウザーを開いて <a href="http://localhost:8080/hello" class="bare">http://localhost:8080/hello</a> にアクセスし、ブラウザーに自分の名前を表示します。</p>
+</div>
+<div class="paragraph">
+<p><a href="http://localhost:8080/q/dev-ui" class="bare">http://localhost:8080/q/dev-ui</a> に移動して <code>OpenId Connect</code> カードを選択し、Auth0 にログインし、アクセストークンの内容を確認します。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-devui-jwt-accesstoken.png" alt="Auth0 DevUI JWT Access Token">
+</div>
+</div>
+<div class="paragraph">
+<p><a href="#opaque-access-tokens">不透明 Auth0 アクセストークンを使用して Quarkus にアクセスする</a> セクションに示されているとおりアクセストークンは暗号化されなくなり、JWT フォーマットになります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="permission-based-access-control"><a class="anchor" href="#permission-based-access-control"></a>権限ベースのアクセス制御</h3>
+<div class="paragraph">
+<p><a href="#role-based-access-control">ロールベースのアクセスコントロール</a> セクションでは、Quarkus でユーザーロールを含む namespace で修飾されたクレームをチェックする方法と、その情報を使用してロールベースのアクセス制御を適用する方法について説明しました。Auth0 はすでに、ID トークンとアクセストークンの両方にカスタムロールクレームを追加するように設定されています。</p>
+</div>
+<div class="paragraph">
+<p>ただし、フロントエンドのエンドポイントからマイクロサービスにアクセストークンを伝播する場合は、権限ベースのアクセス制御が適しています。これは、ユーザーが特定のロールを持つことをトークンが保証するのではなく、特定のアクセストークンがこのサービスに対してそのアクションを実行するために承認されているか確認します。たとえば、管理者ロールを持つからといって、必ずしもそのユーザーがこのマイクロサービスのコンテンツの一部に対する読み取りおよび書き込みを許可されるわけではありません。</p>
+</div>
+<div class="paragraph">
+<p>権限ベースのアクセス制御の制約を <code>ApiEchoService</code> に適用する方法を見てみましょう。</p>
+</div>
+<div class="paragraph">
+<p>Auth0 ダッシュボードに移動し、<code>QuarkusAuth0API</code> API に <code>echo:name</code> 権限を追加します。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-api-permissions.png" alt="Auth0 API permissions">
+</div>
+</div>
+<div class="paragraph">
+<p><code>echo:name</code> 権限は、認可コードフロー中に標準 Oauth2 <code>scope</code> もリクエストされた場合、<code>echo:name</code> 権限が標準の OAuth2 <code>scope</code> クレーム値としてアクセストークンに含まれます。次のように設定を更新します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-configuration hljs" data-lang="configuration">quarkus.oidc.auth-server-url=https://dev-3ve0cgn7.us.auth0.com
+quarkus.oidc.application-type=hybrid
+quarkus.oidc.authentication.scopes=profile,echo:name <i class="conum" data-value="1"></i><b>(1)</b>
+quarkus.oidc.authentication.extra-params.audience=https://quarkus-auth0
+quarkus.oidc.client-id=sKQu1dXjHB6r0sra0Y1YCqBZKWXqCkly
+quarkus.oidc.credentials.secret=${client-secret}
+
+# Point to the custom roles claim
+quarkus.oidc.roles.role-claim-path="https://quarkus-security.com/roles"
+
+# Logout
+quarkus.oidc.end-session-path=v2/logout
+quarkus.oidc.logout.post-logout-uri-param=returnTo
+quarkus.oidc.logout.extra-params.client_id=${quarkus.oidc.client-id}
+quarkus.oidc.logout.path=/logout
+quarkus.oidc.logout.post-logout-path=/hello/post-logout
+quarkus.http.auth.permission.authenticated.paths=/logout
+quarkus.http.auth.permission.authenticated.policy=authenticated
+
+quarkus.oidc.token.verify-access-token-with-user-info=true
+
+org.acme.ApiEchoServiceClient/mp-rest/url=http://localhost:8080</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>認可コードフロー中に、追加の <code>echo:name</code> スコープがリクエストされます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>ここで、権限ベースのアクセス制御を適用するように、<code>ApiEchoService</code> を更新します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import io.quarkus.security.PermissionsAllowed;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/echo")
+public class ApiEchoService {
+
+    @POST
+    @PermissionsAllowed("echo:name")
+    @Produces(MediaType.TEXT_PLAIN)
+    String echoUserName(String username) {
+        return username;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>以上を実行することで、Quarkus OIDC は <code>scope</code> クレーム値を現行のセキュリティーアイデンティティーの権限として自動的に関連付けます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>@RolesAllowed</code> アノテーションと <code>@PermissionsAllowed</code> アノテーションを組み合わせることで、Quarkus でロールベースおよび権限ベースのアクセス制御を適用できます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>ブラウザーを開いて <a href="http://localhost:8080/hello" class="bare">http://localhost:8080/hello</a> にアクセスし、ブラウザーに表示される名前を取得します。</p>
+</div>
+<div class="paragraph">
+<p>権限が正しく適用されていることを確認するには、これを <code>echo.name</code>: <code>@PermissionsAllowed("echo.name")</code> に変更します。ブラウザーのキャッシュをクリアし、http://localhost:8080/hello に再度アクセスすると、<code>ApiEchoService</code> によって <code>403</code> が報告されます。ここで、権限を <code>@PermissionsAllowed ("echo:name")</code> に戻します。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="integration-testing"><a class="anchor" href="#integration-testing"></a>統合テスト</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>すでに OIDC DevUI SPA を使用して Auth0 にログインし、アクセストークンを使用して Quarkus エンドポイントをテストし、その過程でエンドポイントコードを更新しています。</p>
+</div>
+<div class="paragraph">
+<p>しかし、テストの実行も重要です。ここでは、<a href="continuous-testing">Quarkus 継続的テスト</a> 機能を使用して、このチュートリアルを実施する中で開発したエンドポイントと設定をテストする方法を説明します。</p>
+</div>
+<div class="paragraph">
+<p>次のテストコードから始めます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import io.quarkus.test.junit.QuarkusTest;
+import org.junit.jupiter.api.Test;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.is;
+
+@QuarkusTest
+public class GreetingResourceTest {
+
+    @Test
+    public void testHelloEndpoint() {
+        given()
+          .when().get("/hello")
+          .then()
+             .statusCode(200)
+             .body(is("Hello, Sergey Beryozkin"));
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>アプリケーションを開発モードで起動すると、CLI ウィンドウに次のように表示されます。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-devmode-started.png" alt="Auth0 DevMode started">
+</div>
+</div>
+<div class="paragraph">
+<p><code>r</code> を押すと、このテストが <code>403</code> で失敗していることがわかります。テストはエンドポイントにトークンを送信しないため、これは想定された結果です。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-test-failure-403.png" alt="Auth0 test failure 403">
+</div>
+</div>
+<div class="paragraph">
+<p>Before fixing the test, let&#8217;s review the options available for testing Quarkus endpoints secured by OIDC. These options might vary, depending on which flow your application supports and how you prefer to test. Endpoints which use OIDC authorization code flow can be tested using <a href="security-oidc-code-flow-authentication#code-flow-integration-testing">one of these options</a> and endpoints which use Bearer token authentication can be tested using <a href="security-oidc-bearer-token-authentication#bearer-token-integration-testing">one of these options</a>.</p>
+</div>
+<div class="paragraph">
+<p>このように、Auth0 で保護されたエンドポイントは、<code>Wiremock</code> または <code>@TestSecurity</code> アノテーションを使用してテストできます。このようなテストを自分で書いてみて、問題が発生した場合はご連絡ください。</p>
+</div>
+<div class="paragraph">
+<p>ただしこのチュートリアルでは、最近追加された <code>OidcTestClient</code> を使用して、ライブ Auth0 開発テナントを使用するエンドポイントのテストをサポートします。</p>
+</div>
+<div class="paragraph">
+<p>関連する設定フラグメントを次に示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-configuration hljs" data-lang="configuration">quarkus.oidc.auth-server-url=https://dev-3ve0cgn7.us.auth0.com
+quarkus.oidc.application-type=hybrid
+quarkus.oidc.authentication.scopes=profile
+quarkus.oidc.client-id=sKQu1dXjHB6r0sra0Y1YCqBZKWXqCkly
+quarkus.oidc.credentials.secret=${client-secret}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>実稼働環境では、<code>%prod.</code> および <code>%test.</code> 修飾子を使用して本番レベルとテストレベルの設定を区別します。ここでは、実際のアプリケーションで上記の設定が <code>%test.</code> から始まり、この設定に <code>%prod.</code> で修飾された Auth0 実稼働テナント設定が含まれると仮定します。</p>
+</div>
+<div class="paragraph">
+<p><code>OidcTestClient</code> を使用してこのような設定をテストするには、OAuth2 <code>password</code> または <code>client_credentials</code> グラントのいずれかを使用して、Auth0 開発テナントからトークンを取得する必要があります。ここでは <code>password</code> グラントを使用します。Auth0 ダッシュボードに登録されているアプリケーションが <code>password</code> グラントを許可していることを確認してください。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-password-grant.png" alt="Auth0 password grant">
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>ここで明確にする必要があるのですが、実稼働環境で非推奨の OAuth2 <code>password</code> トークングラントを使用することは推奨されません。ただし、それの使用は、ライブ開発 Auth0 テナントから取得したトークンを使用してエンドポイントをテストする場合に役立ちます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>OidcTestClient</code> should be used to test applications accepting bearer tokens which will work for the endpoint developed in this tutorial as it supports both authorization code flow and bearer token authentication. You would need to use OIDC WireMock or <code>HtmlUnit</code> directly against the Auth0 dev tenant if only the authorization code flow was supported - in the latter case <code>HtmlUnit</code> test code would have to be aligned with how Auth0 challenges users to enter their credentials. If you like, you can copy the <a href="security-oidc-code-flow-authentication#code-flow-integration-testing-wiremock">HtmlUnit test fragment</a> from the documentation and experiment with it.</p>
+</div>
+<div class="paragraph">
+<p>ここでは <code>OidcTestClient</code> を使用して、現時点で失敗しているテストを修正します。</p>
+</div>
+<div class="paragraph">
+<p>まず、次の依存関係を追加する必要があります。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-test-oidc-server&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">testImplementation("io.quarkus:quarkus-test-oidc-server")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これは、アクセストークンの取得テストに使用できるユーティリティークラス <code>io.quarkus.test.oidc.client.OidcTestClient</code> を提供します (この依存関係は OIDC WireMock サポートも提供しますので、必要に応じてドキュメントでテストに使用する方法を確認してください)。</p>
+</div>
+<div class="paragraph">
+<p>次に、テストコードを以下のように更新します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.is;
+
+import java.util.Map;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.oidc.client.OidcTestClient;
+
+@QuarkusTest
+public class GreetingResourceTest {
+
+    static OidcTestClient oidcTestClient = new OidcTestClient();
+
+    @AfterAll
+    public static void close() {
+        client.close();
+    }
+
+    @Test
+    public void testHelloEndpoint() {
+        given()
+          .auth().oauth2(getAccessToken(`sberyozkin@gmail.com`, "userpassword"))
+          .when().get("/hello")
+          .then()
+             .statusCode(200)
+             .body(is("Hello, Sergey Beryozkin"));
+    }
+
+    private String getAccessToken(String name, String secret) {
+        return oidcTestClient.getAccessToken(name, secret, <i class="conum" data-value="1"></i><b>(1)</b>
+            Map.of("audience", "https://quarkus-auth0",
+	           "scope", "openid profile"));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>OidcTestClient</code> は、登録済みユーザーの名前とパスワードのいずれかと、<code>audience</code> および <code>scope</code> パラメーターを使用して、アクセストークンを取得するために使用されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>OidcTestClient</code> は、<code>Auth0</code> トークンのエンドポイントのアドレス、クライアント id、およびシークレットを検出します。</p>
+</div>
+<div class="paragraph">
+<p>もう一度 <code>r</code> を押すと、テストが合格します。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-test-success.png" alt="Auth0 test success">
+</div>
+</div>
+<div class="paragraph">
+<p>ちなみに、必要に応じて DevUI から直接、連続モードでテストを実行することもできます。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/auth0-continuous-testing.png" alt="Auth0 Continuous testing">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="production-mode"><a class="anchor" href="#production-mode"></a>プロダクションモード</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Auth0 で保護された Quarkus エンドポイントを開発モードで開発およびテストしました。
+次のステップでは、アプリケーションを本番モードで実行します。
+JVM モードとネイティブモードを選択します。</p>
+</div>
+<div class="sect2">
+<h3 id="run-the-application-in-jvm-mode"><a class="anchor" href="#run-the-application-in-jvm-mode"></a>JVMモードでアプリケーションを実行</h3>
+<div class="paragraph">
+<p>アプリケーションをコンパイルします:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>アプリケーションの実行:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">java -jar target/quarkus-app/quarkus-run.jar</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ブラウザーを開いて <a href="http://localhost:8080/hello" class="bare">http://localhost:8080/hello</a> にアクセスし、ブラウザーに表示される名前を取得します。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="run-the-application-in-native-mode"><a class="anchor" href="#run-the-application-in-native-mode"></a>ネイティブ・モードでアプリケーションを実行</h3>
+<div class="paragraph">
+<p>この同じデモを、変更を加えることなくネイティブモードにコンパイルできます。
+つまり、実稼働環境に JVM をインストールする必要はありません。
+ランタイムテクノロジーは生成されたバイナリーに組み込まれ、最小限のリソースで実行できるように最適化されています。</p>
+</div>
+<div class="paragraph">
+<p>コンパイルには少し時間がかかるため、この手順はデフォルトで無効になっています。</p>
+</div>
+<div class="paragraph">
+<p><code>native</code> プロファイルを有効にして、アプリケーションを再度ビルドします。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build --native</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install -Dnative</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build -Dquarkus.native.enabled=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、以下のバイナリーを直接実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./target/quarkus-auth0-1.0.0-SNAPSHOT-runner</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ブラウザーを開いて <a href="http://localhost:8080/hello" class="bare">http://localhost:8080/hello</a> にアクセスし、ブラウザーに表示される名前を取得します。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="troubleshooting"><a class="anchor" href="#troubleshooting"></a>トラブルシューティング</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このチュートリアルで説明された手順は、チュートリアルで説明されたとおりに動作するはずです。すでに認証を完了している場合は、更新後の Quarkus エンドポイントにアクセスする際にブラウザーの Cookie をクリアする必要があることもあります。開発モードで Quarkus アプリケーションを手動で再起動する必要がある可能性もありますが、これhら想定されていません。このチュートリアルを完了するのにサポートが必要な場合は、Quarkus チームにお問い合わせください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="summary"><a class="anchor" href="#summary"></a>まとめ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このチュートリアルでは、同じエンドポイントコードでサポートされている認可コードフローとベアラートークン認証フローを使用して、Quarkus エンドポイントを <code>quarkus-oidc</code> エクステンションと Auth0 で保護する方法を実演しました。
+コードを 1 行も書くことなく、カスタム Auth0 ログアウトフローのサポートを追加し、namespace で修飾されたカスタム Auth0 クレームを使用してロールベースのアクセス制御を有効にしました。
+マイクロサービス REST クライアントに <code>@AccessToken</code> アノテーションを追加することで、フロントエンドエンドポイントからマイクロサービスエンドポイントにトークンを伝播しました。
+マイクロサービスエンドポイントは、<code>@PermissionsAllowed</code> アノテーションを使用して権限ベースのアクセス制御を有効にしました。
+Quarkus 開発モードを使用して、エンドポイントを再起動せずにコードと設定を更新し、OIDC Dev UI を使用して Auth0 トークンを視覚化およびテストしました。
+Quarkus の継続的テスト機能を使用して、OIDC Dev UI テストをライブ Auth0 開発テナントに対する統合テストで補完しました。
+最後に、アプリケーションを JVM モードとネイティブモードで実行しました。</p>
+</div>
+<div class="paragraph">
+<p>お楽しみください！</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="references"><a class="anchor" href="#references"></a>リファレンス</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="security-overview">Quarkus Securityの概要</a></p>
+</li>
+<li>
+<p><a href="security-oidc-code-flow-authentication">ウェブアプリケーションを保護するOIDCコードフローメカニズム</a></p>
+</li>
+<li>
+<p><a href="security-openid-connect-providers">よく知られたOpenID Connectプロバイダーの設定</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#create-an-auth0-application">Auth0 アプリケーションの作成</a></li>
+<li><a href="#create-a-quarkus-application">Quarkus アプリケーションの作成</a></li>
+<li><a href="#test-the-quarkus-endpoint">Quarkus エンドポイントのテスト</a></li>
+<li><a href="#looking-at-auth0-tokens-in-the-oidc-dev-ui">OIDC Dev UI で Auth0 トークンを確認する</a></li>
+<li><a href="#logout-support">ログアウトのサポート</a></li>
+<li><a href="#role-based-access-control">ロールベースのアクセスコントロール</a></li>
+<li><a href="#opaque-access-tokens">不透明 Auth0 アクセストークンを使用して Quarkus にアクセスする</a></li>
+<li><a href="#token-propagation">アクセストークンのマイクロサービスへの伝搬</a>
+<ul class="sectlevel2">
+<li><a href="#jwt-access-tokens">JWT形式のアクセストークン</a></li>
+<li><a href="#api-microservice">APIマイクロサービス</a></li>
+<li><a href="#permission-based-access-control">権限ベースのアクセス制御</a></li>
+</ul>
+</li>
+<li><a href="#integration-testing">統合テスト</a></li>
+<li><a href="#production-mode">プロダクションモード</a>
+<ul class="sectlevel2">
+<li><a href="#run-the-application-in-jvm-mode">JVMモードでアプリケーションを実行</a></li>
+<li><a href="#run-the-application-in-native-mode">ネイティブ・モードでアプリケーションを実行</a></li>
+</ul>
+</li>
+<li><a href="#troubleshooting">トラブルシューティング</a></li>
+<li><a href="#summary">まとめ</a></li>
+<li><a href="#references">リファレンス</a></li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

@@ -1,0 +1,4061 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>RESTEasy Reactive を使用して REST サービスを作成する - 3.2 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.2/guides/resteasy-reactive" />
+  <meta property="og:title" content="RESTEasy Reactive を使用して REST サービスを作成する - 3.2" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/resteasy-reactive">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.2/guides/resteasy-reactive">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.2/guides/resteasy-reactive" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.2/guides/resteasy-reactive">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.2/guides/resteasy-reactive">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.2/guides/resteasy-reactive">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.2/guides/resteasy-reactive">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.2/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" selected>3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">RESTEasy Reactive を使用して REST サービスを作成する </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、QuarkusでRESTEasy Reactiveを使用してRESTサービスを記述する方法を説明します。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>本書は、RESTEasy Reactiveのリファレンスガイドです。よりライトな紹介は、 <a href="rest-json.html">Writing JSON REST servicesのガイド</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-is-resteasy-reactive"><a class="anchor" href="#what-is-resteasy-reactive"></a>RESTEasy Reactiveとは？</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>RESTEasy Reactiveは、共通の <a href="https://vertx.io/">Vert.x</a> レイヤーで動作するようにゼロから書かれた新しい <a href="https://jakarta.ee/specifications/restful-ws/3.1/jakarta-restful-ws-spec-3.1.html">Jakarta REST（旧称JAX-RS）</a> の 実装で、完全にリアクティブです。また、Quarkusと非常に緊密に統合されており、結果として多くの作業をビルド時に移行します。</p>
+</div>
+<div class="paragraph">
+<p>Jakarta RESTの実装として使えるはずですが、その上、ブロッキングとノンブロッキングの両方のエンドポイントに対して素晴らしいパフォーマンスを発揮し、Jakarta RESTが提供する機能の上に多くの新機能を備えています。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-endpoints"><a class="anchor" href="#writing-endpoints"></a>エンドポイントの作成</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="getting-started"><a class="anchor" href="#getting-started"></a>はじめに</h3>
+<div class="paragraph">
+<p>次のインポートをビルドファイルに追加します:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-resteasy-reactive&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-resteasy-reactive")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これで、 <code>org.acme.rest.Endpoint</code> クラスで最初のエンドポイントを書くことができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+@Path("")
+public class Endpoint {
+
+    @GET
+    public String hello() {
+        return "Hello, World!";
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="terminology"><a class="anchor" href="#terminology"></a>用語解説</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">REST</dt>
+<dd>
+<p><a href="https://en.wikipedia.org/wiki/Representational_state_transfer">REpresentational State Transfer</a></p>
+</dd>
+<dt class="hdlist1">エンドポイント</dt>
+<dd>
+<p>REST 呼び出しを処理するために呼び出される Java メソッド</p>
+</dd>
+<dt class="hdlist1">URL / URI (Uniform Resource Locator / Identifier)</dt>
+<dd>
+<p>REST リソースの場所を特定するために使用 (<a href="https://tools.ietf.org/html/rfc7230#section-2.7">仕様</a>)</p>
+</dd>
+<dt class="hdlist1">リソース</dt>
+<dd>
+<p>ドメインオブジェクトを表します。これは、APIが提供し、変更するものです。Jakarta RESTでは <code>entity</code> とも呼ばれます。</p>
+</dd>
+<dt class="hdlist1">表現</dt>
+<dd>
+<p>通信上でのリソースの表現方法は、Content typeによって異なります。</p>
+</dd>
+<dt class="hdlist1">Content type</dt>
+<dd>
+<p>text/plain や application/json などの特定の表現 (メディアタイプとも呼ばれます) を指定します</p>
+</dd>
+<dt class="hdlist1">HTTP</dt>
+<dd>
+<p>REST 呼び出しをルーティングするための基本的なワイヤープロトコル (<a href="https://tools.ietf.org/html/rfc7230">HTTP 仕様</a> を参照)</p>
+</dd>
+<dt class="hdlist1">HTTP リクエスト</dt>
+<dd>
+<p>HTTP メソッド、ターゲット URI、ヘッダー、およびオプションのメッセージボディで設定される HTTP 呼び出しのリクエスト部分</p>
+</dd>
+<dt class="hdlist1">HTTP レスポンス</dt>
+<dd>
+<p>HTTP レスポンスステータス、ヘッダー、およびオプションのメッセージボディで設定される HTTP 呼び出しのレスポンス部分</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="declaring-endpoints-uri-mapping"><a class="anchor" href="#declaring-endpoints-uri-mapping"></a>エンドポイントの宣言:URI マッピング</h3>
+<div class="paragraph">
+<p><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/Path.html">@Path</a> アノテーションでアノテーションされたクラスは、HTTPメソッドアノテーション（下記参照）が付与されている限り、RESTエンドポイントとして公開されるメソッドを持つことができます。</p>
+</div>
+<div class="paragraph">
+<p>その <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/Path.html">@Path</a> アノテーションは、これらのメソッドを公開するためのURIプレフィックスを定義します。これは、空であるか、または <code>rest</code> や <code>rest/V1</code> のような接頭辞を含むことができます。</p>
+</div>
+<div class="paragraph">
+<p>公開された各エンドポイント メソッドは、そのメソッドを含むクラス アノテーションに追加する別の <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/Path.html"><code>@Path</code></a> アノテーションを持つことができます。 たとえば、これは <code>rest/hello</code> エンドポイントを定義します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+@Path("rest")
+public class Endpoint {
+
+    @Path("hello")
+    @GET
+    public String hello() {
+        return "Hello, World!";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>URIマッピングの詳細については、 <a href="#uri-parameters">URIパラメータ</a> を参照してください。</p>
+</div>
+<div class="paragraph">
+<p>以下に示すように、<code>@ApplicationPath</code> アノテーションを使用して、すべての REST エンドポイントのルートパスを設定できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
+
+@ApplicationPath("/api")
+public static class MyApplication extends Application {
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、すべての rest エンドポイントは <code>/api</code> に対する相対パスで解決されるようになり、上記の <code>@Path ("rest")</code> のエンドポイントには <code>/api/rest/</code> でアクセスすることができるようになります。また、アノテーションを使用したくない場合は、<code>quarkus.resteasy-reactive.path</code> ビルド時のプロパティーを設定して、ルートパスを設定することができます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="declaring-endpoints-http-methods"><a class="anchor" href="#declaring-endpoints-http-methods"></a>エンドポイントの宣言: HTTP メソッド</h3>
+<div class="paragraph">
+<p>各エンドポイントメソッドには、次のいずれかのアノテーションを付ける必要があります。これにより、どの HTTP メソッドがそのメソッドにマップされるかが定義されます。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. HTTPメソッドアノテーション</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">アノテーション</th>
+<th class="tableblock halign-left valign-top">使用方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/GET.html"><code>@GET</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">リソース表現を取得します。状態を変更しないでください。<a href="https://tools.ietf.org/html/rfc7231#section-4.2.2">idempotent</a> (<a href="https://tools.ietf.org/html/rfc7231#section-4.3.1">HTTP docs</a>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/HEAD.html"><code>@HEAD</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ボディのない <code>GET</code> と同様に、リソースに関するメタデータを取得します (<a href="https://tools.ietf.org/html/rfc7231#section-4.3.2">HTTP docs</a>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/POST.html"><code>@POST</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">リソースを作成し、そのリソースへのリンクを取得します (<a href="https://tools.ietf.org/html/rfc7231#section-4.3.3">HTTP docs</a>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/PUT.html"><code>@PUT</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">リソースを置き換えるか作成します。<a href="https://tools.ietf.org/html/rfc7231#section-4.2.2">idempotent</a> (<a href="https://tools.ietf.org/html/rfc7231#section-4.3.4">HTTP docs</a>) であるべきです。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/DELETE.html"><code>@DELETE</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">既存のリソースを削除します。<a href="https://tools.ietf.org/html/rfc7231#section-4.2.2">idempotent</a>  (<a href="https://tools.ietf.org/html/rfc7231#section-4.3.5">HTTP docs</a>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/OPTIONS.html"><code>@OPTIONS</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">リソースに関する情報を取得します。<a href="https://tools.ietf.org/html/rfc7231#section-4.2.2">idempotent</a> (<a href="https://tools.ietf.org/html/rfc7231#section-4.3.7">HTTP docs</a>) です。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/PATCH.html"><code>@PATCH</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">リソースを更新するか、作成します。<a href="https://tools.ietf.org/html/rfc7231#section-4.2.2">idempotent</a> (<a href="https://tools.ietf.org/html/rfc5789#section-2">HTTP docs</a>) ではありません。</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>また、他のメソッドを <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/HttpMethod.html">@HttpMethod</a> アノテーションを使用して宣言することで宣言することも出来ます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.Path;
+
+@Retention(RetentionPolicy.RUNTIME)
+@HttpMethod("CHEESE")
+@interface CHEESE {
+}
+
+@Path("")
+public class Endpoint {
+
+    @CHEESE
+    public String hello() {
+        return "Hello, Cheese World!";
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="declaring-endpoints-representation-content-types"><a class="anchor" href="#declaring-endpoints-representation-content-types"></a>エンドポイントの宣言: 表現/コンテンツタイプ</h3>
+<div class="paragraph">
+<p>各エンドポイントメソッドは、特定のリソース表現を消費したり生成したりすることがあり、それは HTTP <a href="https://tools.ietf.org/html/rfc7231#section-3.1.1.5"><code>Content-Type</code></a> header で示され、その中に次のような <a href="https://tools.ietf.org/html/rfc7231#section-3.1.1.1">MIME (Media Type)</a> 値が含まれています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>String</code> を返すエンドポイントのデフォルトである <code>text/plain</code>。</p>
+</li>
+<li>
+<p>HTML の <code>text/html</code> (<a href="qute">Qute テンプレート</a> と同様)</p>
+</li>
+<li>
+<p><a href="#json">JSON REST endpoint</a> の場合 <code>application/json</code></p>
+</li>
+<li>
+<p>任意のテキストメディアタイプのサブタイプワイルドカードである <code>text/*</code></p>
+</li>
+<li>
+<p>任意のメディアタイプのワイルドカードである <code>*/*</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>エンドポイントクラスに<a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/Produces.html">@Produces</a> または <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/Consumes.html">@Consumes</a> アノテーションをつけることができます。 これらを使用し、エンドポイントが HTTP リクエストボディとして受け入れ、HTTP レスポンスボディとして生成するメディアタイプを 1 つまたは複数指定できます。これらのクラスアノテーションは、各メソッドに適用されます。</p>
+</div>
+<div class="paragraph">
+<p>また、<a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/Produces.html">@Produces</a> や <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/Consumes.html">@Consumes</a> アノテーションをメソッドにつけることもできます。そのアノテーションは最終的にクラスアノテーションをオーバーライドします。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/core/MediaType.html">MediaType</a> クラスには、あらかじめ定義された特定のメディアタイプを指し示すために使用できる多くの定数があります。</p>
+</div>
+<div class="paragraph">
+<p>詳しくは <a href="#negotiation">ネゴシエーション</a> の項をご覧ください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="accessing-request-parameters"><a class="anchor" href="#accessing-request-parameters"></a>リクエストパラメーターへのアクセス</h3>
+<div id="request-parameters" class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+パラメーター名の情報を生成するために、<code>-parameters</code> (javac) または <code>&lt;parameters&gt;</code> または <code>&lt;maven.compiler.parameters&gt;</code> (<a href="https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html#parameters">Maven</a>) を使ってコンパイラーを設定することを忘れないでください。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>次の HTTP リクエスト要素は、エンドポイントメソッドによって取得される可能性があります。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 2. HTTP request parameter annotations</caption>
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">HTTP 要素</th>
+<th class="tableblock halign-left valign-top">アノテーション</th>
+<th class="tableblock halign-left valign-top">使用方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a id="path-parameter"></a>パスパラメーター</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">リンク:https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/RestPath.html[<code>@RestPath</code>] (または何もない)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URIテンプレートパラメータ（ <a href="https://tools.ietf.org/html/rfc6570">URIテンプレート仕様</a> の簡略版）、詳しくは <a href="#uri-parameters">URIパラメータ</a> を参照。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">クエリーパラメーター</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/RestQuery.html"><code>@RestQuery</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://tools.ietf.org/html/rfc3986#section-3.4">URI クエリーパラメーター</a> の値</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ヘッダ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/RestHeader.html"><code>@RestHeader</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://tools.ietf.org/html/rfc7230#section-3.2">HTTP ヘッダ</a> の値</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cookie</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/RestCookie.html"><code>@RestCookie</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://tools.ietf.org/html/rfc6265#section-4.2">HTTP cookie</a> の値</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">フォームパラメーター</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/RestForm.html"><code>@RestForm</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST">HTTP URL-encoded FORM</a> の値</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">マトリックスパラメーター</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/RestMatrix.html"><code>@RestMatrix</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://tools.ietf.org/html/rfc3986#section-3.3">URI パスセグメントパラメーター</a> の値</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>これらのアノテーションはそれぞれ、参照する要素の名前を指定することができ、指定していない場合は、アノテーションされたメソッドのパラメーターの名前が使用されます。</p>
+</div>
+<div class="paragraph">
+<p>クライアントが次の HTTP 呼び出しを行った場合:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">POST /cheeses;variant=goat/tomme?age=matured HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Cookie: level=hardcore
+X-Cheese-Secret-Handshake: fist-bump
+
+smell=strong</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、このエンドポイントメソッドを使用してさまざまなパラメーターをすべて取得できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+
+import org.jboss.resteasy.reactive.RestCookie;
+import org.jboss.resteasy.reactive.RestForm;
+import org.jboss.resteasy.reactive.RestHeader;
+import org.jboss.resteasy.reactive.RestMatrix;
+import org.jboss.resteasy.reactive.RestPath;
+import org.jboss.resteasy.reactive.RestQuery;
+
+@Path("/cheeses/{type}")
+public class Endpoint {
+
+    @POST
+    public String allParams(@RestPath String type,
+                            @RestMatrix String variant,
+                            @RestQuery String age,
+                            @RestCookie String level,
+                            @RestHeader("X-Cheese-Secret-Handshake")
+                            String secretHandshake,
+                            @RestForm String smell) {
+        return type + "/" + variant + "/" + age + "/" + level + "/"
+            + secretHandshake + "/" + smell;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/RestPath.html"><code>@RestPath</code></a> アノテーションはオプションです。名前が既存のURIテンプレート変数と一致するパラメータは、自動的に <a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/RestPath.html"><code>@RestPath</code></a> を持つと想定されます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>また、これに対してJakarta RESTアノテーション <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/PathParam.html">@PathParam</a> または <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/QueryParam.html">@QueryParam</a> , <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/HeaderParam.html">@HeaderParam</a> , <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/CookieParam.html">@CookieParam</a> , <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/FormParam.html">@FormParam</a> ,<a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/MatrixParam.html">@MatrixParam</a> のいずれかを使用することができます。ただし、パラメータ名を指定する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>より高度な使用例については、 <a href="#parameter-mapping">パラメータ・マッピング</a> を参照してください。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>RESTEasy Reactiveリクエストパラメータ処理コードで例外が発生した場合、例外はデフォルトでログに出力されません（セキュリティ上の理由から）。このため、特定のHTTPステータスコードが返される理由を理解するのが難しい場合があります（jakarta RESTでは、さまざまなケースで直感的でないエラーコードの使用が義務付けられているため）。このような場合、 <code>org.jboss.resteasy.reactive.server.handlers.ParameterHandler</code> カテゴリーのログレベルを <code>DEBUG</code> のように設定するとよいでしょう:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.log.category."org.jboss.resteasy.reactive.server.handlers.ParameterHandler".level=DEBUG</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="grouping-parameters-in-a-custom-class"><a class="anchor" href="#grouping-parameters-in-a-custom-class"></a>カスタムクラスでパラメータをグループ化</h4>
+<div id="parameter-grouping" class="paragraph">
+<p>リクエストパラメータをメソッドパラメータとしてエンドポイントに宣言する代わりに、コンテナクラスでまとめることができます。したがって、前の例を次のように書き換えることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+
+import org.jboss.resteasy.reactive.RestCookie;
+import org.jboss.resteasy.reactive.RestForm;
+import org.jboss.resteasy.reactive.RestHeader;
+import org.jboss.resteasy.reactive.RestMatrix;
+import org.jboss.resteasy.reactive.RestPath;
+import org.jboss.resteasy.reactive.RestQuery;
+
+@Path("/cheeses/{type}")
+public class Endpoint {
+
+    public static class Parameters {
+        @RestPath
+        String type;
+
+        @RestMatrix
+        String variant;
+
+        @RestQuery
+        String age;
+
+        @RestCookie
+        String level;
+
+        @RestHeader("X-Cheese-Secret-Handshake")
+        String secretHandshake;
+
+        @RestForm
+        String smell;
+    }
+
+    @POST
+    public String allParams(@BeanParam Parameters parameters) { <i class="conum" data-value="1"></i><b>(1)</b>
+        return parameters.type + "/" + parameters.variant + "/" + parameters.age
+            + "/" + parameters.level + "/" + parameters.secretHandshake
+            + "/" + parameters.smell;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>BeanParam</code> は、OpenAPIのようなライブラリがパラメータを確認できるように、Jakarta REST仕様に準拠する必要があります。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="declaring-uri-parameters"><a class="anchor" href="#declaring-uri-parameters"></a>URI パラメーターの宣言</h3>
+<div id="uri-parameters" class="paragraph">
+<p>URI パラメーターを宣言し、パスで正規表現を使用できるため、たとえば、次のエンドポイントは <code>/hello/stef/23</code> と <code>/hello</code> のリクエストを処理しますが、<code>/hello/stef/0x23</code> は処理しません。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+@Path("hello")
+public class Endpoint {
+
+    @Path("{name}/{age:\\d+}")
+    @GET
+    public String personalisedHello(String name, int age) {
+        return "Hello " + name + " is your age really " + age + "?";
+    }
+
+    @GET
+    public String genericHello() {
+        return "Hello stranger";
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="accessing-the-request-body"><a class="anchor" href="#accessing-the-request-body"></a>リクエストボディへのアクセス</h3>
+<div class="paragraph">
+<p>アノテーションのないメソッドパラメータは、HTTP表現からパラメータのJavaタイプにマッピングされた後、メソッドボディを受け取ります。<sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup></p>
+</div>
+<div class="paragraph">
+<p>次のパラメーター型は、そのままでサポートされます。</p>
+</div>
+<table id="resource-types" class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 3. Request body parameter types</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">タイプ</th>
+<th class="tableblock halign-left valign-top">使用方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html"><code>File</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">一時ファイル内のリクエストボディ全体</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>byte[]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">デコードされていないリクエストボディ全体</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>char[]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">デコードされたリクエストボディ全体</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html"><code>String</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">デコードされたリクエストボディ全体</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/InputStream.html"><code>InputStream</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ブロッキングストリームのリクエストボディ</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/Reader.html"><code>Reader</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ブロッキングストリームのリクエストボディ</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">すべての Java プリミティブとそのラッパークラス</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Java プリミティブ型</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/math/BigDecimal.html"><code>BigDecimal</code></a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/math/BigInteger.html"><code>BigInteger</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">大きな整数と小数</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.json/jakarta.json-api/1.1.4/jakarta/json/JsonArray.html"><code>JsonArray</code></a>, <a href="https://javadoc.io/doc/jakarta.json/jakarta.json-api/1.1.4/jakarta/json/JsonObject.html"><code>JsonObject</code></a>,
+<a href="https://javadoc.io/doc/jakarta.json/jakarta.json-api/1.1.4/jakarta/json/JsonStructure.html"><code>JsonStructure</code></a>, <a href="https://javadoc.io/doc/jakarta.json/jakarta.json-api/1.1.4/jakarta/json/JsonValue.html"><code>JsonValue</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JSON 値の型</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/io.vertx/vertx-core/4.4.6io/vertx/core/buffer/Buffer.html"><code>Buffer</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Vert.x Buffer</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">他の型</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#json">JSONからその型にマッピング</a> されます。</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+より多くの <a href="#readers-writers">ボディパラメータタイプ</a> へのサポートを追加することが可能です。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="multipart"><a class="anchor" href="#multipart"></a>マルチパートフォームデータの処理</h3>
+<div class="paragraph">
+<p>コンテンツタイプとして <code>multipart/form-data</code> を持つ HTTP リクエストを処理するために、通常の <a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/RestForm.html"><code>@RestForm</code></a> というアノテーションを使うことが出来ますが、パーツをファイルとして、あるいはエンティティとしてアクセスできる特別な型があります。その使用例を見てみましょう。</p>
+</div>
+<div class="paragraph">
+<p>ファイルアップロード、JSONエンティティ、文字列の説明を含むフォーム値を含むHTTPリクエストを想定すると、次のようなエンドポイントを書くことができます：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.MediaType;
+
+import org.jboss.resteasy.reactive.PartType;
+import org.jboss.resteasy.reactive.RestForm;
+import org.jboss.resteasy.reactive.multipart.FileUpload;
+
+@Path("multipart")
+public class MultipartResource {
+    public static class Person {
+        public String firstName;
+        public String lastName;
+    }
+
+    @POST
+    public void multipart(@RestForm String description,
+            @RestForm("image") FileUpload file,
+            @RestForm @PartType(MediaType.APPLICATION_JSON) Person person) {
+        // do something
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>description</code> パラメーターには、HTTP リクエストの <code>description</code> という部分に含まれるデータが格納されます（なぜなら <a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/RestForm.html">@RestForm</a> が値を定義していない場合は、フィールド名が使用される為です）。一方、 <code>file</code> パラメータは、HTTP リクエストの <code>image</code> 部分にアップロードされたファイルに関するデータを含み、 <code>person</code> パラメータは、 <code>JSON</code> <a href="#json">ボディリーダー</a> を使用して <code>Person</code> エンティティを読み込みます。</p>
+</div>
+<div class="paragraph">
+<p>マルチパートリクエストの各パートのサイズは、 <code>quarkus.http.limits.max-form-attribute-size</code> の値に準拠する必要があり、そのデフォルトは 2048 バイトです。この設定を超えるサイズのパートを持つリクエストは、HTTPステータスコード413となります。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/multipart/FileUpload.html"><code>FileUpload</code></a> はアップロードされたファイルの様々なメタデータにアクセスすることができます。しかし、アップロードされたファイルへの処理が必要なだけなら、<code>java.nio.file.Path</code> や <code>java.io.File</code> を使用することができます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>名前に関係なく、アップロードされたすべてのファイルのすべてのパーツにアクセスする必要がある場合は、 <code>@RestForm(FileUpload.ALL) List&lt;FileUpload&gt;</code> で実現出来ます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/PartType.html">@PartType</a> は、リクエストの対応する部分を希望するJava型にデシリアライズする際の補助として使用されます。これは、特定のパラメータに <a href="#readers-writers">特別なボディ・パラメータ型</a> を使用する必要がある場合にのみ必要です。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+他のリクエストパラメータ型と同様に、 <a href="#parameter-grouping">コンテナクラス</a> にまとめることも可能です。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+ファイルのアップロードを処理する場合、POJO を処理するコード内でファイルを永続的なストレージ (データベース、専用ファイルシステム、クラウドストレージなど) に移動させることが非常に重要です。そうしないと、リクエストが終了したときに、ファイルにアクセスできなくなります。さらに、<code>quarkus.http.body.delete-uploaded-files-on-end</code> を true に設定すると、HTTP レスポンスの送信時に、アップロードされたファイルが削除されます。この設定を無効にすると、ファイルはサーバーのファイルシステム上 (<code>quarkus.http.body.uploads-directory</code> 設定オプションで定義したディレクトリー) に存在しますが、アップロードされたファイルは UUID ファイル名で保存されて追加のメタデータが保存されないため、これらのファイルは本質的にファイルのランダムダンプとなります。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Resourceメソッドが様々なタイプのマルチパートリクエストを処理する必要がある場合、リクエストのすべてのパートにアクセスできるように、 <code>org.jboss.resteasy.reactive.server.multipart.MultipartFormDataInput</code> メソッドタイプを使用することができます。</p>
+</div>
+<div class="paragraph">
+<p>次のコードは、パートに対して反復処理を行い、集約されたデータのリストを返すという簡単な例です:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Path("/test")
+public static class Resource {
+
+    @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public List&lt;Item&gt; hello(MultipartFormDataInput input) throws IOException {
+        Map&lt;String, Collection&lt;FormValue&gt;&gt; map = input.getValues();
+        List&lt;Item&gt; items = new ArrayList&lt;&gt;();
+        for (var entry : map.entrySet()) {
+            for (FormValue value : entry.getValue()) {
+                items.add(new Item(
+                        entry.getKey(),
+                        value.isFileItem() ? value.getFileItem().getFileSize() : value.getValue().length(),
+                        value.getCharset(),
+                        value.getFileName(),
+                        value.isFileItem(),
+                        value.getHeaders()));
+            }
+
+        }
+        return items;
+    }
+
+    public static class Item {
+        public final String name;
+        public final long size;
+        public final String charset;
+        public final String fileName;
+        public final boolean isFileItem;
+        public final Map&lt;String, List&lt;String&gt;&gt; headers;
+
+        public Item(String name, long size, String charset, String fileName, boolean isFileItem,
+                Map&lt;String, List&lt;String&gt;&gt; headers) {
+            this.name = name;
+            this.size = size;
+            this.charset = charset;
+            this.fileName = fileName;
+            this.isFileItem = isFileItem;
+            this.headers = headers;
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="handling-malformed-input"><a class="anchor" href="#handling-malformed-input"></a>不正な入力の処理</h4>
+<div class="paragraph">
+<p>マルチパート・ボディの読み取りの一部として、RESTEasy Reactiveは適切なMessageBodyReaderを呼び出します。 <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/ext/MessageBodyReader.html">MessageBodyReader</a> をリクエストの各パートに対して作成します。これらのパートの1つに対して <code>IOException</code> が発生した場合（たとえば、Jackson が JSON 部分をデシリアライズできなかった場合）、 <code>org.jboss.resteasy.reactive.server.multipart.MultipartPartReadingException</code> がスローされます。この例外が <a href="#exception-mapping">例外マッピング</a> で述べたようにアプリケーションで処理されない場合、デフォルトでHTTP 400レスポンスが返されます。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="multipart-output"><a class="anchor" href="#multipart-output"></a>マルチパート出力</h4>
+<div class="paragraph">
+<p>同様に、RESTEasy Reactive は、ユーザーがサーバーからファイルをダウンロードできるようにするための Multipart Form データを生成することができます。例えば、公開したい情報を保持する POJO を、次のように書くことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.ws.rs.core.MediaType;
+
+import org.jboss.resteasy.reactive.PartType;
+import org.jboss.resteasy.reactive.RestForm;
+
+public class DownloadFormData {
+
+    @RestForm
+    String name;
+
+    @RestForm
+    @PartType(MediaType.APPLICATION_OCTET_STREAM)
+    File file;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、次のようなリソースを介してこの POJO を公開します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("multipart")
+public class Endpoint {
+
+    @GET
+    @Produces(MediaType.MULTIPART_FORM_DATA)
+    @Path("file")
+    public DownloadFormData getFile() {
+        // return something
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>さらに、クラス <code>MultipartFormDataOutput</code> を使用して、フォームのパーツを手動で追加することも可能です:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+import org.jboss.resteasy.reactive.server.multipart.MultipartFormDataOutput;
+
+@Path("multipart")
+public class Endpoint {
+
+    @GET
+    @Produces(MediaType.MULTIPART_FORM_DATA)
+    @Path("file")
+    public MultipartFormDataOutput getFile() {
+        MultipartFormDataOutput form = new MultipartFormDataOutput();
+        form.addFormData("person", new Person("John"), MediaType.APPLICATION_JSON_TYPE);
+        form.addFormData("status", "a status", MediaType.TEXT_PLAIN_TYPE)
+                .getHeaders().putSingle("extra-header", "extra-value");
+        return form;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この最後の方法は、出力のパーツに追加のヘッダーを追加することができます。</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+当面、マルチパートデータを返すことはエンドポイントをブロックすることに限定されます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="returning-a-response-body"><a class="anchor" href="#returning-a-response-body"></a>レスポンスボディを返す</h3>
+<div class="paragraph">
+<p>HTTP レスポンスを返すには、メソッドから必要なリソースを返すだけです。メソッドの戻り値の型と、オプションのコンテントタイプを使用して、HTTPレスポンスへのシリアライズ方法を決定します（より高度な情報については、 <a href="#negotiation">ネゴシエーション</a> のセクションを参照してください）。</p>
+</div>
+<div class="paragraph">
+<p><a href="#resource-types">HTTPレスポンス</a> から読み取れる、あらかじめ定義された任意の型を返すことができ、それ以外の型は、 <a href="#json">その型からJSON</a> にマッピングされます。</p>
+</div>
+<div class="paragraph">
+<p>さらに、次の戻り値の型もサポートされています。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 4. Additional response body parameter types</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">タイプ</th>
+<th class="tableblock halign-left valign-top">使用方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/nio/file/Path.html"><code>Path</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">指定されたパスで指定されたファイルの内容</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/PathPart.html"><code>PathPart</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">指定されたパスで指定されたファイルの部分的な内容</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/FilePart.html"><code>FilePart</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ファイルの部分的な内容</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/io.vertx/vertx-core/4.4.6/io/vertx/core/file/AsyncFile.html"><code>AsyncFile</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Vert.x AsyncFile (完全または部分的)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>また、次のような <a href="#reactive">リアクティブ型</a> を返すこともできます: <a href="https://javadoc.io/doc/io.smallrye.reactive/mutiny/2.1.0/io/smallrye/mutiny/Uni.html">Uni</a> , <a href="https://javadoc.io/doc/io.smallrye.reactive/mutiny/2.1.0/io/smallrye/mutiny/Multi.html">Multi</a> あるいは <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/concurrent/CompletionStage.html">CompletionStage</a> のように、言及された戻り値の型のいずれかに解決されるもの。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="setting-other-response-properties"><a class="anchor" href="#setting-other-response-properties"></a>他のレスポンスプロパティーの設定</h3>
+<div class="sect3">
+<h4 id="manually-setting-the-response"><a class="anchor" href="#manually-setting-the-response"></a>手動でレスポンスを設定する</h4>
+<div class="paragraph">
+<p>ステータスコードやヘッダーなど、本文だけでなく HTTP レスポンスに多くのプロパティーを設定する必要がある場合は、リソースメソッドからメソッドに <code>org.jboss.resteasy.reactive.RestResponse</code> を返すようにすることができます。この例は次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.NewCookie;
+
+import org.jboss.resteasy.reactive.RestResponse;
+import org.jboss.resteasy.reactive.RestResponse.ResponseBuilder;
+
+@Path("")
+public class Endpoint {
+
+    @GET
+    public RestResponse&lt;String&gt; hello() {
+        // HTTP OK status with text/plain content type
+        return ResponseBuilder.ok("Hello, World!", MediaType.TEXT_PLAIN_TYPE)
+         // set a response header
+         .header("X-Cheese", "Camembert")
+         // set the Expires response header to two days from now
+         .expires(Date.from(Instant.now().plus(Duration.ofDays(2))))
+         // send a new cookie
+         .cookie(new NewCookie("Flavour", "chocolate"))
+         // end of builder API
+         .build();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+また、Jakarta REST型 <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/core/Response.html">Response</a> を使用することが出来ますが、それはあなたのエンティティに強く型付けされていません。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="using-annotations"><a class="anchor" href="#using-annotations"></a>アノテーションの使用</h4>
+<div class="paragraph">
+<p>または、静的な値でステータスコードや HTTP ヘッダーのみを設定する必要がある場合は、それぞれ <code>@org.jboss.resteasy.reactive.ResponseStatus</code> および/または  <code>ResponseHeader</code> を使用できます。この例は次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import org.jboss.resteasy.reactive.Header;
+import org.jboss.resteasy.reactive.ResponseHeader;
+import org.jboss.resteasy.reactive.ResponseStatus;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+@Path("")
+public class Endpoint {
+
+    @ResponseStatus(201)
+    @ResponseHeader(name = "X-Cheese", value = "Camembert")
+    @GET
+    public String hello() {
+        return "Hello, World!";
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="redirect-support"><a class="anchor" href="#redirect-support"></a>リダイレクトサポート</h3>
+<div class="paragraph">
+<p><code>@POST</code> 、 <code>@PUT</code> 、 <code>@DELETE</code> のエンドポイントを処理する場合、アクションの実行後に <code>@GET</code> のエンドポイントにリダイレクトするのが一般的で、ユーザーが2回目のアクションをトリガーせずにページを再読み込みできるようにします。これを実現するには、複数の方法があります。</p>
+</div>
+<div class="sect3">
+<h4 id="using-restresponse"><a class="anchor" href="#using-restresponse"></a>RestResponseの使用</h4>
+<div class="paragraph">
+<p><code>RestResponse</code> を戻り値の型として使用し、適切なリダイレクトURIを作成することは、以下の例のように可能です:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.UriInfo;
+import org.jboss.resteasy.reactive.RestResponse;
+
+@Path("/fruits")
+public class FruitResource {
+
+    public static class Fruit {
+        public Long id;
+        public String name;
+        public String description;
+
+        public Fruit() {
+        }
+
+        public Fruit(Long id, String name, String description) {
+            this.id = id;
+            this.name = name;
+            this.description = description;
+        }
+    }
+
+    private final Map&lt;Long, Fruit&gt; fruits = new ConcurrentHashMap&lt;&gt;();
+    private final AtomicLong ids = new AtomicLong(0);
+
+
+    public FruitResource() {
+        Fruit apple = new Fruit(ids.incrementAndGet(), "Apple", "Winter fruit");
+        fruits.put(apple.id, apple);
+        Fruit pinneapple = new Fruit(ids.incrementAndGet(), "Pineapple", "Tropical fruit");
+        fruits.put(pinneapple.id, pinneapple);
+    }
+
+    // when invoked, this method will result in an HTTP redirect to the GET method that obtains the fruit by id
+    @POST
+    public RestResponse&lt;Fruit&gt; add(Fruit fruit, @Context UriInfo uriInfo) {
+        fruit.id = ids.incrementAndGet();
+        fruits.put(fruit.id, fruit);
+        // seeOther results in an HTTP 303 response with the Location header set to the value of the URI
+        return RestResponse.seeOther(uriInfo.getAbsolutePathBuilder().path(Long.toString(fruit.id)).build());
+    }
+
+    @GET
+    @Path("{id}")
+    public Fruit byId(Long id) {
+        return fruits.get(id);
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="using-redirectexception"><a class="anchor" href="#using-redirectexception"></a>RedirectExceptionの使用</h4>
+<div class="paragraph">
+<p>また、ユーザーはメソッド本体から <code>jakarta.ws.rs.RedirectionException</code> を投げることで、RESTEasy Reactive に目的のリダイレクトを実行させることができます。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="asyncreactive-support"><a class="anchor" href="#asyncreactive-support"></a>非同期/リアクティブサポート</h3>
+<div id="reactive" class="paragraph">
+<p>エンドポイントメソッドがレスポンスする前に非同期またはリアクティブタスクを実行する必要がある場合は、メソッドを宣言して( <a href="https://smallrye.io/smallrye-mutiny/">Mutiny</a> の) <a href="https://javadoc.io/doc/io.smallrye.reactive/mutiny/2.1.0/io/smallrye/mutiny/Uni.html"><code>Uni</code></a> 型を返すことができます 。この場合、現在の HTTP リクエストはメソッドの後で、返された<a href="https://javadoc.io/doc/io.smallrye.reactive/mutiny/2.1.0/io/smallrye/mutiny/Uni.html"><code>Uni</code></a> インスタンスが値に解決され、前述のルールに従って正確にレスポンスにマッピングされるまで自動的に一時停止されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+import io.smallrye.mutiny.Uni;
+
+@Path("escoffier")
+public class Endpoint {
+
+    @GET
+    public Uni&lt;Book&gt; culinaryGuide() {
+        return Book.findByIsbn("978-2081229297");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、書籍がデータベースから取得されている間はイベントループスレッドをブロックせず、書籍がクライアントに送信される準備が整うまでQuarkusがより多くのリクエストに対応し、このリクエストを終了させることができるようになります。詳細については、 <a href="#execution-model">実行モデルのドキュメント</a> を参照してください。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/concurrent/CompletionStage.html"><code>CompletionStage</code></a> 戻り値の型もサポートされています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="streaming-support"><a class="anchor" href="#streaming-support"></a>ストリーミングサポート</h3>
+<div class="paragraph">
+<p>レスポンスを要素ごとにストリーミングする場合は、エンドポイントメソッドに( <a href="https://smallrye.io/smallrye-mutiny/">Mutiny</a> の) <a href="https://javadoc.io/doc/io.smallrye.reactive/mutiny/2.1.0/io/smallrye/mutiny/Multi.html"><code>Multi</code></a> 型を返すようにすることができます。これは、テキストまたはバイナリーデータのストリーミングに特に役立ちます。</p>
+</div>
+<div class="paragraph">
+<p>この例では、 <a href="https://github.com/quarkiverse/quarkus-reactive-messaging-http">Reactive Messaging HTTP</a> を使用して、テキストデータをストリーミングする方法を示しています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+import org.eclipse.microprofile.reactive.messaging.Channel;
+
+import io.smallrye.mutiny.Multi;
+
+@Path("logs")
+public class Endpoint {
+
+    @Inject
+    @Channel("log-out")
+    Multi&lt;String&gt; logs;
+
+    @GET
+    public Multi&lt;String&gt; streamLogs() {
+        return logs;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+レスポンスフィルターは、ストリーミングされたレスポンスでは呼び出されません。これは、ヘッダーまたは HTTP ステータスコードを設定できるという誤った印象を与えるためです。これは、最初のレスポンスの後では当てはまりません。レスポンスの一部がすでに書き込まれている可能性があるため、例外マッパーも呼び出されません。
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="customizing-headers-and-status"><a class="anchor" href="#customizing-headers-and-status"></a>ヘッダーとステータスのカスタマイズ</h4>
+<div class="paragraph">
+<p>カスタムHTTPヘッダーやHTTPレスポンスを設定する必要がある場合は、代わりに次のように <code>org.jboss.resteasy.reactive.RestMulti</code> を返却します ：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+import org.eclipse.microprofile.reactive.messaging.Channel;
+
+import io.smallrye.mutiny.Multi;
+import org.jboss.resteasy.reactive.RestMulti;
+
+@Path("logs")
+public class Endpoint {
+
+    @Inject
+    @Channel("log-out")
+    Multi&lt;String&gt; logs;
+
+    @GET
+    public Multi&lt;String&gt; streamLogs() {
+        return RestMulti.fromMultiData(logs).status(222).header("foo", "bar").build();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In more advanced cases where the headers and / or status can only be obtained from the results of an async call, the <code>RestMulti.fromUniResponse</code> needs to be used.
+Here is an example of such a use case:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+import java.util.List;import java.util.Map;import org.eclipse.microprofile.reactive.messaging.Channel;
+
+import io.smallrye.mutiny.Multi;
+import org.jboss.resteasy.reactive.RestMulti;
+
+@Path("logs")
+public class Endpoint {
+
+    interface SomeService {
+        Uni&lt;SomeResponse&gt; get();
+    }
+
+    interface SomeResponse {
+        Multi&lt;byte[]&gt; data;
+
+        String myHeader();
+    }
+
+    private final SomeService someService;
+
+    public Endpoint(SomeService someService) {
+        this.someService = someService;
+    }
+
+    @GET
+    public Multi&lt;String&gt; streamLogs() {
+        return RestMulti.fromUniResponse(someService.get(), SomeResponse::data, (r -&gt; Map.of("MyHeader", List.of(r.myHeader()))));
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="server-sent-event-sse-support"><a class="anchor" href="#server-sent-event-sse-support"></a>サーバー送信イベント (SSE) のサポート</h3>
+<div class="paragraph">
+<p>レスポンスにJSONオブジェクトをストリーミングしたい場合は、エンドポイントメソッドに <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/Produces.html">@Produces(MediaType.SERVER_SENT_EVENTS)</a> アノテーションを付けるだけで、 <a href="https://html.spec.whatwg.org/multipage/server-sent-events.html">Server-Sent Events</a> を使用することができます。 そして各要素に <code>@RestStreamElementType(MediaType.APPLICATION_JSON)</code> を指定することで、 <a href="#json">JSONにシリアライズ</a> されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+import org.jboss.resteasy.reactive.RestStreamElementType;
+
+import io.smallrye.mutiny.Multi;
+
+import org.eclipse.microprofile.reactive.messaging.Channel;
+
+@Path("escoffier")
+public class Endpoint {
+
+    // Inject our Book channel
+    @Inject
+    @Channel("book-out")
+    Multi&lt;Book&gt; books;
+
+    @GET
+    // Each element will be sent as JSON
+    @RestStreamElementType(MediaType.APPLICATION_JSON)
+    // by using @RestStreamElementType, we don't need to add @Produces(MediaType.SERVER_SENT_EVENTS)
+    public Multi&lt;Book&gt; stream() {
+        return books;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Sometimes it&#8217;s useful to create a customized SSE message, for example if you need to specify the <code>event</code> field of a SSE message to distinguish various event types.
+A resource method may return <code>Multi&lt;jakarta.ws.rs.sse.OutboundSseEvent&gt;</code> and an injected <code>jakarta.ws.rs.sse.Sse</code> can be used to create <code>OutboundSseEvent</code> instances.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.sse.OutboundSseEvent;
+import jakarta.ws.rs.sse.Sse;
+
+import org.jboss.resteasy.reactive.RestStreamElementType;
+
+import io.smallrye.mutiny.Multi;
+
+import org.eclipse.microprofile.reactive.messaging.Channel;
+
+@Path("escoffier")
+public class Endpoint {
+
+    @Inject
+    @Channel("book-out")
+    Multi&lt;Book&gt; books;
+
+    @Inject
+    Sse sse; <i class="conum" data-value="1"></i><b>(1)</b>
+
+    @GET
+    @RestStreamElementType(MediaType.TEXT_PLAIN)
+    public Multi&lt;OutboundSseEvent&gt; stream() {
+        return books.map(book -&gt; sse.newEventBuilder() <i class="conum" data-value="2"></i><b>(2)</b>
+            .name("book")  <i class="conum" data-value="3"></i><b>(3)</b>
+            .data(book.title) <i class="conum" data-value="4"></i><b>(4)</b>
+            .build());
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Inject the server-side entry point for creating <code>OutboundSseEvent</code>s.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Create a new outbound event builder.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Set the event name, i.e. the value of the <code>event</code> field of a SSE message.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Set the data, i.e. the value of the <code>data</code> field of a SSE message.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Manipulation of the returned HTTP headers and status code is not possible via <code>RestMulti.fromUniResponse</code> because when returning SSE responses the headers and status code cannot be delayed until the response becomes available.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="controlling-http-caching-features"><a class="anchor" href="#controlling-http-caching-features"></a>HTTP キャッシング機能の制御</h3>
+<div class="paragraph">
+<p>RESTEasy Reactive は、HTTP キャッシングセマンティックスの処理、つまり 'Cache-Control' HTTP ヘッダーの設定を容易にするために、<a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/Cache.html"><code>@Cache</code></a> と <a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/NoCache.html"><code>@NoCache</code></a> というアノテーションを提供します。</p>
+</div>
+<div class="paragraph">
+<p>これらのアノテーションはリソースメソッドまたはリソースクラス (この場合、同じアノテーションを <strong>含まない</strong> クラスのすべてのリソースメソッドに適用されます) に配置することができ、ユーザーがドメインオブジェクトを返すことができ、明示的に <code>Cache-Control</code> HTTP ヘッダーを構築することに対処する必要はありません。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/Cache.html"><code>@Cache</code></a> が複雑な <code>Cache-Control</code> ヘッダーを構築するのに対し、<a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/NoCache.html"><code>@NoCache</code></a> は何もキャッシュさせたくない、つまり <code>Cache-Control: nocache</code> というシンプルな表記法になっています。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>Cache-Control</code> ヘッダーの詳細は、 <a href="https://datatracker.ietf.org/doc/html/rfc7234">RFC 7234</a> を参照してください
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="accessing-context-objects"><a class="anchor" href="#accessing-context-objects"></a>コンテキストオブジェクトへのアクセス</h3>
+<div id="context-objects" class="paragraph">
+<p>エンドポイントメソッドが次のタイプのパラメーターを受け取る場合、フレームワークが提供するコンテキストオブジェクトは多数あります。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 5. コンテキスト・オブジェクト</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">タイプ</th>
+<th class="tableblock halign-left valign-top">使用方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/core/HttpHeaders.html"><code>HttpHeaders</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">すべてのリクエストヘッダー</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/container/ResourceInfo.html"><code>ResourceInfo</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">現在のエンドポイントメソッドとクラスに関する情報 (リフレクションが必要)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/core/SecurityContext.html"><code>SecurityContext</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">現在のユーザーとロールへのアクセス</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive/3.2.12.Final/org/jboss/resteasy/reactive/server/SimpleResourceInfo.html"><code>SimpleResourceInfo</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">現在のエンドポイントメソッドとクラスに関する情報 (反映は不要)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/core/UriInfo.html"><code>UriInfo</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">現在のエンドポイントとアプリケーション URI に関する情報を提供します</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/core/Application.html"><code>Application</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">高度: 現在のJakarta RESTのアプリケーションクラス</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/core/Configuration.html"><code>Configuration</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">高度: デプロイされたJakarta RESTアプリケーションに関する設定</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/ext/Providers.html"><code>Providers</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">高度: Jakarta RESTプロバイダへの実行時アクセス</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/core/Request.html"><code>Request</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">高度: 現在のHTTPメソッドと <a href="#preconditions">事前条件</a> にアクセス</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/core/ResourceContext.html"><code>ResourceContext</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">詳細: エンドポイントのインスタンスへのアクセス</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive/3.2.12.Final/org/jboss/resteasy/reactive/server/spi/ServerRequestContext.html"><code>ServerRequestContext</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">詳細:RESTEasy 現在の要求/レスポンスへのリアクティブアクセス</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/sse/Sse.html"><code>Sse</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">詳細: 複雑な SSE のユースケース</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/io.vertx/vertx-core/4.4.6/io/vertx/core/http/HttpServerRequest.html"><code>HttpServerRequest</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">詳細: Vert.xHTTP リクエスト</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/io.vertx/vertx-core/4.4.6/io/vertx/core/http/HttpServerResponse.html"><code>HttpServerResponse</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">詳細: Vert..x HTTP レスポンス</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>たとえば、現在ログインしているユーザーの名前を返す方法は次のとおりです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import java.security.Principal;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.SecurityContext;
+
+@Path("user")
+public class Endpoint {
+
+    @GET
+    public String userName(SecurityContext security) {
+        Principal user = security.getUserPrincipal();
+        return user != null ? user.getName() : "&lt;NOT LOGGED IN&gt;";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これらのコンテキスト・オブジェクトは、https://javadoc.io/static/jakarta.inject/jakarta.inject-api/2.0.1/jakarta/inject/Inject.html[ <code>@Inject</code> ] を使って、同じ型のフィールドに注入することもできます：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import java.security.Principal;
+
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.SecurityContext;
+
+@Path("user")
+public class Endpoint {
+
+    @Inject
+    SecurityContext security;
+
+    @GET
+    public String userName() {
+        Principal user = security.getUserPrincipal();
+        return user != null ? user.getName() : "&lt;NOT LOGGED IN&gt;";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>または、エンドポイントコンストラクターでも:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import java.security.Principal;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.SecurityContext;
+
+@Path("user")
+public class Endpoint {
+
+    SecurityContext security;
+
+    Endpoint(SecurityContext security) {
+        this.security = security;
+    }
+
+    @GET
+    public String userName() {
+        Principal user = security.getUserPrincipal();
+        return user != null ? user.getName() : "&lt;NOT LOGGED IN&gt;";
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="json-serialisation"><a class="anchor" href="#json-serialisation"></a>JSON シリアライゼーション</h3>
+<div id="json" class="paragraph">
+<p><code>io.quarkus:quarkus-resteasy-reactive</code> をインポートする代わりに、以下のモジュールのいずれかをインポートすることで、JSON のサポートを受けることができます。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">GAV</th>
+<th class="tableblock halign-left valign-top">使用方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.quarkus:quarkus-resteasy-reactive-jackson</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/FasterXML/jackson">Jackson support</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.quarkus:quarkus-resteasy-reactive-jsonb</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://eclipse-ee4j.github.io/jsonb-api/">JSON-B support</a></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>In both cases, importing those modules will allow HTTP message bodies to be read from JSON
+and serialised to JSON, for <a href="#resource-types">all the types not already registered with a more specific
+serialisation</a>.</p>
+</div>
+<div class="sect3">
+<h4 id="advanced-jackson-specific-features"><a class="anchor" href="#advanced-jackson-specific-features"></a>詳細なJackson固有の機能</h4>
+<div class="paragraph">
+<p><code>quarkus-resteasy-reactive-jackson</code> エクステンションを使用する場合、RESTEasy Reactive がサポートするいくつかの高度な機能があります。</p>
+</div>
+<div class="sect4">
+<h5 id="secure-serialization"><a class="anchor" href="#secure-serialization"></a>セキュア・シリアライゼーション</h5>
+<div class="paragraph">
+<p>JSON をシリアライズするために Jackson を使用する場合、RESTEasy Reactive は、現在のユーザのroleに基づいてシリアライズされるフィールドのセットを制限する機能を提供します。これは、返されるPOJOのフィールド（またはゲッター）を <code>@io.quarkus.resteasy.reactive.jackson.SecureField</code> でアノテーションするだけで実現できます。</p>
+</div>
+<div class="paragraph">
+<p>簡単な例を挙げると、次のようになります:</p>
+</div>
+<div class="paragraph">
+<p><code>Person</code> という名前のPOJOがあり、以下のようになっているとします:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import io.quarkus.resteasy.reactive.jackson.SecureField;
+
+public class Person {
+
+    @SecureField(rolesAllowed = "admin")
+    private final Long id;
+    private final String first;
+    private final String last;
+
+    public Person(Long id, String first, String last) {
+        this.id = id;
+        this.first = first;
+        this.last = last;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getFirst() {
+        return first;
+    }
+
+    public String getLast() {
+        return last;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Person</code> を使用する非常にシンプルな Jakarta REST Resource は次のようになります:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+@Path("person")
+public class Person {
+
+    @Path("{id}")
+    @GET
+    public Person getPerson(Long id) {
+        return new Person(id, "foo", "bar");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Assuming security has been set up for the application (see our <a href="security-overview">guide</a> for more details), when a user with the <code>admin</code> role
+performs an HTTP GET on <code>/person/1</code> they will receive:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "id": 1,
+  "first": "foo",
+  "last": "bar"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>レスポンスを閉じます。</p>
+</div>
+<div class="paragraph">
+<p>ただし、<code>admin</code> ロールを持たないユーザーは次のものを受け取ります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "first": "foo",
+  "last": "bar"
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+この安全なシリアライズを行うために、追加の設定を適用する必要はありません。ただし、ユーザーは <code>@io.quarkus.resteasy.reactive.jackson.EnableSecureSerialization</code> および <code>@io.quarkus.resteasy.reactive.jackson.DisableSecureSerialization</code> アノテーションを使用して、特定の Jakarta REST Resource クラスまたはメソッドに対するオプトインまたはオプトアウトを行うことができます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="jsonview-support"><a class="anchor" href="#jsonview-support"></a>@JsonView support</h5>
+<div class="paragraph">
+<p>Jakarta RESTメソッドに <a href="https://fasterxml.github.io/jackson-annotations/javadoc/2.10/com/fasterxml/jackson/annotation/JsonView.html">@JsonView</a> のアノテーションを付けると、メソッドごとに、返されるPOJOのシリアライズをカスタマイズすることができます。これは、例で説明するのが一番わかりやすいでしょう。</p>
+</div>
+<div class="paragraph">
+<p><code>@JsonView</code> の一般的な使用法は、特定のメソッドの特定のフィールドを非表示にすることです。その流れの中で、2 つのビューを定義しましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class Views {
+
+    public static class Public {
+    }
+
+    public static class Private extends Public {
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>シリアル化中にフィールドを非表示にする <code>User</code> POJO があると仮定します。この簡単な例は次のとおりです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class User {
+
+    @JsonView(Views.Private.class)
+    public int id;
+
+    @JsonView(Views.Public.class)
+    public String name;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このユーザーを返す Jakarta REST メソッドによっては、 <code>id</code> フィールドをシリアライズから除外したい場合があります。例えば、安全でないメソッドでは、このフィールドを公開しないようにしたい場合があります。RESTEasy Reactiveでそれを実現する方法は、次の例のとおりです:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@JsonView(Views.Public.class)
+@GET
+@Path("/public")
+public User userPublic() {
+    return testUser();
+}
+
+@JsonView(Views.Private.class)
+@GET
+@Path("/private")
+public User userPrivate() {
+    return testUser();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>結果の <code>userPublic</code> メソッドがシリアル化されると、<code>Public</code> ビューに含まれないため、<code>id</code> フィールドはレスポンスに含まれません。ただし、<code>userPrivate</code> の結果には、シリアル化されたときに期待されるように <code>id</code> が含まれます。</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="completely-customized-per-method-serialization"><a class="anchor" href="#completely-customized-per-method-serialization"></a>メソッドごとに完全にカスタマイズされたシリアル化</h5>
+<div class="paragraph">
+<p>There are times when you need to completely customize the serialization of a POJO on a per Jakarta REST method basis. For such use cases, the <code>@io.quarkus.resteasy.reactive.jackson.CustomSerialization</code> annotation
+is a great tool, as it allows you to configure a per-method <code>com.fasterxml.jackson.databind.ObjectWriter</code> which can be configured at will.</p>
+</div>
+<div class="paragraph">
+<p>ユースケースの例を次に示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@CustomSerialization(UnquotedFields.class)
+@GET
+@Path("/invalid-use-of-custom-serializer")
+public User invalidUseOfCustomSerializer() {
+    return testUser();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ここで、<code>UnquotedFields</code> は次のように定義された <code>BiFunction</code> です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public static class UnquotedFields implements BiFunction&lt;ObjectMapper, Type, ObjectWriter&gt; {
+
+    @Override
+    public ObjectWriter apply(ObjectMapper objectMapper, Type type) {
+        return objectMapper.writer().without(JsonWriteFeature.QUOTE_FIELD_NAMES);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>基本的にこのクラスが行うことは、フィールド名に引用符を含めないよう Jackson に強制することです。</p>
+</div>
+<div class="paragraph">
+<p>このカスタマイズは、 <code>@CustomSerialization(UnquotedFields.class)</code> を使用する Jakarta REST メソッドのシリアライズに対してのみ実行されることに注意する必要があります。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="xml-serialisation"><a class="anchor" href="#xml-serialisation"></a>XML シリアライゼーション</h3>
+<div id="xml" class="paragraph">
+<p>XML サポートを有効にするには、プロジェクトに <code>quarkus-resteasy-reactive-jaxb</code> エクステンションを追加します。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">GAV</th>
+<th class="tableblock halign-left valign-top">使用方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.quarkus:quarkus-resteasy-reactive-jaxb</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javaee.github.io/jaxb-v2/">XML support</a></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>このモジュールをインポートすると、 <a href="#resource-types">より厳密にシリアライズで登録されていないすべての型について</a> HTTPメッセージボディをXMLから読み込んでXMLにシリアライズできるようになります。</p>
+</div>
+<div class="paragraph">
+<p>JAXB RESTEasy Reactiveエクステンションは、リソースで使用され、JAXBシリアライゼーションを必要とするクラスを自動的に検出します。そして、これらのクラスを、JAXBメッセージリーダーとライターが内部で使用するデフォルトの <code>JAXBContext</code> に登録します。</p>
+</div>
+<div class="paragraph">
+<p>しかし、状況によっては、これらのクラスが原因で <code>JAXBContext</code> が失敗することがあります。例えば、異なる Java パッケージで同じクラス名を使用している場合などです。このような場合、アプリケーションはビルド時に失敗し、問題の原因となったJAXB例外が出力されるので、適切に修正することができます。また、 <code>quarkus.jaxb.exclude-classes</code> というプロパティを使用して、問題の原因となるクラスを除外することもできます。任意のリソースで必要とされるクラスを除外する場合、JAXB RESTEasy reactive エクステンションは、除外されたクラスを含むカスタム <code>JAXBContext</code> を作成およびキャッシュするため、パフォーマンスの低下は最小限に抑えられます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The property <code>quarkus.jaxb.exclude-classes</code> accepts a comma separated list of fully qualified class names, for example: <code>quarkus.jaxb.exclude-classes=org.acme.one.Model,org.acme.two.Model</code>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="advanced-jaxb-specific-features"><a class="anchor" href="#advanced-jaxb-specific-features"></a>高度な JAXB 固有の機能</h4>
+<div class="paragraph">
+<p><code>quarkus-resteasy-reactive-jaxb</code> エクステンションを使用する場合、RESTEasy Reactive がサポートするいくつかの高度な機能があります。</p>
+</div>
+<div class="sect4">
+<h5 id="inject-jaxb-components"><a class="anchor" href="#inject-jaxb-components"></a>JAXB コンポーネントを注入する</h5>
+<div class="paragraph">
+<p>JAXB resteasy リアクティブエクステンションは、ユーザーに対して透過的にリクエストとレスポンスをシリアライズおよびアンシリアライズします。ただし、JAXB コンポーネントをより細かく制御する必要がある場合は、JAXBContext、Marshaller、または Unmarshaller コンポーネントのいずれかを Bean に注入できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+public class MyService {
+
+    @Inject
+    JAXBContext jaxbContext;
+
+    @Inject
+    Marshaller marshaller;
+
+    @Inject
+    Unmarshaller unmarshaller;
+
+    // ...
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Quarkus は、<code>@XmlRootElement</code> でアノテーションが付けられたすべてのクラスを自動的に検出し、それらを JAXB コンテキストにバインドします。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="customize-the-jaxb-configuration"><a class="anchor" href="#customize-the-jaxb-configuration"></a>JAXB 設定をカスタマイズする</h5>
+<div class="paragraph">
+<p>JAXB コンテキスト、および/または Marshaller/Unmarshaller コンポーネントの JAXB 設定をカスタマイズするには、型 <code>io.quarkus.jaxb.runtime.JaxbContextCustomizer</code> の CDI Bean を定義することをお勧めします。</p>
+</div>
+<div class="paragraph">
+<p>カスタムモジュールを登録する必要がある場合の例は次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Singleton
+public class RegisterCustomModuleCustomizer implements JaxbContextCustomizer {
+
+    // For JAXB context configuration
+    @Override
+    public void customizeContextProperties(Map&lt;String, Object&gt; properties) {
+
+    }
+
+    // For Marshaller configuration
+    @Override
+    public void customizeMarshaller(Marshaller marshaller) throws PropertyException {
+        marshaller.setProperty("jaxb.formatted.output", Boolean.TRUE);
+    }
+
+    // For Unmarshaller configuration
+    @Override
+    public void customizeUnmarshaller(Unmarshaller unmarshaller) throws PropertyException {
+        // ...
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>3 つのメソッドすべてを実装する必要はありませんが、必要なものだけを実装する必要があります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>または、次のようにして、独自の <code>JAXBContext</code> Bean を提供できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class CustomJaxbContext {
+
+    // Replaces the CDI producer for JAXBContext built into Quarkus
+    @Singleton
+    @Produces
+    JAXBContext jaxbContext() {
+        // ...
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>カスタム JAXB コンテキストインスタンスを提供する場合は、XML シリアル化に使用するクラスを登録する必要があることに注意してください。これは、Quarkus がカスタム JAXB コンテキストインスタンスを自動検出されたクラスで更新しないことを意味します。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="web-links-support"><a class="anchor" href="#web-links-support"></a>Web リンクのサポート</h3>
+<div id="links" class="paragraph">
+<p>Web リンクのサポートを有効にするには、プロジェクトに <code>quarkus-resteasy-reactive-links</code> エクステンションを追加します。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">GAV</th>
+<th class="tableblock halign-left valign-top">使用方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.quarkus:quarkus-resteasy-reactive-links</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://www.w3.org/wiki/LinkHeader">Web Links support</a></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>このモジュールをインポートすると、エンドポイントリソースに <code>@InjectRestLinks</code> アノテーションを付けるだけで、レスポンスの HTTP ヘッダに Web リンクを挿入することができるようになります。返される Web リンクを宣言するには、リンクされたメソッドで <code>@RestLink</code> アノテーションを使用する必要があります。この例としては、以下のようなものがあります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Path("/records")
+public class RecordsResource {
+
+    @GET
+    @RestLink(rel = "list")
+    @InjectRestLinks
+    public List&lt;Record&gt; getAll() {
+        // ...
+    }
+
+    @GET
+    @Path("/{id}")
+    @RestLink(rel = "self")
+    @InjectRestLinks(RestLinkType.INSTANCE)
+    public TestRecord get(@PathParam("id") int id) {
+        // ...
+    }
+
+    @PUT
+    @Path("/{id}")
+    @RestLink
+    @InjectRestLinks(RestLinkType.INSTANCE)
+    public TestRecord update(@PathParam("id") int id) {
+        // ...
+    }
+
+    @DELETE
+    @Path("/{id}")
+    @RestLink
+    public TestRecord delete(@PathParam("id") int id) {
+        // ...
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上記のリソース内でメソッド <code>getAll</code> によって定義されたエンドポイント <code>/records</code> を curl を使用して呼び出すと、Web リンクヘッダーが取得されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">&amp; curl -i localhost:8080/records
+Link: &lt;http://localhost:8080/records&gt;; rel="list"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このリソースは型 <code>Record</code> の単一のインスタンスを返さないため、メソッド <code>get</code>、<code>update</code>、および <code>delete</code> のリンクは挿入されません。これで、エンドポイント <code>/records/1</code> を呼び出すと、次の Web リンクが表示されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">&amp; curl -i localhost:8080/records/1
+Link: &lt;http://localhost:8080/records&gt;; rel="list"
+Link: &lt;http://localhost:8080/records/1&gt;; rel="self"
+Link: &lt;http://localhost:8080/records/1&gt;; rel="update"
+Link: &lt;http://localhost:8080/records/1&gt;; rel="delete"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>get `, `update `, `delete</code> の各メソッドでは、パスパラメータ "id" を使用しており、エンティティタイプ "Record" にフィールド "id" が存在するため、Web リンクは返されるリンクに適切に値 "1" を入力します。これに加えて、エンティティ・タイプのどのフィールドとも一致しないパス・パラメータを持つウェブ・リンクを生成することも可能です。たとえば、次のメソッドでは、パスパラメータ "text" を使用していますが、エンティティRecordには "text" という名前のフィールドがありません:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Path("/records")
+public class RecordsResource {
+
+    // ...
+
+    @GET
+    @Path("/search/{text}")
+    @RestLink(rel = "search records by free text")
+    @InjectRestLinks
+    public List&lt;Record&gt; search(@PathParam("text") String text) { <i class="conum" data-value="4"></i><b>(4)</b>
+        // ...
+    }
+
+    // ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このリソースの生成されたウェブリンクは次のようになります <code>Link: &lt;<a href="http://localhost:8080/search/{text}&gt;" class="bare">http://localhost:8080/search/{text}&gt;</a>; rel="search records by free text"</code> 。</p>
+</div>
+<div class="paragraph">
+<p>最後に、 <code>delete</code> リソースを呼び出すと、 <code>delete</code> メソッドに <code>@InjectRestLinks</code> アノテーションが付いていないため、ウェブリンクが表示されないはずです。</p>
+</div>
+<div class="sect3">
+<h4 id="programmatically-access-to-the-web-links-registry"><a class="anchor" href="#programmatically-access-to-the-web-links-registry"></a>Web リンクレジストリーへのプログラムによるアクセス</h4>
+<div class="paragraph">
+<p><code>RestLinksProvider</code> Bean を挿入するだけで、プログラムで Web リンクレジストリーにアクセスできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Path("/records")
+public class RecordsResource {
+
+    @Inject
+    RestLinksProvider linksProvider;
+
+    // ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>型 <code>RestLinksProvider</code> の挿入された Bean を使用すると、メソッド <code>RestLinksProvider.getTypeLinks</code> を使用して型ごとにリンクを取得するか、メソッド <code>RestLinksProvider.getInstanceLinks</code> を使用して具象インスタンスによってリンクを取得できます。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="json-hypertext-application-language-hal-support"><a class="anchor" href="#json-hypertext-application-language-hal-support"></a>JSON Hypertext Application Language ( HAL ) のサポート</h4>
+<div class="paragraph">
+<p><a href="https://tools.ietf.org/id/draft-kelly-json-hal-01.html">HAL</a> 標準は、ウェブリンクを表現するためのシンプルなフォーマットです。</p>
+</div>
+<div class="paragraph">
+<p>HAL サポートを有効にするには、プロジェクトに <code>quarkus-hal</code> エクステンションを追加します。また、HAL には JSON サポートが必要なため、<code>quarkus-resteasy-reactive-jsonb</code> または <code>quarkus-resteasy-reactive-jackson</code> エクステンションを追加する必要があります。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">GAV</th>
+<th class="tableblock halign-left valign-top">使用方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.quarkus:quarkus-hal</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://tools.ietf.org/id/draft-kelly-json-hal-01.html">HAL</a></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>エクステンションを追加したら、次は REST リソースにアノテーションを付け、メディアタイプ <code>application/hal+json</code> (または RestMediaType.APPLICATION_HAL_JSON を使用) を生成できるようにします。例えば、以下のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Path("/records")
+public class RecordsResource {
+
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON, RestMediaType.APPLICATION_HAL_JSON })
+    @RestLink(rel = "list")
+    @InjectRestLinks
+    public List&lt;Record&gt; getAll() {
+        // ...
+    }
+
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON, RestMediaType.APPLICATION_HAL_JSON })
+    @Path("/{id}")
+    @RestLink(rel = "self")
+    @InjectRestLinks(RestLinkType.INSTANCE)
+    public TestRecord get(@PathParam("id") int id) {
+        // ...
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ここで、エンドポイント <code>/records</code> と <code>/records/{id}</code> は、<code>json</code> と <code>hal + json</code> の両方のメディアタイプを受け入れて、Hal 形式でレコードを出力します。</p>
+</div>
+<div class="paragraph">
+<p>例えば、 curl を使用して <code>/records</code> エンドポイントを呼び出してレコードのリストを返す場合、HAL 形式は次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">&amp; curl -H "Accept:application/hal+json" -i localhost:8080/records
+{
+    "_embedded": {
+        "items": [
+            {
+                "id": 1,
+                "slug": "first",
+                "value": "First value",
+                "_links": {
+                    "self": {
+                        "href": "http://localhost:8081/records/1"
+                    },
+                    "list": {
+                        "href": "http://localhost:8081/records"
+                    }
+                }
+            },
+            {
+                "id": 2,
+                "slug": "second",
+                "value": "Second value",
+                "_links": {
+                    "self": {
+                        "href": "http://localhost:8081/records/2"
+                    },
+                    "list": {
+                        "href": "http://localhost:8081/records"
+                    }
+                }
+            }
+        ]
+    },
+    "_links": {
+        "list": {
+            "href": "http://localhost:8081/records"
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>1 つのインスタンスのみを返すリソース <code>/records/1</code> を呼び出すと、出力は次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">&amp; curl -H "Accept:application/hal+json" -i localhost:8080/records/1
+{
+    "id": 1,
+    "slug": "first",
+    "value": "First value",
+    "_links": {
+        "self": {
+            "href": "http://localhost:8081/records/1"
+        },
+        "list": {
+            "href": "http://localhost:8081/records"
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>最後に、次の例で説明するように、 <code>HalCollectionWrapper</code> （エンティティのリストを返す） または <code>HalEntityWrapper</code> （単一オブジェクトを返す）を返すことで、リソースにプログラム的に追加のHALリンクを提供することも可能です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Path("/records")
+public class RecordsResource {
+
+    @Inject
+    RestLinksProvider linksProvider;
+
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON, RestMediaType.APPLICATION_HAL_JSON })
+    @RestLink(rel = "list")
+    public HalCollectionWrapper getAll() {
+        List&lt;Record&gt; list = // ...
+        HalCollectionWrapper halCollection = new HalCollectionWrapper(list, "collectionName", linksProvider.getTypeLinks(Record.class));
+        halCollection.addLinks(Link.fromPath("/records/1").rel("first-record").build());
+        return halCollection;
+    }
+
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON, RestMediaType.APPLICATION_HAL_JSON })
+    @Path("/{id}")
+    @RestLink(rel = "self")
+    @InjectRestLinks(RestLinkType.INSTANCE)
+    public HalEntityWrapper get(@PathParam("id") int id) {
+        Record entity = // ...
+        HalEntityWrapper halEntity = new HalEntityWrapper(entity, linksProvider.getInstanceLinks(entity));
+        halEntity.addLinks(Link.fromPath("/records/1/parent").rel("parent-record").build());
+        return halEntity;
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cors-filter"><a class="anchor" href="#cors-filter"></a>CORS フィルター</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">クロスオリジンリソース共有</a> (CORS)は、ウェブページ上の制限されたリソースを、最初のリソースが提供されたドメイン以外の別のドメインから要求できるようにするメカニズムです。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus には、HTTP レイヤーレベルの CORS フィルターが付属しています。使用方法については、<a href="http-reference#cors-filter">HTTPリファレンスドキュメント</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="more-advanced-usage"><a class="anchor" href="#more-advanced-usage"></a>より高度な使用法</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ここでは、最初は知る必要がないかもしれませんが、より複雑なユースケースに役立つ可能性のある、より詳細なトピックをいくつか紹介します。</p>
+</div>
+<div class="sect2">
+<h3 id="execution-model-blocking-non-blocking"><a class="anchor" href="#execution-model-blocking-non-blocking"></a>実行モデル、ブロッキング、ノンブロッキング</h3>
+<div id="execution-model" class="paragraph">
+<p>RESTEasy Reactive は、次の 2 つのメインスレッド型を使用して実装されます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>イベントループスレッド: HTTPリクエストからのバイトの読み込みとHTTPレスポンスへのバイトの書き戻しを担当します。</p>
+</li>
+<li>
+<p>ワーカースレッド: プールされ、長時間実行される操作の負荷を軽減するために使用できます</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>イベントループスレッド (IO スレッドとも呼ばれます) は、すべての IO 操作を非同期で実際に実行し、それらの IO 操作の完了に関心のあるリスナーをトリガーする役割を果たします。</p>
+</div>
+<div class="paragraph">
+<p>デフォルトでは、スレッド RESTEasy Reactive は、メソッドのシグネチャーに応じてエンドポイントメソッドを実行します。メソッドが次のタイプのいずれかを返す場合、それは非ブロッキングと見なされ、デフォルトで IO スレッドで実行されます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>io.smallrye.mutiny.Uni</code></p>
+</li>
+<li>
+<p><code>io.smallrye.mutiny.Multi</code></p>
+</li>
+<li>
+<p><code>java.util.concurrent.CompletionStage</code></p>
+</li>
+<li>
+<p><code>org.reactivestreams.Publisher</code></p>
+</li>
+<li>
+<p>Kotlin の <code>suspended</code> メソッド</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>この「最善の推測」アプローチは、ほとんどの操作がデフォルトで正しいスレッドで実行されることを意味します。リアクティブなコードを書いている場合、メソッドは通常これらの型のいずれかを返し、IOスレッドで実行されます。ブロッキングコードを書いている場合、メソッドは通常、結果を直接返し、これらはワーカースレッドで実行されます。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://javadoc.io/doc/io.smallrye.common/smallrye-common-annotation/1.5.0/io/smallrye/common/annotation/Blocking.html">@Blocking</a> と <a href="https://javadoc.io/doc/io.smallrye.common/smallrye-common-annotation/1.5.0/io/smallrye/common/annotation/NonBlocking.html">@NonBlocking</a> アノテーションを使用してこの動作をオーバーライドすることができます。これは、メソッド、クラス、 <code>jakarta.ws.rs.core.Application</code> の各レベルで適用することができます。</p>
+</div>
+<div class="paragraph">
+<p>以下の例は、デフォルトの動作をオーバーライドし、<code>Uni</code> を返しても、常にワーカースレッドで実行されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+import io.smallrye.common.annotation.Blocking;
+
+@Path("yawn")
+public class Endpoint {
+
+    @Blocking
+    @GET
+    public Uni&lt;String&gt; blockingHello() throws InterruptedException {
+        // do a blocking operation
+        Thread.sleep(1000);
+        return Uni.createFrom().item("Yaaaawwwwnnnnnn…");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ほとんどの場合、 <a href="https://smallrye.io/smallrye-mutiny/">Mutiny</a> 、 <a href="https://hibernate.org/reactive/">Hibernate Reactive</a> 、または <a href="quarkus-reactive-architecture#quarkus-extensions-enabling-reactive">Quarkusリアクティブエクステンション</a> などを使って、同じブロック操作を非同期/リアクティブに実現する方法があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import java.time.Duration;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+import io.smallrye.mutiny.Uni;
+
+@Path("yawn")
+public class Endpoint {
+
+    @GET
+    public Uni&lt;String&gt; blockingHello() throws InterruptedException {
+        return Uni.createFrom().item("Yaaaawwwwnnnnnn…")
+                // do a non-blocking sleep
+                .onItem().delayIt().by(Duration.ofSeconds(2));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>メソッドやクラスに <code>jakarta.transaction.Transactional</code> のアノテーションを付けると、そのメソッドもブロッキングメソッドとして扱われます。これは、JTAがブロッキング技術であり、一般的にHibernateやJDBCなどの他のブロッキング技術と共に使用されるためです。クラスに明示的に <code>@Blocking</code> または <code>@NonBlocking</code> を付けると、この動作は上書きされます。</p>
+</div>
+<div class="sect3">
+<h4 id="overriding-the-default-behaviour"><a class="anchor" href="#overriding-the-default-behaviour"></a>デフォルトの動作のオーバーライド</h4>
+<div class="paragraph">
+<p>デフォルトの動作をオーバーライドしたい場合は、アプリケーション内の <code>jakarta.ws.rs.core.Application</code> サブクラスに <code>@Blocking</code> または <code>@NonBlocking</code> のアノテーションを付けると、明示的なアノテーションを持たないすべてのメソッドのデフォルトが設定されます。</p>
+</div>
+<div class="paragraph">
+<p>クラスやメソッドに直接アノテーションを付けることで動作をオーバーライドすることは可能ですが、アノテーションのないエンドポイントは、メソッドのシグネチャに関係なくデフォルトに従うようになりました。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="exception-mapping"><a class="anchor" href="#exception-mapping"></a>例外のマッピング</h3>
+<div class="paragraph">
+<p>もしアプリケーションがエラー時に正規の HTTP コード以外を返す必要がある場合、最善の方法は、フレームワークが <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/WebApplicationException.html"><code>WebApplicationException</code></a> またはその継承型を使用して適切な HTTP レスポンスを送信する結果となる例外を投げることです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.Path;
+
+@Path("cheeses/{cheese}")
+public class Endpoint {
+
+    @GET
+    public String findCheese(String cheese) {
+        if(cheese == null)
+            // send a 400
+            throw new BadRequestException();
+        if(!cheese.equals("camembert"))
+            // send a 404
+            throw new NotFoundException("Unknown cheese: " + cheese);
+        return "Camembert is a very nice cheese";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If your endpoint method is delegating calls to another service layer which
+does not know of Jakarta REST, you need a way to turn service exceptions to an
+HTTP response, and you can do that using the
+<a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive/3.2.12.Final/org/jboss/resteasy/reactive/server/ServerExceptionMapper.html"><code>@ServerExceptionMapper</code></a>
+annotation on a method, with one parameter of the exception type you want to handle, and turning
+that exception into a <a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/RestResponse.html"><code>RestResponse</code></a> (or a
+<a href="https://javadoc.io/doc/io.smallrye.reactive/mutiny/2.1.0/io/smallrye/mutiny/Uni.html"><code>Uni&lt;RestResponse&lt;?&gt;&gt;</code></a>):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import java.util.Map;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Response;
+
+import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
+import org.jboss.resteasy.reactive.RestResponse;
+
+class UnknownCheeseException extends RuntimeException {
+    public final String name;
+
+    public UnknownCheeseException(String name) {
+        this.name = name;
+    }
+}
+
+@ApplicationScoped
+class CheeseService {
+    private static final Map&lt;String, String&gt; cheeses =
+            Map.of("camembert", "Camembert is a very nice cheese",
+                   "gouda", "Gouda is acceptable too, especially with cumin");
+
+    public String findCheese(String name) {
+        String ret = cheeses.get(name);
+        if(ret != null)
+            return ret;
+        throw new UnknownCheeseException(name);
+    }
+}
+
+@Path("cheeses/{cheese}")
+public class Endpoint {
+
+    @Inject
+    CheeseService cheeses;
+
+    @ServerExceptionMapper
+    public RestResponse&lt;String&gt; mapException(UnknownCheeseException x) {
+        return RestResponse.status(Response.Status.NOT_FOUND, "Unknown cheese: " + x.name);
+    }
+
+    @GET
+    public String findCheese(String cheese) {
+        if(cheese == null)
+            // send a 400
+            throw new BadRequestException();
+        return cheeses.findCheese(cheese);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+REST エンドポイントクラスで定義された例外マッパーは、例外が同じクラスで出力された場合にのみ呼び出されます。グローバル例外マッパーを定義する場合は、REST エンドポイントクラスの外部で定義するだけです。
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
+import org.jboss.resteasy.reactive.RestResponse;
+
+class ExceptionMappers {
+    @ServerExceptionMapper
+    public RestResponse&lt;String&gt; mapException(UnknownCheeseException x) {
+        return RestResponse.status(Response.Status.NOT_FOUND, "Unknown cheese: " + x.name);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>また、 <a href="https://jakarta.ee/specifications/restful-ws/3.1/jakarta-restful-ws-spec-3.1.html#exceptionmapper">例外マッパー</a> を、Jakarta RESTの方法で宣言することができます。</p>
+</div>
+<div class="paragraph">
+<p>例外マッパーは、次のパラメーター型のいずれかを宣言できます。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 6. Exception mapper parameters</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">タイプ</th>
+<th class="tableblock halign-left valign-top">使用方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">例外型</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">処理する例外型を定義します</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#context-objects">Contextオブジェクト</a> のいずれか</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/container/ContainerRequestContext.html"><code>ContainerRequestContext</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">現在のリクエストにアクセスするためのコンテキストオブジェクト</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>次の戻り値の型のいずれかを宣言できます。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 7. Exception mapper return types</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">タイプ</th>
+<th class="tableblock halign-left valign-top">使用方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/RestResponse.html">RestResponse</a> または <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/core/Response.html">Response</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">例外が発生したときにクライアントに送信するレスポンス</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/io.smallrye.reactive/mutiny/2.1.0/io/smallrye/mutiny/Uni.html"><code>Uni&lt;RestResponse&gt;</code></a> または <a href="https://javadoc.io/doc/io.smallrye.reactive/mutiny/2.1.0/io/smallrye/mutiny/Uni.html"><code>Uni&lt;Response&gt;</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">例外が発生したときにクライアントに送信する非同期レスポンス</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>例外が発生した場合、RESTEasy Reactive はデフォルトでログを記録しません (セキュリティ上の理由による)。 このため、特定の例外処理コードが呼び出された (または呼び出されなかった) 理由を理解するのが難しい場合があります。 RESTEasy Reactive が例外マッピングコードを実行する前に実際の例外をログするようにするには、次のように <code>org.jboss.resteasy.reactive.common.core.AbstractResteasyReactiveContext</code> ログカテゴリを <code>DEBUG</code> に設定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.log.category."org.jboss.resteasy.reactive.common.core.AbstractResteasyReactiveContext".level=DEBUG</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="request-or-response-filters"><a class="anchor" href="#request-or-response-filters"></a>リクエストまたはレスポンスフィルター</h3>
+<div class="sect3">
+<h4 id="via-annotations"><a class="anchor" href="#via-annotations"></a>アノテーション経由</h4>
+<div class="paragraph">
+<p>リクエスト処理の次のフェーズで呼び出される関数を宣言できます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>エンドポイントメソッドが識別される前: 事前ルーティングリクエストフィルター</p>
+</li>
+<li>
+<p>ルーティング後、エンドポイントメソッドが呼び出される前: 通常のリクエストフィルター</p>
+</li>
+<li>
+<p>エンドポイントメソッドが呼び出された後: レスポンスフィルター</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>これらのフィルターを使用すると、リクエスト URI、HTTP メソッドの調査、ルーティングへの影響、リクエストヘッダーの検索または変更、リクエストの中止、レスポンスの変更など、さまざまなことができます。</p>
+</div>
+<div class="paragraph">
+<p>リクエストフィルターは、 <a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive/3.2.12.Final/org/jboss/resteasy/reactive/server/ServerRequestFilter.html"><code>@ServerRequestFilter</code></a> アノテーションで宣言することが出来ます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.util.Optional;
+
+class Filters {
+
+    @ServerRequestFilter(preMatching = true)
+    public void preMatchingFilter(ContainerRequestContext requestContext) {
+        // make sure we don't lose cheese lovers
+        if("yes".equals(requestContext.getHeaderString("Cheese"))) {
+            requestContext.setRequestUri(URI.create("/cheese"));
+        }
+    }
+
+    @ServerRequestFilter
+    public Optional&lt;RestResponse&lt;Void&gt;&gt; getFilter(ContainerRequestContext ctx) {
+        // only allow GET methods for now
+        if(ctx.getMethod().equals(HttpMethod.GET)) {
+            return Optional.of(RestResponse.status(Response.Status.METHOD_NOT_ALLOWED));
+        }
+        return Optional.empty();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>リクエストフィルターは通常、リクエストを処理するメソッドが実行されるのと同じスレッドで実行されます。つまり、リクエストを処理するメソッドが <code>@Blocking</code> でアノテーションされている場合は、フィルターもワーカスレッドで実行されます。メソッドに <code>@NonBlocking</code> のアノテーションがある場合 (あるいは全くアノテーションがない場合)、フィルターは同じイベントループのスレッドで実行されます。</p>
+</div>
+<div class="paragraph">
+<p>しかし、リクエストを処理するメソッドがワーカスレッドで実行されるにも関わらず、フィルターをイベントループで実行する必要がある場合、<code>@ServerRequestFilter (nonBlocking=true)</code> を使用することができます。しかし、これらのフィルターはこの設定を使わず、ワーカースレッドで実行される <strong>どんな</strong> フィルターよりも前に実行される必要があることに注意してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>同様に、レスポンスフィルターは <a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive/3.2.12.Final/org/jboss/resteasy/reactive/server/ServerResponseFilter.html"><code>@ServerResponseFilter</code></a> アノテーションで宣言することが可能です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class Filters {
+    @ServerResponseFilter
+    public void getFilter(ContainerResponseContext responseContext) {
+        Object entity = responseContext.getEntity();
+        if(entity instanceof String) {
+            // make it shout
+            responseContext.setEntity(((String)entity).toUpperCase());
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Such a response filter will also be called for <a href="#exception-mapping">handled</a> exceptions.</p>
+</div>
+<div class="paragraph">
+<p>フィルターは、次のパラメーター型のいずれかを宣言できます。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 8. Filter parameters</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">タイプ</th>
+<th class="tableblock halign-left valign-top">使用方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#context-objects">Contextオブジェクト</a> のいずれか</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/container/ContainerRequestContext.html"><code>ContainerRequestContext</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">現在のリクエストにアクセスするためのコンテキストオブジェクト</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/container/ContainerResponseContext.html"><code>ContainerResponseContext</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">現在のレスポンスにアクセスするためのコンテキストオブジェクト</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Throwable.html"><code>Throwable</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Any thrown and <a href="#exception-mapping">handled</a> exception, or <code>null</code> (only for response filters).</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>次の戻り値の型のいずれかを宣言できます。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 9. Filter return types</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">タイプ</th>
+<th class="tableblock halign-left valign-top">使用方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/RestResponse.html"><code>RestResponse&lt;?&gt;</code></a> または <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/core/Response.html"><code>Response</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">フィルターチェーンを続行する代わりにクライアントに送信するレスポンス、またはフィルターチェーンを続行する必要がある場合は null</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Optional.html"><code>Optional&lt;RestResponse&lt;?&gt;&gt;</code></a> または <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Optional.html"><code>Optional&lt;Response&gt;</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">フィルターチェーンを続行する代わりにクライアントに送信するオプションのレスポンス、またはフィルターチェーンを続行する必要がある場合は空の値</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://javadoc.io/doc/io.smallrye.reactive/mutiny/2.1.0/io/smallrye/mutiny/Uni.html"><code>Uni&lt;RestResponse&lt;?&gt;&gt;</code></a> または <a href="https://javadoc.io/doc/io.smallrye.reactive/mutiny/2.1.0/io/smallrye/mutiny/Uni.html"><code>Uni&lt;Response&gt;</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">フィルターチェーンを続行する代わりにクライアントに送信する非同期レスポンス、またはフィルターチェーンを続行する必要がある場合は null</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/NameBinding.html"><code>@NameBinding</code></a> メタアノテーションを使用して、フィルターが実行されるリソースメソッドを制限できます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="the-jakarta-rest-way"><a class="anchor" href="#the-jakarta-rest-way"></a>ジャカルタRESTの方式</h4>
+<div class="paragraph">
+<p><a href="https://jakarta.ee/specifications/restful-ws/3.1/jakarta-restful-ws-spec-3.1.html#filters">JAX-RS方式でリクエストフィルタ、レスポンスフィルタを宣言する</a>こともできます。</p>
+</div>
+<div class="paragraph">
+<p>HTTP リクエストとレスポンスの両方とも、それぞれ <code>ContainerRequestFilter</code> または <code>ContainerResponseFilter</code> の実装を提供することで、 インターセプトすることができます。これらのフィルタは、メッセージに関連付けられたメタデータを処理するのに適しています。HTTP ヘッダ、クエリパラメーター、メディアタイプ、その他のメタデータです。また、ユーザーがエンドポイントにアクセスする権限を持っていない場合など、リクエスト処理を中止する機能も持っています。</p>
+</div>
+<div class="paragraph">
+<p><code>ContainerRequestFilter</code> を使用して、サービスにロギング機能を追加してみましょう。 <code>ContainerRequestFilter</code> を実装して、 <code>@Provider</code> アノテーションをつけることで実現できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.json;
+
+import io.vertx.core.http.HttpServerRequest;
+import org.jboss.logging.Logger;
+
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.ext.Provider;
+
+@Provider
+public class LoggingFilter implements ContainerRequestFilter {
+
+    private static final Logger LOG = Logger.getLogger(LoggingFilter.class);
+
+    @Context
+    UriInfo info;
+
+    @Context
+    HttpServerRequest request;
+
+    @Override
+    public void filter(ContainerRequestContext context) {
+
+        final String method = context.getMethod();
+        final String path = info.getPath();
+        final String address = request.remoteAddress().toString();
+
+        LOG.infof("Request %s %s from IP %s", method, path, address);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これで、RESTメソッドが呼び出されるたびに、リクエストがコンソールにログとして記録されるようになりました。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">2019-06-05 12:44:26,526 INFO  [org.acm.res.jso.LoggingFilter] (executor-thread-1) Request GET /legumes from IP 127.0.0.1
+2019-06-05 12:49:19,623 INFO  [org.acm.res.jso.LoggingFilter] (executor-thread-1) Request GET /fruits from IP 0:0:0:0:0:0:0:1
+2019-06-05 12:50:44,019 INFO  [org.acm.res.jso.LoggingFilter] (executor-thread-1) Request POST /fruits from IP 0:0:0:0:0:0:0:1
+2019-06-05 12:51:04,485 INFO  [org.acm.res.jso.LoggingFilter] (executor-thread-1) Request GET /fruits from IP 127.0.0.1</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>A <code>ContainerResponseFilter</code> will also be called for <a href="#exception-mapping">handled</a> exceptions.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="readers-and-writers-mapping-entities-and-http-bodies"><a class="anchor" href="#readers-and-writers-mapping-entities-and-http-bodies"></a>リーダーとライター: マッピングエンティティーと HTTP ボディ</h3>
+<div id="readers-writers" class="paragraph">
+<p>エンドポイントメソッドが（<a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive-common/3.2.12.Final/org/jboss/resteasy/reactive/RestResponse.html"><code>RestResponse&lt;?&gt;</code></a> もしくはエンティティの <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/core/Response.html"><code>Response</code></a> を返し）オブジェクトを返すときはいつでも、RESTEasy Reactive は、それを HTTP レスポンス本文にマップする方法を探します。</p>
+</div>
+<div class="paragraph">
+<p>同様に、エンドポイントメソッドがオブジェクトをパラメーターとして受け取る場合は常に、HTTP リクエストの本文をそのオブジェクトにマッピングする方法を探します。</p>
+</div>
+<div class="paragraph">
+<p>これは、<a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/ext/MessageBodyReader.html"><code>MessageBodyReader</code></a> と <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/ext/MessageBodyWriter.html"><code>MessageBodyWriter</code></a> インターフェイスのプラグインシステムによって行われ、どの Java 型からどのメディアタイプへマッピングするか、またその型の Java インスタンスとどのように HTTP ボディをやり取りするかを定義する役割を持っています。</p>
+</div>
+<div class="paragraph">
+<p>たとえば、エンドポイントに独自の <code>Cheese</code> 型がある場合:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+
+class Cheese {
+    public String name;
+
+    public Cheese(String name) {
+        this.name = name;
+    }
+}
+
+@Path("cheese")
+public class Endpoint {
+
+    @GET
+    public Cheese sayCheese() {
+        return new Cheese("Cheeeeeese");
+    }
+
+    @PUT
+    public void addCheese(Cheese cheese) {
+        System.err.println("Received a new cheese: " + cheese.name);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、 <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/ext/Provider.html"><code>@Provider</code></a> でアノテーションを付けたボディリーダー/ライターを使用して読み取りと書き込みの方法を定義できます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.Provider;
+
+@Provider
+public class CheeseBodyHandler implements MessageBodyReader&lt;Cheese&gt;,
+                                           MessageBodyWriter&lt;Cheese&gt; {
+
+    @Override
+    public boolean isWriteable(Class&lt;?&gt; type, Type genericType,
+                               Annotation[] annotations, MediaType mediaType) {
+        return type == Cheese.class;
+    }
+
+    @Override
+    public void writeTo(Cheese t, Class&lt;?&gt; type, Type genericType,
+                        Annotation[] annotations, MediaType mediaType,
+                        MultivaluedMap&lt;String, Object&gt; httpHeaders,
+                        OutputStream entityStream)
+            throws IOException, WebApplicationException {
+        entityStream.write(("[CheeseV1]" + t.name)
+                           .getBytes(StandardCharsets.UTF_8));
+    }
+
+    @Override
+    public boolean isReadable(Class&lt;?&gt; type, Type genericType,
+                              Annotation[] annotations, MediaType mediaType) {
+        return type == Cheese.class;
+    }
+
+    @Override
+    public Cheese readFrom(Class&lt;Cheese&gt; type, Type genericType,
+                            Annotation[] annotations, MediaType mediaType,
+                            MultivaluedMap&lt;String, String&gt; httpHeaders,
+                            InputStream entityStream)
+            throws IOException, WebApplicationException {
+        String body = new String(entityStream.readAllBytes(), StandardCharsets.UTF_8);
+        if(body.startsWith("[CheeseV1]"))
+            return new Cheese(body.substring(11));
+        throw new IOException("Invalid cheese: " + body);
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ライターのパフォーマンスを最大限に高めたい場合は、 <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/ext/MessageBodyWriter.html"><code>MessageBodyWriter</code></a> の代わりに <a href="https://javadoc.io/doc/io.quarkus.resteasy.reactive/resteasy-reactive/3.2.12.Final/org/jboss/resteasy/reactive/server/spi/ServerMessageBodyWriter.html"><code>ServerMessageBodyWriter</code></a> を拡張できます。こちらでは、リフレクションの使用を減らし、ブロッキング IO レイヤーをバイパスできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.Provider;
+
+import org.jboss.resteasy.reactive.server.spi.ResteasyReactiveResourceInfo;
+import org.jboss.resteasy.reactive.server.spi.ServerMessageBodyWriter;
+import org.jboss.resteasy.reactive.server.spi.ServerRequestContext;
+
+@Provider
+public class CheeseBodyHandler implements MessageBodyReader&lt;Cheese&gt;,
+                                           ServerMessageBodyWriter&lt;Cheese&gt; {
+
+    // …
+
+    @Override
+    public boolean isWriteable(Class&lt;?&gt; type, ResteasyReactiveResourceInfo target,
+                               MediaType mediaType) {
+        return type == Cheese.class;
+    }
+
+    @Override
+    public void writeResponse(Cheese t, ServerRequestContext context)
+      throws WebApplicationException, IOException {
+        context.serverResponse().end("[CheeseV1]" + t.name);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+プロバイダークラスに <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/Consumes.html"><code>Consumes</code></a>/<a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/Produces.html"><code>Produces</code></a> アノテーションを追加すると、リーダー/ライターが適用するコンテンツタイプを制限することができます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="reader-and-writer-interceptors"><a class="anchor" href="#reader-and-writer-interceptors"></a>リーダーおよびライターインターセプター</h3>
+<div class="paragraph">
+<p>リクエストとレスポンスをインターセプトするのと同様に、 <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/ext/ReaderInterceptor.html">ReaderInterceptor</a> または <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/ext/WriterInterceptor.html">WriterInterceptor</a> を拡張し、 <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/ext/Provider.html">@Provider</a> でアノテーションすることで、リーダーとライターもインターセプトすることができます。</p>
+</div>
+<div class="paragraph">
+<p>このエンドポイントを見ると、次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+
+@Path("cheese")
+public class Endpoint {
+
+    @GET
+    public String sayCheese() {
+        return "Cheeeeeese";
+    }
+
+    @PUT
+    public void addCheese(String cheese) {
+        System.err.println("Received a new cheese: " + cheese);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次のようなリーダーとライターのインターセプターを追加できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import java.io.IOException;
+
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.ext.Provider;
+import jakarta.ws.rs.ext.ReaderInterceptor;
+import jakarta.ws.rs.ext.ReaderInterceptorContext;
+import jakarta.ws.rs.ext.WriterInterceptor;
+import jakarta.ws.rs.ext.WriterInterceptorContext;
+
+@Provider
+public class CheeseIOInterceptor implements ReaderInterceptor, WriterInterceptor {
+
+    @Override
+    public void aroundWriteTo(WriterInterceptorContext context)
+      throws IOException, WebApplicationException {
+        System.err.println("Before writing " + context.getEntity());
+        context.proceed();
+        System.err.println("After writing " + context.getEntity());
+    }
+
+    @Override
+    public Object aroundReadFrom(ReaderInterceptorContext context)
+      throws IOException, WebApplicationException {
+        System.err.println("Before reading " + context.getGenericType());
+        Object entity = context.proceed();
+        System.err.println("After reading " + entity);
+        return entity;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="resteasy-reactive-and-rest-client-reactive-interactions"><a class="anchor" href="#resteasy-reactive-and-rest-client-reactive-interactions"></a>RESTEasy リアクティブおよび REST クライアントリアクティブインタラクション</h4>
+<div class="paragraph">
+<p>Quarkusでは、RESTEasy Reactiveエクステンションと <a href="rest-client-reactive">REST Client Reactive</a> エクステンションは、同じインフラストラクチャを共有しています。この考慮の重要な結果の1つは、（Jakarta RESTの意味での）プロバイダのリストを共有することです。</p>
+</div>
+<div class="paragraph">
+<p>例えば、 <code>WriterInterceptor</code> を宣言した場合、デフォルトではサーバーの呼び出しとクライアントの呼び出しの両方をインターセプトしますが、これは望ましい動作ではないかもしれません。</p>
+</div>
+<div class="paragraph">
+<p>しかし、このデフォルトの動作を変更してプロバイダーに制約を設けることができます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>プロバイダーに <code>@ConstrainedTo(RuntimeType.SERVER)</code> アノテーションを追加することで、 <strong>サーバー</strong> の呼び出しのみを考慮します。</p>
+</li>
+<li>
+<p>プロバイダーに <code>@ConstrainedTo(RuntimeType.CLIENT)</code> アノテーションを追加することで、 <strong>クライアント</strong> の呼び出しのみを考慮します。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="parameter-mapping"><a class="anchor" href="#parameter-mapping"></a>パラメーターマッピング</h3>
+<div class="paragraph">
+<p>すべての <a href="#request-parameters">リクエストパラメーター</a> は、<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a> として宣言することができますが、それ以外にも以下のいずれかの型でも大丈夫です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>リンク先のタイプ: <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/ext/ParamConverter.html"><code>ParamConverter</code></a> は、登録済みの <a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/ext/ParamConverterProvider.html"><code>ParamConverterProvider</code></a> から入手できます。</p>
+</li>
+<li>
+<p>プリミティブ型</p>
+</li>
+<li>
+<p>単一の <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html"><code>String</code></a> 引数を受け入れるコンストラクターを持つ型。</p>
+</li>
+<li>
+<p><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html"><code>String</code></a> という引数を持ち、その型のインスタンスを返す <code>valueOf</code> または <code>fromString</code> という名前の静的メソッドを持っている型。もし両方のメソッドが存在する場合は、<code>valueOf</code> が使用されます。ただし、その型が <code>enum</code> の場合は <code>fromString</code> が使用されます。</p>
+</li>
+<li>
+<p><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html"><code>List&lt;T&gt;</code></a>、<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Set.html"><code>Set&lt;T&gt;</code></a>、または <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/SortedSet.html"><code>SortedSet&lt;T&gt;</code></a>。ここで <code>T</code> は上記の基準を満たします。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>次の例は、これらすべての可能性を示しています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.List;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.ext.ParamConverter;
+import jakarta.ws.rs.ext.ParamConverterProvider;
+import jakarta.ws.rs.ext.Provider;
+
+import org.jboss.resteasy.reactive.RestQuery;
+
+@Provider
+class MyConverterProvider implements ParamConverterProvider {
+
+    @Override
+    public &lt;T&gt; ParamConverter&lt;T&gt; getConverter(Class&lt;T&gt; rawType, Type genericType,
+                                              Annotation[] annotations) {
+        // declare a converter for this type
+        if(rawType == Converter.class) {
+            return (ParamConverter&lt;T&gt;) new MyConverter();
+        }
+        return null;
+    }
+
+}
+
+// this is my custom converter
+class MyConverter implements ParamConverter&lt;Converter&gt; {
+
+    @Override
+    public Converter fromString(String value) {
+        return new Converter(value);
+    }
+
+    @Override
+    public String toString(Converter value) {
+        return value.value;
+    }
+
+}
+
+// this uses a converter
+class Converter {
+    String value;
+    Converter(String value) {
+        this.value = value;
+    }
+}
+
+class Constructor {
+    String value;
+    // this will use the constructor
+    public Constructor(String value) {
+        this.value = value;
+    }
+}
+
+class ValueOf {
+    String value;
+    private ValueOf(String value) {
+        this.value = value;
+    }
+    // this will use the valueOf method
+    public static ValueOf valueOf(String value) {
+        return new ValueOf(value);
+    }
+}
+
+@Path("hello")
+public class Endpoint {
+
+    @Path("{converter}/{constructor}/{primitive}/{valueOf}")
+    @GET
+    public String conversions(Converter converter, Constructor constructor,
+                              int primitive, ValueOf valueOf,
+                              @RestQuery List&lt;Constructor&gt; list) {
+        return converter + "/" + constructor + "/" + primitive
+               + "/" + valueOf + "/" + list;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="handling-dates"><a class="anchor" href="#handling-dates"></a>日付の取り扱い</h4>
+<div class="paragraph">
+<p>RESTEasy Reactiveは、（ <code>java.time.LocalDateTime</code> のような） <code>java.time.Temporal</code> の実装をクエリ、パス、またはフォームのパラメータとして使用することをサポートしています。さらに、 <code>@org.jboss.resteasy.reactive.DateFormat</code> アノテーションを提供し、これを使用してカスタムの期待パターンを設定することができます。指定しない場合は、JDKの各型のデフォルトフォーマットが暗黙のうちに使用されます。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="preconditions"><a class="anchor" href="#preconditions"></a>前提条件</h3>
+<div class="paragraph">
+<p>以下のようないくつかの条件の下で、<a href="https://tools.ietf.org/html/rfc7232">HTTPでは条件付きのリクエストが可能です</a> :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>リソースの最終変更日</p>
+</li>
+<li>
+<p>リソースの状態またはバージョンを指定するためのリソースのハッシュコードに似たリソースタグ</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><a href="https://javadoc.io/doc/jakarta.ws.rs/jakarta.ws.rs-api/3.1.0/jakarta/ws/rs/core/Request.html"><code>Request</code></a> コンテキストオブジェクトを使用して、条件付きリクエスト検証を行う方法を見てみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+import java.util.Date;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+
+@Path("conditional")
+public class Endpoint {
+
+    // It's important to keep our date on seconds because that's how it's sent to the
+    // user in the Last-Modified header
+    private Date date = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
+    private int version = 1;
+    private EntityTag tag = new EntityTag("v1");
+    private String resource = "Some resource";
+
+    @GET
+    public Response get(Request request) {
+        // first evaluate preconditions
+        ResponseBuilder conditionalResponse = request.evaluatePreconditions(date, tag);
+        if(conditionalResponse != null)
+            return conditionalResponse.build();
+        // preconditions are OK
+        return Response.ok(resource)
+                .lastModified(date)
+                .tag(tag)
+                .build();
+    }
+
+    @PUT
+    public Response put(Request request, String body) {
+        // first evaluate preconditions
+        ResponseBuilder conditionalResponse = request.evaluatePreconditions(date, tag);
+        if(conditionalResponse != null)
+            return conditionalResponse.build();
+        // preconditions are OK, we can update our resource
+        resource = body;
+        date = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
+        version++;
+        tag = new EntityTag("v" + version);
+        return Response.ok(resource)
+                .lastModified(date)
+                .tag(tag)
+                .build();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>GET /conditional</code> を初めて呼び出すと、このようなレスポンスが返ってきます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">HTTP/1.1 200 OK
+Content-Type: text/plain;charset=UTF-8
+ETag: "v1"
+Last-Modified: Wed, 09 Dec 2020 16:10:19 GMT
+Content-Length: 13
+
+Some resource</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これで、新しいバージョンを取得する必要があるかどうかを確認したい場合は、次のようなリクエストを行うことができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">GET /conditional HTTP/1.1
+Host: localhost:8080
+If-Modified-Since: Wed, 09 Dec 2020 16:10:19 GMT</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、次のようなレスポンスが返ってきます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">HTTP/1.1 304 Not Modified</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>なぜなら、そのリソースはその日以降に変更されていないからです。これはリソースを送信する手間を省くだけでなく、ユーザーが同時に変更されたことを検出するのにも役立ちます。たとえば、あるクライアントがリソースを更新したいが、別のユーザーがその後にリソースを変更したとしましょう。この場合、前の <code>GET</code> リクエストに続いて、この更新を行うことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">PUT /conditional HTTP/1.1
+Host: localhost:8080
+If-Unmodified-Since: Wed, 09 Dec 2020 16:25:43 GMT
+If-Match: v1
+Content-Length: 8
+Content-Type: text/plain
+
+newstuff</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>また、他のユーザーが GET と PUT の間のリソースを変更した場合は、次の回答が返されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">HTTP/1.1 412 Precondition Failed
+ETag: "v2"
+Content-Length: 0</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="negotiation"><a class="anchor" href="#negotiation"></a>ネゴシエーション</h3>
+<div class="paragraph">
+<p>REST (<a href="https://tools.ietf.org/html/rfc7231#section-3.4">および HTTP</a>) の主な考え方の 1 つは、リソースはその表現に依存せず、クライアントとサーバーの両方が、望むだけ多くのメディアタイプでリソースを自由に表現できることです。これにより、サーバーは複数の表現のサポートを宣言し、クライアントはどの表現をサポートするかを宣言し、適切なものを提供されるようにすることができます。</p>
+</div>
+<div class="paragraph">
+<p>次のエンドポイントは、プレーンテキストまたは JSON での cheese の提供をサポートしています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest;
+
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+
+class Cheese {
+    public String name;
+    @JsonCreator
+    public Cheese(String name) {
+        this.name = name;
+    }
+    @Override
+    public String toString() {
+        return "Cheese: " + name;
+    }
+}
+
+@Path("negotiated")
+public class Endpoint {
+
+    @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
+    @GET
+    public Cheese get() {
+        return new Cheese("Morbier");
+    }
+
+    @Consumes(MediaType.TEXT_PLAIN)
+    @PUT
+    public Cheese putString(String cheese) {
+        return new Cheese(cheese);
+    }
+
+    @Consumes(MediaType.APPLICATION_JSON)
+    @PUT
+    public Cheese putJson(Cheese cheese) {
+        return cheese;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>JSON の場合、ユーザーは <a href="https://tools.ietf.org/html/rfc7231#section-5.3.2"><code>Accept</code></a> ヘッダーでどの表現を取得するかを選択することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">&gt; GET /negotiated HTTP/1.1
+&gt; Host: localhost:8080
+&gt; Accept: application/json
+
+&lt; HTTP/1.1 200 OK
+&lt; Content-Type: application/json
+&lt; Content-Length: 18
+&lt;
+&lt; {"name":"Morbier"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そしてテキストの場合:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">&gt; GET /negotiated HTTP/1.1
+&gt; Host: localhost:8080
+&gt; Accept: text/plain
+&gt;
+&lt; HTTP/1.1 200 OK
+&lt; Content-Type: text/plain
+&lt; Content-Length: 15
+&lt;
+&lt; Cheese: Morbier</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>同様に、2 つの異なる表現を PUT することができます。JSON:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">&gt; PUT /negotiated HTTP/1.1
+&gt; Host: localhost:8080
+&gt; Content-Type: application/json
+&gt; Content-Length: 16
+&gt;
+&gt; {"name": "brie"}
+
+&lt; HTTP/1.1 200 OK
+&lt; Content-Type: application/json;charset=UTF-8
+&lt; Content-Length: 15
+&lt;
+&lt; {"name":"brie"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>またはプレーンテキスト:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sh hljs" data-lang="sh">&gt; PUT /negotiated HTTP/1.1
+&gt; Host: localhost:8080
+&gt; Content-Type: text/plain
+&gt; Content-Length: 9
+&gt;
+&gt; roquefort
+
+&lt; HTTP/1.1 200 OK
+&lt; Content-Type: application/json;charset=UTF-8
+&lt; Content-Length: 20
+&lt;
+&lt; {"name":"roquefort"}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="http-compression"><a class="anchor" href="#http-compression"></a>HTTP圧縮</h3>
+<div class="paragraph">
+<p>HTTP レスポンスのボディは、デフォルトでは圧縮されていません。<code>quarkus.http.enable-compression=true</code> を使用して HTTP 圧縮サポートを有効にできます。</p>
+</div>
+<div class="paragraph">
+<p>圧縮サポートが有効であれば、以下の場合にレスポンスボディが圧縮されます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ルートメソッドが <code>@io.quarkus.vertx.http.Compressed</code> でアノテーションされている、または</p>
+</li>
+<li>
+<p><code>Content-Type</code> ヘッダーが設定されており、その値は <code>quarkus.http.compress-media-types</code> を介して設定された圧縮メディアタイプである。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>次の場合、レスポンスボディは圧縮されません。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ルートメソッドが <code>@io.quarkus.vertx.http.Uncompressed</code> でアノテーションされている、または</p>
+</li>
+<li>
+<p><code>Content-Type</code> ヘッダーが設定されていない。</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+デフォルトでは、 <code>text/html</code> , <code>text/plain</code> , <code>text/xml</code> , <code>text/css</code> , <code>text/javascript</code> , <code>application/javascript</code> のメディアタイプが圧縮されます。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+クライアントが HTTP 圧縮をサポートしていない場合、レスポンスボディは圧縮されません。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="includeexclude-jakarta-rest-classes"><a class="anchor" href="#includeexclude-jakarta-rest-classes"></a>Jakarta RESTクラスのインクルード／エクスクルード</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="using-build-time-conditions"><a class="anchor" href="#using-build-time-conditions"></a>ビルドタイム条件の使用</h3>
+<div class="paragraph">
+<p>Quarkusでは、CDI Beanと同様に、ビルド時の条件によって、Jakarta RESTリソース、プロバイダ、フィーチャーを直接取り込んだり除外したりすることができます。したがって、さまざまなJakarta RESTクラスにプロファイル条件（ <code>@io.quarkus.arc.profile.IfBuildProfile</code> または <code>@io.quarkus.arc.profile.UnlessBuildProfile</code> ）やプロパティ条件（ <code>io.quarkus.arc.properties.IfBuildProperty</code> または <code>io.quarkus.arc.properties.UnlessBuildProperty</code> ）をアノテーションして、ビルド時にQuarkusに対して、どのような条件の下でJakarta RESTクラスを含めるべきかを示すことができます。</p>
+</div>
+<div class="paragraph">
+<p>次の例では、Quarkusは、ビルドプロファイル <code>app1</code> が有効になっている場合に限り、 <code>ResourceForApp1Only</code> リソースを含めます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@IfBuildProfile("app1")
+public class ResourceForApp1Only {
+
+    @GET
+    @Path("sayHello")
+    public String sayHello() {
+        return "hello";
+     }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Jakarta REST Applicationが検出され、メソッド <code>getClasses()</code> 、 <code>getSingletons()</code> がオーバーライドされている場合、Quarkusはビルド時の条件を無視し、Jakarta REST Applicationで定義されているもののみを考慮することに注意してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-a-runtime-property"><a class="anchor" href="#using-a-runtime-property"></a>実行時プロパティの使用</h3>
+<div class="paragraph">
+<p>Quarkusでは、 <code>@io.quarkus.resteasy.reactive.server.EndpointDisabled</code> アノテーションを使用して、実行時プロパティの値に基づいてjakarta RESTリソースを条件付きで無効化することもできます。</p>
+</div>
+<div class="paragraph">
+<p>次の例では、アプリケーションで <code>some.property</code> が <code>"disable"</code> に設定されている場合、Quarkus は実行時に <code>RuntimeResource</code> を除外します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@EndpointDisabled(name = "some.property", stringValue = "disable")
+public class RuntimeResource {
+
+    @GET
+    @Path("sayHello")
+    public String sayHello() {
+        return "hello";
+     }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="resteasy-reactive-client"><a class="anchor" href="#resteasy-reactive-client"></a>RESTEasy Reactive クライアント</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>RESTEasy Reactiveには、サーバー側に加えて、ノンブロッキングを核とした新しいMicroProfile Rest Clientの実装が搭載されています。</p>
+</div>
+<div class="paragraph">
+<p>なお、RESTEasy Reactiveでは、 <code>quarkus-rest-client</code> エクステンションが正常に動作しない場合があります。 <code>quarkus-rest-client-reactive</code> を代わりに使用して下さい。</p>
+</div>
+<div class="paragraph">
+<p>リアクティブ・クライアントの詳細については、<a href="rest-client-reactive.html">REST Client Reactiveガイド</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. <a href="#path-parameter">URIテンプレートパラメータ</a> または <a href="#context-objects">コンテキストオブジェクト</a>でないかぎり。
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#what-is-resteasy-reactive">RESTEasy Reactiveとは？</a></li>
+<li><a href="#writing-endpoints">エンドポイントの作成</a>
+<ul class="sectlevel2">
+<li><a href="#getting-started">はじめに</a></li>
+<li><a href="#terminology">用語解説</a></li>
+<li><a href="#declaring-endpoints-uri-mapping">エンドポイントの宣言:URI マッピング</a></li>
+<li><a href="#declaring-endpoints-http-methods">エンドポイントの宣言: HTTP メソッド</a></li>
+<li><a href="#declaring-endpoints-representation-content-types">エンドポイントの宣言: 表現/コンテンツタイプ</a></li>
+<li><a href="#accessing-request-parameters">リクエストパラメーターへのアクセス</a></li>
+<li><a href="#declaring-uri-parameters">URI パラメーターの宣言</a></li>
+<li><a href="#accessing-the-request-body">リクエストボディへのアクセス</a></li>
+<li><a href="#multipart">マルチパートフォームデータの処理</a></li>
+<li><a href="#returning-a-response-body">レスポンスボディを返す</a></li>
+<li><a href="#setting-other-response-properties">他のレスポンスプロパティーの設定</a></li>
+<li><a href="#redirect-support">リダイレクトサポート</a></li>
+<li><a href="#asyncreactive-support">非同期/リアクティブサポート</a></li>
+<li><a href="#streaming-support">ストリーミングサポート</a></li>
+<li><a href="#server-sent-event-sse-support">サーバー送信イベント (SSE) のサポート</a></li>
+<li><a href="#controlling-http-caching-features">HTTP キャッシング機能の制御</a></li>
+<li><a href="#accessing-context-objects">コンテキストオブジェクトへのアクセス</a></li>
+<li><a href="#json-serialisation">JSON シリアライゼーション</a></li>
+<li><a href="#xml-serialisation">XML シリアライゼーション</a></li>
+<li><a href="#web-links-support">Web リンクのサポート</a></li>
+</ul>
+</li>
+<li><a href="#cors-filter">CORS フィルター</a></li>
+<li><a href="#more-advanced-usage">より高度な使用法</a>
+<ul class="sectlevel2">
+<li><a href="#execution-model-blocking-non-blocking">実行モデル、ブロッキング、ノンブロッキング</a></li>
+<li><a href="#exception-mapping">例外のマッピング</a></li>
+<li><a href="#request-or-response-filters">リクエストまたはレスポンスフィルター</a></li>
+<li><a href="#readers-and-writers-mapping-entities-and-http-bodies">リーダーとライター: マッピングエンティティーと HTTP ボディ</a></li>
+<li><a href="#reader-and-writer-interceptors">リーダーおよびライターインターセプター</a></li>
+<li><a href="#parameter-mapping">パラメーターマッピング</a></li>
+<li><a href="#preconditions">前提条件</a></li>
+<li><a href="#negotiation">ネゴシエーション</a></li>
+<li><a href="#http-compression">HTTP圧縮</a></li>
+</ul>
+</li>
+<li><a href="#includeexclude-jakarta-rest-classes">Jakarta RESTクラスのインクルード／エクスクルード</a>
+<ul class="sectlevel2">
+<li><a href="#using-build-time-conditions">ビルドタイム条件の使用</a></li>
+<li><a href="#using-a-runtime-property">実行時プロパティの使用</a></li>
+</ul>
+</li>
+<li><a href="#resteasy-reactive-client">RESTEasy Reactive クライアント</a></li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

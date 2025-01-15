@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>コンテキストと依存性注入(CDI)の紹介 - 3.2 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.2/guides/cdi" />
+  <meta property="og:title" content="コンテキストと依存性注入(CDI)の紹介 - 3.2" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/cdi">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.2/guides/cdi">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.2/guides/cdi" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.2/guides/cdi">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.2/guides/cdi">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.2/guides/cdi">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.2/guides/cdi">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.2/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" selected>3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">コンテキストと依存性注入(CDI)の紹介 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、 <a href="https://jakarta.ee/specifications/cdi/4.0/jakarta-cdi-spec-4.0.html">Jakarta Contexts and Dependency Injection 4.0</a> 仕様に基づくQuarkusプログラミングモデルの基本原則について説明します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ok-lets-start-simple-what-is-a-bean"><a class="anchor" href="#ok-lets-start-simple-what-is-a-bean"></a>1. OK、簡単なことから始めましょう。Beanとは何でしょうか?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Beanは <em>コンテナーで管理された</em> オブジェクトです。依存性の注入、ライフサイクルコールバック、インターセプターなどの基本的なサービスのセットをサポートしています。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="wait-a-minute-what-does-container-managed-mean"><a class="anchor" href="#wait-a-minute-what-does-container-managed-mean"></a>2. ちょっと待ってください。「コンテナーで管理された」とはどういう意味ですか?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>簡単に言えば、オブジェクトインスタンスのライフサイクルを直接制御することはできません。その代わりに、アノテーションや設定などの宣言的な手段でライフサイクルに影響を与えることができます。コンテナーはアプリケーションが動作する <em>環境</em> です。コンテナーは、Beanのインスタンスを作成したり破棄したり、指定されたコンテキストにインスタンスを関連付けたり、他のBeanに注入したりします。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-is-it-good-for"><a class="anchor" href="#what-is-it-good-for"></a>3. 何に使うと適切ですか?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>アプリケーション開発者は、「どこで、どのように」ではなく、ビジネスロジックに集中して、すべての依存関係を持つ完全に初期化されたコンポーネントを得ることができます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<em>制御の反転</em> (Inversion of Control, IoC )というプログラミングの原理を聞いたことがあると思います。依存性注入はIoCの実装技術の一つです。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-does-a-bean-look-like"><a class="anchor" href="#what-does-a-bean-look-like"></a>4. Beanはどんな形をしているのでしょうか?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Beanにはいくつかの種類があります。一番多いのは、クラスベースのBeanです。</p>
+</div>
+<div class="listingblock">
+<div class="title">シンプルなBeanの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import org.eclipse.microprofile.metrics.annotation.Counted;
+
+@ApplicationScoped <i class="conum" data-value="1"></i><b>(1)</b>
+public class Translator {
+
+    @Inject
+    Dictionary dictionary; <i class="conum" data-value="2"></i><b>(2)</b>
+
+    @Counted  <i class="conum" data-value="3"></i><b>(3)</b>
+    String translate(String sentence) {
+      // ...
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>これはスコープアノテーションです。これはコンテナーに、Beanのインスタンスをどのコンテキストに関連付けるかを伝えます。この特定のケースでは、 <strong>単一のBeanインスタンス</strong> がアプリケーション用に作成され、 `Translator`の注入を行う他の全てのBeanによって使用されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>これはフィールド注入ポイントです。 <code>Translator</code>  が <code>Dictionary</code>  Beanに依存していることをコンテナーに伝えます。マッチするBeanがない場合、ビルドは失敗します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>これは、インターセプターのバインディングアノテーションです。このケースではアノテーションは MicroProfile Metrics から来ています。関連するインターセプターは、呼び出しをインターセプトして、関連するメトリクスを更新します。 <a href="#interceptors">インターセプター</a> については、後で説明します。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="typesafe_resolution"><a class="anchor" href="#typesafe_resolution"></a>5. いいですね。依存関係の解決方法はどのように動作しますか?名前も識別子も見当たりません。</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>良い質問ですね。CDIでは、Beanをインジェクションポイントにマッチングするプロセスは <strong>タイプセーフ</strong> です。各Beanは、Beanタイプのセットを宣言します。上の例では、 <code>Translator</code> Beanには、 <code>Translator</code> と <code>java.lang.Object</code> の 2 つのBeanタイプがあります。その後、Beanが <em>必要な型</em> にマッチするBean型を持ち、 <em>必要な</em> すべての <em>修飾子を</em> 持っている場合、Beanはインジェクションポイントに代入可能です。この後、修飾子について説明します。今のところ、上記のBeanが <code>Translator</code> と <code>java.lang.Object</code> のタイプのインジェクションポイントに代入可能であることを知っていれば十分です。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="hm-wait-a-minute-what-happens-if-multiple-beans-declare-the-same-type"><a class="anchor" href="#hm-wait-a-minute-what-happens-if-multiple-beans-declare-the-same-type"></a>6. ふむ、ちょっと待ってください。複数のBeanが同じ型を宣言した場合はどうなるのでしょうか?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>シンプルなルールがあります: <strong>正確に1つのBeanがインジェクションポイントに割り当て可能でなければならず、そうでなければビルドは失敗します。</strong> 割り当て可能なBeanがない場合、ビルドは <code>UnsatisfiedResolutionException</code> で失敗します。複数のBeanが割り当て可能な場合、ビルドは <code>AmbiguousResolutionException</code> で失敗します。これは非常に便利です。コンテナーがどのインジェクションポイントに対しても明確な依存関係を見つけることができない場合、アプリケーションは早く失敗するからです。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>jakarta.enterprise.inject.Instance</code> を通じてプログラム的なルックアップを使用して、実行時に曖昧さを解決したり、指定された型を実装しているすべてのBeanを反復処理したりすることができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class Translator {
+
+    @Inject
+    Instance&lt;Dictionary&gt; dictionaries; <i class="conum" data-value="1"></i><b>(1)</b>
+
+    String translate(String sentence) {
+      for (Dictionary dict : dictionaries) { <i class="conum" data-value="2"></i><b>(2)</b>
+         // ...
+      }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>このインジェクションポイントは、 <code>Dictionary</code>  型を実装した複数のBeanがあっても、曖昧な依存関係にはなりません。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>jakarta.enterprise.inject.Instance</code> は、 <code>Iterable</code> を拡張します。</td>
+</tr>
+</table>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="can-i-use-setter-and-constructor-injection"><a class="anchor" href="#can-i-use-setter-and-constructor-injection"></a>7. セッターやコンストラクタのインジェクションは使えますか?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>はい、使用できます。実際、CDIでは "セッター・インジェクション "は、より強力な <a href="https://jakarta.ee/specifications/cdi/4.0/jakarta-cdi-spec-4.0.html#initializer_methods">イニシャライザー・メソッド</a> に取って代わられています。
+イニシャライザは複数のパラメータを受け取ることができ、JavaBeanの命名規則に従う必要はありません。</p>
+</div>
+<div class="listingblock">
+<div class="title">初期化とコンストラクタのインジェクション例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+public class Translator {
+
+    private final TranslatorHelper helper;
+
+    Translator(TranslatorHelper helper) { <i class="conum" data-value="1"></i><b>(1)</b>
+       this.helper = helper;
+    }
+
+    @Inject <i class="conum" data-value="2"></i><b>(2)</b>
+    void setDeps(Dictionary dic, LocalizationService locService) { <i class="conum" data-value="3"></i><b>(3)</b>
+      / ...
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>これはコンストラクタのインジェクションです。実際には、このコードは通常のCDI実装では動作しません。通常のスコープを持つBeanは常にno-argsコンストラクタを宣言しなければならず、Beanのコンストラクタは <code>@Inject</code>  でアノテーションされなければなりません。しかし、Quarkusでは、no-argsコンストラクタが存在しないことを検出し、バイトコードに直接「追加」します。また、コンストラクタが1つしかない場合は、 <code>@Inject</code>  を追加する必要はありません。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>イニシャライザメソッドには <code>@Inject</code>  をアノテーションしなければなりません。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>イニシャライザは複数のパラメーターを受け付けることができ、それぞれがインジェクションポイントとなります。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="you-talked-about-some-qualifiers"><a class="anchor" href="#you-talked-about-some-qualifiers"></a>8. 修飾子の話をしましたか?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://jakarta.ee/specifications/cdi/4.0/jakarta-cdi-spec-4.0.html#qualifiers">修飾子</a> は，コンテナが同じ型を実装するBeanを区別するのに役立つアノテーションです。
+すでに述べたように、Beanは、必要な修飾子がすべてあれば注入ポイントに割り当て可能です。注入ポイントで修飾子を宣言しない場合、 <code>@Default</code> 修飾子が仮定されます。</p>
+</div>
+<div class="paragraph">
+<p>修飾子型は、 <code>@Retention(RUNTIME)</code> として定義され、 <code>@jakarta.inject.Qualifier</code> メタアノテーションでアノテーションされた Java アノテーションです:</p>
+</div>
+<div class="listingblock">
+<div class="title">修飾子の例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Qualifier
+@Retention(RUNTIME)
+@Target({METHOD, FIELD, PARAMETER, TYPE})
+public @interface Superior {}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Beanの修飾子は、Beanクラスやプロデューサのメソッドやフィールドに修飾子タイプをアノテーションすることで宣言されます。</p>
+</div>
+<div class="listingblock">
+<div class="title">カスタム修飾子を持つ Bean の例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Superior <i class="conum" data-value="1"></i><b>(1)</b>
+@ApplicationScoped
+public class SuperiorTranslator extends Translator {
+
+    String translate(String sentence) {
+      // ...
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@Superior</code> は <a href="https://jakarta.ee/specifications/cdi/4.0/jakarta-cdi-spec-4.0.html#defining_qualifier_types">修飾子アノテーション</a> です。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>このBeanは <code>@Inject @Superior Translator</code>  と <code>@Inject @Superior SuperiorTranslator</code>  には割り当てられますが、 <code>@Inject Translator</code>  には割り当てられません。その理由は、 <code>@Inject Translator</code>  はタイプセーフ解決の際に自動的に <code>@Inject @Default Translator</code>  に変換されるからです。また、私たちの <code>SuperiorTranslator</code>  は <code>@Default</code>  を宣言していないので、元の <code>Translator</code>  Beanだけが代入可能です。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="bean-scope"><a class="anchor" href="#bean-scope"></a>9. 良いですね。Beanスコープとは何ですか?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Beanのスコープはインスタンスのライフサイクルを決定します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+すべてのBeanは、正確に1つのスコープを持っています。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="bean-scope-available"><a class="anchor" href="#bean-scope-available"></a>10. 実際にQuarkusアプリケーションで使用できるスコープは何ですか?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>jakarta.enterprise.context.ConversationScoped</code> 以外の仕様で言及されているすべてのビルトインスコープを使用することができます。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">アノテーション</th>
+<th class="tableblock halign-left valign-top">説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@jakarta.enterprise.context.ApplicationScoped</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">単一のBeanインスタンスがアプリケーションに使用され，すべての注入ポイント間で共有されます。インスタンスは，遅延的に，すなわち，一旦メソッドが <a href="#client_proxies">クライアントプロキシ</a> 上で呼び出されると，生成されます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@jakarta.inject.Singleton</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">クライアントプロキシーを使用しないことを除いて、 <code>@ApplicationScoped</code> と同じです。インスタンスは、@Singleton Beanに解決するインジェクションポイントがインジェクションされたときに生成されます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@jakarta.enterprise.context.RequestScoped</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Beanインスタンスは、現在の <em>リクエスト</em> (通常はHTTPリクエスト)に関連付けられています。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@jakarta.enterprise.context.Dependent</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">これは疑似スコープです。インスタンスは共有されておらず、すべての注入ポイントは依存Beanの新しいインスタンスをスポーンします。依存Beanのライフサイクルは、それを注入するBeanに拘束されています。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@jakarta.enterprise.context.SessionScoped</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">このスコープは <code>jakarta.servlet.http.HttpSession</code> オブジェクトによってバックアップされています。 <code>quarkus-undertow</code> エクステンションを使用している場合のみ利用可能です。</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Quarkusのエクステンションによって提供される他のカスタムスコープもあります。例えば、 <a href="transaction"><code>quarkus-narayana-jta</code></a> は <a href="transaction#transaction-scope"><code>jakarta.transaction.TransactionScoped</code></a> を提供します。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="applicationscoped-and-singleton-look-very-similar-which-one-should-i-choose-for-my-quarkus-application"><a class="anchor" href="#applicationscoped-and-singleton-look-very-similar-which-one-should-i-choose-for-my-quarkus-application"></a>11. <code>@ApplicationScoped</code> と <code>@Singleton</code> は非常に似ているように見えます。Quarkusアプリケーションにはどれを選べばいいのでしょうか?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>それは場合によりけりです ;-)。</p>
+</div>
+<div class="paragraph">
+<p><code>@Singleton</code> Beanは， <a href="#client_proxies">クライアントプロキシ</a> がなく，したがって，Beanが注入されるときに，インスタンスが <em>即座に(eagerly)生成</em> されます。対照的に， <code>@ApplicationScoped</code> Beanのインスタンスは，注入されたインスタンスに対してメソッドが初めて呼び出されるとき，すなわち， <em>遅延的に生成</em> されます。</p>
+</div>
+<div class="paragraph">
+<p>さらに、クライアントプロキシーはメソッドの呼び出しを委譲するだけなので、注入された <code>@ApplicationScoped</code> Bean のフィールドを直接読み書きしてはいけません。注入された <code>@Singleton</code> のフィールドは安全に読み書きすることができます。</p>
+</div>
+<div class="paragraph">
+<p><code>@Singleton</code> はインダイレクトがない(コンテキストから現在のインスタンスをデリゲートするプロキシーがない)ため、パフォーマンスが若干向上するはずです。</p>
+</div>
+<div class="paragraph">
+<p>一方、 <a href="getting-started-testing#quarkus_mock">QuarkusMock</a> を使用して <code>@Singleton</code> Beanをモックすることはできません。</p>
+</div>
+<div class="paragraph">
+<p><code>@ApplicationScoped</code> Beanは、実行時に破棄して再作成することもできます。既存のインジェクションポイントは、インジェクションされたプロキシーが現在のインスタンスにデリゲートするので、単に機能します。</p>
+</div>
+<div class="paragraph">
+<p>したがって、 <code>@Singleton</code> を使用する正当な理由がない限り、デフォルトで <code>@ApplicationScoped</code> を使用することをお勧めします。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="client_proxies"><a class="anchor" href="#client_proxies"></a>12. クライアントプロキシーの概念が理解できません。</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>実際、 <a href="https://jakarta.ee/specifications/cdi/4.0/jakarta-cdi-spec-4.0.html#client_proxies" target="_blank" rel="noopener">クライアントプロキシ</a> は把握しにくいかもしれませんが、いくつかの便利な機能を提供します。
+クライアントプロキシは，基本的に，すべてのメソッド呼び出しをターゲットBeanインスタンスに委譲するオブジェクトです。
+これは， <code>io.quarkus.arc.ClientProxy</code> を実装し，Beanクラスを拡張するコンテナ構成体です。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+クライアントプロキシーはメソッドの呼び出しをデリゲートするだけです。そのため、通常のスコープされたBeanのフィールドを読み書きしてはいけません。
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">生成されたクライアントプロキシーの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+class Translator {
+
+    String translate(String sentence) {
+      // ...
+    }
+}
+
+// The client proxy class is generated and looks like...
+class Translator_ClientProxy extends Translator { <i class="conum" data-value="1"></i><b>(1)</b>
+
+    String translate(String sentence) {
+      // Find the correct translator instance...
+      Translator translator = getTranslatorInstanceFromTheApplicationContext();
+      // And delegate the method invocation...
+      return translator.translate(sentence);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>Translator</code> Beanの <a href="https://jakarta.ee/specifications/cdi/4.0/jakarta-cdi-spec-4.0.html#contextual_instance">コンテキストインスタンス</a> への直接参照ではなく， <code>Translator_ClientProxy</code> インスタンスが常に注入される。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>クライアントプロキシーは、以下のことを可能にします。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>遅延インスタンス化 - メソッドがプロキシーに呼び出されるとインスタンスが生成されます。</p>
+</li>
+<li>
+<p>「狭い」スコープのBeanを「広い」スコープのBeanに注入する機能、すなわち、 <code>@RequestScoped</code>  Beanを <code>@ApplicationScoped</code>  Beanに注入することができます。</p>
+</li>
+<li>
+<p>依存関係グラフの円形の依存関係。循環的な依存関係を持つことは、しばしば再設計を検討すべきであることを示していますが、時には避けられないこともあります。</p>
+</li>
+<li>
+<p>まれなケースでは、手動でBeanを破棄するのが現実的です。直接参照を注入すると、古くなったBeanのインスタンスになってしまいます。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ok-you-said-that-there-are-several-kinds-of-beans"><a class="anchor" href="#ok-you-said-that-there-are-several-kinds-of-beans"></a>13. そうですか。Beanは何種類かあるんですよね?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>はい、一般的には以下に区別しています:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>クラスBean</p>
+</li>
+<li>
+<p>プロデューサーメソッド</p>
+</li>
+<li>
+<p>プロデューサーフィールド</p>
+</li>
+<li>
+<p>合成Bean</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+合成Beanは通常、エクステンションによって提供されます。そのため、このガイドではそれらを取り上げません。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>プロデューサ・メソッドとフィールドは、Beanのインスタンス化を追加で制御する必要がある場合に便利です。また、サードパーティのライブラリを統合する際に、クラスソースを制御できず、追加のアノテーションなどを追加できない場合にも便利です。</p>
+</div>
+<div class="listingblock">
+<div class="title">プロデューサーの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+public class Producers {
+
+    @Produces <i class="conum" data-value="1"></i><b>(1)</b>
+    double pi = Math.PI; <i class="conum" data-value="2"></i><b>(2)</b>
+
+    @Produces <i class="conum" data-value="3"></i><b>(3)</b>
+    List&lt;String&gt; names() {
+       List&lt;String&gt; names = new ArrayList&lt;&gt;();
+       names.add("Andy");
+       names.add("Adalbert");
+       names.add("Joachim");
+       return names; <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+}
+
+@ApplicationScoped
+public class Consumer {
+
+   @Inject
+   double pi;
+
+   @Inject
+   List&lt;String&gt; names;
+
+   // ...
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>コンテナーは,フィールドアノテーションを分析して,Beanのメタデータを構築します。 <em>型</em> は,Beanの型の集合を構築するために使用されます。この場合、 <code>double</code>  と <code>java.lang.Object</code> .スコープアノテーションは宣言されていないので、デフォルトは <code>@Dependent</code> になります。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>コンテナーは、Beanのインスタンスを作成するときにこのフィールドを読みます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>コンテナーは,メソッドのアノテーションを解析して,Beanのメタデータを構築します。戻り値の <em>型</em> は、Bean型のセットを構築するために使用されます。この場合、 <code>List&lt;String&gt;</code> と <code>Collection&lt;String&gt;</code>、 <code>Iterable&lt;String&gt;</code>、 <code>java.lang.Object</code> となります。スコープアノテーションは宣言されていないので、デフォルトは <code>@Dependent</code>  となります。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>コンテナーは、Beanのインスタンスを作成する際にこのメソッドを呼び出します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>プロデューサーについては他にもあります。修飾子を宣言したり、プロデューサーメソッドのパラメーターに依存性を注入したりすることができます。プロデューサについては、例えば <a href="https://docs.jboss.org/weld/reference/latest/en-US/html/producermethods.html" target="_blank" rel="noopener">Weld</a> のドキュメントを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ok-injection-looks-cool-what-other-services-are-provided"><a class="anchor" href="#ok-injection-looks-cool-what-other-services-are-provided"></a>14. OK、インジェクションは便利ですね。他にはどんなサービスが提供されていますか?</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="lifecycle-callbacks"><a class="anchor" href="#lifecycle-callbacks"></a>14.1. ライフサイクルコールバック</h3>
+<div class="paragraph">
+<p>Beanクラスは、ライフサイクル <code>@PostConstruct</code>  と <code>@PreDestroy</code>  コールバックを宣言することができます。</p>
+</div>
+<div class="listingblock">
+<div class="title">ライフサイクルコールバックの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+
+@ApplicationScoped
+public class Translator {
+
+    @PostConstruct <i class="conum" data-value="1"></i><b>(1)</b>
+    void init() {
+       // ...
+    }
+
+    @PreDestroy <i class="conum" data-value="2"></i><b>(2)</b>
+    void destroy() {
+      // ...
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>このコールバックは、Beanインスタンスがサービスに投入される前に呼び出されます。ここでいくつかの初期化を行うのが安全です。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>このコールバックは、Beanインスタンスが破棄される前に呼び出されます。ここでいくつかのクリーンアップタスクを実行しても安全です。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+コールバック内のロジックを「副作用なし」に保つこと、つまり、コールバック内で他のBeanを呼び出すことは避けるべきです。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="interceptors"><a class="anchor" href="#interceptors"></a>14.2. インターセプター</h3>
+<div class="paragraph">
+<p>インターセプターは、横断的な問題をビジネス・ロジックから分離するために使用されます。基本的なプログラミングモデルとセマンティクスを定義した Java Interceptors という別の仕様があります。</p>
+</div>
+<div class="listingblock">
+<div class="title">シンプルなインターセプターバインディングの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import jakarta.interceptor.InterceptorBinding;
+
+@InterceptorBinding <i class="conum" data-value="1"></i><b>(1)</b>
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.METHOD, ElementType.CONSTRUCTOR}) <i class="conum" data-value="2"></i><b>(2)</b>
+@Inherited <i class="conum" data-value="3"></i><b>(3)</b>
+public @interface Logged {
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>これは、インターセプター バインディング アノテーションです。 使用方法については、次の例を参照してください。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>インターセプター バインディング アノテーションは常にインターセプターの型に付けられ、ターゲットの型またはメソッドに付けることもできます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>インターセプター バインディングはしばしば <code>@Inherited</code> ですが、そうでなければならない訳ではありません。</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">シンプルなインターセプターの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.annotation.Priority;
+import jakarta.interceptor.AroundInvoke;
+import jakarta.interceptor.Interceptor;
+import jakarta.interceptor.InvocationContext;
+
+@Logged <i class="conum" data-value="1"></i><b>(1)</b>
+@Priority(2020) <i class="conum" data-value="2"></i><b>(2)</b>
+@Interceptor <i class="conum" data-value="3"></i><b>(3)</b>
+public class LoggingInterceptor {
+
+   @Inject <i class="conum" data-value="4"></i><b>(4)</b>
+   Logger logger;
+
+   @AroundInvoke <i class="conum" data-value="5"></i><b>(5)</b>
+   Object logInvocation(InvocationContext context) {
+      // ...log before
+      Object ret = context.proceed(); <i class="conum" data-value="6"></i><b>(6)</b>
+      // ...log after
+      return ret;
+   }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>インターセプターバインディングアノテーションは、インターセプターをBeanにバインドするために使用されます。次の例のように Beanクラスに <code>@Logged</code> をアノテーションするだけです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>Priority</code>  はインターセプターを有効にし、インターセプターの順序に影響を与えます。優先度の値が小さいインターセプターが最初に呼び出されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>インターセプターコンポーネントをマークします。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>インターセプターは、依存性注入の対象となる場合があります。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td><code>AroundInvoke</code>  とは、ビジネスの方法に口出しする方法を指します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>インターセプターチェーンの次のインターセプターに進むか、インターセプターされたビジネスメソッドを呼び出します。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+インターセプタのインスタンスは、インターセプトするBeanのインスタンスに依存するオブジェクトです。
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">シンプルなインターセプターの使用例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.enterprise.context.ApplicationScoped;
+
+@Logged <i class="conum" data-value="1"></i><b>(1)</b> <i class="conum" data-value="2"></i><b>(2)</b>
+@ApplicationScoped
+public class MyService {
+   void doSomething() {
+       ...
+   }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>インターセプター・バインディング・アノテーションをBeanクラスに付けると、すべてのビジネス・メソッドがインターセプトされるようになります。  アノテーションは個々のメソッドに付けることもでき、その場合、アノテーションされたメソッドのみがインターセプトされます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>@Logged</code> アノテーションは <code>@Inherited</code> であることを思い出してください。 MyService を継承する Bean クラスがあれば、LoggingInterceptor も適用されます。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="decorators"><a class="anchor" href="#decorators"></a>14.3. デコレーター</h3>
+<div class="paragraph">
+<p>デコレーターはインターセプターと似ていますが、ビジネスセマンティクスを持つインターフェイスを実装しているため、ビジネスロジックを実装することができます。</p>
+</div>
+<div class="listingblock">
+<div class="title">シンプルなデコレーターの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.decorator.Decorator;
+import jakarta.decorator.Delegate;
+import jakarta.annotation.Priority;
+import jakarta.inject.Inject;
+import jakarta.enterprise.inject.Any;
+
+public interface Account {
+   void withdraw(BigDecimal amount);
+}
+
+@Priority(10) <i class="conum" data-value="1"></i><b>(1)</b>
+@Decorator <i class="conum" data-value="2"></i><b>(2)</b>
+public class LargeTxAccount implements Account { <i class="conum" data-value="3"></i><b>(3)</b>
+
+   @Inject
+   @Any
+   @Delegate
+   Account delegate; <i class="conum" data-value="4"></i><b>(4)</b>
+
+   @Inject
+   LogService logService; <i class="conum" data-value="5"></i><b>(5)</b>
+
+   void withdraw(BigDecimal amount) {
+      delegate.withdraw(amount); <i class="conum" data-value="6"></i><b>(6)</b>
+      if (amount.compareTo(1000) &gt; 0) {
+         logService.logWithdrawal(delegate, amount);
+      }
+   }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@Priority</code> はデコレーターを有効にします。優先度の値が小さいインターセプターが最初に呼び出されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>@Decorator</code> はデコレーターコンポーネントをマークします。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>装飾された型のセットには、 <code>java.io.Serializable</code> を除く、Java インターフェースであるすべての Bean 型が含まれます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>各デコレーターは、正確に1つの <em>デリゲート・インジェクション・ポイント</em> を宣言する必要があります。デコレーターは、このデリゲート・インジェクション・ポイントに割り当て可能なBeanに適用されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>デコレーターは、他のBeanを注入することができます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>デコレーターは、デリゲートオブジェクトの任意のメソッドを呼び出すことができます。そして、コンテナは、チェーンの次のデコレーターか、インターセプトされたインスタンスのビジネスメソッドを呼び出します。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+デコレーターのインスタンスは、インターセプトするBeanのインスタンスに依存するオブジェクトです。つまり、インターセプトされたBeanごとに新しいデコレーターインスタンスが作成されます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="events-and-observers"><a class="anchor" href="#events-and-observers"></a>14.4. イベントとオブザーバー</h3>
+<div class="paragraph">
+<p>Beanは、完全に分離された方法で相互作用するために、イベントを生成したり消費したりすることもできます。任意の Java オブジェクトをイベントのペイロードとして使用できます。オプションの修飾子は、トピックセレクタとして機能します。</p>
+</div>
+<div class="listingblock">
+<div class="title">シンプルなイベントの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class TaskCompleted {
+  // ...
+}
+
+@ApplicationScoped
+class ComplicatedService {
+
+   @Inject
+   Event&lt;TaskCompleted&gt; event; <i class="conum" data-value="1"></i><b>(1)</b>
+
+   void doSomething() {
+      // ...
+      event.fire(new TaskCompleted()); <i class="conum" data-value="2"></i><b>(2)</b>
+   }
+
+}
+
+@ApplicationScoped
+class Logger {
+
+   void onTaskCompleted(@Observes TaskCompleted task) { <i class="conum" data-value="3"></i><b>(3)</b>
+      // ...log the task
+   }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>jakarta.enterprise.event.Event</code> は、イベントの発行に使われています。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>イベントを同期的に発生させます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>このメソッドは、 <code>TaskCompleted</code>  イベントが発生したときに通知されます。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+イベント/オブザーバーの詳細については、 <a href="https://docs.jboss.org/weld/reference/latest/en-US/html/events.html" target="_blank" rel="noopener">Weld docsを</a>をご覧ください。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="conclusion"><a class="anchor" href="#conclusion"></a>15. まとめ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、 <a href="https://jakarta.ee/specifications/cdi/4.0/jakarta-cdi-spec-4.0.html">Jakarta Contexts and Dependency Injection 4.0</a> 仕様に基づくQuarkusプログラミングモデルの基本的なトピックについて説明しました。
+QuarkusはCDI Lite仕様を実装していますが、CDI Full仕様は実装していません。 
+<a href="cdi-reference#supported_features">サポートされる機能のリスト</a> と <a href="cdi-reference#limitations">制限事項のリスト</a> も参照してください。また、 <a href="cdi-reference#nonstandard_features">非標準の機能</a> や <a href="cdi-reference#build_time_apis">Quarkus固有のAPI</a> も多数あります。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Quarkus固有の機能や制限について詳しく知りたい場合は、Quarkus <a href="cdi-reference">CDIリファレンスガイド</a> があります。また、より複雑なトピックに精通するために、 <a href="https://jakarta.ee/specifications/cdi/4.0/jakarta-cdi-spec-4.0.html">CDI仕様書</a> や <a href="https://docs.jboss.org/weld/reference/latest/en-US/html/">Weldドキュメント</a> （WeldはCDIリファレンス実装です）を読むことをお勧めします。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#ok-lets-start-simple-what-is-a-bean">1. OK、簡単なことから始めましょう。Beanとは何でしょうか?</a></li>
+<li><a href="#wait-a-minute-what-does-container-managed-mean">2. ちょっと待ってください。「コンテナーで管理された」とはどういう意味ですか?</a></li>
+<li><a href="#what-is-it-good-for">3. 何に使うと適切ですか?</a></li>
+<li><a href="#what-does-a-bean-look-like">4. Beanはどんな形をしているのでしょうか?</a></li>
+<li><a href="#typesafe_resolution">5. いいですね。依存関係の解決方法はどのように動作しますか?名前も識別子も見当たりません。</a></li>
+<li><a href="#hm-wait-a-minute-what-happens-if-multiple-beans-declare-the-same-type">6. ふむ、ちょっと待ってください。複数のBeanが同じ型を宣言した場合はどうなるのでしょうか?</a></li>
+<li><a href="#can-i-use-setter-and-constructor-injection">7. セッターやコンストラクタのインジェクションは使えますか?</a></li>
+<li><a href="#you-talked-about-some-qualifiers">8. 修飾子の話をしましたか?</a></li>
+<li><a href="#bean-scope">9. 良いですね。Beanスコープとは何ですか?</a></li>
+<li><a href="#bean-scope-available">10. 実際にQuarkusアプリケーションで使用できるスコープは何ですか?</a></li>
+<li><a href="#applicationscoped-and-singleton-look-very-similar-which-one-should-i-choose-for-my-quarkus-application">11. <code>@ApplicationScoped</code> と <code>@Singleton</code> は非常に似ているように見えます。Quarkusアプリケーションにはどれを選べばいいのでしょうか?</a></li>
+<li><a href="#client_proxies">12. クライアントプロキシーの概念が理解できません。</a></li>
+<li><a href="#ok-you-said-that-there-are-several-kinds-of-beans">13. そうですか。Beanは何種類かあるんですよね?</a></li>
+<li><a href="#ok-injection-looks-cool-what-other-services-are-provided">14. OK、インジェクションは便利ですね。他にはどんなサービスが提供されていますか?</a>
+<ul class="sectlevel2">
+<li><a href="#lifecycle-callbacks">14.1. ライフサイクルコールバック</a></li>
+<li><a href="#interceptors">14.2. インターセプター</a></li>
+<li><a href="#decorators">14.3. デコレーター</a></li>
+<li><a href="#events-and-observers">14.4. イベントとオブザーバー</a></li>
+</ul>
+</li>
+<li><a href="#conclusion">15. まとめ</a></li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

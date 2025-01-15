@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Quarkus 2.10.0.Final リリース - Loomの仮想スレッドの準備作業と様々な改良をあちこちに施しました。 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/blog/quarkus-2-10-0-final-released/" />
+  <meta property="og:title" content="Quarkus 2.10.0.Final リリース - Loomの仮想スレッドの準備作業と様々な改良をあちこちに施しました。" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/blog/quarkus-2-10-0-final-released/">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="post">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/blog/quarkus-2-10-0-final-released/">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="active">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/blog/quarkus-2-10-0-final-released/" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/blog/quarkus-2-10-0-final-released/">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/blog/quarkus-2-10-0-final-released/">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/blog/quarkus-2-10-0-final-released/">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/blog/quarkus-2-10-0-final-released/">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    <div class="full-width-breadcrumb-bg align-self">
+  <div class="width-12-12">
+      <p class="returnlink"><a href="/blog">Blog</a> <i class="fas fa-chevron-right"></i> Quarkus 2.10.0.Final リリース - Loomの仮想スレッドの準備作業と様々な改良をあちこちに施しました。</p>
+  </div>
+</div>
+
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+    <div class="grid-wrapper">
+      <div class="width-12-12">
+        <div class="post-date">
+          June 22, 2022 
+          
+            <span class="tags"><a href="/blog/tag/release">#release</a></span>
+          
+        </div>
+        <h1 class="post-title">Quarkus 2.10.0.Final リリース - Loomの仮想スレッドの準備作業と様々な改良をあちこちに施しました。</h1>
+        <div class="grid-wrapper">
+          <div class="width-8-12 width-12-12-m byline-wrapper">
+            
+            
+              <img class="headshot" src="https://www.gravatar.com/avatar/ec96387a1a8295b6fd6dffb68f80c352">
+            
+            <p class="byline">By <a href="/author/gsmet">Guillaume Smet</a></p>
+          </div>
+          <div class="width-12-12">
+              <div class="paragraph">
+<p>新しい月、新しいQuarkusの機能リリース、ご存知でしょう。Quarkus 2.10.0.Finalがリリースされました。</p>
+</div>
+<div class="paragraph">
+<p>このバージョンは、探索的な作業と既存のエクステンションに対する改良が混在しています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Loomの仮想スレッドに関する準備作業</p>
+</li>
+<li>
+<p>GraphQLのノンブロッキング対応</p>
+</li>
+<li>
+<p>Reactive SQL ClientsのKubernetesサービスバインディングのサポート</p>
+</li>
+<li>
+<p>キャッシュエクステンション用 <code>CacheKeyGenerator</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>他多数!</p>
+</div>
+<div class="sect1">
+<h2 id="migration-guide"><a class="anchor" href="#migration-guide"></a>移行ガイド</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>2.9からの移行は、 <a href="https://github.com/quarkusio/quarkus/wiki/Migration-Guide-2.10">移行ガイド</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="whats-new"><a class="anchor" href="#whats-new"></a>変更点</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="preliminary-work-on-looms-virtual-threads"><a class="anchor" href="#preliminary-work-on-looms-virtual-threads"></a>Loomの仮想スレッドに関する準備作業</h3>
+<div class="paragraph">
+<p>QuarkusチームはLoomの仮想スレッドの実験を開始し、 <a href="https://github.com/quarkusio/quarkus/pull/24942">最初のプルリクエスト</a> がマージされました。</p>
+</div>
+<div class="paragraph">
+<p>まだまだ荒削りで、APIも変更される可能性がありますが、Loomの仮想スレッドに興味を持たれた方は、お気軽に試してみてください。</p>
+</div>
+<div class="paragraph">
+<p>今後の展開と発表にご期待ください。</p>
+</div>
+<div class="paragraph">
+<p>この取り組みについて詳しく知りたい方は、 <a href="https://developers.redhat.com/devnation/tech-talks/integrate-loom-quarkus">クレマンとアーサーの講演動画</a> をご覧ください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="graphql-non-blocking-support"><a class="anchor" href="#graphql-non-blocking-support"></a>GraphQLのノンブロッキング対応</h3>
+<div class="paragraph">
+<p>Quarkusは、命令型とリアクティブ型の両方のプログラムパラダイムを提供しており、その両方が全面的に公開されるように努力しています。</p>
+</div>
+<div class="paragraph">
+<p>GraphQL エクステンションがノンブロッキングワークロードをサポートするようになりました。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="smallrye-reactive-messaging-upgrade"><a class="anchor" href="#smallrye-reactive-messaging-upgrade"></a>SmallRye Reactive Messagingのアップグレード</h3>
+<div class="paragraph">
+<p>SmallRye Reactive Messagingが3.16.0にアップグレードされました。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="kubernetes-service-binding-support-for-reactive-sql-clients"><a class="anchor" href="#kubernetes-service-binding-support-for-reactive-sql-clients"></a>Reactive SQL ClientsのKubernetesサービスバインディングのサポート</h3>
+<div class="paragraph">
+<p>Reactive SQL Clients エクステンションの Kubernetes サービスバインディングのサポートを追加しました。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cachekeygenerator-for-cache-extension"><a class="anchor" href="#cachekeygenerator-for-cache-extension"></a>キャッシュエクステンションのためのCacheKeyGenerator</h3>
+<div class="paragraph">
+<p><code>quarkus-cache</code> エクステンションは、キャッシュキーをカスタマイズする方法なしに、メソッドパラメータから自動的にキャッシュキーを生成していました。</p>
+</div>
+<div class="paragraph">
+<p>このカスタマイズを可能にするために、2.10で新しいコントラクト <code>CacheKeyGenerator</code> が導入されました。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="quarkus-bootstrap-maven-plugin-deprecated-in-favor-of-quarkus-extension-maven-plugin"><a class="anchor" href="#quarkus-bootstrap-maven-plugin-deprecated-in-favor-of-quarkus-extension-maven-plugin"></a>quarkus-bootstrap-maven-pluginは非推奨となり、quarkus-extension-maven-pluginが使用されるようになりました。</h3>
+<div class="paragraph">
+<p><code>quarkus-bootstrap-maven-plugin</code> は非推奨となり、 <code>quarkus-extension-maven-plugin</code> が採用されました。</p>
+</div>
+<div class="paragraph">
+<p>これは、エクステンションの開発者にのみ影響があり、新しいプラグインに切り替えていただく必要があります。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>非推奨のプラグインはしばらく公開し続けますので、新しいプラグインへの移行を急がないでください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="better-infrastructure-for-jdbc-driver-extensions"><a class="anchor" href="#better-infrastructure-for-jdbc-driver-extensions"></a>JDBCドライバエクステンションのためのより良いインフラ</h3>
+<div class="paragraph">
+<p>あるコントリビューターが SQLite 用の JDBC ドライバエクステンションに取り組み始め、私たちは外部の JDBC ドライバエクステンションのためのインフラを改善しました。</p>
+</div>
+<div class="paragraph">
+<p>最も注目すべきは、外部JDBCドライバエクステンションの場合でも、デフォルトで使用するHibernate ORM dialect を指定できるようになったことです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="quiltflower-decompiler-support"><a class="anchor" href="#quiltflower-decompiler-support"></a>Quiltflowerデコンパイラのサポート</h3>
+<div class="paragraph">
+<p>Quarkusのエクステンションを作成する場合、生成されたソースコードを逆コンパイルすると、何が起こっているかをよりよく理解できることがよくあります。</p>
+</div>
+<div class="paragraph">
+<p>今まではFernflowerを使っていましたが、より良い出力が得られるQuiltflowerに切り替えました。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="new-guides"><a class="anchor" href="#new-guides"></a>新しいガイド</h3>
+<div class="paragraph">
+<p>新しいガイドをいくつか追加しました。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="/guides/stork-kubernetes">KubernetesでStorkを使用する</a></p>
+</li>
+<li>
+<p><a href="/guides/security-openid-connect-client-reference">OpenId Connect クライアント リファレンスガイド</a></p>
+</li>
+<li>
+<p><a href="/guides/podman">PodmanとQuarkusの併用</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="full-changelog"><a class="anchor" href="#full-changelog"></a>完全な変更履歴</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://github.com/quarkusio/quarkus/releases/tag/2.10.0.Final">2.10.0.Final の完全な変更履歴は、GitHub</a> で入手できます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="contributors"><a class="anchor" href="#contributors"></a>コントリビューター</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusコミュニティは成長を続けており、現在 <a href="https://github.com/quarkusio/quarkus/graphs/contributors">656名のコントリビューター</a> がいます。それぞれの方に感謝します。</p>
+</div>
+<div class="paragraph">
+<p>特に2.10 リリースに関しては次の方に感謝致します: Alexey Loubyansky, Alexey Sharandin, Amos Feng, andreaTP, Andy Damevin, Anthony Dahanne, Anton Kozlov, aona42, arnavarr, Auri Munoz, Bill Burke, Clara Fang, Clement Escoffier, Davide, Eddú Meléndez, Emanuel Alves, Eric Deandrea, Erik Åsén, Erin Schnabel, Fabricio Gregorio, Falko Modler, Fedor Dudinskiy, Felipe Henrique Gross Windmoller, Foivos Zakkak, franz1981, Geoffrey De Smet, George Gastaldi, Georgios Andrianakis, Greg Stewart, Guillaume Le Floch, Guillaume Smet, Gwenneg Lepage, Holly Cummins, Ioannis Canellos, Jacob Skillin, Jakob, James Netherton, Jan Martiška, Jason T. Greene, Jay, jeanphibaconnais, Jeff MAURY, Joel Mateus, Jose, Julien Gracia, Julien Ponge, Katia Aresti, kdnakt, Kevin Wooten, kioichiyoda, Knut Wannheden, Ladislav Thon, Loïc Hermann, Loïc Mathieu, luneo7, lyoff, Manyanda Chitimbo, Marc Wrobel, Marcin Kłopotek, Martin Kouba, Martin Panzer, Matej Vasek, Matthias Andreas Benkard, Max Rydahl Andersen, Michael Anstis, Michal Karm Babacek, Michal Vavřík, Michał Szynkiewicz, Mihai.Poenaru, mun711, Nathan Erwin, Neil Moffat, newur, Oleksiy Lukin, Ozan Gunalp, Pedro Igor, Peter Palaga, Phillip Krüger, Primož Hrovat, Robert Stupp, Roberto Cortez, Romain QUINIO, Rostislav Svoboda, Sanal Kumar, Sanne Grinovero, Sergey Beryozkin, Steve Ebersole, Stuart Douglas, Stéphane Épardaud, Thomas Segismont, Vinícius Ferraz Campos Florentino, Willem Jan Glerum, Wim Goeman, xstefank, Yoann Rodière and Yoshikazu Nojima。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="come-join-us"><a class="anchor" href="#come-join-us"></a>参加のお誘い</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>私達は皆様からのフィードバックに重きを置いています。バグ報告、改善要望を是非お願いします。一緒に素晴らしいものを作り上げていきましょう!</p>
+</div>
+<div class="paragraph">
+<p>Quarkusユーザーの場合でも、単に興味を持っているだけの場合でも、恥ずかしがらずにコミュニティに参加して下さい!:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/quarkusio/quarkus/issues">GitHub</a> でフィードバック</p>
+</li>
+<li>
+<p>コードを作成し、 <a href="https://github.com/quarkusio/quarkus/pulls">プルリクエスト</a> を送信</p>
+</li>
+<li>
+<p><a href="https://quarkusio.zulipchat.com/">Zulip</a> や <a href="https://groups.google.com/d/forum/quarkus-dev">メーリングリスト</a> でディスカッションに参加</p>
+</li>
+<li>
+<p><a href="https://stackoverflow.com/questions/tagged/quarkus">Stack Overflow</a> で質問</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+              
+          </div>
+          <div class="width-12-12"><div class="share-page">
+  <a class="share-linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=https://quarkus.io/blog/quarkus-2-10-0-final-released/&title=Quarkus 2.10.0.Final リリース - Loomの仮想スレッドの準備作業と様々な改良をあちこちに施しました。" rel="nofollow" target="_blank" title="Share on LinkedIn">
+    <i class="fa-brands fa-linkedin fa-xl"></i>
+  </a>
+  <a class="share-x" href="https://x.com/intent/tweet?text=Quarkus 2.10.0.Final リリース - Loomの仮想スレッドの準備作業と様々な改良をあちこちに施しました。&url=https://quarkus.io/blog/quarkus-2-10-0-final-released/&via=quarkusio&related=quarkusio" rel="nofollow" target="_blank" title="Share on X">
+    <i class="fa-brands fa-square-x-twitter fa-xl"></i>
+  </a>
+  <a class="share-facebook" href="https://facebook.com/sharer.php?u=https://quarkus.io/blog/quarkus-2-10-0-final-released/" rel="nofollow" target="_blank" title="Share on Facebook">
+    <i class="fa-brands fa-square-facebook fa-xl"></i>
+  </a>
+  <a class="share-reddit" href="http://www.reddit.com/submit?url=https://quarkus.io/blog/quarkus-2-10-0-final-released/" onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;" title="Share on Reddit" >
+    <i class="fa-brands fa-square-reddit fa-xl"></i>
+  </a>
+  <a class="share-email" href="mailto:?subject=Quarkus 2.10.0.Final リリース - Loomの仮想スレッドの準備作業と様々な改良をあちこちに施しました。&amp;body=Quarkus 2.10.0.Final リリース - Loomの仮想スレッドの準備作業と様々な改良をあちこちに施しました。 https://quarkus.io/blog/quarkus-2-10-0-final-released/" title="Share via Email" >
+    <i class="fa-solid fa-envelope fa-xl"></i>
+  </a>
+</div>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+  <script src="https://giscus.app/client.js"
+        data-repo="quarkusio/quarkus"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkxMzk5MTQ5MzI="
+        data-category="Quarkus Blog/Website"
+        data-category-id="DIC_kwDOCFbutM4CAFFV"
+        data-mapping="og:title"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+  </script>
+  </div>
+</div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

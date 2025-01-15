@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>SmallRyeのフォールト・トレランス - 3.8 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.8/guides/smallrye-fault-tolerance" />
+  <meta property="og:title" content="SmallRyeのフォールト・トレランス - 3.8" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/smallrye-fault-tolerance">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.8/guides/smallrye-fault-tolerance">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.8/guides/smallrye-fault-tolerance" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.8/guides/smallrye-fault-tolerance">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.8/guides/smallrye-fault-tolerance">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.8/guides/smallrye-fault-tolerance">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.8/guides/smallrye-fault-tolerance">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.8/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" selected>3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">SmallRyeのフォールト・トレランス </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>マイクロサービスの分散した性質がもたらす課題の1つは、外部システムとの通信が本質的に信頼できないことです。これにより、アプリケーションの耐障害性に対する要求が高まります。より耐障害性の高いアプリケーションを簡単に作るために、Quarkusは <a href="https://github.com/eclipse/microprofile-fault-tolerance/">MicroProfile Fault Tolerance</a>仕様の実装である <a href="https://github.com/smallrye/smallrye-fault-tolerance/">SmallRye Fault Tolerance</a>を提供します。</p>
+</div>
+<div class="paragraph">
+<p>このガイドでは、 <code>@Timeout</code> , <code>@Fallback</code> , <code>@Retry</code> および <code>@CircuitBreaker</code> などの MicroProfile Fault Tolerance アノテーションの使用法を説明します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>約15分</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 17+がインストールされ、 <code>JAVA_HOME</code> が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.9.6</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルをビルドしたい場合、MandrelまたはGraalVM（あるいはネイティブなコンテナビルドを使用する場合はDocker）をインストールし、 <a href="building-native-image.html#configuring-graalvm">適切に設定</a>していること</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-scenario"><a class="anchor" href="#the-scenario"></a>シナリオ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドで構築されたアプリケーションは、グルメコーヒーのeショップのためのシンプルなバックエンドをシミュレートします。これは、店舗にあるコーヒーサンプルに関する情報を提供する REST エンドポイントを実装しています。</p>
+</div>
+<div class="paragraph">
+<p>そのような実装はされていませんが、エンドポイントのいくつかのメソッドが、データベースや外部のマイクロサービスなどの外部サービスとの通信を必要とし、信頼性の低い要素を導入することを想像してみましょう。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution"><a class="anchor" href="#solution"></a>ソリューション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次の章で紹介する手順に沿って、ステップを踏んでアプリを作成することをお勧めします。ただし、完成した例にそのまま進んでも構いません。</p>
+</div>
+<div class="paragraph">
+<p>Gitレポジトリをクローンするか <code>git clone -b 3.8 <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code> 、 <a href="https://github.com/quarkusio/quarkus-quickstarts/archive/3.8.zip">アーカイブ</a> をダウンロードします。</p>
+</div>
+<div class="paragraph">
+<p>ソリューションは <code>microprofile-fault-tolerance-quickstart</code> <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/3.8/microprofile-fault-tolerance-quickstart">ディレクトリ</a> にあります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-maven-project"><a class="anchor" href="#creating-the-maven-project"></a>Mavenプロジェクトの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、新しいプロジェクトが必要です。以下のコマンドで新規プロジェクトを作成します。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:microprofile-fault-tolerance-quickstart \
+    --extension='smallrye-fault-tolerance,resteasy-reactive-jackson' \
+    --no-code
+cd microprofile-fault-tolerance-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:3.8.6:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=microprofile-fault-tolerance-quickstart \
+    -Dextensions='smallrye-fault-tolerance,resteasy-reactive-jackson' \
+    -DnoCode
+cd microprofile-fault-tolerance-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Windowsユーザーの場合:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>cmdを使用する場合、（バックスラッシュ <code>\</code> を使用せず、すべてを同じ行に書かないでください）。</p>
+</li>
+<li>
+<p>Powershellを使用する場合は、 <code>-D</code> パラメータを二重引用符で囲んでください。例: <code>"-DprojectArtifactId=microprofile-fault-tolerance-quickstart"</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>このコマンドは、プロジェクトを生成して、RESTEasy Reactive/Jakarta RESTとSmallRye Fault Toleranceのエクステンションをインポートします。</p>
+</div>
+<div class="paragraph">
+<p>すでにQuarkusプロジェクトが設定されている場合は、プロジェクトのベースディレクトリーで以下のコマンドを実行することで、プロジェクトに <code>smallrye-fault-tolerance</code> エクステンションを追加することができます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus extension add smallrye-fault-tolerance</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:add-extension -Dextensions='smallrye-fault-tolerance'</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew addExtension --extensions='smallrye-fault-tolerance'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、以下がビルドファイルに追加されます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-smallrye-fault-tolerance&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-smallrye-fault-tolerance")</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="preparing-an-application-rest-endpoint-and-cdi-bean"><a class="anchor" href="#preparing-an-application-rest-endpoint-and-cdi-bean"></a>アプリケーションの準備: RESTエンドポイントとCDIビーン</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このセクションでは、後でフォールトトレランス機能を追加できるよう、拡張可能なようにアプリケーションの骨組を作成します。</p>
+</div>
+<div class="paragraph">
+<p>まず、お店のコーヒーのサンプルを表すシンプルなエンティティを作成します。 :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.microprofile.faulttolerance;
+
+public class Coffee {
+
+    public Integer id;
+    public String name;
+    public String countryOfOrigin;
+    public Integer price;
+
+    public Coffee() {
+    }
+
+    public Coffee(Integer id, String name, String countryOfOrigin, Integer price) {
+        this.id = id;
+        this.name = name;
+        this.countryOfOrigin = countryOfOrigin;
+        this.price = price;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>続いて、コーヒーのサンプルのrepositoryとして動作するシンプルなCDIビーンです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.microprofile.faulttolerance;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import jakarta.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+public class CoffeeRepositoryService {
+
+    private Map&lt;Integer, Coffee&gt; coffeeList = new HashMap&lt;&gt;();
+
+    public CoffeeRepositoryService() {
+        coffeeList.put(1, new Coffee(1, "Fernandez Espresso", "Colombia", 23));
+        coffeeList.put(2, new Coffee(2, "La Scala Whole Beans", "Bolivia", 18));
+        coffeeList.put(3, new Coffee(3, "Dak Lak Filter", "Vietnam", 25));
+    }
+
+    public List&lt;Coffee&gt; getAllCoffees() {
+        return new ArrayList&lt;&gt;(coffeeList.values());
+    }
+
+    public Coffee getCoffeeById(Integer id) {
+        return coffeeList.get(id);
+    }
+
+    public List&lt;Coffee&gt; getRecommendations(Integer id) {
+        if (id == null) {
+            return Collections.emptyList();
+        }
+        return coffeeList.values().stream()
+                .filter(coffee -&gt; !id.equals(coffee.id))
+                .limit(2)
+                .collect(Collectors.toList());
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>最後に、 <code>org.acme.microprofile.faulttolerance.CoffeeResource</code> クラスを以下のように作成します。 :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.microprofile.faulttolerance;
+
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+import org.jboss.logging.Logger;
+
+@Path("/coffee")
+public class CoffeeResource {
+
+    private static final Logger LOGGER = Logger.getLogger(CoffeeResource.class);
+
+    @Inject
+    CoffeeRepositoryService coffeeRepository;
+
+    private AtomicLong counter = new AtomicLong(0);
+
+    @GET
+    public List&lt;Coffee&gt; coffees() {
+        final Long invocationNumber = counter.getAndIncrement();
+
+        maybeFail(String.format("CoffeeResource#coffees() invocation #%d failed", invocationNumber));
+
+        LOGGER.infof("CoffeeResource#coffees() invocation #%d returning successfully", invocationNumber);
+        return coffeeRepository.getAllCoffees();
+    }
+
+    private void maybeFail(String failureLogMessage) {
+        if (new Random().nextBoolean()) {
+            LOGGER.error(failureLogMessage);
+            throw new RuntimeException("Resource failure.");
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この時点で、コーヒーサンプルのリストを JSON 形式で表示する単一の REST メソッドを公開しています。 <code>CoffeeResource#maybeFail()</code> メソッドにいくつかの障害を発生させるコードを導入したことに注意してください。これにより、リクエストの約 50 % で <code>CoffeeResource#coffees()</code> エンドポイントメソッドに障害が発生します。</p>
+</div>
+<div class="paragraph">
+<p>アプリケーションが動作することを確認してみましょう。次のようにQuarkusの開発サーバーを起動してください。 :</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code><a href="http://localhost:8080/coffee" class="bare">http://localhost:8080/coffee</a></code> をブラウザで開きます。いくつかのリクエストを行います（いくつかのリクエストは失敗することを想定しています）。少なくともいくつかのリクエストは、コーヒーサンプルのリストをJSONで表示してくれるはずです。残りのリクエストは、  <code>CoffeeResource#maybeFail()</code> 内で <code>RuntimeException</code> をスローして失敗します。</p>
+</div>
+<div class="paragraph">
+<p>おめでとうございます！（多少、信頼性に欠けるものの）Quarkusアプリケーションが完成しました！</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="adding-resiliency-retries"><a class="anchor" href="#adding-resiliency-retries"></a>レジリエンスの追加: リトライ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusの開発サーバーを稼働させ、IDEで以下のように <code>CoffeeResource#coffees()</code> メソッドに <code>@Retry</code> アノテーションを追加し、ファイルを保存します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.faulttolerance.Retry;
+...
+
+public class CoffeeResource {
+    ...
+    @GET
+    @Retry(maxRetries = 4)
+    public List&lt;Coffee&gt; coffees() {
+        ...
+    }
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ブラウザの更新を実行します。Quarkusの開発サーバーが自動的に変更を検出してアプリを再コンパイルしてくれるので、再起動する必要はありません。</p>
+</div>
+<div class="paragraph">
+<p>もう何度か更新ボタンを押してください。実質的にすべてのリクエストが成功しているはずです。 <code>CoffeeResource#coffees()</code> メソッドは、実際にはまだ約 50% の時間で失敗していますが、そのたびにプラットフォームは自動的に呼び出しを再試行します!</p>
+</div>
+<div class="paragraph">
+<p>障害がまだ発生していることを確認するには、開発サーバーの出力をチェックします。ログメッセージは以下のようになっているはずです。 :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">2019-03-06 12:17:41,725 INFO  [org.acm.fau.CoffeeResource] (XNIO-1 task-1) CoffeeResource#coffees() invocation #5 returning successfully
+2019-03-06 12:17:44,187 INFO  [org.acm.fau.CoffeeResource] (XNIO-1 task-1) CoffeeResource#coffees() invocation #6 returning successfully
+2019-03-06 12:17:45,166 ERROR [org.acm.fau.CoffeeResource] (XNIO-1 task-1) CoffeeResource#coffees() invocation #7 failed
+2019-03-06 12:17:45,172 ERROR [org.acm.fau.CoffeeResource] (XNIO-1 task-1) CoffeeResource#coffees() invocation #8 failed
+2019-03-06 12:17:45,176 INFO  [org.acm.fau.CoffeeResource] (XNIO-1 task-1) CoffeeResource#coffees() invocation #9 returning successfully</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>呼び出しが失敗するたびに、すぐに別の呼び出しが成功するまで続いていることがわかります。4回のリトライを許可しているので、ユーザーが実際に失敗にさらされるためには、5回の呼び出しが連続して失敗する必要があります。これは起こりそうもないことです。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="adding-resiliency-timeouts"><a class="anchor" href="#adding-resiliency-timeouts"></a>レジリエンスの追加: タイムアウト</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>では、MicroProfile Fault Toleranceには他に何があるのでしょうか。タイムアウトについて見てみましょう。</p>
+</div>
+<div class="paragraph">
+<p><code>CoffeeResource</code> エンドポイントに以下の 2 つのメソッドを追加します。ここでもサーバーを再起動する必要はなく、コードを貼り付けてファイルを保存するだけです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.faulttolerance.Timeout;
+...
+public class CoffeeResource {
+    ...
+    @GET
+    @Path("/{id}/recommendations")
+    @Timeout(250)
+    public List&lt;Coffee&gt; recommendations(int id) {
+        long started = System.currentTimeMillis();
+        final long invocationNumber = counter.getAndIncrement();
+
+        try {
+            randomDelay();
+            LOGGER.infof("CoffeeResource#recommendations() invocation #%d returning successfully", invocationNumber);
+            return coffeeRepository.getRecommendations(id);
+        } catch (InterruptedException e) {
+            LOGGER.errorf("CoffeeResource#recommendations() invocation #%d timed out after %d ms",
+                    invocationNumber, System.currentTimeMillis() - started);
+            return null;
+        }
+    }
+
+    private void randomDelay() throws InterruptedException {
+        Thread.sleep(new Random().nextInt(500));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>いくつかの新しい機能を追加しました。ユーザーが現在見ているコーヒーに基づいて、関連するコーヒーをお勧めできるようにしたいのです。これは重要な機能ではなく、あれば望ましい機能です。システムに負荷がかかり、おすすめ情報を得るためのロジックの実行に時間がかかりすぎる場合は、むしろタイムアウトしておすすめ情報のないUIを表示したいと考えています。</p>
+</div>
+<div class="paragraph">
+<p>なお、タイムアウトは250msに設定し、0～500msのランダムな人工的な遅延が <code>CoffeeResource#recommendations()</code> メソッドに導入されたことに注意してください。</p>
+</div>
+<div class="paragraph">
+<p>お使いのブラウザで <code><a href="http://localhost:8080/coffee/2/recommendations" class="bare">http://localhost:8080/coffee/2/recommendations</a></code> にアクセスして、2、3回更新してください。</p>
+</div>
+<div class="paragraph">
+<p><code>org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException</code> でいくつかのリクエストがタイムアウトになるはずです。タイムアウトにならなかったリクエストでは、JSONに2つのおすすめコーヒーサンプルが表示されます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="adding-resiliency-fallbacks"><a class="anchor" href="#adding-resiliency-fallbacks"></a>レジリエンスの追加: フォールバック</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>関連するコーヒーを入手するための代替手段（おそらくより迅速な方法）を提供することで、おすすめ機能をさらに改善しましょう。</p>
+</div>
+<div class="paragraph">
+<p><code>CoffeeResource</code> にフォールバック・メソッドを、 <code>CoffeeResource#recommendations()</code> メソッドに <code>@Fallback</code> アノテーションを以下のように追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.util.Collections;
+import org.eclipse.microprofile.faulttolerance.Fallback;
+
+...
+public class CoffeeResource {
+    ...
+    @Fallback(fallbackMethod = "fallbackRecommendations")
+    public List&lt;Coffee&gt; recommendations(int id) {
+        ...
+    }
+
+    public List&lt;Coffee&gt; fallbackRecommendations(int id) {
+        LOGGER.info("Falling back to RecommendationResource#fallbackRecommendations()");
+        // safe bet, return something that everybody likes
+        return Collections.singletonList(coffeeRepository.getCoffeeById(1));
+    }
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code><a href="http://localhost:8080/coffee/2/recommendations" class="bare">http://localhost:8080/coffee/2/recommendations</a></code> を何回も更新してください。 <code>TimeoutException</code> はもう表示されないはずです。代わりに、タイムアウトが発生した場合、元のメソッドが返す2つのレコメンデーションではなく、フォールバックメソッド <code>fallbackRecommendations()</code> にハードコードされた1つのレコメンデーションが表示されます。</p>
+</div>
+<div class="paragraph">
+<p>フォールバックが本当に行われているかどうか、サーバーの出力を確認してください。 :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">2020-01-09 13:21:34,250 INFO  [org.acm.fau.CoffeeResource] (executor-thread-1) CoffeeResource#recommendations() invocation #1 returning successfully
+2020-01-09 13:21:36,354 ERROR [org.acm.fau.CoffeeResource] (executor-thread-1) CoffeeResource#recommendations() invocation #2 timed out after 250 ms
+2020-01-09 13:21:36,355 INFO  [org.acm.fau.CoffeeResource] (executor-thread-1) Falling back to RecommendationResource#fallbackRecommendations()</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+フォールバックメソッドには、元のメソッドと同じパラメータが必要です。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="adding-resiliency-circuit-breaker"><a class="anchor" href="#adding-resiliency-circuit-breaker"></a>レジリエンスの追加: サーキットブレーカー</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>サーキットブレーカーは，システムの一部が一時的に不安定になったときに，システム内で発生する障害の数を制限するのに有効です。サーキットブレーカーは、あるメソッドの成功と失敗を記録し、失敗したメソッドの割合が指定された閾値に達すると、サーキットブレーカーが <em>開き</em>、それ以降のメソッドの呼び出しを一定時間ブロックします。</p>
+</div>
+<div class="paragraph">
+<p>次のコードを <code>CoffeeRepositoryService</code> ビーンに追加して、サーキットブレーカーの動作をデモできるようにします。 :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.util.concurrent.atomic.AtomicLong;
+import org.eclipse.microprofile.faulttolerance.CircuitBreaker;
+...
+
+public class CoffeeRepositoryService {
+    ...
+
+    private AtomicLong counter = new AtomicLong(0);
+
+    @CircuitBreaker(requestVolumeThreshold = 4)
+    public Integer getAvailability(Coffee coffee) {
+        maybeFail();
+        return new Random().nextInt(30);
+    }
+
+    private void maybeFail() {
+        // introduce some artificial failures
+        final Long invocationNumber = counter.getAndIncrement();
+        if (invocationNumber % 4 &gt; 1) { // alternate 2 successful and 2 failing invocations
+            throw new RuntimeException("Service failed.");
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、以下のコードを <code>CoffeeResource</code> のエンドポイントに注入します。 :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class CoffeeResource {
+    ...
+    @Path("/{id}/availability")
+    @GET
+    public Response availability(int id) {
+        final Long invocationNumber = counter.getAndIncrement();
+
+        Coffee coffee = coffeeRepository.getCoffeeById(id);
+        // check that coffee with given id exists, return 404 if not
+        if (coffee == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        try {
+            Integer availability = coffeeRepository.getAvailability(coffee);
+            LOGGER.infof("CoffeeResource#availability() invocation #%d returning successfully", invocationNumber);
+            return Response.ok(availability).build();
+        } catch (RuntimeException e) {
+            String message = e.getClass().getSimpleName() + ": " + e.getMessage();
+            LOGGER.errorf("CoffeeResource#availability() invocation #%d failed: %s", invocationNumber, message);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(message)
+                    .type(MediaType.TEXT_PLAIN_TYPE)
+                    .build();
+        }
+    }
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>もう一つの機能を追加しました。このアプリケーションは、私たちの店における、指定されたコーヒーの残りのパッケージの量を返すことができます（単なる乱数です）。</p>
+</div>
+<div class="paragraph">
+<p>今回は、CDIビーンに人工的な失敗を導入しました。 <code>CoffeeRepositoryService#getAvailability()</code> メソッドは、2回の成功と2回の失敗の呼び出しを交互に行うことになります。</p>
+</div>
+<div class="paragraph">
+<p>また、<code>@CircuitBreaker`アノテーションを追加し、`requestVolumeThreshold = 4`としました。`CircuitBreaker.failureRatio</code> はデフォルトで 0.5 で、 <code>CircuitBreaker.delay</code> はデフォルトで 5 秒です。つまり、過去4回の起動のうち2回が失敗した場合にサーキットブレーカーが開き、5秒間その状態のままになります。</p>
+</div>
+<div class="paragraph">
+<p>これを試すには、次のようにします。 :</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>ブラウザで <code><a href="http://localhost:8080/coffee/2/availability" class="bare">http://localhost:8080/coffee/2/availability</a></code> を開いて下さい。数字が返ってくるのが見えるでしょう。</p>
+</li>
+<li>
+<p>リフレッシュすると、この2回目のリクエストが再び成功し、数字が返ってくるはずです。</p>
+</li>
+<li>
+<p>さらに2回リフレッシュします。2回とも、"RuntimeException:Service failed." というテキストが表示されます。これは、 <code>CoffeeRepositoryService#getAvailability()</code> によってスローされる例外です。</p>
+</li>
+<li>
+<p>さらに数回更新します。長く待ちすぎていなければ、再び例外が表示されるはずですが、今回は "CircuitBreakerOpenException: getAvailability" となっています。この例外は、サーキットブレーカーが開き、 <code>CoffeeRepositoryService#getAvailability()</code> メソッドが呼び出されなくなったことを示しています。</p>
+</li>
+<li>
+<p>5秒後にサーキットブレーカーが閉じて、再び2回のリクエストを成功させるようになります。</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="runtime-configuration"><a class="anchor" href="#runtime-configuration"></a>ランタイム設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>application.properties</code> ファイルの中で、実行時にアノテーションパラメータをオーバーライドすることができます。</p>
+</div>
+<div class="paragraph">
+<p>先ほどのリトライの例で言えば :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import org.eclipse.microprofile.faulttolerance.Retry;
+...
+
+public class CoffeeResource {
+    ...
+    @GET
+    @Retry(maxRetries = 4)
+    public List&lt;Coffee&gt; coffees() {
+        ...
+    }
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>以下の設定項目により、 <code>maxRetries</code> パラメータをオーバーライドして、リトライ回数を4回から6回に変更することができます。 :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">org.acme.CoffeeResource/coffees/Retry/maxRetries=6</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+フォーマットは <code>fully-qualified-class-name/method-name/annotation-name/property-name=value</code> です。また、 <code>annotation-name/property-name=value</code> を通じて、すべてのアノテーションに対するプロパティを設定することもできます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="conclusion"><a class="anchor" href="#conclusion"></a>まとめ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>SmallRye Fault Toleranceは、ビジネスロジックの複雑さに影響を与えることなく、アプリケーションの耐障害性を向上させます。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusのフォールトトレランス機能を有効にするために必要なのは次の通りです。 :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus-maven-plugin</code> で <code>smallrye-fault-tolerance</code> Quarkus エクステンションをプロジェクトに追加することです :</p>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus extension add smallrye-fault-tolerance</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:add-extension -Dextensions='smallrye-fault-tolerance'</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew addExtension --extensions='smallrye-fault-tolerance'</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>または、以下のMavenの依存関係を単純に追加することもできます。 :</p>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-smallrye-fault-tolerance&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-smallrye-fault-tolerance")</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="additional-resources"><a class="anchor" href="#additional-resources"></a>追加リソース</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>SmallRye Fault Toleranceには、ここに示した以外にも多くの機能があります。
+これらの機能については、 <a href="https://smallrye.io/docs/smallrye-fault-tolerance/6.2.6/index.html">SmallRye Fault Toleranceのドキュメント</a> を参照してください。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusでは、SmallRye Fault Toleranceのオプション機能をすぐに使用することができます。</p>
+</div>
+<div class="paragraph">
+<p>Mutinyがサポートされているので、非同期のメソッドは <code>CompletionStage</code> だけでなく <code>Uni</code> を返すことができます。</p>
+</div>
+<div class="paragraph">
+<p>MicroProfile Context PropagationはFault Toleranceと統合されているので、既存のコンテキストは自動的に非同期メソッドに伝搬されます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>これは CDI リクエストコンテキストにも当てはまります。もしオリジナルのスレッドでアクティブであれば、新しいスレッドに伝搬されますが、もしそうでなければ、新しいスレッドはそれを持ちません。 これは MicroProfile Fault Tolerance 仕様に反しており、  <code>@Asynchronous</code>  メソッド呼び出しの間はリクエストコンテキストがアクティブでなければならないとされています。</p>
+</div>
+<div class="paragraph">
+<p>MicroProfile Context Propagationがある場合、この要件は適用されるべきではないと考えています。コンテキスト伝搬の主な目的は、新しいスレッドが元のスレッドと同じコンテキストを持っていることを確認することにあります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>非互換モードはデフォルトで有効になっています。
+これは、 <code>CompletionStage</code> (または <code>Uni</code> ) を返すメソッドには、 <code>@Asynchronous</code> 、 <code>@AsynchronousNonBlocking</code> 、 <code>@Blocking</code> 、 <code>@NonBlocking</code> のアノテーションがなくても、非同期フォールトトレランスが適用されることを意味します。
+また、サーキット・ブレーカー、フォールバック、リトライは、例外そのものが何が起こるべきかを決定するのに不十分な場合、例外の原因チェーンを自動的に検査することを意味します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>このモードは、非互換性は非常に小さいものの、MicroProfile Fault Tolerance仕様と互換性がありません。 完全な互換性を回復するには、このコンフィギュレーションプロパティを追加してください。 :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">smallrye.faulttolerance.mp-compatibility=true</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Mutinyのサポートを含む <a href="https://smallrye.io/docs/smallrye-fault-tolerance/6.2.6/reference/programmatic-api.html">プログラムAPI</a> が存在し、宣言的なアノテーションベースのAPIと統合されています。 
+<code>FaultTolerance</code> および <code>MutinyFaultTolerance</code> API はすぐに使用できます。</p>
+</div>
+<div class="paragraph">
+<p>Kotlinのサポートがあるため（Kotlin用のQuarkusエクステンションを使用することが前提）、フォールトトレランスのアノテーションで <code>suspend</code> 関数を保護することができます。</p>
+</div>
+<div class="paragraph">
+<p>メトリクスは自動的に検出され、統合されます。 アプリケーションでQuarkus Extension for Micrometerを使用している場合、SmallRye Fault ToleranceからMicrometerにメトリクスが送信されます。 アプリケーションがSmallRye Metrics用のQuarkusエクステンションを使用している場合、SmallRye Fault ToleranceはMicroProfile Metricsにメトリクスを送信します。 そうでない場合は、SmallRye Fault Toleranceのメトリクスは無効になります。</p>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#the-scenario">シナリオ</a></li>
+<li><a href="#solution">ソリューション</a></li>
+<li><a href="#creating-the-maven-project">Mavenプロジェクトの作成</a></li>
+<li><a href="#preparing-an-application-rest-endpoint-and-cdi-bean">アプリケーションの準備: RESTエンドポイントとCDIビーン</a></li>
+<li><a href="#adding-resiliency-retries">レジリエンスの追加: リトライ</a></li>
+<li><a href="#adding-resiliency-timeouts">レジリエンスの追加: タイムアウト</a></li>
+<li><a href="#adding-resiliency-fallbacks">レジリエンスの追加: フォールバック</a></li>
+<li><a href="#adding-resiliency-circuit-breaker">レジリエンスの追加: サーキットブレーカー</a></li>
+<li><a href="#runtime-configuration">ランタイム設定</a></li>
+<li><a href="#conclusion">まとめ</a></li>
+<li><a href="#additional-resources">追加リソース</a></li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

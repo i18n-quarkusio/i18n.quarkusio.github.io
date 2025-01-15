@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Redisクライアントの使用 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/guides/redis" />
+  <meta property="og:title" content="Redisクライアントの使用" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/redis">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/guides/redis">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/guides/redis" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/guides/redis">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/guides/redis">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/guides/redis">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/guides/redis">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" selected>3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <a class="editlink" href="https://github.com/quarkusio/quarkus/edit/main/docs/src/main/asciidoc/redis.adoc">このページを編集</a>
+      
+      <h1 class="text-caps">Redisクライアントの使用 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、QuarkusアプリケーションがRedisクライアントエクステンションを使用してRedisサーバーに接続する方法を説明します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>この技術は、previewと考えられています。</p>
+</div>
+<div class="paragraph">
+<p><em>preview</em> では、下位互換性やエコシステムでの存在は保証されていません。具体的な改善には設定や API の変更が必要になるかもしれませんが、 <em>stable</em> になるための計画は現在進行中です。フィードバックは <a href="https://groups.google.com/d/forum/quarkus-dev">メーリングリスト</a> や <a href="https://github.com/quarkusio/quarkus/issues">GitHub の課題管理</a> で受け付けています。</p>
+</div>
+<div class="paragraph">
+<p>とりうるステータスの完全なリストについては、 <a href="https://quarkus.io/faq/#extension-status">FAQの項目</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>約15分</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 17+がインストールされ、 <code>JAVA_HOME</code> が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.9.9</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルをビルドしたい場合、MandrelまたはGraalVM（あるいはネイティブなコンテナビルドを使用する場合はDocker）をインストールし、 <a href="building-native-image.html#configuring-graalvm">適切に設定</a>していること</p>
+</li>
+<li>
+<p>Dockerが稼働している環境</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="architecture"><a class="anchor" href="#architecture"></a>アーキテクチャ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、 <a href="https://redis.io/commands/incrby"><code>INCRBY</code></a> コマンドを使用して、数値をインクリメントするシンプルな Rest API を公開します。また、 <code>GET</code> 、 <code>SET（文字列グループ）</code> 、 <code>DEL</code> 、 <code>KEYS（キーグループ）</code> のような他の Redis コマンドの使い方も見ていきましょう。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus Redisエクステンションを使用して、Redisと対話型で接続しましょう。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution"><a class="anchor" href="#solution"></a>ソリューション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次の章で紹介する手順に沿って、ステップを踏んでアプリを作成することをお勧めします。ただし、完成した例にそのまま進んでも構いません。</p>
+</div>
+<div class="paragraph">
+<p>Gitレポジトリをクローンするか <code>git clone <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code> 、 <a href="https://github.com/quarkusio/quarkus-quickstarts/archive/main.zip">アーカイブ</a> をダウンロードします。</p>
+</div>
+<div class="paragraph">
+<p>ソリューションは <code>redis-quickstart</code> <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/main/redis-quickstart">ディレクトリ</a> にあります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-maven-project"><a class="anchor" href="#creating-the-maven-project"></a>Mavenプロジェクトの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、新しいプロジェクトが必要です。以下のコマンドで新規プロジェクトを作成します:</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:redis-quickstart \
+    --extension='redis-client,rest-jackson' \
+    --no-code
+cd redis-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:3.17.6:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=redis-quickstart \
+    -Dextensions='redis-client,rest-jackson' \
+    -DnoCode
+cd redis-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Windowsユーザーの場合:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>cmdを使用する場合、（バックスラッシュ <code>\</code> を使用せず、すべてを同じ行に書かないでください）。</p>
+</li>
+<li>
+<p>Powershellを使用する場合は、 <code>-D</code> パラメータを二重引用符で囲んでください。例: <code>"-DprojectArtifactId=redis-quickstart"</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>このコマンドは、Redisエクステンションをインポートして新しいプロジェクトを生成します。</p>
+</div>
+<div class="paragraph">
+<p>すでにQuarkusプロジェクトが設定されている場合は、プロジェクトのベースディレクトリーで以下のコマンドを実行することで、プロジェクトに <code>redis-client</code> エクステンションを追加することができます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus extension add redis-client</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:add-extension -Dextensions='redis-client'</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew addExtension --extensions='redis-client'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、ビルドファイルに以下が追加されます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-redis-client&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-redis-client")</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-increment-pojo"><a class="anchor" href="#creating-the-increment-pojo"></a>インクリメントPOJOの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>Increment</code> POJO を使用してインクリメントをモデル化します。 <code>src/main/java/org/acme/redis/Increment.java</code> ファイルを作成し、以下の内容で作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.redis;
+
+public class Increment {
+    public String key; <i class="conum" data-value="1"></i><b>(1)</b>
+    public long value; <i class="conum" data-value="2"></i><b>(2)</b>
+
+    public Increment(String key, long value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    public Increment() {
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Redisキーとして使用されるキー</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Redisキーが保持する値</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-increment-service"><a class="anchor" href="#creating-the-increment-service"></a>インクリメントサービスの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Redis クライアントの役割を果たす <code>IncrementService</code> クラスを作成します。このクラスで、 <code>SET</code> 、 <code>GET</code> 、 <code>DEL</code> 、 <code>KEYS</code> 、 <code>INCRBY</code> Redis コマンドを実行できるようになります。</p>
+</div>
+<div class="paragraph">
+<p>以下の内容の <code>src/main/java/org/acme/redis/IncrementService.java</code> ファイルを作成します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.redis;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+import io.quarkus.redis.datasource.ReactiveRedisDataSource;
+import io.quarkus.redis.datasource.RedisDataSource;
+import io.quarkus.redis.datasource.keys.KeyCommands;
+import io.quarkus.redis.datasource.keys.ReactiveKeyCommands;
+import io.quarkus.redis.datasource.string.StringCommands;
+import io.smallrye.mutiny.Uni;
+
+@ApplicationScoped
+public class IncrementService {
+
+    // This quickstart demonstrates both the imperative
+    // and reactive Redis data sources
+    // Regular applications will pick one of them.
+
+    private ReactiveKeyCommands&lt;String&gt; keyCommands; <i class="conum" data-value="1"></i><b>(1)</b>
+    private ValueCommands&lt;String, Long&gt; countCommands; <i class="conum" data-value="2"></i><b>(2)</b>
+
+    public IncrementService(RedisDataSource ds, ReactiveRedisDataSource reactive) { <i class="conum" data-value="3"></i><b>(3)</b>
+        countCommands = ds.value(Long.class); <i class="conum" data-value="4"></i><b>(4)</b>
+        keyCommands = reactive.key();  <i class="conum" data-value="5"></i><b>(5)</b>
+
+    }
+
+
+    long get(String key) {
+        Long value = countCommands.get(key); <i class="conum" data-value="6"></i><b>(6)</b>
+        if (value == null) {
+            return 0L;
+        }
+        return value;
+    }
+
+    void set(String key, Long value) {
+        countCommands.set(key, value); <i class="conum" data-value="7"></i><b>(7)</b>
+    }
+
+    void increment(String key, Long incrementBy) {
+        countCommands.incrby(key, incrementBy); <i class="conum" data-value="8"></i><b>(8)</b>
+    }
+
+    Uni&lt;Void&gt; del(String key) {
+        return keyCommands.del(key) <i class="conum" data-value="9"></i><b>(9)</b>
+            .replaceWithVoid();
+    }
+
+    Uni&lt;List&lt;String&gt;&gt; keys() {
+        return keyCommands.keys("*"); <i class="conum" data-value="10"></i><b>(10)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>キー操作のために使用するフィールド</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>カウンター操作のために使用するフィールド</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>命令型と反応型の両方のデータソースをインジェクトします</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>カウンターを操作するためのコマンドを取得します</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>キーを操作するコマンドを取得します</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>与えられたキーに関連する値を取得します　 <code>null</code> の場合は、 0 を返します</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>与えられたキーに関連する値を設定します</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>キーが与えられた値をインクリメントします</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>キー（とそれに付随する値）を削除します</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="10"></i><b>10</b></td>
+<td>すべてのキーをリストアップします</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-increment-resource"><a class="anchor" href="#creating-the-increment-resource"></a>インクリメントリソースの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>以下の内容の <code>src/main/java/org/acme/redis/IncrementResource.java</code> ファイルを作成します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.redis;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.DELETE;
+import java.util.List;
+
+import io.smallrye.mutiny.Uni;
+
+@Path("/increments")
+public class IncrementResource {
+
+    @Inject
+    IncrementService service;
+
+    @GET
+    public Uni&lt;List&lt;String&gt;&gt; keys() {
+        return service.keys();
+    }
+
+    @POST
+    public Increment create(Increment increment) {
+        service.set(increment.key, increment.value);
+        return increment;
+    }
+
+    @GET
+    @Path("/{key}")
+    public Increment get(String key) {
+        return new Increment(key, service.get(key));
+    }
+
+    @PUT
+    @Path("/{key}")
+    public void increment(String key, long value) {
+        service.increment(key, value);
+    }
+
+    @DELETE
+    @Path("/{key}")
+    public Uni&lt;Void&gt; delete(String key) {
+        return service.del(key);
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-test-class"><a class="anchor" href="#creating-the-test-class"></a>テストクラスの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>pom.xml</code> ファイルを編集し、以下の依存関係を追加します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.rest-assured&lt;/groupId&gt;
+    &lt;artifactId&gt;rest-assured&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>src/test/java/org/acme/redis/IncrementResourceTest.java</code> ファイルを以下の内容で作成してください:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.redis;
+
+import static org.hamcrest.Matchers.is;
+
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.test.junit.QuarkusTest;
+
+import static io.restassured.RestAssured.given;
+
+import io.restassured.http.ContentType;
+
+@QuarkusTest
+public class IncrementResourceTest {
+
+    @Test
+    public void testRedisOperations() {
+        // verify that we have nothing
+        given()
+                .accept(ContentType.JSON)
+                .when()
+                .get("/increments")
+                .then()
+                .statusCode(200)
+                .body("size()", is(0));
+
+        // create a first increment key with an initial value of 0
+        given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .body("{\"key\":\"first-key\",\"value\":0}")
+                .when()
+                .post("/increments")
+                .then()
+                .statusCode(200)
+                .body("key", is("first-key"))
+                .body("value", is(0));
+
+        // create a second increment key with an initial value of 10
+        given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .body("{\"key\":\"second-key\",\"value\":10}")
+                .when()
+                .post("/increments")
+                .then()
+                .statusCode(200)
+                .body("key", is("second-key"))
+                .body("value", is(10));
+
+        // increment first key by 1
+        given()
+                .contentType(ContentType.JSON)
+                .body("1")
+                .when()
+                .put("/increments/first-key")
+                .then()
+                .statusCode(204);
+
+        // verify that key has been incremented
+        given()
+                .accept(ContentType.JSON)
+                .when()
+                .get("/increments/first-key")
+                .then()
+                .statusCode(200)
+                .body("key", is("first-key"))
+                .body("value", is(1));
+
+        // increment second key by 1000
+        given()
+                .contentType(ContentType.JSON)
+                .body("1000")
+                .when()
+                .put("/increments/second-key")
+                .then()
+                .statusCode(204);
+
+        // verify that key has been incremented
+        given()
+                .accept(ContentType.JSON)
+                .when()
+                .get("/increments/second-key")
+                .then()
+                .statusCode(200)
+                .body("key", is("second-key"))
+                .body("value", is(1010));
+
+        // verify that we have two keys in registered
+        given()
+                .accept(ContentType.JSON)
+                .when()
+                .get("/increments")
+                .then()
+                .statusCode(200)
+                .body("size()", is(2));
+
+        // delete first key
+        given()
+                .accept(ContentType.JSON)
+                .when()
+                .delete("/increments/first-key")
+                .then()
+                .statusCode(204);
+
+        // verify that we have one key left after deletion
+        given()
+                .accept(ContentType.JSON)
+                .when()
+                .get("/increments")
+                .then()
+                .statusCode(200)
+                .body("size()", is(1));
+
+        // delete second key
+        given()
+                .accept(ContentType.JSON)
+                .when()
+                .delete("/increments/second-key")
+                .then()
+                .statusCode(204);
+
+        // verify that there is no key left
+        given()
+                .accept(ContentType.JSON)
+                .when()
+                .get("/increments")
+                .then()
+                .statusCode(200)
+                .body("size()", is(0));
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="get-it-running"><a class="anchor" href="#get-it-running"></a>起動</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>指示に従えば、Redisサーバーが起動しているはずです。あとは、アプリケーションを使って実行するだけです。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>別のターミナルを開いて <code>curl <a href="http://localhost:8080/increments" class="bare">http://localhost:8080/increments</a></code> コマンドを実行します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="interacting-with-the-application"><a class="anchor" href="#interacting-with-the-application"></a>アプリケーションとの相互作用</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>上で見たように、APIは5つのRestエンドポイントを公開しています。このセクションでは、インクリメントを初期化する方法、現在のインクリメントのリストを見る方法、キーを指定して値をインクリメントする方法、インクリメントの現在の値を取得する方法、そして最後にキーを削除する方法を見ていきます。</p>
+</div>
+<div class="sect2">
+<h3 id="creating-a-new-increment"><a class="anchor" href="#creating-a-new-increment"></a>新しいインクリメントの作成</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST -H "Content-Type: application/json" -d '{"key":"first","value":10}' http://localhost:8080/increments <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>最初のインクリメントを作成し、キーは <code>first</code> 、初期値は <code>10</code> とします</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>上記のコマンドを実行すると、以下のような結果が返ってくるはずです:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "key": "first",
+  "value": 10
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="see-current-increments-keys"><a class="anchor" href="#see-current-increments-keys"></a>現在のインクリメントキーの確認</h3>
+<div class="paragraph">
+<p>現在のインクリメントキーのリストを表示するには、以下のコマンドを実行します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:8080/increments</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上記のコマンドは <code>["first"]</code> を返し、これまでのところインクリメントが 1 つしかないことを示しているはずです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="retrieve-a-new-increment"><a class="anchor" href="#retrieve-a-new-increment"></a>新しいインクリメントの取得</h3>
+<div class="paragraph">
+<p>キーを使ってインクリメントを取得するには、以下のコマンドを実行する必要があります:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:8080/increments/first <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>このコマンドを実行すると、以下のような結果が返ってくるはずです:</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "key": "first",
+  "value": 10
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="increment-a-value-given-its-key"><a class="anchor" href="#increment-a-value-given-its-key"></a>キーが与えられた値をインクリメントします</h3>
+<div class="paragraph">
+<p>値をインクリメントするには、以下のコマンドを実行します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X PUT -H "Content-Type: application/json" -d '27' http://localhost:8080/increments/first <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>first</code> の値を 27 増やします。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>さて、コマンドを実行すると <code>curl <a href="http://localhost:8080/increments/first" class="bare">http://localhost:8080/increments/first</a></code> は次のような結果を返します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "key": "first",
+  "value": 37 <i class="conum" data-value="1"></i><b>(1)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>first</code> キーの値が <code>37</code> になっていることがわかりますが、これはまさに簡単な計算である <code>10 + 27</code> の結果と同じです。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="deleting-a-key"><a class="anchor" href="#deleting-a-key"></a>キーの削除</h3>
+<div class="paragraph">
+<p>インクリメントのキーを指定して削除するには、以下のコマンドを使用します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X DELETE  http://localhost:8080/increments/first <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>first</code> のインクリメントを削除します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>さて、コマンドを実行すると <code>curl <a href="http://localhost:8080/increments" class="bare">http://localhost:8080/increments</a></code> は空のリスト <code>[]</code> を返します</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-for-production"><a class="anchor" href="#configuring-for-production"></a>本番環境での設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>この時点で、QuarkusはRedis Dev Serviceを使用して、Redisサーバーを実行し、アプリケーションを構成しています。 しかし、本番環境では、独自のRedisを実行することになります（または、クラウドサービスを使用します）。</p>
+</div>
+<div class="paragraph">
+<p>以下の形で6379番ポートでRedisサーバを起動してみましょう:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">docker run --ulimit memlock=-1:-1 -it --rm=true --memory-swappiness=0 --name redis_quarkus_test -p 6379:6379 redis:5.0.6</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、 <code>src/main/resources/application.properties</code> ファイルを開き追加します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">%prod.quarkus.redis.hosts=redis://localhost:6379</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="packaging-and-running-in-jvm-mode"><a class="anchor" href="#packaging-and-running-in-jvm-mode"></a>JVMモードでのパッケージ化と実行</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>従来の jar ファイルとしてアプリケーションを実行することができます。</p>
+</div>
+<div class="paragraph">
+<p>まず、パッケージ化します:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+このコマンドはテストを実行するためのRedisインスタンスを起動します。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>次に、以下を実行してください:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">java -jar target/quarkus-app/quarkus-run.jar</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-native"><a class="anchor" href="#running-native"></a>ネイティブ実行</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ソースコードを変更することなく、このアプリケーションからネイティブ実行可能ファイルを作成することもできます。ネイティブ実行可能ファイルは、JVMへの依存を取り除きます。ターゲットプラットフォーム上でアプリケーションを実行するために必要なすべてのものが実行ファイルに含まれているため、アプリケーションを最小限のリソースオーバーヘッドで実行することができます。</p>
+</div>
+<div class="paragraph">
+<p>GraalVMは、不要なコードパスを削除するために追加のステップを実行するため、ネイティブ実行可能ファイルのコンパイルには少し時間がかかります。 <code>native</code> プロファイルを使用して、ネイティブ実行可能ファイルをコンパイルしてください。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build --native</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install -Dnative</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build -Dquarkus.native.enabled=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ビルドが完了したら、実行可能ファイルを次のように実行することが出来ます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./target/redis-quickstart-1.0.0-SNAPSHOT-runner</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="going-further"><a class="anchor" href="#going-further"></a>さらに詳しく</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus Redisエクステンションの詳細については、 <a href="redis-reference">Redis エクステンションリファレンスガイド</a> を参照してください。</p>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#architecture">アーキテクチャ</a></li>
+<li><a href="#solution">ソリューション</a></li>
+<li><a href="#creating-the-maven-project">Mavenプロジェクトの作成</a></li>
+<li><a href="#creating-the-increment-pojo">インクリメントPOJOの作成</a></li>
+<li><a href="#creating-the-increment-service">インクリメントサービスの作成</a></li>
+<li><a href="#creating-the-increment-resource">インクリメントリソースの作成</a></li>
+<li><a href="#creating-the-test-class">テストクラスの作成</a></li>
+<li><a href="#get-it-running">起動</a></li>
+<li><a href="#interacting-with-the-application">アプリケーションとの相互作用</a>
+<ul class="sectlevel2">
+<li><a href="#creating-a-new-increment">新しいインクリメントの作成</a></li>
+<li><a href="#see-current-increments-keys">現在のインクリメントキーの確認</a></li>
+<li><a href="#retrieve-a-new-increment">新しいインクリメントの取得</a></li>
+<li><a href="#increment-a-value-given-its-key">キーが与えられた値をインクリメントします</a></li>
+<li><a href="#deleting-a-key">キーの削除</a></li>
+</ul>
+</li>
+<li><a href="#configuring-for-production">本番環境での設定</a></li>
+<li><a href="#packaging-and-running-in-jvm-mode">JVMモードでのパッケージ化と実行</a></li>
+<li><a href="#running-native">ネイティブ実行</a></li>
+<li><a href="#going-further">さらに詳しく</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same extensions</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/guides/redis-dev-services">Dev Services for Redis</a></li>
+      
+        
+        <li class="reference"><a href="/guides/cache-redis-reference">Redisキャッシュ</a></li>
+      
+        
+        <li class="reference"><a href="/guides/redis-reference">Redis エクステンションのリファレンスガイド</a></li>
+      </ul>
+    </div>
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/guides/redis-dev-services">Dev Services for Redis</a></li>
+      
+        
+        <li class="reference"><a href="/guides/redis-reference">Redis エクステンションのリファレンスガイド</a></li>
+      
+        
+        <li class="guide"><a href="/guides/elasticsearch">Elasticsearchクラスターの実行</a></li>
+      
+        
+        <li class="guide"><a href="/guides/elasticsearch-dev-services">Dev Services for Elasticsearch</a></li>
+      
+        
+        <li class="reference"><a href="/guides/cache-redis-reference">Redisキャッシュ</a></li>
+      
+        
+        <li class="guide"><a href="/guides/mongodb-panache">シンプルになったMongoDB with Panache</a></li>
+      
+        
+        <li class="guide"><a href="/guides/mongodb-panache-kotlin">シンプルになったMongoDB with PanacheとKotlin</a></li>
+      
+        
+        <li class="guide"><a href="/guides/hibernate-search-standalone-elasticsearch">Elasticsearch/OpenSearch を使用する Standalone モードでの Hibernate Search の使用</a></li>
+      
+        
+        <li class="guide"><a href="/guides/hibernate-search-orm-elasticsearch">Hibernate ORMとElasticsearch/OpenSearchでHibernate Searchを使用</a></li>
+      
+        
+        <li class="guide"><a href="/guides/mongodb">MongoDB クライアントの利用</a></li>
+      
+        
+        <li class="guide"><a href="/guides/cache">アプリケーションデータのキャッシング</a></li>
+      
+        
+        <li class="reference"><a href="/guides/datasource">Quarkusでデータソースを設定</a></li>
+      
+        
+        <li class="guide"><a href="/guides/databases-dev-services">Dev Services for Databases</a></li>
+      
+        
+        <li class="guide"><a href="/guides/infinispan-dev-services">Infinispanの開発サービス</a></li>
+      
+        
+        <li class="guide"><a href="/guides/rest-data-panache">PanacheでJakarta RESTリソースを生成する</a></li>
+      
+        
+        <li class="reference"><a href="/guides/cache-infinispan-reference">Infinispan Cache</a></li>
+      
+        
+        <li class="reference"><a href="/guides/infinispan-client-reference">Infinispanクライアントエクステンションリファレンスガイド</a></li>
+      
+        
+        <li class="guide"><a href="/guides/lra">Narayana LRA 参加者サポート</a></li>
+      
+        
+        <li class="guide"><a href="/guides/reactive-sql-clients">リアクティブ SQL クライアント</a></li>
+      
+        
+        <li class="guide"><a href="/guides/hibernate-orm-panache">シンプルになったHibernate ORM with Panache</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

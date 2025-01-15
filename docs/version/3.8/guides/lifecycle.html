@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>アプリケーションの初期化と終了 - 3.8 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.8/guides/lifecycle" />
+  <meta property="og:title" content="アプリケーションの初期化と終了 - 3.8" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/lifecycle">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.8/guides/lifecycle">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.8/guides/lifecycle" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.8/guides/lifecycle">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.8/guides/lifecycle">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.8/guides/lifecycle">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.8/guides/lifecycle">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.8/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" selected>3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">アプリケーションの初期化と終了 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>アプリケーションの起動時にカスタムアクションを実行し、アプリケーションの停止時にすべてをクリーンアップする必要があることがよくあります。このガイドでは、以下の方法を説明します:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>メインメソッドでQuarkusアプリケーションを書く</p>
+</li>
+<li>
+<p>タスクを実行して終了するコマンドモードのアプリケーションを書く</p>
+</li>
+<li>
+<p>アプリケーションの開始時に通知される</p>
+</li>
+<li>
+<p>アプリケーションが停止したときに通知される</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>約15分</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 17+がインストールされ、 <code>JAVA_HOME</code> が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.9.6</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルをビルドしたい場合、MandrelまたはGraalVM（あるいはネイティブなコンテナビルドを使用する場合はDocker）をインストールし、 <a href="building-native-image.html#configuring-graalvm">適切に設定</a>していること</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution"><a class="anchor" href="#solution"></a>ソリューション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次の章で紹介する手順に沿って、ステップを踏んでアプリを作成することをお勧めします。ただし、完成した例にそのまま進んでも構いません。</p>
+</div>
+<div class="paragraph">
+<p>Gitレポジトリをクローンするか <code>git clone -b 3.8 <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code> 、 <a href="https://github.com/quarkusio/quarkus-quickstarts/archive/3.8.zip">アーカイブ</a> をダウンロードします。</p>
+</div>
+<div class="paragraph">
+<p>ソリューションは <code>lifecycle-quickstart</code> <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/3.8/lifecycle-quickstart">ディレクトリ</a> にあります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-maven-project"><a class="anchor" href="#creating-the-maven-project"></a>Mavenプロジェクトの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、新しいプロジェクトが必要です。以下のコマンドで新規プロジェクトを作成します。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:lifecycle-quickstart \
+    --no-code
+cd lifecycle-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:3.8.6:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=lifecycle-quickstart \
+    -DnoCode
+cd lifecycle-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Windowsユーザーの場合:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>cmdを使用する場合、（バックスラッシュ <code>\</code> を使用せず、すべてを同じ行に書かないでください）。</p>
+</li>
+<li>
+<p>Powershellを使用する場合は、 <code>-D</code> パラメータを二重引用符で囲んでください。例: <code>"-DprojectArtifactId=lifecycle-quickstart"</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>以下が生成されます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Mavenの構造</p>
+</li>
+<li>
+<p><code>native</code>  と <code>jvm</code>  の両方のモードに対応した <code>Dockerfile</code>  ファイルの例</p>
+</li>
+<li>
+<p>アプリケーション設定ファイル</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-main-method"><a class="anchor" href="#the-main-method"></a>メインメソッド</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>デフォルトでは、Quarkusは自動的にメインメソッドを生成し、Quarkusをブートストラップして、シャットダウンが開始されるのを待ちます。独自のメインメソッドを用意しましょう:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package com.acme;
+
+import io.quarkus.runtime.annotations.QuarkusMain;
+import io.quarkus.runtime.Quarkus;
+
+@QuarkusMain  <i class="conum" data-value="1"></i><b>(1)</b>
+public class Main {
+
+    public static void main(String ... args) {
+        System.out.println("Running main method");
+        Quarkus.run(args); <i class="conum" data-value="2"></i><b>(2)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>このアノテーションは、設定でオーバーライドされない限り、これをメインのメソッドとして使用するようQuarkusに指示します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>これによりQuarkusが起動します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>このメインクラスはQuarkusを起動し、停止するまで実行します。これは自動生成されたメインクラスと変わりませんが、MavenやGradleのコマンドを実行する必要がなく、IDEから直接起動するだけで済むという利点があります。</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+まだQuarkusが設定されておらず、Quarkusは別のClassLoaderで動作する可能性があるため、このメインメソッドでビジネスロジックを行うことは推奨されていません。起動時にロジックを実行したい場合は、以下のように <code>io.quarkus.runtime.QuarkusApplication</code>  を使用してください。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>起動時に実際にビジネスロジックを実行したい場合(またはタスクを完了してから終了するアプリケーションを書きたい場合)、runメソッドに <code>io.quarkus.runtime.QuarkusApplication</code>  クラスを指定する必要があります。Quarkusが起動すると、アプリケーションの <code>run</code>  メソッドが呼び出されます。このメソッドが返されると、Quarkusアプリケーションは終了します。</p>
+</div>
+<div class="paragraph">
+<p>起動時にロジックを実行したい場合は、 <code>Quarkus.waitForExit()</code>  を呼び出す必要があります。このメソッドは、シャットダウンが要求されるまで待機します( <code>Ctrl+C</code>  を押したときのような外部シグナルや、スレッドが <code>Quarkus.asyncExit()</code>  を呼び出したときのような外部シグナルのいずれか)。</p>
+</div>
+<div class="paragraph">
+<p>その一例が以下のようなものです:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package com.acme;
+
+import io.quarkus.runtime.Quarkus;
+import io.quarkus.runtime.QuarkusApplication;
+import io.quarkus.runtime.annotations.QuarkusMain;
+
+@QuarkusMain
+public class Main {
+    public static void main(String... args) {
+        Quarkus.run(MyApp.class, args);
+    }
+
+    public static class MyApp implements QuarkusApplication {
+
+        @Override
+        public int run(String... args) throws Exception {
+            System.out.println("Do startup logic here");
+            Quarkus.waitForExit();
+            return 0;
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>Quarkus.run</code> はコードがエラーを処理できるようにするバージョンも提供します。例:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package com.acme;
+
+import io.quarkus.runtime.Quarkus;
+import io.quarkus.runtime.QuarkusApplication;
+import io.quarkus.runtime.annotations.QuarkusMain;
+
+@QuarkusMain
+public class Main {
+    public static void main(String... args) {
+        Quarkus.run(MyApp.class,
+        (exitCode, exception) -&gt; {
+            // do whatever
+        },
+        args);
+    }
+
+    public static class MyApp implements QuarkusApplication {
+
+        @Override
+        public int run(String... args) throws Exception {
+            System.out.println("Do startup logic here");
+            Quarkus.waitForExit();
+            return 0;
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="injecting-the-command-line-arguments"><a class="anchor" href="#injecting-the-command-line-arguments"></a>コマンドライン引数の注入</h3>
+<div class="paragraph">
+<p>コマンドラインで渡された引数を注入することができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject
+@CommandLineArguments
+String[] args;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>コマンドライン引数は、プロパティ <code>quarkus.args</code> で <code>-D</code> フラグを介してアプリケーションに渡すことができます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Quarkus開発モードの場合:</p>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev -Dquarkus.args=cmd-args</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev -Dquarkus.args=cmd-args</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev -Dquarkus.args=cmd-args</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>runner jarの場合: <code>java -Dquarkus.args=&lt;cmd-args&gt; -jar target/quarkus-app/quarkus-run.jar</code></p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルの場合: <code>./target/lifecycle-quickstart-1.0-SNAPSHOT-runner -Dquarkus.args=&lt;cmd-args&gt;</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="listening-for-startup-and-shutdown-events"><a class="anchor" href="#listening-for-startup-and-shutdown-events"></a>スタートアップとシャットダウンのイベントをリッスンする</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>org.acme.lifecycle</code>  パッケージ内に <code>AppLifecycleBean</code>  という名前の新しいクラスを作成し(または別の名前を選び)、以下の内容をコピーします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.lifecycle;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+
+import io.quarkus.runtime.ShutdownEvent;
+import io.quarkus.runtime.StartupEvent;
+import org.jboss.logging.Logger;
+
+@ApplicationScoped
+public class AppLifecycleBean {
+
+    private static final Logger LOGGER = Logger.getLogger("ListenerBean");
+
+    void onStart(@Observes StartupEvent ev) {               <i class="conum" data-value="1"></i><b>(1)</b>
+        LOGGER.info("The application is starting...");
+    }
+
+    void onStop(@Observes ShutdownEvent ev) {               <i class="conum" data-value="2"></i><b>(2)</b>
+        LOGGER.info("The application is stopping...");
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>アプリケーションの起動時に呼び出されるメソッド</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>アプリケーションの終了時に呼び出されるメソッド</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+また、各再配置の間に <em>開発モード</em> でイベントが呼び出されます。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+メソッドは，注入されたBeanにアクセスできます。詳細は <a href="https://github.com/quarkusio/quarkus-quickstarts/blob/3.8/lifecycle-quickstart/src/main/java/org/acme/lifecycle/AppLifecycleBean.java">AppLifecycleBean.java</a> クラスを確認してください。
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="what-is-the-difference-from-initializedapplicationscoped-class-and-destroyedapplicationscoped-class"><a class="anchor" href="#what-is-the-difference-from-initializedapplicationscoped-class-and-destroyedapplicationscoped-class"></a><code>@Initialized(ApplicationScoped.class)</code> と <code>@Destroyed(ApplicationScoped.class)</code> との違いは?</h3>
+<div class="paragraph">
+<p>JVMモードでは、 <code>StartupEvent</code> が常に <code>@Initialized(ApplicationScoped.class)</code> の <strong>後に</strong> 起動され、 <code>ShutdownEvent</code> が <code>@Destroyed(ApplicationScoped.class)</code> の <strong>前に</strong> 起動されることを除けば、実質的な違いはありません。しかし、ネイティブの実行形式のビルドでは、 <code>@Initialized(ApplicationScoped.class)</code> は <strong>ネイティブのビルドプロセスの一部</strong> として起動され、 <code>StartupEvent</code> はネイティブイメージが実行されるときに起動されます。詳細は、<a href="writing-extensions.html#bootstrap-three-phases">Bootstrapの3つのフェーズとQuarkus Philosophy</a> を参照してください。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+CDIアプリケーションでは、アプリケーションコンテキストが初期化されたときに、Qualifier <code>@Initialized(ApplicationScoped.class)</code> のイベントが発生します。詳しくは <a href="https://jakarta.ee/specifications/cdi/2.0/cdi-spec-2.0.html#application_context" target="_blank" rel="noopener">仕様</a>をご覧ください。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="startup_annotation"><a class="anchor" href="#startup_annotation"></a><code>@Startup</code>  を使用して、アプリケーション起動時に CDI Bean を初期化する</h3>
+<div class="paragraph">
+<p><code>@Startup</code>  でアノテーションされたクラス、プロデューサメソッド、フィールドで表現されたBeanは、アプリケーションの起動時に初期化されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.lifecycle;
+
+import io.quarkus.runtime.Startup;
+import jakarta.enterprise.context.ApplicationScoped;
+
+@Startup <i class="conum" data-value="1"></i><b>(1)</b>
+@ApplicationScoped
+public class EagerAppBean {
+
+   private final String name;
+
+   EagerAppBean(NameGenerator generator) { <i class="conum" data-value="2"></i><b>(2)</b>
+     this.name = generator.createName();
+   }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@Startup</code>  でアノテーションされた各Beanに対して、 <code>StartupEvent</code>  の合成オブザーバが生成されます。デフォルトの優先度が使用されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Beanのコンストラクタは、アプリケーションの起動時に呼び出され、結果として得られるコンテキストインスタンスがアプリケーションのコンテキストに格納されます。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>@Dependent</code> Beanは、 <code>@Dependent</code>  Beanに宣言されたオブザーバーの行動に従うために、その後すぐに破壊されます。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+クラスが <code>@Startup</code>  でアノテーションされていて、スコープのアノテーションがない場合は、 <code>@ApplicationScoped</code>  が自動的に追加されます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>@Startup</code> アノテーションは、非static、非producer、argsなしメソッドでも宣言できます：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.lifecycle;
+
+import io.quarkus.runtime.Startup;
+import jakarta.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+public class EagerAppBean {
+
+   @Startup
+   void init() { <i class="conum" data-value="1"></i><b>(1)</b>
+     doSomeCoolInit();
+   }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>アプリケーションが起動すると、Bean が作成され、コンテキストインスタンスに対して <code>init()</code> メソッドが呼び出されます。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="shutdown_annotation"><a class="anchor" href="#shutdown_annotation"></a><code>@Shutdown</code> を使用して、アプリケーションのシャットダウン中に CDI Bean のビジネスメソッドを実行します。</h3>
+<div class="paragraph">
+<p><code>@io.quarkus.runtime.Shutdown</code> アノテーションは、アプリケーションのシャットダウン中に実行されるべき CDI Bean のビジネスメソッドをマークするために使用されます。アノテーションされたメソッドは、非プライベートかつ非静的で、引数を宣言しない必要があります。動作は、 <code>ShutdownEvent</code> オブザーバの宣言に似ています。以下の例は、機能的に同等です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.runtime.Shutdown;
+import io.quarkus.runtime.ShutdownEvent;
+import jakarta.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+class Bean1 {
+   void onShutdown(@Observes ShutdownEvent event) {
+      // place the logic here
+   }
+}
+
+@ApplicationScoped
+class Bean2 {
+
+   @Shutdown
+   void shutdown() {
+      // place the logic here
+   }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="package-and-run-the-application"><a class="anchor" href="#package-and-run-the-application"></a>アプリケーションをパッケージ化して実行する</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次のコマンドでアプリケーションを実行します。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ログメッセージが表示されます。アプリケーションが停止すると、2つ目のログメッセージが印刷されます。</p>
+</div>
+<div class="paragraph">
+<p>いつものように、アプリケーションは以下の方法でパッケージ化できます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして次のように実行します <code>java -jar target/quarkus-app/quarkus-run.jar</code> 。</p>
+</div>
+<div class="paragraph">
+<p>次のようにネイティブ実行可能ファイルを生成することもできます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build --native</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install -Dnative</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build -Dquarkus.package.type=native</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="launch-modes"><a class="anchor" href="#launch-modes"></a>起動モード</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusには3種類の起動モードがあります。 <code>NORMAL</code>  (つまりプロダクション)、 <code>DEVELOPMENT</code>  、 <code>TEST</code>  です。 <code>quarkus:dev</code>  を実行している場合は <code>DEVELOPMENT</code>  、JUnit テストを実行している場合は <code>TEST</code>  、それ以外の場合は <code>NORMAL</code>  となります。</p>
+</div>
+<div class="paragraph">
+<p>アプリケーションは、 <code>io.quarkus.runtime.LaunchMode</code>  enum を CDI Beanに注入するか、静的メソッド <code>io.quarkus.runtime.LaunchMode.current()</code>  を呼び出すことで起動モードを取得できます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="graceful-shutdown"><a class="anchor" href="#graceful-shutdown"></a>グレースフルシャットダウン</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusはグレースフルシャットダウンをサポートします。Quarkusは、設定されたタイムアウトまで、実行中のリクエストが終了するのを待つことができます。デフォルトでは無効になっていますが、 <code>quarkus.shutdown.timeout</code> 設定プロパティを設定することで設定可能です。このプロパティを設定すると、実行中のリクエストがすべて完了するか、タイムアウトが経過するまでシャットダウンは行われません。このプロパティは継続時間であり、標準の <code>java.time.Duration</code> 形式で設定できます。</p>
+</div>
+<div class="paragraph">
+<p>リクエストを受け付けるエクステンションは、個別にサポートを追加する必要があります。現時点では HTTP エクステンションだけがこれをサポートしているので、メッセージングリクエストがアクティブなときにシャットダウンが発生する可能性があります。</p>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#solution">ソリューション</a></li>
+<li><a href="#creating-the-maven-project">Mavenプロジェクトの作成</a></li>
+<li><a href="#the-main-method">メインメソッド</a>
+<ul class="sectlevel2">
+<li><a href="#injecting-the-command-line-arguments">コマンドライン引数の注入</a></li>
+</ul>
+</li>
+<li><a href="#listening-for-startup-and-shutdown-events">スタートアップとシャットダウンのイベントをリッスンする</a>
+<ul class="sectlevel2">
+<li><a href="#what-is-the-difference-from-initializedapplicationscoped-class-and-destroyedapplicationscoped-class"><code>@Initialized(ApplicationScoped.class)</code> と <code>@Destroyed(ApplicationScoped.class)</code> との違いは?</a></li>
+<li><a href="#startup_annotation"><code>@Startup</code>  を使用して、アプリケーション起動時に CDI Bean を初期化する</a></li>
+<li><a href="#shutdown_annotation"><code>@Shutdown</code> を使用して、アプリケーションのシャットダウン中に CDI Bean のビジネスメソッドを実行します。</a></li>
+</ul>
+</li>
+<li><a href="#package-and-run-the-application">アプリケーションをパッケージ化して実行する</a></li>
+<li><a href="#launch-modes">起動モード</a></li>
+<li><a href="#graceful-shutdown">グレースフルシャットダウン</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same extensions</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/cdi-integration">CDI 統合ガイド</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.8/guides/cdi-reference">コンテキストと依存性インジェクション</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/cdi">コンテキストと依存性注入(CDI)の紹介</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

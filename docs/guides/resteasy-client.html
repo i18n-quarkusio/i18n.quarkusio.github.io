@@ -1,0 +1,3208 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>レガシーREST クライアントの利用 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/guides/resteasy-client" />
+  <meta property="og:title" content="レガシーREST クライアントの利用" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/resteasy-client">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/guides/resteasy-client">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/guides/resteasy-client" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/guides/resteasy-client">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/guides/resteasy-client">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/guides/resteasy-client">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/guides/resteasy-client">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" selected>3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <a class="editlink" href="https://github.com/quarkusio/quarkus/edit/main/docs/src/main/asciidoc/resteasy-client.adoc">このページを編集</a>
+      
+      <h1 class="text-caps">レガシーREST クライアントの利用 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>このガイドは、Quarkus 2.8までデフォルトのJakarta REST（旧称JAX-RS）実装であった <a href="https://resteasy.dev">RESTEasy Classic</a> と互換性のあるREST Clientに関するものです。</p>
+</div>
+<div class="paragraph">
+<p>It is now recommended to use Quarkus REST (formerly RESTEasy Reactive), which supports equally well traditional blocking workloads and reactive workloads.
+For more information about Quarkus REST,
+please see the <a href="rest-client">REST Client guide</a> and, for the server side, the <a href="rest-json">introductory REST JSON guide</a> or the more detailed <a href="rest">Quarkus REST guide</a>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>このガイドでは、MicroProfile REST Clientを使用して、ほとんど手間をかけずにREST APIとやりとりする方法を説明します。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+サーバーサイドで JSON REST API を書く必要がある場合は、<a href="rest-json.html">JSON REST API ガイド</a>を参照してください。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>約15分</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 17+がインストールされ、 <code>JAVA_HOME</code> が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.9.9</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルをビルドしたい場合、MandrelまたはGraalVM（あるいはネイティブなコンテナビルドを使用する場合はDocker）をインストールし、 <a href="building-native-image.html#configuring-graalvm">適切に設定</a>していること</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution"><a class="anchor" href="#solution"></a>ソリューション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次の章で紹介する手順に沿って、ステップを踏んでアプリを作成することをお勧めします。ただし、完成した例にそのまま進んでも構いません。</p>
+</div>
+<div class="paragraph">
+<p>Gitレポジトリをクローンするか <code>git clone <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code> 、 <a href="https://github.com/quarkusio/quarkus-quickstarts/archive/main.zip">アーカイブ</a> をダウンロードします。</p>
+</div>
+<div class="paragraph">
+<p>The solution is located in the <code>resteasy-client-quickstart</code> <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/main/resteasy-client-quickstart">directory</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-maven-project"><a class="anchor" href="#creating-the-maven-project"></a>Mavenプロジェクトの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、新しいプロジェクトが必要です。以下のコマンドで新規プロジェクトを作成します。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:resteasy-client-quickstart \
+    --extension='resteasy,resteasy-jackson,resteasy-client,resteasy-client-jackson' \
+    --no-code
+cd resteasy-client-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:3.17.6:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=resteasy-client-quickstart \
+    -Dextensions='resteasy,resteasy-jackson,resteasy-client,resteasy-client-jackson' \
+    -DnoCode
+cd resteasy-client-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Windowsユーザーの場合:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>cmdを使用する場合、（バックスラッシュ <code>\</code> を使用せず、すべてを同じ行に書かないでください）。</p>
+</li>
+<li>
+<p>Powershellを使用する場合は、 <code>-D</code> パラメータを二重引用符で囲んでください。例: <code>"-DprojectArtifactId=resteasy-client-quickstart"</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>このコマンドは、REST エンドポイントを持つ Maven プロジェクトを生成し、 <code>rest-client</code> と <code>resteasy-jackson</code> のエクステンションをインポートします。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>REST サーバーのサポートのために <code>resteasy</code> と <code>resteasy-jackson</code> のエクステンションを使用しています。</p>
+</li>
+<li>
+<p>the <code>resteasy-client</code> and <code>resteasy-client-jackson</code> extensions for the REST client support.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>If you already have your Quarkus project configured, you can add the <code>resteasy-client</code> and the <code>resteasy-client-jackson</code> extensions
+to your project by running the following command in your project base directory:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus extension add resteasy-client,resteasy-client-jackson</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:add-extension -Dextensions='resteasy-client,resteasy-client-jackson'</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew addExtension --extensions='resteasy-client,resteasy-client-jackson'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、 <code>pom.xml</code> に以下が追加されます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-resteasy-client&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-resteasy-client-jackson&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-resteasy-client")
+implementation("io.quarkus:quarkus-resteasy-client-jackson")</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="setting-up-the-model"><a class="anchor" href="#setting-up-the-model"></a>モデルのセットアップ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、 <a href="https://stage.code.quarkus.io">stage.code.quarkus.io</a> サービスが提供するREST APIの一部を利用する方法をデモします。まず最初に、 使用するモデルを`Extension` POJO の形式でセットアップします。</p>
+</div>
+<div class="paragraph">
+<p><code>src/main/java/org/acme/rest/client/Extension.java</code> ファイルを作成し、以下の内容を設定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import java.util.List;
+
+public class Extension {
+
+    public String id;
+    public String name;
+    public String shortName;
+    public List&lt;String&gt; keywords;
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上記のモデルは、サービスによって提供されるフィールドのサブセットに過ぎませんが、このガイドの目的には十分です。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-the-interface"><a class="anchor" href="#create-the-interface"></a>インターフェースの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>RESTEasy REST Client の使用方法は、適切な Jakarta REST と MicroProfile アノテーションを使用してインターフェースを作成するだけです。この場合、インターフェースは <code>src/main/java/org/acme/rest/client/ExtensionsService.java</code> で作成し、以下の内容を持つ必要があります:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import org.jboss.resteasy.annotations.jaxrs.QueryParam;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
+import java.util.Set;
+
+@Path("/extensions")
+@RegisterRestClient
+public interface ExtensionsService {
+
+    @GET
+    Set&lt;Extension&gt; getById(@QueryParam String id);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>getById</code> メソッドは、私たちのコードに、Code Quarkus API からidを指定してエクステンションを問い合わせる機能を与えます。クライアントがすべてのネットワーキングとマーシャリングを処理してくれるので、このような技術的な詳細は一切ありません。</p>
+</div>
+<div class="paragraph">
+<p>上のコードのアノテーションの目的は以下の通りです。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>@RegisterRestClient</code> により、Quarkusは、このインターフェイスがRESTクライアントとしてCDIインジェクションに利用可能であることを知ることができます。</p>
+</li>
+<li>
+<p><code>@Path</code> と <code>@GET</code> 、 <code>@QueryParam</code> は、サービスへのアクセス方法を定義するために使用される標準的な Jakarta REST アノテーションです。</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>When a JSON extension is installed such as <code>quarkus-resteasy-client-jackson</code> or <code>quarkus-resteasy-client-jsonb</code>, Quarkus will use the <code>application/json</code> media type
+by default for most return values, unless the media type is explicitly set via
+<code>@Produces</code> or <code>@Consumes</code> annotations (there are some exceptions for well known types, such as <code>String</code> and <code>File</code>, which default to <code>text/plain</code> and <code>application/octet-stream</code>
+respectively).</p>
+</div>
+<div class="paragraph">
+<p>デフォルトでJSONを使用したくない場合は、 <code>quarkus.resteasy-json.default-json=false</code> を設定すると、デフォルトは自動ネゴシエーションに戻ります。これを設定した場合、JSON を使用するためには <code>@Produces(MediaType.APPLICATION_JSON)</code> と <code>@Consumes(MediaType.APPLICATION_JSON)</code> をエンドポイントに追加する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>JSONのデフォルトに依存しない場合は、エンドポイントに <code>@Produces</code> と <code>@Consumes</code> のアノテーションを付けて、期待されるcontent-typesを正確に定義することが強く推奨されています。これにより、ネイティブ実行可能ファイルに含まれる Jakarta REST プロバイダー（コンバーターと見なすことができます）の数を減らすことができます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="path-parameters"><a class="anchor" href="#path-parameters"></a>パスパラメーター</h3>
+<div class="paragraph">
+<p>GETリクエストにパスパラメータが必要な場合は、 <code>@QueryParam</code> の代わりに（または追加で） <code>@PathParam("parameter-name")</code> を利用することができます。パスとクエリパラメータは、必要に応じて組み合わせることができます（以下のモックの例を参照してください）。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import org.jboss.resteasy.annotations.jaxrs.PathParam;
+import org.jboss.resteasy.annotations.jaxrs.QueryParam;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import java.util.Set;
+
+@Path("/extensions")
+@RegisterRestClient
+public interface ExtensionsService {
+
+    @GET
+    @Path("/stream/{stream}")
+    Set&lt;Extension&gt; getByStream(@PathParam String stream, @QueryParam("id") String id);
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-the-configuration"><a class="anchor" href="#create-the-configuration"></a>コンフィグレーションの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>REST 呼び出しが行われるベース URL を決定するために、REST クライアントは <code>application.properties</code> からの設定を使用します。プロパティーの名前は、以下のコードで表示される特定の規則に従う必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># Your configuration properties
+quarkus.rest-client."org.acme.rest.client.ExtensionsService".url=https://stage.code.quarkus.io/api # <i class="conum" data-value="1"></i><b>(1)</b>
+quarkus.rest-client."org.acme.rest.client.ExtensionsService".scope=jakarta.inject.Singleton # <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Having this configuration means that all requests performed using <code>ExtensionsService</code> will use <code><a href="https://stage.code.quarkus.io" class="bare">https://stage.code.quarkus.io</a></code> as the base URL.
+Using the configuration above, calling the <code>getById</code> method of <code>ExtensionsService</code> with a value of <code>io.quarkus:quarkus-resteasy-client</code> would result in an HTTP GET request being made to <code><a href="https://stage.code.quarkus.io/api/extensions?id=io.quarkus:quarkus-rest-client" class="bare">https://stage.code.quarkus.io/api/extensions?id=io.quarkus:quarkus-rest-client</a></code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>この設定をすると、 <code>ExtensionsService</code> のデフォルトのスコープは <code>@Singleton</code> になります。サポートされているスコープの値は <code>@Singleton</code> , <code>@Dependent</code> , <code>@ApplicationScoped</code> および <code>@RequestScoped</code> です。既定のスコープは <code>@Dependent</code> です。デフォルトのスコープはインターフェイス上で定義することもできます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>org.acme.rest.client.ExtensionsService</code> は、前のセクションで作成した`ExtensionsService` インターフェイスの完全修飾名と <em>一致しなければならない</em> ことに注意してください。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>標準のMicroProfile Rest Clientのプロパティ表記を使用して、クライアントを設定することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">org.acme.rest.client.ExtensionsService/mp-rest/url=https://stage.code.quarkus.io/api
+org.acme.rest.client.ExtensionsService/mp-rest/scope=jakarta.inject.Singleton</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>プロパティがQuarkus記法とMicroProfile記法の両方で指定されている場合、Quarkus記法が優先されます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>構成を容易にするために、 <code>@RegisterRestClient</code> <code>configKey</code> プロパティーを使用して、インターフェイスの完全修飾名とは別の構成ルートを使用することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@RegisterRestClient(configKey="extensions-api")
+public interface ExtensionsService {
+    [...]
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># Your configuration properties
+quarkus.rest-client.extensions-api.url=https://stage.code.quarkus.io/api
+quarkus.rest-client.extensions-api.scope=jakarta.inject.Singleton</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="disabling-hostname-verification"><a class="anchor" href="#disabling-hostname-verification"></a>ホスト名の検証を無効にする</h3>
+<div class="paragraph">
+<p>特定のRESTクライアントのSSLホスト名検証を無効にするには、次のプロパティーを構成に追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.rest-client.extensions-api.verify-host=false</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>この設定は、SSLホスト名検証を無効にするため、本番運用では使用しないでください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>さらに、カスタムのホスト名検証ストラテジーを使用するようにRESTクライアントを設定することができます。必要なのは、インターフェース <code>javax.net.ssl.HostnameVerifier</code> を実装したクラスを用意し、以下のプロパティを設定に追加することだけです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.rest-client.extensions-api.hostname-verifier=&lt;full qualified custom hostname verifier class name&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Quarkus REST クライアントは、 <code>io.quarkus.restclient.NoopHostnameVerifier</code> と呼ばれるホスト名検証を無効にするための組込ホスト名検証ストラテジーを提供しています。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="disabling-ssl-verifications"><a class="anchor" href="#disabling-ssl-verifications"></a>SSL の検証の無効化</h3>
+<div class="paragraph">
+<p>全てのSSL検証を無効にするには、次のプロパティーを設定に追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.tls.trust-all=true</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>この設定は、あらゆる種類のSSL検証を無効にするため、実運用環境では使用しないでください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-the-jakarta-rest-resource"><a class="anchor" href="#create-the-jakarta-rest-resource"></a>Jakarta RESTリソースの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>src/main/java/org/acme/rest/client/ExtensionsResource.java</code> ファイルを以下の内容で作成してください:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.resteasy.annotations.jaxrs.PathParam;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import java.util.Set;
+
+@Path("/extension")
+public class ExtensionsResource {
+
+    @Inject
+    @RestClient
+    ExtensionsService extensionsService;
+
+    @GET
+    @Path("/id/{id}")
+    public Set&lt;Extension&gt; id(@PathParam String id) {
+        return extensionsService.getById(id);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>標準の CDI <code>@Inject</code> アノテーションに加えて、MicroProfile <code>@RestClient</code> アノテーションを使用して <code>ExtensionsService</code> を注入する必要があることに注意してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="update-the-test"><a class="anchor" href="#update-the-test"></a>テストの更新</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>また、エンドポイントに加えられた変更を反映させるために、機能テストを更新する必要があります。 <code>src/test/java/org/acme/rest/client/ExtensionsResourceTest.java</code> ファイルを編集し、 <code>testExtensionIdEndpoint</code> メソッドの内容を変更します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.greaterThan;
+
+import org.acme.rest.client.resources.WireMockExtensionsResource;
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.junit.QuarkusTest;
+
+@QuarkusTest
+@QuarkusTestResource(WireMockExtensionsResource.class)
+public class ExtensionsResourceTest {
+
+    @Test
+    public void testExtensionsIdEndpoint() {
+        given()
+            .when().get("/extension/id/io.quarkus:quarkus-rest-client")
+            .then()
+            .statusCode(200)
+            .body("$.size()", is(1),
+                "[0].id", is("io.quarkus:quarkus-rest-client"),
+                "[0].name", is("REST Client Classic"),
+                "[0].keywords.size()", greaterThan(1),
+                "[0].keywords", hasItem("rest-client"));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上のコードでは、 <a href="http://rest-assured.io/">REST Assured</a> の <a href="https://github.com/rest-assured/rest-assured/wiki/GettingStarted#jsonpath">json-path</a> 機能を使用しています。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="redirection"><a class="anchor" href="#redirection"></a>リダイレクト</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>HTTPサーバーは、ステータスコードが "3 "で始まるレスポンスと、リダイレクト先のURLを保持するHTTPヘッダー "Location "を送信することで、レスポンスを別の場所にリダイレクトできます。RESTクライアントがHTTPサーバーからリダイレクトレスポンスを受信しても、新しい場所への再リクエストは自動的に実行されません。ただし、"follow-redirects "プロパティを有効にすることで、自動リダイレクトを有効にすることができます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus.rest-client.follow-redirects</code> で、すべてのRESTクライアントに対してリダイレクトが有効になります。</p>
+</li>
+<li>
+<p><code>quarkus.rest-client.&lt;client-prefix&gt;.follow-redirects</code> で、特定のRESTクライアントに対するリダイレクトを有効にすることができます。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>このプロパティがtrueの場合、REST Clientは、HTTPサーバーからリダイレクトレスポンスを受信すると、新しいリクエストを実行します。</p>
+</div>
+<div class="paragraph">
+<p>さらに、プロパティ "max-redirects" を使って、リダイレクトの回数を制限することができます。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://www.rfc-editor.org/rfc/rfc2616#section-10.3.8">RFC2616</a> 仕様によると、デフォルトではGETまたはHEADメソッドに対してのみリダイレクトが行われるという重要な注意点があります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="async-support"><a class="anchor" href="#async-support"></a>非同期サポート</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The rest client supports asynchronous rest calls.
+Async support comes in 2 flavors: you can return a <code>CompletionStage</code> or a <code>Uni</code> (requires the <code>quarkus-resteasy-client-mutiny</code> extension).
+Let&#8217;s see it in action by adding a <code>getByIdAsync</code> method in our <code>ExtensionsService</code> REST interface. The code should look like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import java.util.Set;
+import java.util.concurrent.CompletionStage;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import org.jboss.resteasy.annotations.jaxrs.QueryParam;
+
+@Path("/extensions")
+@RegisterRestClient
+public interface ExtensionsService {
+
+    @GET
+    Set&lt;Extension&gt; getById(@QueryParam String id);
+
+    @GET
+    CompletionStage&lt;Set&lt;Extension&gt;&gt; getByIdAsync(@QueryParam String id);
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>src/main/java/org/acme/rest/client/ExtensionsResource.java</code> ファイルを開き、以下の内容で更新してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import java.util.Set;
+import java.util.concurrent.CompletionStage;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.resteasy.annotations.jaxrs.PathParam;
+
+@Path("/extension")
+public class ExtensionsResource {
+
+    @Inject
+    @RestClient
+    ExtensionsService extensionsService;
+
+    @GET
+    @Path("/id/{id}")
+    public Set&lt;Extension&gt; id(@PathParam String id) {
+        return extensionsService.getById(id);
+    }
+
+    @GET
+    @Path("/id-async/{id}")
+    public CompletionStage&lt;Set&lt;Extension&gt;&gt; idAsync(@PathParam String id) {
+        return extensionsService.getByIdAsync(id);
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>非同期メソッドをテストするには、<code>ExtensionsResourceTest</code> に以下のテストメソッドを追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Test
+public void testExtensionIdAsyncEndpoint() {
+    given()
+        .when().get("/extension/id-async/io.quarkus:quarkus-rest-client")
+        .then()
+        .statusCode(200)
+        .body("$.size()", is(1),
+            "[0].id", is("io.quarkus:quarkus-rest-client"),
+            "[0].name", is("REST Client Classic"),
+            "[0].keywords.size()", greaterThan(1),
+            "[0].keywords", hasItem("rest-client"));
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Uni</code> 版は非常に似ています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import java.util.Set;
+import java.util.concurrent.CompletionStage;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import org.jboss.resteasy.annotations.jaxrs.QueryParam;
+
+import io.smallrye.mutiny.Uni;
+
+@Path("/extensions")
+@RegisterRestClient
+public interface ExtensionsService {
+
+    // ...
+
+    @GET
+    Uni&lt;Set&lt;Extension&gt;&gt; getByIdAsUni(@QueryParam String id);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>ExtensionsResource</code> は次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import java.util.Set;
+import java.util.concurrent.CompletionStage;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.resteasy.annotations.jaxrs.PathParam;
+
+import io.smallrye.mutiny.Uni;
+
+@Path("/extension")
+public class ExtensionsResource {
+
+    @Inject
+    @RestClient
+    ExtensionsService extensionsService;
+
+
+    // ...
+
+    @GET
+    @Path("/id-uni/{id}")
+    public Uni&lt;Set&lt;Extension&gt;&gt; idMutiny(@PathParam String id) {
+        return extensionsService.getByIdAsUni(id);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="title">Mutiny</div>
+<div class="paragraph">
+<p>前のスニペットでは、Mutinyのリアクティブ型を使用していますが、もし慣れていない場合は、まず <a href="mutiny-primer">Mutiny - 直感的なリアクティブプログラミングライブラリ</a> を読んでください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>Uni</code> を返すとき、すべての <em>サブスクリプション</em> は 、リモートサービスを呼び出します。つまり、 <code>Uni</code> で再購読してリクエストを再送信するか、以下のように <code>retry</code> を使用することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject @RestClient ExtensionsService extensionsService;
+
+// ...
+
+extensionsService.getByIdAsUni(id)
+    .onFailure().retry().atMost(10);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>CompletionStage</code> を使用する場合は、再試行のためにサービスのメソッドを呼び出す必要があります。この違いは、 Mutiny とそのサブスクリプションプロトコルの lazy (遅延) 性の側面から来ています。これについての詳細は <a href="https://smallrye.io/smallrye-mutiny/#_uni_and_multi">Mutiny の ドキュメント</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="custom-headers-support"><a class="anchor" href="#custom-headers-support"></a>カスタムヘッダーのサポート</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>MicroProfile REST クライアントでは、 <code>ClientHeadersFactory</code> を <code>@RegisterClientHeaders</code> アノテーションで登録することで、リクエストヘッダを修正することができます。</p>
+</div>
+<div class="paragraph">
+<p><code>ExtensionsResource</code> REST インタフェースに <code>@RegisterClientHeaders</code> アノテーションを追加して、 <code>RequestUUIDHeaderFactory</code> クラスを指すようにしてみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import java.util.Set;
+import java.util.concurrent.CompletionStage;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import org.jboss.resteasy.annotations.jaxrs.QueryParam;
+
+import io.smallrye.mutiny.Uni;
+
+@Path("/extensions")
+@RegisterRestClient
+@RegisterClientHeaders(RequestUUIDHeaderFactory.class)
+public interface ExtensionsService {
+
+    @GET
+    Set&lt;Extension&gt; getById(@QueryParam String id);
+
+    @GET
+    CompletionStage&lt;Set&lt;Extension&gt;&gt; getByIdAsync(@QueryParam String id);
+
+    @GET
+    Uni&lt;Set&lt;Extension&gt;&gt; getByIdAsUni(@QueryParam String id);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、 <code>RequestUUIDHeaderFactory</code> は次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.client;
+
+import org.eclipse.microprofile.rest.client.ext.ClientHeadersFactory;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
+import java.util.UUID;
+
+@ApplicationScoped
+public class RequestUUIDHeaderFactory implements ClientHeadersFactory {
+
+    @Override
+    public MultivaluedMap&lt;String, String&gt; update(MultivaluedMap&lt;String, String&gt; incomingHeaders, MultivaluedMap&lt;String, String&gt; clientOutgoingHeaders) {
+        MultivaluedMap&lt;String, String&gt; result = new MultivaluedHashMap&lt;&gt;();
+        result.add("X-request-uuid", UUID.randomUUID().toString());
+        return result;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上の例のように、 <code>@Singleton</code>, <code>@ApplicationScoped</code> などのスコープを定義するアノテーションを付けることで、 <code>ClientHeadersFactory</code> の実装をCDI Beanにすることができます。</p>
+</div>
+<div class="sect2">
+<h3 id="default-header-factory"><a class="anchor" href="#default-header-factory"></a>デフォルトのヘッダーファクトリー</h3>
+<div class="paragraph">
+<p>また、カスタムファクトリーを指定せずに <code>@RegisterClientHeaders</code> アノテーションを使用することもできます。その場合は、 <code>DefaultClientHeadersFactoryImpl</code> ファクトリーが使用され、 <code>org.eclipse.microprofile.rest.client.propagateHeaders</code> 設定プロパティに記載されているすべてのヘッダーが修正されます。個々のヘッダー名はコンマで区切られています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Path("/extensions")
+@RegisterRestClient
+@RegisterClientHeaders
+public interface ExtensionsService {
+
+    @GET
+    Set&lt;Extension&gt; getById(@QueryParam String id);
+
+    @GET
+    CompletionStage&lt;Set&lt;Extension&gt;&gt; getByIdAsync(@QueryParam String id);
+
+    @GET
+    Uni&lt;Set&lt;Extension&gt;&gt; getByIdAsUni(@QueryParam String id);
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">org.eclipse.microprofile.rest.client.propagateHeaders=Authorization,Proxy-Authorization</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="package-and-run-the-application"><a class="anchor" href="#package-and-run-the-application"></a>アプリケーションをパッケージ化して実行する</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>アプリケーションを実行します:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ブラウザで <a href="http://localhost:8080/extension/id/io.quarkus:quarkus-rest-client" class="bare">http://localhost:8080/extension/id/io.quarkus:quarkus-rest-client</a> を開きます。</p>
+</div>
+<div class="paragraph">
+<p>REST Client extensionに関する基本情報を含む JSON オブジェクトが表示されます。</p>
+</div>
+<div class="paragraph">
+<p>いつものように、アプリケーションは以下の方法でパッケージ化されます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、<code>java -jar target/quarkus-app/quarkus-run.jar</code> で実行されます。</p>
+</div>
+<div class="paragraph">
+<p>次のようにネイティブ実行可能ファイルを生成することもできます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build --native</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install -Dnative</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build -Dquarkus.native.enabled=true</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="rest-client-and-resteasy-interactions"><a class="anchor" href="#rest-client-and-resteasy-interactions"></a>REST クライアントと RESTEasy のやりとり</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusでは、REST Clientエクステンションと <a href="rest-json">RESTEasyエクステンション</a> は、同じインフラストラクチャを共有しています。この考慮の重要な結果の1つは、（Jakarta RESTの意味での）プロバイダのリストを共有することです。</p>
+</div>
+<div class="paragraph">
+<p>例えば、 <code>WriterInterceptor</code> を宣言した場合、デフォルトではサーバーの呼び出しとクライアントの呼び出しの両方をインターセプトしますが、これは望ましい動作ではないかもしれません。</p>
+</div>
+<div class="paragraph">
+<p>しかし、このデフォルトの動作を変更してプロバイダを制約することができます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>プロバイダに <code>@ConstrainedTo(RuntimeType.CLIENT)</code> アノテーションを追加することで、 <strong>クライアント</strong> コールのみを考慮します。</p>
+</li>
+<li>
+<p>プロバイダに <code>@ConstrainedTo(RuntimeType.SERVER)</code> アノテーションを追加することで、 <strong>サーバー</strong> コールのみを考慮します。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-a-mock-http-server-for-tests"><a class="anchor" href="#using-a-mock-http-server-for-tests"></a>テストにモックHTTPサーバーを使用する</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>場合によっては、クライアント自体をモックするのではなく、リモートエンドポイント (HTTP サーバー) をモックしたい場合があります。これは、ネイティブテスト、またはプログラムで作成されたクライアントに特に役立つ場合があります。</p>
+</div>
+<div class="paragraph">
+<p>Wiremock を使用して HTTP サーバーを簡単にモックできます。<a href="rest-client#using-a-mock-http-server-for-tests">Wiremock section of the Quarkus - Using the REST Client</a> では、セットアップ方法について詳しく説明しています。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="further-reading"><a class="anchor" href="#further-reading"></a>さらに詳しく</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://download.eclipse.org/microprofile/microprofile-rest-client-2.0/microprofile-rest-client-spec-2.0.html">MicroProfile Rest Client specification</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration-reference"><a class="anchor" href="#configuration-reference"></a>設定リファレンス</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="ビルド時に固定"></i></span>ビルド時に固定される構成プロパティ - 他のすべての構成プロパティは実行時にオーバーライド可能 <input type="search" id="config-search-0" placeholder="FILTER CONFIGURATION" disabled></p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference searchable configuration-reference-all-rows">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><span class="header-title">Configuration property</span></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">型</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-rest-client-config_quarkus-rest-client-removes-trailing-slash"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-removes-trailing-slash"><code>quarkus.rest-client.removes-trailing-slash</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-1" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If true, the extension will automatically remove the trailing slash in the paths if any. This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7651">QUARKUS_REST_CLIENT_REMOVES_TRAILING_SLASH</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7651" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-multipart-post-encoder-mode"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-multipart-post-encoder-mode"><code>quarkus.rest-client.multipart-post-encoder-mode</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-2" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Mode in which the form data are encoded. Possible values are <code>HTML5</code>, <code>RFC1738</code> and <code>RFC3986</code>. The modes are described in the <a href="https://netty.io/4.1/api/io/netty/handler/codec/http/multipart/HttpPostRequestEncoder.EncoderMode.html">Netty documentation</a></p>
+</div>
+<div class="paragraph">
+<p>By default, Rest Client Reactive uses RFC1738.</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7652">QUARKUS_REST_CLIENT_MULTIPART_POST_ENCODER_MODE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7652" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-proxy-address"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-proxy-address"><code>quarkus.rest-client.proxy-address</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-3" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>A string value in the form of <code>:</code> that specifies the HTTP proxy server hostname (or IP address) and port for requests of clients to use.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7653">QUARKUS_REST_CLIENT_PROXY_ADDRESS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7653" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-proxy-user"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-proxy-user"><code>quarkus.rest-client.proxy-user</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-4" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Proxy username, equivalent to the http.proxy or https.proxy JVM settings.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7654">QUARKUS_REST_CLIENT_PROXY_USER</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7654" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-proxy-password"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-proxy-password"><code>quarkus.rest-client.proxy-password</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-5" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Proxy password, equivalent to the http.proxyPassword or https.proxyPassword JVM settings.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7655">QUARKUS_REST_CLIENT_PROXY_PASSWORD</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7655" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-non-proxy-hosts"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-non-proxy-hosts"><code>quarkus.rest-client.non-proxy-hosts</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-6" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Hosts to access without proxy, similar to the http.nonProxyHosts or https.nonProxyHosts JVM settings. Please note that unlike the JVM settings, this property is empty by default.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7656">QUARKUS_REST_CLIENT_NON_PROXY_HOSTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7656" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-connect-timeout"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-connect-timeout"><code>quarkus.rest-client.connect-timeout</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-7" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>A timeout in milliseconds that REST clients should wait to connect to the remote endpoint.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7657">QUARKUS_REST_CLIENT_CONNECT_TIMEOUT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7657" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">長</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>15000</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-read-timeout"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-read-timeout"><code>quarkus.rest-client.read-timeout</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-8" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>A timeout in milliseconds that REST clients should wait for a response from the remote endpoint.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7658">QUARKUS_REST_CLIENT_READ_TIMEOUT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7658" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">長</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>30000</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-disable-contextual-error-messages"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-disable-contextual-error-messages"><code>quarkus.rest-client.disable-contextual-error-messages</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-9" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If true, the REST clients will not provide additional contextual information (like REST client class and method names) when exception occurs during a client invocation.</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7659">QUARKUS_REST_CLIENT_DISABLE_CONTEXTUAL_ERROR_MESSAGES</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7659" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-user-agent"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-user-agent"><code>quarkus.rest-client.user-agent</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-10" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Default configuration for the HTTP user-agent header to use in all REST clients.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7660">QUARKUS_REST_CLIENT_USER_AGENT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7660" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-headers-header-name"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-headers-header-name"><code>quarkus.rest-client.headers."header-name"</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-11" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The HTTP headers that should be applied to all requests of the rest client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7661">QUARKUS_REST_CLIENT_HEADERS__HEADER_NAME_</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7661" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Map&lt;String,String&gt;</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-hostname-verifier"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-hostname-verifier"><code>quarkus.rest-client.hostname-verifier</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-12" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The class name of the host name verifier. The class must have a public no-argument constructor.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7662">QUARKUS_REST_CLIENT_HOSTNAME_VERIFIER</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7662" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-connection-ttl"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-connection-ttl"><code>quarkus.rest-client.connection-ttl</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-13" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The time in ms for which a connection remains unused in the connection pool before being evicted and closed. A timeout of <code>0</code> means there is no timeout.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7663">QUARKUS_REST_CLIENT_CONNECTION_TTL</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7663" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-connection-pool-size"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-connection-pool-size"><code>quarkus.rest-client.connection-pool-size</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-14" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The size of the connection pool for this client.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7664">QUARKUS_REST_CLIENT_CONNECTION_POOL_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7664" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-keep-alive-enabled"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-keep-alive-enabled"><code>quarkus.rest-client.keep-alive-enabled</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-15" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If set to false disables the keep alive completely.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7665">QUARKUS_REST_CLIENT_KEEP_ALIVE_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7665" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-max-redirects"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-max-redirects"><code>quarkus.rest-client.max-redirects</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-16" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The maximum number of redirection a request can follow.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7666">QUARKUS_REST_CLIENT_MAX_REDIRECTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7666" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-follow-redirects"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-follow-redirects"><code>quarkus.rest-client.follow-redirects</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-17" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>A boolean value used to determine whether the client should follow HTTP redirect responses.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7667">QUARKUS_REST_CLIENT_FOLLOW_REDIRECTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7667" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-providers"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-providers"><code>quarkus.rest-client.providers</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-18" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Map where keys are fully-qualified provider classnames to include in the client, and values are their integer priorities. The equivalent of the <code>@RegisterProvider</code> annotation.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7668">QUARKUS_REST_CLIENT_PROVIDERS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7668" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-scope"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-scope"><code>quarkus.rest-client.scope</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-19" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The CDI scope to use for injections of REST client instances. Value can be either a fully qualified class name of a CDI scope annotation (such as "jakarta.enterprise.context.ApplicationScoped") or its simple name (such as"ApplicationScoped").</p>
+</div>
+<div class="paragraph">
+<p>Default scope for the rest-client extension is "Dependent" (which is the spec-compliant behavior).</p>
+</div>
+<div class="paragraph">
+<p>Default scope for the rest-client-reactive extension is "ApplicationScoped".</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7669">QUARKUS_REST_CLIENT_SCOPE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7669" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-query-param-style"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-query-param-style"><code>quarkus.rest-client.query-param-style</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-20" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>An enumerated type string value with possible values of "MULTI_PAIRS" (default), "COMMA_SEPARATED", or "ARRAY_PAIRS" that specifies the format in which multiple values for the same query parameter is used.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7670">QUARKUS_REST_CLIENT_QUERY_PARAM_STYLE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7670" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><code>multi-pairs</code>, <code>comma-separated</code>, <code>array-pairs</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-verify-host"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-verify-host"><code>quarkus.rest-client.verify-host</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-21" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set whether hostname verification is enabled. Default is enabled. This setting should not be disabled in production as it makes the client vulnerable to MITM attacks.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7671">QUARKUS_REST_CLIENT_VERIFY_HOST</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7671" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-trust-store"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-trust-store"><code>quarkus.rest-client.trust-store</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-22" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The trust store location. Can point to either a classpath resource or a file.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7672">QUARKUS_REST_CLIENT_TRUST_STORE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7672" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-trust-store-password"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-trust-store-password"><code>quarkus.rest-client.trust-store-password</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-23" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The trust store password.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7673">QUARKUS_REST_CLIENT_TRUST_STORE_PASSWORD</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7673" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-trust-store-type"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-trust-store-type"><code>quarkus.rest-client.trust-store-type</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-24" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The type of the trust store. Defaults to "JKS".</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7674">QUARKUS_REST_CLIENT_TRUST_STORE_TYPE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7674" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-key-store"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-key-store"><code>quarkus.rest-client.key-store</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-25" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The key store location. Can point to either a classpath resource or a file.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7675">QUARKUS_REST_CLIENT_KEY_STORE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7675" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-key-store-password"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-key-store-password"><code>quarkus.rest-client.key-store-password</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-26" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The key store password.</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7676">QUARKUS_REST_CLIENT_KEY_STORE_PASSWORD</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7676" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-key-store-type"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-key-store-type"><code>quarkus.rest-client.key-store-type</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-27" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The type of the key store. Defaults to "JKS".</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7677">QUARKUS_REST_CLIENT_KEY_STORE_TYPE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7677" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-tls-configuration-name"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-tls-configuration-name"><code>quarkus.rest-client.tls-configuration-name</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-28" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The name of the TLS configuration to use.</p>
+</div>
+<div class="paragraph">
+<p>If not set and the default TLS configuration is configured (<code>quarkus.tls.*</code>) then that will be used. If a name is configured, it uses the configuration from <code>quarkus.tls.&lt;name&gt;.*</code> If a name is configured, but no TLS configuration is found with that name then an error will be thrown.</p>
+</div>
+<div class="paragraph">
+<p>If no TLS configuration is set, then the keys-tore, trust-store, etc. properties will be used.</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7678">QUARKUS_REST_CLIENT_TLS_CONFIGURATION_NAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7678" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-http2"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-http2"><code>quarkus.rest-client.http2</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-29" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If this is true then HTTP/2 will be enabled.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7679">QUARKUS_REST_CLIENT_HTTP2</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7679" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-max-chunk-size"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-max-chunk-size"><code>quarkus.rest-client.max-chunk-size</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-30" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The max HTTP chunk size (8096 bytes by default).</p>
+</div>
+<div class="paragraph">
+<p>Can be overwritten by client-specific settings.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7680">QUARKUS_REST_CLIENT_MAX_CHUNK_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7680" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">MemorySize <a href="#memory-size-note-anchor-quarkus-rest-client-config_quarkus-rest-client"><span class="icon"><i class="fa fa-question-circle" title="More information about the MemorySize format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>8k</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-alpn"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-alpn"><code>quarkus.rest-client.alpn</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-31" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If the Application-Layer Protocol Negotiation is enabled, the client will negotiate which protocol to use over the protocols exposed by the server. By default, it will try to use HTTP/2 first and if it&#8217;s not enabled, it will use HTTP/1.1. When the property <code>http2</code> is enabled, this flag will be automatically enabled.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7681">QUARKUS_REST_CLIENT_ALPN</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7681" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-capture-stacktrace"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-capture-stacktrace"><code>quarkus.rest-client.capture-stacktrace</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-32" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If <code>true</code>, the stacktrace of the invocation of the REST Client method is captured. This stacktrace will be used if the invocation throws an exception</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7682">QUARKUS_REST_CLIENT_CAPTURE_STACKTRACE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7682" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-logging-scope"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-logging-scope"><code>quarkus.rest-client.logging.scope</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-33" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Scope of logging for the client. <br>
+WARNING: beware of logging sensitive data <br>
+The possible values are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>request-response</code> - enables logging request and responses, including redirect responses</p>
+</li>
+<li>
+<p><code>all</code> - enables logging requests and responses and lower-level logging</p>
+</li>
+<li>
+<p><code>none</code> - no additional logging</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This property is applicable to reactive REST clients only.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7683">QUARKUS_REST_CLIENT_LOGGING_SCOPE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7683" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-logging-body-limit"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-logging-body-limit"><code>quarkus.rest-client.logging.body-limit</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-34" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>How many characters of the body should be logged. Message body can be large and can easily pollute the logs.</p>
+</div>
+<div class="paragraph">
+<p>By default, set to 100.</p>
+</div>
+<div class="paragraph">
+<p>This property is applicable to reactive REST clients only.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7684">QUARKUS_REST_CLIENT_LOGGING_BODY_LIMIT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7684" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>100</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-rest-client-config_quarkus-rest-client-clients-scope"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-clients-scope"><code>quarkus.rest-client."clients".scope</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-35" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The CDI scope to use for injection. This property can contain either a fully qualified class name of a CDI scope annotation (such as "jakarta.enterprise.context.ApplicationScoped") or its simple name (such as "ApplicationScoped"). By default, this is not set which means the interface is not registered as a bean unless it is annotated with <code>RegisterRestClient</code>. If an interface is not annotated with <code>RegisterRestClient</code> and this property is set, then Quarkus will make the interface a bean of the configured scope.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7685">QUARKUS_REST_CLIENT__CLIENTS__SCOPE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7685" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-rest-client-config_quarkus-rest-client-clients-enable-local-proxy"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-clients-enable-local-proxy"><code>quarkus.rest-client."clients".enable-local-proxy</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-36" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If set to true, then Quarkus will ensure that all calls from the REST client go through a local proxy server (that is managed by Quarkus). This can be very useful for capturing network traffic to a service that uses HTTPS.</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client, only the Quarkus REST client (formerly RESTEasy Reactive client).</p>
+</div>
+<div class="paragraph">
+<p>This property only applicable to dev and test mode.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7686">QUARKUS_REST_CLIENT__CLIENTS__ENABLE_LOCAL_PROXY</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7686" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-rest-client-config_quarkus-rest-client-clients-local-proxy-provider"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-clients-local-proxy-provider"><code>quarkus.rest-client."clients".local-proxy-provider</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-37" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>This setting is used to select which proxy provider to use if there are multiple ones. It only applies if <code>enable-local-proxy</code> is true.</p>
+</div>
+<div class="paragraph">
+<p>The algorithm for picking between multiple provider is the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>If only the default is around, use it (its name is <code>default</code>)</p>
+</li>
+<li>
+<p>If there is only one besides the default, use it</p>
+</li>
+<li>
+<p>If there are multiple ones, fail</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7687">QUARKUS_REST_CLIENT__CLIENTS__LOCAL_PROXY_PROVIDER</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7687" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-rest-client-config_quarkus-rest-client-clients-removes-trailing-slash"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-clients-removes-trailing-slash"><code>quarkus.rest-client."clients".removes-trailing-slash</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-38" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If true, the extension will automatically remove the trailing slash in the paths if any. This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7688">QUARKUS_REST_CLIENT__CLIENTS__REMOVES_TRAILING_SLASH</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7688" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-url"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-url"><code>quarkus.rest-client."client".url</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-39" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The base URL to use for this service. This property or the <code>uri</code> property is considered required, unless the <code>baseUri</code> attribute is configured in the <code>@RegisterRestClient</code> annotation.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7689">QUARKUS_REST_CLIENT__CLIENT__URL</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7689" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-uri"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-uri"><code>quarkus.rest-client."client".uri</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-40" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The base URI to use for this service. This property or the <code>url</code> property is considered required, unless the <code>baseUri</code> attribute is configured in the <code>@RegisterRestClient</code> annotation.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7690">QUARKUS_REST_CLIENT__CLIENT__URI</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7690" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-override-uri"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-override-uri"><code>quarkus.rest-client."client".override-uri</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-41" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>This property is only meant to be set by advanced configurations to override whatever value was set for the uri or url. The override is done using the REST Client class name configuration syntax.</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client, only the Quarkus Rest client (formerly RESTEasy Reactive client).</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7691">QUARKUS_REST_CLIENT__CLIENT__OVERRIDE_URI</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7691" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-providers"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-providers"><code>quarkus.rest-client."client".providers</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-42" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Map where keys are fully-qualified provider classnames to include in the client, and values are their integer priorities. The equivalent of the <code>@RegisterProvider</code> annotation.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7692">QUARKUS_REST_CLIENT__CLIENT__PROVIDERS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7692" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-connect-timeout"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-connect-timeout"><code>quarkus.rest-client."client".connect-timeout</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-43" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Timeout specified in milliseconds to wait to connect to the remote endpoint.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7693">QUARKUS_REST_CLIENT__CLIENT__CONNECT_TIMEOUT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7693" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">長</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-read-timeout"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-read-timeout"><code>quarkus.rest-client."client".read-timeout</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-44" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Timeout specified in milliseconds to wait for a response from the remote endpoint.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7694">QUARKUS_REST_CLIENT__CLIENT__READ_TIMEOUT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7694" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">長</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-follow-redirects"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-follow-redirects"><code>quarkus.rest-client."client".follow-redirects</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-45" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>A boolean value used to determine whether the client should follow HTTP redirect responses.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7695">QUARKUS_REST_CLIENT__CLIENT__FOLLOW_REDIRECTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7695" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-multipart-post-encoder-mode"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-multipart-post-encoder-mode"><code>quarkus.rest-client."client".multipart-post-encoder-mode</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-46" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Mode in which the form data are encoded. Possible values are <code>HTML5</code>, <code>RFC1738</code> and <code>RFC3986</code>. The modes are described in the <a href="https://netty.io/4.1/api/io/netty/handler/codec/http/multipart/HttpPostRequestEncoder.EncoderMode.html">Netty documentation</a></p>
+</div>
+<div class="paragraph">
+<p>By default, Rest Client Reactive uses RFC1738.</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7696">QUARKUS_REST_CLIENT__CLIENT__MULTIPART_POST_ENCODER_MODE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7696" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-proxy-address"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-proxy-address"><code>quarkus.rest-client."client".proxy-address</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-47" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>A string value in the form of <code>:</code> that specifies the HTTP proxy server hostname (or IP address) and port for requests of this client to use.</p>
+</div>
+<div class="paragraph">
+<p>Use <code>none</code> to disable proxy</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7697">QUARKUS_REST_CLIENT__CLIENT__PROXY_ADDRESS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7697" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-proxy-user"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-proxy-user"><code>quarkus.rest-client."client".proxy-user</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-48" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Proxy username.</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7698">QUARKUS_REST_CLIENT__CLIENT__PROXY_USER</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7698" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-proxy-password"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-proxy-password"><code>quarkus.rest-client."client".proxy-password</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-49" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Proxy password.</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7699">QUARKUS_REST_CLIENT__CLIENT__PROXY_PASSWORD</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7699" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-non-proxy-hosts"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-non-proxy-hosts"><code>quarkus.rest-client."client".non-proxy-hosts</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-50" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Hosts to access without proxy</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7700">QUARKUS_REST_CLIENT__CLIENT__NON_PROXY_HOSTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7700" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-query-param-style"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-query-param-style"><code>quarkus.rest-client."client".query-param-style</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-51" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>An enumerated type string value with possible values of "MULTI_PAIRS" (default), "COMMA_SEPARATED", or "ARRAY_PAIRS" that specifies the format in which multiple values for the same query parameter is used.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7701">QUARKUS_REST_CLIENT__CLIENT__QUERY_PARAM_STYLE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7701" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><code>multi-pairs</code>, <code>comma-separated</code>, <code>array-pairs</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-verify-host"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-verify-host"><code>quarkus.rest-client."client".verify-host</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-52" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set whether hostname verification is enabled. Default is enabled. This setting should not be disabled in production as it makes the client vulnerable to MITM attacks.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7702">QUARKUS_REST_CLIENT__CLIENT__VERIFY_HOST</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7702" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-trust-store"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-trust-store"><code>quarkus.rest-client."client".trust-store</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-53" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The trust store location. Can point to either a classpath resource or a file.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7703">QUARKUS_REST_CLIENT__CLIENT__TRUST_STORE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7703" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-trust-store-password"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-trust-store-password"><code>quarkus.rest-client."client".trust-store-password</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-54" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The trust store password.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7704">QUARKUS_REST_CLIENT__CLIENT__TRUST_STORE_PASSWORD</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7704" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-trust-store-type"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-trust-store-type"><code>quarkus.rest-client."client".trust-store-type</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-55" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The type of the trust store. Defaults to "JKS".</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7705">QUARKUS_REST_CLIENT__CLIENT__TRUST_STORE_TYPE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7705" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-key-store"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-key-store"><code>quarkus.rest-client."client".key-store</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-56" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The key store location. Can point to either a classpath resource or a file.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7706">QUARKUS_REST_CLIENT__CLIENT__KEY_STORE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7706" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-key-store-password"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-key-store-password"><code>quarkus.rest-client."client".key-store-password</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-57" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The key store password.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7707">QUARKUS_REST_CLIENT__CLIENT__KEY_STORE_PASSWORD</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7707" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-key-store-type"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-key-store-type"><code>quarkus.rest-client."client".key-store-type</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-58" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The type of the key store. Defaults to "JKS".</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7708">QUARKUS_REST_CLIENT__CLIENT__KEY_STORE_TYPE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7708" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-hostname-verifier"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-hostname-verifier"><code>quarkus.rest-client."client".hostname-verifier</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-59" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The class name of the host name verifier. The class must have a public no-argument constructor.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7709">QUARKUS_REST_CLIENT__CLIENT__HOSTNAME_VERIFIER</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7709" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-tls-configuration-name"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-tls-configuration-name"><code>quarkus.rest-client."client".tls-configuration-name</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-60" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The name of the TLS configuration to use.</p>
+</div>
+<div class="paragraph">
+<p>If not set and the default TLS configuration is configured (<code>quarkus.tls.*</code>) then that will be used. If a name is configured, it uses the configuration from <code>quarkus.tls.&lt;name&gt;.*</code> If a name is configured, but no TLS configuration is found with that name then an error will be thrown.</p>
+</div>
+<div class="paragraph">
+<p>If no TLS configuration is set, then the keys-tore, trust-store, etc. properties will be used.</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7710">QUARKUS_REST_CLIENT__CLIENT__TLS_CONFIGURATION_NAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7710" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-connection-ttl"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-connection-ttl"><code>quarkus.rest-client."client".connection-ttl</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-61" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The time in ms for which a connection remains unused in the connection pool before being evicted and closed. A timeout of <code>0</code> means there is no timeout.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7711">QUARKUS_REST_CLIENT__CLIENT__CONNECTION_TTL</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7711" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-connection-pool-size"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-connection-pool-size"><code>quarkus.rest-client."client".connection-pool-size</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-62" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The size of the connection pool for this client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7712">QUARKUS_REST_CLIENT__CLIENT__CONNECTION_POOL_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7712" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-keep-alive-enabled"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-keep-alive-enabled"><code>quarkus.rest-client."client".keep-alive-enabled</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-63" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If set to false disables the keep alive completely.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7713">QUARKUS_REST_CLIENT__CLIENT__KEEP_ALIVE_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7713" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-max-redirects"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-max-redirects"><code>quarkus.rest-client."client".max-redirects</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-64" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The maximum number of redirection a request can follow.</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7714">QUARKUS_REST_CLIENT__CLIENT__MAX_REDIRECTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7714" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-headers-header-name"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-headers-header-name"><code>quarkus.rest-client."client".headers."header-name"</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-65" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The HTTP headers that should be applied to all requests of the rest client.</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7715">QUARKUS_REST_CLIENT__CLIENT__HEADERS__HEADER_NAME_</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7715" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Map&lt;String,String&gt;</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-shared"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-shared"><code>quarkus.rest-client."client".shared</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-66" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set to true to share the HTTP client between REST clients. There can be multiple shared clients distinguished by <em>name</em>, when no specific name is set, the name <code>__vertx.DEFAULT</code> is used.</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7716">QUARKUS_REST_CLIENT__CLIENT__SHARED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7716" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-name"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-name"><code>quarkus.rest-client."client".name</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-67" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set the HTTP client name, used when the client is shared, otherwise ignored.</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7717">QUARKUS_REST_CLIENT__CLIENT__NAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7717" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-user-agent"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-user-agent"><code>quarkus.rest-client."client".user-agent</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-68" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configure the HTTP user-agent header to use.</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7718">QUARKUS_REST_CLIENT__CLIENT__USER_AGENT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7718" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-http2"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-http2"><code>quarkus.rest-client."client".http2</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-69" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If this is true then HTTP/2 will be enabled.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7719">QUARKUS_REST_CLIENT__CLIENT__HTTP2</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7719" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-max-chunk-size"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-max-chunk-size"><code>quarkus.rest-client."client".max-chunk-size</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-70" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The max HTTP ch unk size (8096 bytes by default).</p>
+</div>
+<div class="paragraph">
+<p>This property is not applicable to the RESTEasy Client.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7720">QUARKUS_REST_CLIENT__CLIENT__MAX_CHUNK_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7720" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">MemorySize <a href="#memory-size-note-anchor-quarkus-rest-client-config_quarkus-rest-client"><span class="icon"><i class="fa fa-question-circle" title="More information about the MemorySize format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>8K</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-alpn"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-alpn"><code>quarkus.rest-client."client".alpn</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-71" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If the Application-Layer Protocol Negotiation is enabled, the client will negotiate which protocol to use over the protocols exposed by the server. By default, it will try to use HTTP/2 first and if it&#8217;s not enabled, it will use HTTP/1.1. When the property <code>http2</code> is enabled, this flag will be automatically enabled.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7721">QUARKUS_REST_CLIENT__CLIENT__ALPN</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7721" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-client-config_quarkus-rest-client-client-capture-stacktrace"></a> <span class="property-path"><a href="#quarkus-rest-client-config_quarkus-rest-client-client-capture-stacktrace"><code>quarkus.rest-client."client".capture-stacktrace</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-72" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If <code>true</code>, the stacktrace of the invocation of the REST Client method is captured. This stacktrace will be used if the invocation throws an exception</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-7722">QUARKUS_REST_CLIENT__CLIENT__CAPTURE_STACKTRACE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-7722" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+</tbody>
+</table>
+<div id="memory-size-note-anchor-quarkus-rest-client-config_quarkus-rest-client" class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">About the MemorySize format</div>
+<div class="paragraph">
+<p>A size configuration option recognizes strings in this format (shown as a regular expression): <code>[0-9]+[KkMmGgTtPpEeZzYy]?</code>.</p>
+</div>
+<div class="paragraph">
+<p>If no suffix is given, assume bytes.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#solution">ソリューション</a></li>
+<li><a href="#creating-the-maven-project">Mavenプロジェクトの作成</a></li>
+<li><a href="#setting-up-the-model">モデルのセットアップ</a></li>
+<li><a href="#create-the-interface">インターフェースの作成</a>
+<ul class="sectlevel2">
+<li><a href="#path-parameters">パスパラメーター</a></li>
+</ul>
+</li>
+<li><a href="#create-the-configuration">コンフィグレーションの作成</a>
+<ul class="sectlevel2">
+<li><a href="#disabling-hostname-verification">ホスト名の検証を無効にする</a></li>
+<li><a href="#disabling-ssl-verifications">SSL の検証の無効化</a></li>
+</ul>
+</li>
+<li><a href="#create-the-jakarta-rest-resource">Jakarta RESTリソースの作成</a></li>
+<li><a href="#update-the-test">テストの更新</a></li>
+<li><a href="#redirection">リダイレクト</a></li>
+<li><a href="#async-support">非同期サポート</a></li>
+<li><a href="#custom-headers-support">カスタムヘッダーのサポート</a>
+<ul class="sectlevel2">
+<li><a href="#default-header-factory">デフォルトのヘッダーファクトリー</a></li>
+</ul>
+</li>
+<li><a href="#package-and-run-the-application">アプリケーションをパッケージ化して実行する</a></li>
+<li><a href="#rest-client-and-resteasy-interactions">REST クライアントと RESTEasy のやりとり</a></li>
+<li><a href="#using-a-mock-http-server-for-tests">テストにモックHTTPサーバーを使用する</a></li>
+<li><a href="#further-reading">さらに詳しく</a></li>
+<li><a href="#configuration-reference">設定リファレンス</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same extensions</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/guides/resteasy-client-multipart">マルチパートでのRESTクライアントの使用</a></li>
+      </ul>
+    </div>
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/guides/resteasy-client-multipart">マルチパートでのRESTクライアントの使用</a></li>
+      
+        
+        <li class="guide"><a href="/guides/rest-migration">Quarkus REST（旧RESTEasy Reactive）への移行</a></li>
+      
+        
+        <li class="guide"><a href="/guides/resteasy">RESTEasy Classic</a></li>
+      
+        
+        <li class="guide"><a href="/guides/rest-client">REST クライアントの利用</a></li>
+      
+        
+        <li class="reference"><a href="/guides/security-authorize-web-endpoints-reference">ウェブエンドポイントの認可</a></li>
+      
+        
+        <li class="guide"><a href="/guides/rest-data-panache">PanacheでJakarta RESTリソースを生成する</a></li>
+      
+        
+        <li class="howto"><a href="/guides/rest-virtual-threads">RESTアプリケーションで仮想スレッドを使用する</a></li>
+      
+        
+        <li class="guide"><a href="/guides/openapi-swaggerui">OpenAPIとSwagger UIの利用</a></li>
+      
+        
+        <li class="guide"><a href="/guides/rest-json">JSON RESTサービスの実装</a></li>
+      
+        
+        <li class="guide"><a href="/guides/rest">Quarkus REST（旧RESTEasy Reactive）によるRESTサービスの作成</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

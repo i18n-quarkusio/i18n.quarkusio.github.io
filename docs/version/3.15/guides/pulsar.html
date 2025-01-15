@@ -1,0 +1,3743 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Apache Pulsar リファレンス・ガイド - 3.15 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.15/guides/pulsar" />
+  <meta property="og:title" content="Apache Pulsar リファレンス・ガイド - 3.15" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/pulsar">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.15/guides/pulsar">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.15/guides/pulsar" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.15/guides/pulsar">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.15/guides/pulsar">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.15/guides/pulsar">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.15/guides/pulsar">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.15/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" selected>3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">Apache Pulsar リファレンス・ガイド </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このリファレンスガイドでは、Quarkus アプリケーションが Quarkus Messaging を利用して Apache Pulsar と対話する仕組みを説明します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="introduction"><a class="anchor" href="#introduction"></a>1. はじめに</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://pulsar.apache.org">Apache Pulsar</a> は、クラウド向けに構築されたオープンソースの分散メッセージングおよびストリーミングプラットフォームです。
+階層型ストレージ機能により、マルチテナントの高性能ソリューションをサーバーメッセージングに提供します。</p>
+</div>
+<div class="paragraph">
+<p>Pulsar はパブリッシュ - サブスクライブパターンを実装します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>プロデューサーは <em>トピック</em> にメッセージを公開します。</p>
+</li>
+<li>
+<p>コンシューマーは、そのトピックへの <em>サブスクリプション</em> を作成し、着信メッセージを受信して処理します。処理が完了すると、ブローカーに <em>完了通知</em> を送信します。</p>
+</li>
+<li>
+<p>サブスクリプションが作成されると、コンシューマーが切断されても、Pulsar はすべてのメッセージを保持します。
+保持されたメッセージは、これらのメッセージがすべて正常に処理されたことをコンシューマーが確認した場合にのみ破棄されます。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Pulsar クラスターは、以下の要素で構成されます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ステートレスコンポーネントである 1 つ以上のブローカー。</p>
+</li>
+<li>
+<p>トピックのメタデータ、スキーマ、調整、クラスター設定を維持するための <em>メタデータストア</em>。</p>
+</li>
+<li>
+<p>メッセージの永続的な保存に使用される <em>bookies</em> のセット。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="quarkus-extension-for-apache-pulsar"><a class="anchor" href="#quarkus-extension-for-apache-pulsar"></a>2. Apache Pulsar のための Quarkus エクステンション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus は、 <a href="https://smallrye.io/smallrye-reactive-messaging/">SmallRye Reactive Messaging</a> フレームワークを通じて Apache Pulsar のサポートを提供します。
+Eclipse MicroProfile Reactive Messaging 仕様 3.0 に基づいて、CDI とイベント駆動型を橋渡しする柔軟なプログラミングモデルを提案します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>このガイドでは、Apache Pulsar と SmallRye Reactive Messaging フレームワークについて詳しく説明します。
+クイックスタートについては、<a href="pulsar-getting-started">Apache Pulsar を使用した Quarkus Messaging の概要</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>プロジェクトのベースディレクトリーで次のコマンドを実行すると、<code>messaging-pulsar</code> エクステンションをプロジェクトに追加できます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus extension add messaging-pulsar</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:add-extension -Dextensions='messaging-pulsar'</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew addExtension --extensions='messaging-pulsar'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、 <code>pom.xml</code> に以下が追加されます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-messaging-pulsar&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-messaging-pulsar")</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>このエクステンションには、<code>pulsar-clients-original</code> バージョン 3.0.0 が推移的依存関係として含まれており、Pulsar ブローカーバージョン 2.10.x との互換性があります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-smallrye-pulsar-connector"><a class="anchor" href="#configuring-smallrye-pulsar-connector"></a>3. SmallRye Pulsar コネクターの設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>SmallRye Reactive Messaging フレームワークは、Apache Kafka、Apache Pulsar、AMQP、Apache Camel、JMS、MQTT などのさまざまなメッセージングバックエンドをサポートしているため、汎用的な語彙を使用しています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>アプリケーションは <strong>メッセージ</strong> を送受信します。 <a href="https://javadoc.io/doc/io.smallrye.reactive/smallrye-reactive-messaging-api/latest/org/eclipse/microprofile/reactive/messaging/Message.html"><code>Message</code></a> は、<em>ペイロード</em> をラップし、いくつかの <em>メタデータ</em> で拡張できます。
+これは、値とキーで構成される Pulsar <a href="https://javadoc.io/doc/org.apache.pulsar/pulsar-client-api/latest/org/apache/pulsar/client/api/Message.html"><code>Message</code></a> と混同しないでください。
+Pulsar コネクターでは、Reactive Messaging <em>メッセージ</em> が Pulsar <em>メッセージ</em> に対応します。</p>
+</li>
+<li>
+<p>メッセージは <strong>チャネル</strong> を通過します。アプリケーションコンポーネントは、チャネルに接続してメッセージを公開および消費します。Pulsar コネクターは、<em>チャネル</em> を Pulsar <em>トピック</em> にマッピングします。</p>
+</li>
+<li>
+<p>チャネルは <strong>コネクター</strong> を使用してメッセージバックエンドに接続します。
+コネクターは、着信メッセージを特定のチャネル (アプリケーションが消費するチャネル) にマッピングし、特定のチャネルに送信された発信メッセージを収集するように設定されています。
+各コネクターは、特定のメッセージングテクノロジーに特化しています。
+たとえば、Pulsar を処理するコネクターの名前は、<code>smallrye-pulsar</code> となっています。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>着信チャネルを持つ Pulsar コネクターの最小設定は次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">%prod.pulsar.client.serviceUrl=pulsar:6650 <i class="conum" data-value="1"></i><b>(1)</b>
+mp.messaging.incoming.prices.connector=smallrye-pulsar <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>プロダクションプロファイルの Pulsar ブローカーサービス URL を設定します。
+この URL は、<code>mp.messaging.incoming.$channel.serviceUrl</code> プロパティーを使用して、グローバルに、またはチャネルごとに設定できます。
+開発モードおよびテスト実行時には、<a href="#pulsar-dev-services">Dev Services for Pulsar</a> が Pulsar ブローカーを自動的に起動します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>prices チャネルを管理するためのコネクターを設定します。
+デフォルトでは、<em>トピック</em> 名はチャネル名と同じです。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>トピック名は、トピック属性を設定することで上書きできます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>%prod</code> 接頭辞は、アプリケーションが prod モードで実行されている場合にのみプロパティーが使用されることを示します (つまり、dev または test モードでは使用されません)。詳細は、<a href="config-reference#profiles">プロファイルに関するドキュメント</a> を参照してください。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="title">コネクターの自動アタッチ</div>
+<div class="paragraph">
+<p>クラスパスに単一のコネクターがある場合は、<code>connector</code> 属性の設定を省略できます。
+Quarkus は、<em>孤立した</em> チャネルをクラスパスにある (一意の) コネクターに自動的に関連付けます。
+<em>孤立した</em> チャネルとは、ダウンストリームコンシューマーのない発信チャネル、またはアップストリームプロデューサーのない着信チャネルです。</p>
+</div>
+<div class="paragraph">
+<p>この自動アタッチは、以下を使用して無効にできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.messaging.auto-connector-attachment=false</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>設定オプションの詳細は、<a href="#configuring-pulsar-clients">Pulsar クライアントの設定</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="receiving-messages-from-pulsar"><a class="anchor" href="#receiving-messages-from-pulsar"></a>4. Pulsar からのメッセージの受信</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Pulsar コネクターは、Pulsar クライアントを使用して Pulsar ブローカーに接続し、コンシューマーを作成して Pulsar ブローカーからメッセージを受信します。また、各 Pulsar <code>Message</code> を Reactive Messaging <code>Message</code> にマッピングします。</p>
+</div>
+<div class="sect2">
+<h3 id="example"><a class="anchor" href="#example"></a>4.1. 例</h3>
+<div class="paragraph">
+<p>Pulsar ブローカーが実行中で、<code>pulsar:6650</code> アドレスを使用してアクセスできるとします。
+次のようにして、<code>prices</code> チャネルで Pulsar メッセージを受信するようにアプリケーションを設定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.incoming.prices.serviceUrl=pulsar://pulsar:6650 <i class="conum" data-value="1"></i><b>(1)</b>
+mp.messaging.incoming.prices.subscriptionInitialPosition=Earliest <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Pulsar ブローカーサービスの URL を設定します。</p>
+</li>
+<li>
+<p>コンシューマーのサブスクリプションが <code>Earliest</code> 位置からメッセージの受信を開始することを確認します。</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Pulsar トピックやコンシューマー名を設定する必要はありません。
+デフォルトでは、コネクターはチャネル名 (<code>prices</code>) を使用します。
+トピックとコンシューマー名は、<code>topic</code> 属性と <code>consumerName</code> 属性を設定してオーバーライドすることができます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Pulsar では、コンシューマーがトピックサブスクリプションの <code>subscriptionName</code> を指定する必要があります。
+指定されていない場合、コネクターが一意の <strong>サブスクリプション名</strong> を生成します。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>すると、アプリケーションが <code>double</code> ペイロードを直接受信できるようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.reactive.messaging.Incoming;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+public class PriceConsumer {
+
+    @Incoming("prices")
+    public void consume(double price) {
+        // process your price.
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>または、Reactive Messaging タイプ <code>Message&lt;Double&gt;</code> を取得することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Incoming("prices")
+public CompletionStage&lt;Void&gt; consume(Message&lt;Double&gt; msg) {
+    // access record metadata
+    var metadata = msg.getMetadata(PulsarIncomingMessageMetadata.class).orElseThrow();
+    // process the message payload.
+    double price = msg.getPayload();
+    // Acknowledge the incoming message (acknowledge the Pulsar message back to the broker)
+    return msg.ack();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Reactive Messaging の <code>Message</code> タイプを使用すると、コンシューマーメソッドが着信メッセージのメタデータにアクセスし、確認応答を手動で処理できます。</p>
+</div>
+<div class="paragraph">
+<p>Pulsar メッセージオブジェクトに直接アクセスする場合は、次を使用します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Incoming("prices")
+public void consume(org.apache.pulsar.client.api.Message&lt;Double&gt; msg) {
+    String key = msg.getKey();
+    String value = msg.getValue();
+    String topic = msg.topicName();
+    // ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>org.apache.pulsar.client.api.Message</code> は、基盤となる Pulsar クライアントによって提供され、コンシューマーメソッドで直接使用できます。</p>
+</div>
+<div class="paragraph">
+<p>または、次の例のように、アプリケーションで、チャネル名によって識別される <code>Multi</code> を Bean に注入し、そのイベントをサブスクライブすることもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.smallrye.mutiny.Multi;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import org.jboss.resteasy.reactive.RestStreamElementType;
+
+@Path("/prices")
+public class PriceResource {
+
+    @Inject
+    @Channel("prices")
+    Multi&lt;Double&gt; prices;
+
+    @GET
+    @Path("/prices")
+    @RestStreamElementType(MediaType.TEXT_PLAIN)
+    public Multi&lt;Double&gt; stream() {
+        return prices;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>@Channel</code> でメッセージを消費する場合、アプリケーションコードがサブスクリプションを行います。
+上記の例では、Quarkus REST (旧称 RESTEasy Reactive) エンドポイントがサブスクリプションを処理します。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>チャンネルとして注入できるのは、以下のタイプです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject @Channel("prices") Multi&lt;Double&gt; streamOfPayloads;
+
+@Inject @Channel("prices") Multi&lt;Message&lt;Double&gt;&gt; streamOfMessages;
+
+@Inject @Channel("prices") Publisher&lt;Double&gt; publisherOfPayloads;
+
+@Inject @Channel("prices") Publisher&lt;Message&lt;Double&gt;&gt; publisherOfMessages;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>前出の <code>Message</code> の例と同様に、注入されたチャネルがペイロード (<code>Multi&lt;T&gt;</code>) を受信した場合は、そのチャネルが自動的にメッセージを確認応答し、複数のサブスクライバーをサポートします。
+注入されたチャネルが Message (<code>Multi&lt;Message&lt;T&gt;&gt;</code>) を受信した場合は、手動で確認応答とブロードキャストを行う必要があります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="blocking-processing"><a class="anchor" href="#blocking-processing"></a>4.2. ブロッキング処理</h3>
+<div class="paragraph">
+<p>リアクティブメッセージングは、I/O スレッドでメソッドを呼び出します。このトピックの詳細については、x<a href="quarkus-reactive-architecture">Quarkus リアクティブアーキテクチャーのドキュメント</a> を参照してください。ただし、多くの場合、リアクティブメッセージングとデータベースインタラクションなどのブロック処理を組み合わせる必要があります。このためには、処理が <em>ブロッキング</em> であり、呼び出し元のスレッドで実行するべきではないことを示す <code>@Blocking</code> アノテーションを使用する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>例えば、以下のコードは、Hibernate with Panacheを 使用してデータベースに受信ペイロードを格納する方法を示しています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.smallrye.reactive.messaging.annotations.Blocking;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
+
+@ApplicationScoped
+public class PriceStorage {
+
+    @Incoming("prices")
+    @Transactional
+    public void store(int priceInUsd) {
+        Price price = new Price();
+        price.value = priceInUsd;
+        price.persist();
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>@Blocking</code> アノテーションは 2 つあります。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>io.smallrye.reactive.messaging.annotations.Blocking</code></p>
+</li>
+<li>
+<p><code>io.smallrye.common.annotation.Blocking</code></p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>効果はどちらも同じです。したがって、両方を使うことができます。最初のものは、使用するワーカープールや順序を保持するかどうかなど、より細かい調整が可能です。2 番目のものは、Quarkus の他のリアクティブ機能でも使用され、デフォルトのワーカープールを使用し、順序を保持します。</p>
+</div>
+<div class="paragraph">
+<p><code>@Blocking</code> アノテーションの使用法の詳細については、 <a href="https://smallrye.io/smallrye-reactive-messaging/smallrye-reactive-messaging/3.1/advanced/blocking.html">SmallRye Reactive Messaging – Handling blocking execution</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="title">@RunOnVirtualThread</div>
+<div class="paragraph">
+<p>Java <em>仮想スレッドでの</em> ブロッキング処理の実行については、 <a href="messaging-virtual-threads">Quarkus Virtual Thread support with Reactive Messagingのドキュメント</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="title">@Transactional</div>
+<div class="paragraph">
+<p>メソッドに <code>@Transactional</code> アノテーションが付けられている場合、メソッドに <code>@Blocking</code> アノテーションが付けられていなくても、自動的に <em>blocking</em> と見なされます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="pulsar-subscription-types"><a class="anchor" href="#pulsar-subscription-types"></a>4.3. Pulsar のサブスクリプションタイプ</h3>
+<div class="paragraph">
+<p>Pulsar の <strong>subscriptionType</strong> コンシューマー設定は、パブリッシュ - サブスクライブやキューイングなど、さまざまなメッセージングシナリオを実現するために柔軟に使用できます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Exclusive</strong> サブスクリプションタイプ使用すると、"ファンアウト型の pub/sub メッセージング" 用に <em>一意のサブスクリプション名</em> を指定できます。これがデフォルトのサブスクリプションタイプです。</p>
+</li>
+<li>
+<p><strong>Shared</strong>、<strong>Key_Shared</strong>、または <strong>Failover</strong> サブスクリプションタイプを使用すると、複数のコンシューマーで <em>同じサブスクリプション名</em> を共有して、コンシューマー間で "メッセージキューイング" を実現できます。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>サブスクリプション名が指定されていない場合、Quarkus は一意の ID を生成します。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="deserialization-and-pulsar-schema"><a class="anchor" href="#deserialization-and-pulsar-schema"></a>4.4. デシリアライゼーションと Pulsar Schema</h3>
+<div class="paragraph">
+<p>Pulsar コネクターを使用すると、基盤となる Pulsar コンシューマーのスキーマ設定を設定できます。
+詳細は、<a href="#pulsar-schema-configuration">Pulsar Schema 設定と自動スキーマ検出</a> を参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="acknowledgement-strategies"><a class="anchor" href="#acknowledgement-strategies"></a>4.5. 確認応答ストラテジー</h3>
+<div class="paragraph">
+<p>Pulsar メッセージから生成されたメッセージが <strong>確認応答</strong> されると、コネクターが <a href="https://pulsar.apache.org/docs/3.0.x/concepts-messaging/#acknowledgment">確認応答リクエスト</a> を Pulsar ブローカーに送信します。
+すべての Reactive Messaging メッセージが <strong>確認応答</strong> される必要があります。ほとんどの場合、これは自動的に処理されます。
+確認応答リクエストは、次の 2 つのストラテジーを使用して Pulsar ブローカーに送信できます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>個別確認応答</strong> は、デフォルトのストラテジーです。確認応答リクエストが各メッセージに対してブローカーに送信されます。</p>
+</li>
+<li>
+<p><strong>累積確認応答</strong> は、<code>ack-strategy=cumulative</code> を使用して設定されるストラテジーです。コンシューマーが受信した最後のメッセージのみを確認します。
+提供されたメッセージまでのストリーム内の全メッセージは、そのコンシューマーに再配信されません。</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>デフォルトでは、Pulsar コンシューマーは、ブローカーからの確認応答の確認を待たずに確認応答を検証します。
+<code>ackReceiptEnabled=true</code> を使用してこれを有効にできます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="failure-handling-strategies"><a class="anchor" href="#failure-handling-strategies"></a>4.6. 失敗処理ストラテジー</h3>
+<div class="paragraph">
+<p>Pulsar メッセージから生成されたメッセージが <strong>否定応答</strong> された場合、失敗ストラテジーが適用されます。
+Quarkus Pulsar エクステンションは、4 つのストラテジーをサポートしています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>nack</code> <strong>(デフォルト)</strong> は、ブローカーに <a href="https://pulsar.apache.org/docs/3.0.x/concepts-messaging/#negative-acknowledgment">否定応答</a> を送信し、ブローカーがこのメッセージをコンシューマーに再配信するようにトリガーします。
+否定応答は、<code>negativeAckRedeliveryDelayMicros</code> プロパティーと <code>negativeAck.redeliveryBackoff</code> プロパティーを使用してさらに設定できます。</p>
+</li>
+<li>
+<p><code>fail</code> の場合、アプリケーションが失敗します。メッセージはそれ以上処理されません。</p>
+</li>
+<li>
+<p><code>ignore</code> の場合、失敗がログに記録されますが、確認応答ストラテジーが適用され、処理が続行されます。</p>
+</li>
+<li>
+<p><code>continue</code> の場合、失敗がログに記録されますが、確認応答や否定応答を適用せずに処理が続行されます。このストラテジーは、<a href="#ack-timeout">確認応答タイムアウト</a> 設定とともに使用できます。</p>
+</li>
+<li>
+<p><code>reconsume-later</code> は、<code>reconsumeLater</code> API を使用して、遅延して再消費されるメッセージを <a href="https://pulsar.apache.org/docs/3.0.x/concepts-messaging/#retry-letter-topic">再試行レタートピック</a> に送信します。
+遅延は <code>reconsumeLater.delay</code> プロパティーを使用して設定でき、デフォルトは 3 秒です。
+失敗メタデータに <code>io.smallrye.reactive.messaging.pulsar.PulsarReconsumeLaterMetadata</code> のインスタンスを追加することで、メッセージごとにカスタムの遅延またはプロパティーを設定できます。</p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="ack-timeout"><a class="anchor" href="#ack-timeout"></a>4.6.1. 確認応答タイムアウト</h4>
+<div class="paragraph">
+<p>Pulsar クライアントは、否定応答と同様に、 <a href="https://pulsar.apache.org/docs/3.0.x/concepts-messaging/#acknowledgment-timeout">確認応答タイムアウト</a> メカニズムにより、指定された <strong>ackTimeout</strong> 期間にわたって、確認応答されていないメッセージを追跡し、ブローカーに <strong>確認応答されていないメッセージの再配信リクエスト</strong> を送信します。これを受けて、ブローカーは確認応答されていないメッセージをコンシューマーに再送信します。</p>
+</div>
+<div class="paragraph">
+<p>タイムアウトと再配信バックオフメカニズムを設定するには、<code>ackTimeoutMillis</code> プロパティーと <code>ackTimeout.redeliveryBackoff</code> プロパティーを設定します。
+<code>ackTimeout.redeliveryBackoff</code> には、最小遅延 (ミリ秒単位)、最大遅延 (ミリ秒単位)、および乗数をコンマ区切り値として指定できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.incoming.out.failure-strategy=continue
+mp.messaging.incoming.out.ackTimeoutMillis=10000
+mp.messaging.incoming.out.ackTimeout.redeliveryBackoff=1000,60000,2</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="reconsume-later-and-retry-letter-topic"><a class="anchor" href="#reconsume-later-and-retry-letter-topic"></a>4.6.2. 後の再消費と再試行レタートピック</h4>
+<div class="paragraph">
+<p><a href="https://pulsar.apache.org/docs/3.0.x/concepts-messaging/#retry-letter-topic">再試行レタートピック</a> は、正常に消費されなかったメッセージをデッドレタートピックにプッシュし、メッセージの消費を継続します。
+デッドレタートピックは、確認応答タイムアウト、否定応答、再試行レタートピックなどのさまざまなメッセージ再配信方法で使用できることに注意してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.incoming.data.failure-strategy=reconsume-later
+mp.messaging.incoming.data.reconsumeLater.delay=5000
+mp.messaging.incoming.data.retryEnable=true
+mp.messaging.incoming.data.negativeAck.redeliveryBackoff=1000,60000,2</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="dead-letter-topic"><a class="anchor" href="#dead-letter-topic"></a>4.6.3. デッドレタートピック</h4>
+<div class="paragraph">
+<p><a href="https://pulsar.apache.org/docs/3.0.x/concepts-messaging/#dead-letter-topic">デッドレタートピック</a> は、正常に消費されなかったメッセージをデッドレタートピックにプッシュし、メッセージの消費を継続します。
+デッドレタートピックは、確認応答タイムアウト、否定応答、再試行レタートピックなどのさまざまなメッセージ再配信方法で使用できることに注意してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.incoming.data.failure-strategy=nack
+mp.messaging.incoming.data.deadLetterPolicy.maxRedeliverCount=2
+mp.messaging.incoming.data.deadLetterPolicy.deadLetterTopic=my-dead-letter-topic
+mp.messaging.incoming.data.deadLetterPolicy.initialSubscriptionName=my-dlq-subscription
+mp.messaging.incoming.data.subscriptionType=Shared</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><strong>否定応答</strong> または <strong>確認応答タイムアウト</strong> 再配信方法では、少なくとも未処理のメッセージを含むメッセージのバッチ全体が再配信されます。
+詳細は、<a href="#producer-batching">プロデューサーのバッチ処理</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="receiving-pulsar-messages-in-batches"><a class="anchor" href="#receiving-pulsar-messages-in-batches"></a>4.7. Pulsar メッセージの一括受信</h3>
+<div class="paragraph">
+<p>デフォルトでは、incoming メソッドは各 Pulsar メッセージを個別に受信します。
+<code>batchReceive=true</code> プロパティーを使用するか、コンシューマー設定で <code>batchReceivePolicy</code> を指定することで、バッチモードを有効にすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Incoming("prices")
+public CompletionStage&lt;Void&gt; consumeMessage(Message&lt;org.apache.pulsar.client.api.Messages&lt;Double&gt;&gt; messages) {
+    for (org.apache.pulsar.client.api.Message&lt;Double&gt; msg : messages.getPayload()) {
+        String key = msg.getKey();
+        String topic = msg.getTopicName();
+        long timestamp = msg.getEventTime();
+        //... process messages
+    }
+    // ack will commit the latest offsets (per partition) of the batch.
+    return messages.ack();
+}
+
+@Incoming("prices")
+public void consumeRecords(org.apache.pulsar.client.api.Messages&lt;Double&gt; messages) {
+    for (org.apache.pulsar.client.api.Message&lt;Double&gt; msg : messages) {
+        //... process messages
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>または、consume メソッドにペイロードのリストを直接受信することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Incoming("prices")
+public void consume(List&lt;Double&gt; prices) {
+    for (double price : prices) {
+        // process price
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Quarkus は、着信チャネルのバッチタイプを自動検出し、バッチ設定を自動的に設定します。
+<code>mp.messaging.incoming.$channel.batchReceive</code> プロパティーを使用して、バッチモードを明示的に設定できます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sending-messages-to-pulsar"><a class="anchor" href="#sending-messages-to-pulsar"></a>5. Pulsar へのメッセージの送信</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Pulsar Connector can write Reactive Messaging `Message`s as Pulsar Message.</p>
+</div>
+<div class="sect2">
+<h3 id="example-2"><a class="anchor" href="#example-2"></a>5.1. 例</h3>
+<div class="paragraph">
+<p>Pulsar ブローカーが実行中で、<code>pulsar:6650</code> アドレスを使用してアクセスできるとします。
+次のように、<code>prices</code> チャネルからのメッセージを Pulsar メッセージに書き込むようにアプリケーションを設定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.outgoing.prices.serviceUrl=pulsar://pulsar:6650 <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Pulsar ブローカーサービスの URL を設定します。</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Pulsar トピックやプロデューサー名を設定する必要はありません。
+デフォルトでは、コネクターはチャネル名 (<code>prices</code>) を使用します。
+トピックとコンシューマー名は、<code>topic</code> 属性と <code>producerName</code> 属性を設定してオーバーライドすることができます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>次に、アプリケーションは、<code>Message&lt;Double&gt;</code> を <code>prices</code> チャネルに送信する必要があります。次のスニペットのように、<code>double</code> ペイロードを使用できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.smallrye.mutiny.Multi;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import java.time.Duration;
+import java.util.Random;
+
+@ApplicationScoped
+public class PulsarPriceProducer {
+
+    private final Random random = new Random();
+
+    @Outgoing("prices-out")
+    public Multi&lt;Double&gt; generate() {
+        // Build an infinite stream of random prices
+        // It emits a price every second
+        return Multi.createFrom().ticks().every(Duration.ofSeconds(1))
+            .map(x -&gt; random.nextDouble());
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>generate メソッドは、<code>Multi&lt;Double&gt;</code> を返します。これは、<code>Flow.Publisher</code> インターフェイスを実装します。
+このパブリッシャーは、メッセージを生成し、設定された Pulsar トピックに送信するために、フレームワークによって使用されます。</p>
+</div>
+<div class="paragraph">
+<p>ペイロードを返す代わりに、<code>io.smallrye.reactive.messaging.pulsar.OutgoingMessage</code> を返して、Pulsar メッセージを送信することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Outgoing("out")
+public Multi&lt;OutgoingMessage&lt;Double&gt;&gt; generate() {
+    return Multi.createFrom().ticks().every(Duration.ofSeconds(1))
+        .map(x -&gt; OutgoingMessage.of("my-key", random.nextDouble()));
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ペイロードを <code>org.eclipse.microprofile.reactive.messaging.Message</code> 内にラップして、書き込まれたレコードをより詳細に制御できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Outgoing("generated-price")
+public Multi&lt;Message&lt;Double&gt;&gt; generate() {
+    return Multi.createFrom().ticks().every(Duration.ofSeconds(1))
+            .map(x -&gt; Message.of(random.nextDouble())
+                    .addMetadata(PulsarOutgoingMessageMetadata.builder()
+                            .withKey("my-key")
+                            .withProperties(Map.of("property-key", "value"))
+                            .build()));
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Messages</code> を送信するときに <code>io.smallrye.reactive.messaging.pulsar.PulsarOutgoingMessageMetadata</code> のインスタンスを追加して、メッセージが Pulsar に書き込まれる方法に影響を与えることができます。</p>
+</div>
+<div class="paragraph">
+<p>発信メソッドは、<code>Flow.Publisher</code> を返すメソッドシグネチャーの他に、単一のメッセージを返すこともできます。
+この場合、プロデューサーがこのメソッドをジェネレーターとして使用して無限のストリームを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Outgoing("prices-out") T generate(); // T excluding void
+
+@Outgoing("prices-out") Message&lt;T&gt; generate();
+
+@Outgoing("prices-out") Uni&lt;T&gt; generate();
+
+@Outgoing("prices-out") Uni&lt;Message&lt;T&gt;&gt; generate();
+
+@Outgoing("prices-out") CompletionStage&lt;T&gt; generate();
+
+@Outgoing("prices-out") CompletionStage&lt;Message&lt;T&gt;&gt; generate();</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="serialization-and-pulsar-schema"><a class="anchor" href="#serialization-and-pulsar-schema"></a>5.2. シリアライゼーションと Pulsar Schema</h3>
+<div class="paragraph">
+<p>Pulsar コネクターを使用すると、基盤となる Pulsar プロデューサーのスキーマ設定を設定できます。
+詳細は、<a href="#pulsar-schema-configuration">Pulsar Schema 設定と自動スキーマ検出</a> を参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="sending-keyvalue-pairs"><a class="anchor" href="#sending-keyvalue-pairs"></a>5.3. キー/値のペアの送信</h3>
+<div class="paragraph">
+<p>キー/値のペアを Pulsar に送信するには、Pulsar プロデューサースキーマを <a href="https://javadoc.io/doc/org.apache.pulsar/pulsar-client-api/latest/org/apache/pulsar/common/schema/KeyValue.html">KeyValue</a> スキーマを使用して設定できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package pulsar.outbound;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
+
+import org.apache.pulsar.client.api.Schema;
+import org.apache.pulsar.common.schema.KeyValue;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
+
+import io.smallrye.common.annotation.Identifier;
+
+@ApplicationScoped
+public class PulsarKeyValueExample {
+
+    @Identifier("out")
+    @Produces
+    Schema&lt;KeyValue&lt;String, Long&gt;&gt; schema = Schema.KeyValue(Schema.STRING, Schema.INT64);
+
+    @Incoming("in")
+    @Outgoing("out")
+    public KeyValue&lt;String, Long&gt; process(long in) {
+        return new KeyValue&lt;&gt;("my-key", in);
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>書き込まれたレコードをさらに制御する必要がある場合は、<code>PulsarOutgoingMessageMetadata</code> を使用します。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="acknowledgement"><a class="anchor" href="#acknowledgement"></a>5.4. 確認</h3>
+<div class="paragraph">
+<p>Pulsar ブローカーは、プロデューサーからメッセージを受信すると、メッセージに <code>MessageId</code> を割り当ててプロデューサーに送り返し、メッセージが公開されたことを確認します。</p>
+</div>
+<div class="paragraph">
+<p>デフォルトでは、コネクターは Pulsar がレコードを確認応答するのを待ってから、処理 (受信した <code>Message</code> の確認応答) を続行します。
+これを無効にするには、<code>waitForWriteCompletion</code> 属性を <code>false</code> に設定します。</p>
+</div>
+<div class="paragraph">
+<p>レコードを書き込めない場合、メッセージは <code>nacked</code> になります。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Pulsar クライアントは、失敗した場合に、 <strong>送信タイムアウト</strong> に達するまで、自動的にメッセージの送信を再試行します。
+<strong>送信タイムアウト</strong> は、 <code>sendTimeoutMs</code> 属性で設定可能で、デフォルトでは 30 秒です。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="back-pressure-and-inflight-records"><a class="anchor" href="#back-pressure-and-inflight-records"></a>5.5. バックプレッシャーとインフライトレコード</h3>
+<div class="paragraph">
+<p>Pulsar 発信コネクターは、バックプレッシャーを処理し、Pulsar ブローカーへの書き込みを待機している保留メッセージの数を監視します。
+保留メッセージの数は、<code>maxPendingMessages</code> 属性を使用して設定され、デフォルトは 1000 です。</p>
+</div>
+<div class="paragraph">
+<p>コネクターは、その数のメッセージのみを同時に送信します。
+少なくとも 1 つの保留メッセージがブローカーによって確認応答されるまで、他のメッセージは送信されません。
+次に、ブローカーの保留メッセージの 1 つが確認応答されると、コネクターが Pulsar に新しいメッセージを書き込みます。</p>
+</div>
+<div class="paragraph">
+<p>また、<code>maxPendingMessages</code> を <code>0</code> に設定することで、保留メッセージの制限を解除することもできます。
+Pulsar では、<code>maxPendingMessagesAcrossPartitions</code> を使用して、パーティションごとの保留メッセージの数を設定することもできます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="producer-batching"><a class="anchor" href="#producer-batching"></a>5.6. プロデューサーのバッチ処理</h3>
+<div class="paragraph">
+<p>デフォルトでは、Pulsar プロデューサーは個々のメッセージをまとめてバッチ処理し、ブローカーに公開します。
+バッチ処理のパラメーターは、<code>batchingMaxPublishDelayMicros</code>、<code>batchingPartitionSwitchFrequencyByPublishDelay</code>、<code>batchingMaxMessages</code>、<code>batchingMaxBytes</code> 設定プロパティーを使用して設定できます。<code>batchingEnabled=false</code> で完全に無効にすることもできます。</p>
+</div>
+<div class="paragraph">
+<p><code>Key_Shared</code> コンシューマーサブスクリプションを使用する場合、<code>batcherBuilder</code> を <code>BatcherBuilder.KEY_BASED</code> に設定できます。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="pulsar-transactions-and-exactly-once-processing"><a class="anchor" href="#pulsar-transactions-and-exactly-once-processing"></a>6. Pulsar トランザクションと exactly-once 処理</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://pulsar.apache.org/docs/3.0.x/txn-why/">Pulsar トランザクション</a> を使用すると、イベントストリーミングアプリケーションが 1 つのアトミック操作でメッセージを消費、処理、生成できます。</p>
+</div>
+<div class="paragraph">
+<p>トランザクションを使用すると、1 つまたは複数のプロデューサーが複数のトピックにメッセージのバッチを送信できるようになります。バッチ内のすべてのメッセージが、最終的にすべてのコンシューマーにみえるか、またはコンシューマーに一切みえなくなります。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>使用するには、ブローカー設定で <code>transactionCoordinatorEnabled=true</code> および <code>systemTopicEnabled=true</code> を使用して、トランザクションのサポートを有効にする必要があります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>クライアント側でも、<code>PulsarClient</code> 設定でトランザクションのサポートを有効にする必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.outgoing.tx-producer.enableTransaction=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Pulsar コネクターは、トランザクション内にレコードを書き込むための <code>PulsarTransactions</code> カスタムエミッターを提供します。</p>
+</div>
+<div class="paragraph">
+<p>これは、通常のエミッター <code>@Channel</code> として使用できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package pulsar.outbound;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Message;
+
+import io.smallrye.mutiny.Uni;
+import io.smallrye.reactive.messaging.pulsar.OutgoingMessage;
+import io.smallrye.reactive.messaging.pulsar.transactions.PulsarTransactions;
+
+@ApplicationScoped
+public class PulsarTransactionalProducer {
+
+    @Inject
+    @Channel("tx-out-example")
+    PulsarTransactions&lt;OutgoingMessage&lt;Integer&gt;&gt; txProducer;
+
+    @Inject
+    @Channel("other-producer")
+    PulsarTransactions&lt;String&gt; producer;
+
+    @Incoming("in")
+    public Uni&lt;Void&gt; emitInTransaction(Message&lt;Integer&gt; in) {
+        return txProducer.withTransaction(emitter -&gt; {
+            emitter.send(OutgoingMessage.of("a", 1));
+            emitter.send(OutgoingMessage.of("b", 2));
+            emitter.send(OutgoingMessage.of("c", 3));
+            producer.send(emitter, "4");
+            producer.send(emitter, "5");
+            producer.send(emitter, "6");
+            return Uni.createFrom().completionStage(in::ack);
+        });
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>withTransaction</code> メソッドに渡される関数は、レコードを生成する <code>TransactionalEmitter</code> を受け取り、トランザクションの結果を提供する <code>Uni</code> を返します。
+処理が正常に完了すると、プロデューサーがフラッシュされ、トランザクションがコミットされます。
+処理中に例外が発生したり、失敗した <code>Uni</code> が返されたり、<code>TransactionalEmitter</code> が中止の対象としてマークされたりすると、トランザクションは中止されます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>複数のトランザクションプロデューサーが 1 つのトランザクションに参加できます。
+これにより、すべてのメッセージが開始したトランザクションを使用して確実に送信されます。また、トランザクションがコミットされる前に、参加しているすべてのプロデューサーがフラッシュされます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>このメソッドが Vert.x コンテキストで呼び出されると、処理関数もそのコンテキストで呼び出されます。
+それ以外の場合は、プロデューサーの送信スレッドで呼び出されます。</p>
+</div>
+<div class="sect2">
+<h3 id="exactly-once-processing"><a class="anchor" href="#exactly-once-processing"></a>6.1. Exactly-Once 処理</h3>
+<div class="paragraph">
+<p>Pulsar Transactions API を使用すると、生成されたメッセージとともに、トランザクション内のコンシューマーオフセットを管理することもできます。
+これにより、コンシューマーとトランザクションプロデューサーを consume-transform-produce パターンでカップリングすることができます。これは exactly-once 処理としても知られています。
+これは、アプリケーションがメッセージを消費および処理し、結果をトピックに公開して、消費されたメッセージのオフセットをトランザクションでコミットすることを意味します。</p>
+</div>
+<div class="paragraph">
+<p><code>PulsarTransactions</code> エミッターは、トランザクション内の着信 Pulsar メッセージに exactly-once 処理を適用する方法も提供します。</p>
+</div>
+<div class="paragraph">
+<p>次の例には、トランザクション内の Pulsar メッセージのバッチが含まれています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.outgoing.tx-out-example.enableTransaction=true
+# ...
+mp.messaging.incoming.in-channel.enableTransaction=true
+mp.messaging.incoming.in-channel.batchReceive=true</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package pulsar.outbound;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+import org.apache.pulsar.client.api.Messages;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Message;
+
+import io.smallrye.mutiny.Uni;
+import io.smallrye.reactive.messaging.pulsar.transactions.PulsarTransactions;
+
+    @ApplicationScoped
+    public class PulsarExactlyOnceProcessor {
+
+        @Inject
+        @Channel("tx-out-example")
+        PulsarTransactions&lt;Integer&gt; txProducer;
+
+        @Incoming("in-channel")
+        public Uni&lt;Void&gt; emitInTransaction(Message&lt;Messages&lt;Integer&gt;&gt; batch) {
+            return txProducer.withTransactionAndAck(batch, emitter -&gt; {
+                for (org.apache.pulsar.client.api.Message&lt;Integer&gt; record : batch.getPayload()) {
+                    emitter.send(PulsarMessage.of(record.getValue() + 1, record.getKey()));
+                }
+                return Uni.createFrom().voidItem();
+            });
+        }
+
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>処理が正常に完了すると、トランザクション内でメッセージが確認応答され、トランザクションがコミットされます。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>exactly-once を使用する場合、累積的にではなく、個別にのみメッセージを確認応答できます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>処理を中止する必要がある場合、メッセージは否定応答されます。処理を再試行したり、フェイルストップしたりするために、いずれかの失敗ストラテジーを使用することができます。
+トランザクションが失敗して中止された場合、<code>withTransaction</code> から返される <code>Uni</code> は失敗することに注意してください。</p>
+</div>
+<div class="paragraph">
+<p>アプリケーションでエラーケースを処理することもできます。しかし、メッセージの消費を続行するには、<code>@Incoming</code> メソッドから返される <code>Uni</code> が失敗しないようにする必要があります。
+<code>PulsarTransactions#withTransactionAndAck</code> メソッドは、メッセージの確認応答と否定応答を行いますが、リアクティブストリームを停止しません。
+失敗を無視すると、最後にコミットされたオフセットにコンシューマーがリセットされ、そこから処理が再開されます。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>失敗発生時に重複を回避するために、ブローカー側でメッセージの重複排除とバッチインデックスレベルの確認応答を有効にすることを推奨します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.pulsar.devservices.broker-config.brokerDeduplicationEnabled=true
+quarkus.pulsar.devservices.broker-config.brokerDeduplicationEntriesInterval=1000
+quarkus.pulsar.devservices.broker-config.brokerDeduplicationSnapshotIntervalSeconds=3000
+quarkus.pulsar.devservices.broker-config.acknowledgmentAtBatchIndexLevelEnabled=3000
+
+mp.messaging.incoming.data.batchIndexAckEnabled=true</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="pulsar-schema-configuration"><a class="anchor" href="#pulsar-schema-configuration"></a>7. Pulsar Schema 設定と自動スキーマ検出</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Pulsar メッセージは、ペイロードとともに非構造化バイト配列として保存されます。
+Pulsar <strong>スキーマ</strong> は、構造化データを raw メッセージバイトにシリアライズする方法を定義します。
+<strong>スキーマ</strong> は、強制的なデータ構造での書き込みと読み取りを行うために、プロデューサーとコンシューマーに適用されます。
+スキーマは、データがトピックに公開される前にデータを raw バイトにシリアライズします。また、raw バイトがコンシューマーに配信される前に raw バイトをデシリアライズします。</p>
+</div>
+<div class="paragraph">
+<p>Pulsar は、登録されたスキーマ情報を保存する中央リポジトリーとしてスキーマレジストリーを使用します。
+これにより、プロデューサー/コンシューマーがブローカーを通じてトピックのメッセージのスキーマを調整できるようになります。
+デフォルトでは、スキーマの保存に Apache BookKeeper が使用されます。</p>
+</div>
+<div class="paragraph">
+<p>Pulsar API は、多数の <a href="https://pulsar.apache.org/docs/3.0.x/schema-understand#primitive-type">プリミティブ型</a> および <a href="https://pulsar.apache.org/docs/3.0.x/schema-understand#complex-type">complex 型</a> (Key/Value、Avro、Protobuf など) に関する組み込みのスキーマ情報を提供します。</p>
+</div>
+<div class="paragraph">
+<p>Pulsar コネクターでは、<code>schema</code> プロパティーを使用してスキーマをプリミティブ型として指定できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.incoming.prices.connector=smallrye-pulsar
+mp.messaging.incoming.prices.schema=INT32
+
+mp.messaging.outgoing.prices-out.connector=smallrye-pulsar
+mp.messaging.outgoing.prices-out.schema=DOUBLE</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>schema</code> プロパティーの値が <a href="https://javadoc.io/doc/org.apache.pulsar/pulsar-client-api/latest/org/apache/pulsar/common/schema/SchemaType.html">スキーマタイプ</a> と一致する場合、そのタイプを使用した単純なスキーマが作成され、該当するチャネルに使用されます。</p>
+</div>
+<div class="paragraph">
+<p>Pulsar コネクターを使用すると、<code>@Identifier</code> 修飾子で識別される <code>Schema</code> Bean を CDI を通じて提供することで、複雑なスキーマタイプを設定できます。</p>
+</div>
+<div class="paragraph">
+<p>たとえば、次の Bean は JSON スキーマとキー/値スキーマを提供します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package pulsar.configuration;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
+
+import org.apache.pulsar.client.api.Schema;
+import org.apache.pulsar.common.schema.KeyValue;
+import org.apache.pulsar.common.schema.KeyValueEncodingType;
+
+import io.smallrye.common.annotation.Identifier;
+
+@ApplicationScoped
+public class PulsarSchemaProvider {
+
+    @Produces
+    @Identifier("user-schema")
+    Schema&lt;User&gt; userSchema = Schema.JSON(User.class);
+
+    @Produces
+    @Identifier("a-channel")
+    Schema&lt;KeyValue&lt;Integer, User&gt;&gt; keyValueSchema() {
+        return Schema.KeyValue(Schema.INT32, Schema.JSON(User.class), KeyValueEncodingType.SEPARATED);
+    }
+
+    public static class User {
+        String name;
+        int age;
+
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>定義されたスキーマを使用して着信チャネル <code>users</code> を設定するには、<code>schema</code> プロパティーをスキーマ <code>user-schema</code> の識別子に設定する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.incoming.users.connector=smallrye-pulsar
+mp.messaging.incoming.users.schema=user-schema</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>schema</code> プロパティーが見つからない場合、コネクターはチャネル名で識別される <code>Schema</code> Bean を検索します。
+たとえば、発信チャネル <code>a-channel</code> はキー/値スキーマを使用します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.outgoing.a-channel.connector=smallrye-pulsar</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>スキーマ情報が提供されていない場合、着信チャネルは <code>Schema.AUTO_CONSUME()</code> を使用します。一方、発信チャネルは <code>Schema.AUTO_PRODUCE_BYTES()</code> スキーマを使用します。</p>
+</div>
+<div class="sect2">
+<h3 id="auto-schema-discovery"><a class="anchor" href="#auto-schema-discovery"></a>7.1. 自動スキーマ検出</h3>
+<div class="paragraph">
+<p>Quarkus Messaging Pulsar (<code>io.quarkus:quarkus-messaging-pulsar</code>) を使用すると、Quarkus は多くの場合、設定する正しい Pulsar Schema を自動的に検出できます。
+この自動検出は、<code>@Incoming</code> メソッドと <code>@Outgoing</code> メソッドの宣言、および注入された <code>@Channel</code> に基づいています。</p>
+</div>
+<div class="paragraph">
+<p>たとえば、以下のように宣言した場合</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Outgoing("generated-price")
+public Multi&lt;Integer&gt; generate() {
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このとき、設定において <code>generated-price</code> チャネルで <code>smallrye-pulsar</code> コネクターを使用するよう指定されていると、Quarkus は <code>generated-price</code> チャネルの <code>schema</code> 属性を Pulsar Schema <code>INT32</code> に自動的に設定します。</p>
+</div>
+<div class="paragraph">
+<p>同様に、以下を宣言した場合</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Incoming("my-pulsar-consumer")
+public void consume(org.apache.pulsar.api.client.Message&lt;byte[]&gt; record) {
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>設定において <code>my-pulsar-consumer</code> チャネルで <code>smallrye-pulsar</code> コネクターを使用するよう指定されていると、Quarkus は <code>schema</code> 属性を Pulsar <code>BYTES</code> Schema に自動的に設定します。</p>
+</div>
+<div class="paragraph">
+<p>最後に、以下を宣言した場合</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject
+@Channel("price-create")
+Emitter&lt;Double&gt; priceEmitter;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>設定において <code>price-create</code> チャネルが <code>smallrye-pulsar</code> コネクターを使用するよう指定されていると、Quarkus は <code>schema</code> を Pulsar <code>INT64</code> Schema に自動的に設定します。</p>
+</div>
+<div class="paragraph">
+<p>Pulsar Schema の自動検出でサポートされているすべてのタイプは、次のとおりです。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>short</code> および <code>java.lang.Short</code></p>
+</li>
+<li>
+<p><code>int</code> および <code>java.lang.Integer</code></p>
+</li>
+<li>
+<p><code>long</code> および <code>java.lang.Long</code></p>
+</li>
+<li>
+<p><code>float</code> および <code>java.lang.Float</code></p>
+</li>
+<li>
+<p><code>double</code> および`java.lang.Double`</p>
+</li>
+<li>
+<p><code>byte[]</code></p>
+</li>
+<li>
+<p><code>java.time.Instant</code></p>
+</li>
+<li>
+<p><code>java.sql.Timestamp</code></p>
+</li>
+<li>
+<p><code>java.time.LocalDate</code></p>
+</li>
+<li>
+<p><code>java.time.LocalTime</code></p>
+</li>
+<li>
+<p><code>java.time.LocalDateTime</code></p>
+</li>
+<li>
+<p><code>java.nio.ByteBuffer</code></p>
+</li>
+<li>
+<p>Avro スキーマから生成されたクラスと Avro <code>GenericRecord</code> は、<code>AVRO</code> スキーマタイプで設定されます。</p>
+</li>
+<li>
+<p>Protobuf スキーマから生成されたクラスは、<code>PROTOBUF</code> スキーマタイプで設定されます。</p>
+</li>
+<li>
+<p>その他のクラスは、自動的に <code>JSON</code> スキーマタイプで設定されます。</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>JSON</code> スキーマタイプは、スキーマ検証を適用することに注意してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Pulsar が提供するこれらのスキーマに加えて、Quarkus は <em>検証を適用することなく</em> 次のスキーマ実装を提供します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>io.vertx.core.buffer.Buffer</code> は、<code>io.quarkus.pulsar.schema.BufferSchema</code> スキーマで設定されます。</p>
+</li>
+<li>
+<p><code>io.vertx.core.json.JsonObject</code> は、<code>io.quarkus.pulsar.schema.JsonObjectSchema</code> スキーマで設定されます。</p>
+</li>
+<li>
+<p><code>io.vertx.core.json.JsonArray</code> は、<code>io.quarkus.pulsar.schema.JsonArraySchema</code> スキーマで設定されます。</p>
+</li>
+<li>
+<p>スキーマレス JSON シリアライゼーションでは、<code>schema</code> 設定が <code>ObjectMapper&lt;fully_qualified_name_of_the_bean&gt;</code> に設定されている場合、Jackson <code>ObjectMapper</code> を使用してスキーマが生成されます。このとき、Pulsar Schema 検証は適用されません。
+<code>io.quarkus.pulsar.schema.ObjectMapperSchema</code> を使用すると、検証なしで JSON スキーマを明示的に設定できます。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>schema</code> が設定されている場合、自動検出によって置き換えられることはありません。</p>
+</div>
+<div class="paragraph">
+<p>シリアライザーの自動検出に問題がある場合は、<code>quarkus.messaging.pulsar.serializer-autodetection.enabled=false</code> を設定することで、これを完全にオフにすることができます。
+オフにする必要があると認識した場合は、<a href="https://github.com/quarkusio/quarkus/issues">Quarkus issue tracker</a> にバグを報告していただければ、どのような問題でも修正することができます。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="pulsar-dev-services"><a class="anchor" href="#pulsar-dev-services"></a>8. Dev Services for Pulsar</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>With Quarkus Messaging Pulsar extension (<code>quarkus-messaging-pulsar</code>)
+Dev Services for Pulsar automatically starts a Pulsar broker in dev mode and when running tests.
+So, you don&#8217;t have to start a broker manually.
+The application is configured automatically.</p>
+</div>
+<div class="sect2">
+<h3 id="enabling-disabling-dev-services-for-pulsar"><a class="anchor" href="#enabling-disabling-dev-services-for-pulsar"></a>8.1. Enabling / Disabling Dev Services for Pulsar</h3>
+<div class="paragraph">
+<p>Dev Services for Pulsar is automatically enabled unless:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus.pulsar.devservices.enabled</code> is set to <code>false</code></p>
+</li>
+<li>
+<p>the <code>pulsar.client.serviceUrl</code> is configured</p>
+</li>
+<li>
+<p>all the Reactive Messaging Pulsar channels have the <code>serviceUrl</code> attribute set</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Dev Services for Pulsar relies on Docker to start the broker.
+If your environment does not support Docker, you will need to start the broker manually, or connect to an already running broker.
+You can configure the broker address using <code>pulsar.client.</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="shared-broker"><a class="anchor" href="#shared-broker"></a>8.2. 共有ブローカー</h3>
+<div class="paragraph">
+<p>Most of the time you need to share the broker between applications.
+Dev Services for Pulsar implements a <em>service discovery</em> mechanism for your multiple Quarkus applications running in <em>dev</em> mode to share a single broker.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Dev Services for Pulsar starts the container with the <code>quarkus-dev-service-pulsar</code> label which is used to identify the container.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you need multiple (shared) brokers, you can configure the <code>quarkus.pulsar.devservices.service-name</code> attribute and indicate the broker name.
+It looks for a container with the same value, or starts a new one if none can be found.
+The default service name is <code>pulsar</code>.</p>
+</div>
+<div class="paragraph">
+<p>Sharing is enabled by default in dev mode, but disabled in test mode.
+You can disable the sharing with <code>quarkus.pulsar.devservices.shared=false</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="setting-the-port"><a class="anchor" href="#setting-the-port"></a>8.3. ポートの設定</h3>
+<div class="paragraph">
+<p>By default, Dev Services for Pulsar picks a random port and configures the application.
+You can set the port by configuring the <code>quarkus.pulsar.devservices.port</code> property.</p>
+</div>
+<div class="paragraph">
+<p>Note that the Pulsar advertised address is automatically configured with the chosen port.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuring-the-image"><a class="anchor" href="#configuring-the-image"></a>8.4. イメージの設定</h3>
+<div class="paragraph">
+<p>Dev Services for Pulsar supports the <a href="https://hub.docker.com/r/apachepulsar/pulsar">official Apache Pulsar image</a>.</p>
+</div>
+<div class="paragraph">
+<p>A custom image name can be configured as such:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.pulsar.devservices.image-name=datastax/lunastreaming-all:2.10_4.7</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuring-the-pulsar-broker"><a class="anchor" href="#configuring-the-pulsar-broker"></a>8.5. Configuring the Pulsar broker</h3>
+<div class="paragraph">
+<p>You can configure the Dev Services for Pulsar with custom broker configuration.</p>
+</div>
+<div class="paragraph">
+<p>The following example enables transaction support:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.pulsar.devservices.broker-config.transaction-coordinator-enabled=true
+quarkus.pulsar.devservices.broker-config.system-topic-enabled=true</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-pulsar-clients"><a class="anchor" href="#configuring-pulsar-clients"></a>9. Pulsar クライアントの設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Pulsar のクライアント、コンシューマー、プロデューサーは、Pulsar クライアントアプリケーションの動作を設定するために、細かくカスタマイズすることが可能です。</p>
+</div>
+<div class="paragraph">
+<p>Pulsar コネクターは、Pulsar クライアントと、チャネルごとのコンシューマーまたはプロデューサーを作成します。それぞれに実用的なデフォルトが設定されているため、設定が容易です。
+作成は処理されますが、利用できる設定オプションは、すべて Pulsar チャネルを通じて設定可能です。</p>
+</div>
+<div class="paragraph">
+<p>通常、<code>PulsarClient</code>、<code>PulsarConsumer</code>、`PulsarProducer`を作成するには、ビルダー API を使用します。ビルダー API は、その性質上、実装に渡す設定オブジェクトを毎回ビルドします。
+該当する設定オブジェクトは、
+<a href="https://javadoc.io/doc/org.apache.pulsar/pulsar-client-original/latest/org/apache/pulsar/client/impl/conf/ClientConfigurationData.html">ClientConfigurationData</a>、
+<a href="https://javadoc.io/doc/org.apache.pulsar/pulsar-client-original/latest/org/apache/pulsar/client/impl/conf/ConsumerConfigurationData.html">ConsumerConfigurationData</a>、
+および <a href="https://javadoc.io/doc/org.apache.pulsar/pulsar-client-original/latest/org/apache/pulsar/client/impl/conf/ProducerConfigurationData.html">ProducerConfigurationData</a> です。</p>
+</div>
+<div class="paragraph">
+<p>Pulsar コネクターを使用すると、これらの設定オブジェクトのプロパティーを直接受信できます。
+たとえば、<code>PulsarClient</code> のブローカー認証情報は、<code>authPluginClassName</code> および <code>authParams</code> プロパティーを使用して受信されます。
+受信チャネル <code>data</code> の認証を設定するには、以下のように指定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.incoming.data.connector=smallrye-pulsar
+mp.messaging.incoming.data.serviceUrl=pulsar://localhost:6650
+mp.messaging.incoming.data.topic=topic
+mp.messaging.incoming.data.subscriptionInitialPosition=Earliest
+mp.messaging.incoming.data.schema=INT32
+mp.messaging.incoming.data.authPluginClassName=org.apache.pulsar.client.impl.auth.AuthenticationBasic
+mp.messaging.incoming.data.authParams={"userId":"superuser","password":"admin"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Pulsar コンシューマーのプロパティー <code>subscriptionInitialPosition</code> も、列挙値 <code>SubscriptionInitialPosition.Earliest</code> として表される <code>Earliest</code> 値で設定されていることに注意してください。</p>
+</div>
+<div class="paragraph">
+<p>この方法は、ほとんどの設定ケースに対応できます。
+ただし、<code>CryptoKeyReader</code>、<code>ServiceUrlProvider</code> などのシリアライズできないオブジェクトは、この方法では設定できません。
+Pulsar コネクターを使用すると、Pulsar 設定データオブジェクト <code>ClientConfigurationData</code>、<code>ConsumerConfigurationData</code>、<code>ProducerConfigurationData</code> のインスタンスを考慮できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.enterprise.inject.Produces;
+import io.smallrye.common.annotation.Identifier;
+import org.apache.pulsar.client.impl.conf.ConsumerConfigurationData;
+
+class PulsarConfig {
+
+    @Produces
+    @Identifier("my-consumer-options")
+    public ConsumerConfigurationData&lt;String&gt; getConsumerConfig() {
+        ConsumerConfigurationData&lt;String&gt; data = new ConsumerConfigurationData&lt;&gt;();
+        data.setAckReceiptEnabled(true);
+        data.setCryptoKeyReader(DefaultCryptoKeyReader.builder()
+                //...
+                .build());
+        return data;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このインスタンスは、コネクターが使用するクライアントを設定するために取得および使用されます。
+<code>client-configuration</code>、<code>consumer-configuration</code>、または <code>producer-configuration</code> 属性を使用してクライアントの名前を指定する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.incoming.prices.consumer-configuration=my-consumer-options</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>[client|consumer|producer]-configuration</code> が設定されていない場合、コネクターはチャネル名で識別されるインスタンスを検索します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.enterprise.inject.Produces;
+import io.smallrye.common.annotation.Identifier;
+import org.apache.pulsar.client.impl.AutoClusterFailover;
+import org.apache.pulsar.client.impl.conf.ClientConfigurationData;
+
+class PulsarConfig {
+
+    @Produces
+    @Identifier("prices")
+    public ClientConfigurationData getClientConfig() {
+        ClientConfigurationData data = new ClientConfigurationData();
+        data.setEnableTransaction(true);
+        data.setServiceUrlProvider(AutoClusterFailover.builder()
+                // ...
+                .build());
+        return data;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>また、キーごとの設定値を含む <code>Map&lt;String, Object&gt;</code> を指定することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.enterprise.inject.Produces;
+import io.smallrye.common.annotation.Identifier;
+import org.apache.pulsar.client.api.BatcherBuilder;
+import org.apache.pulsar.client.impl.conf.ClientConfigurationData;
+import org.apache.pulsar.client.impl.customroute.PartialRoundRobinMessageRouterImpl;
+import java.util.Map;
+
+class PulsarConfig {
+
+    @Produces
+    @Identifier("prices")
+    public Map&lt;String, Object&gt; getProducerConfig() {
+        return Map.of(
+                "batcherBuilder", BatcherBuilder.KEY_BASED,
+                "sendTimeoutMs", 3000,
+                "customMessageRouter", new PartialRoundRobinMessageRouterImpl(4));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>さまざまな設定ソースは、重要度の最も低いものから最も高いものの順に、次の優先順序で読み込まれます。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>デフォルトの設定識別子 (<code>default-pulsar-client</code>、<code>default-pulsar-consumer</code>、<code>default-pulsar-producer</code>) を使用して生成された <code>Map&lt;String, Object&gt;</code> 設定マップ</p>
+</li>
+<li>
+<p>設定内またはチャネル名内の識別子を使用して生成された <code>Map&lt;String, Object&gt;</code> 設定マップ</p>
+</li>
+<li>
+<p>チャネル設定内またはチャネル名内の識別子を使用して生成された <code>[Client|Producer|Consuemr]ConfigurationData</code> オブジェクト</p>
+</li>
+<li>
+<p><code>[Client|Producer|Consuemr]ConfigurationData</code> フィールド名を使用して名前が付けられたチャネル設定プロパティー</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>設定オプションの完全なリストについては、<a href="#configuration-reference">設定リファレンス</a> を参照してください。</p>
+</div>
+<div class="sect2">
+<h3 id="configuring-pulsar-authentication"><a class="anchor" href="#configuring-pulsar-authentication"></a>9.1. Pulsar認証の設定</h3>
+<div class="paragraph">
+<p>Pulsar は、プラグ可能な認証フレームワークを提供します。Pulsar ブローカー/プロキシーは、このメカニズムを使用してクライアントを認証します。</p>
+</div>
+<div class="paragraph">
+<p>クライアントは、<code>authPluginClassName</code> および <code>authParams</code> 属性を使用して <code>application.properties</code> ファイルで設定できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">pulsar.client.serviceUrl=pulsar://pulsar:6650
+pulsar.client.authPluginClassName=org.apache.pulsar.client.impl.auth.AuthenticationBasic
+pulsar.client.authParams={"userId":"superuser","password":"admin"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>または、プログラムで設定することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.util.Map;
+
+import jakarta.enterprise.inject.Produces;
+import io.smallrye.common.annotation.Identifier;
+import org.apache.pulsar.client.impl.conf.ClientConfigurationData;
+import org.apache.pulsar.client.impl.auth.AuthenticationBasic;
+
+class PulsarConfig {
+
+    @Produces
+    @Identifier("prices")
+    public ClientConfigurationData config() {
+        var data = new ClientConfigurationData();
+        var auth = new AuthenticationBasic();
+        auth.configure(Map.of("userId", "superuser", "password", "admin"));
+        data.setAuthentication(auth);
+        return data;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="configuring-authentication-to-pulsar-using-mtls"><a class="anchor" href="#configuring-authentication-to-pulsar-using-mtls"></a>9.1.1. Configuring authentication to Pulsar using mTLS</h4>
+<div class="paragraph">
+<p>Pulsar Messaging extension integrates with the <a href="./tls-registry-reference">Quarkus TLS registry</a> to authenticate clients using mTLS.</p>
+</div>
+<div class="paragraph">
+<p>To configure the mTLS for a Pulsar channel, you need to provide a named TLS configuration in the <code>application.properties</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.tls.my-tls-config.trust-store.p12.path=target/certs/pulsar-client-truststore.p12
+quarkus.tls.my-tls-config.trust-store.p12.password=secret
+quarkus.tls.my-tls-config.key-store.p12.path=target/certs/pulsar-client-keystore.p12
+quarkus.tls.my-tls-config.key-store.p12.password=secret
+
+mp.messaging.incoming.prices.tls-configuration-name=my-tls-config</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="configuring-access-to-datastax-luna-streaming"><a class="anchor" href="#configuring-access-to-datastax-luna-streaming"></a>9.1.2. Datastax Luna Streaming へのアクセスの設定</h4>
+<div class="paragraph">
+<p>Luna Streaming は、DataStax のツールとサポートを備えた、Apache Pulsar の製品版ディストリビューションです。
+DataStax Luna Pulsar テナントを作成したら、自動生成されたトークンをメモし、トークン認証を設定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">pulsar.client.serviceUrl=pulsar+ssl://pulsar-aws-eucentral1.streaming.datastax.com:6651
+pulsar.client.authPluginClassName=org.apache.pulsar.client.impl.auth.AuthenticationToken
+pulsar.client.authParams=token:eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2ODY4MTc4MzQsImlzcyI6ImRhdGFzdGF4Iiwic3ViIjoiY2xpZW50OzA3NGZhOTI4LThiODktNDBhNC04MDEzLWNlNjVkN2JmZWIwZTtjSEpwWTJWejsyMDI5ODdlOGUyIiwidG9rZW5pZCI6IjIwMjk4N2U4ZTIifQ....</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>必ず事前にトピックを作成するか、namespace 設定で <em>自動トピック作成</em> を有効にしてください。</p>
+</div>
+<div class="paragraph">
+<p>トピック設定では、トピックの完全な名前を参照する必要があることに注意してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.incoming.prices.topic=persistent://my-tenant/default/prices</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="configuring-access-to-streamnative-cloud"><a class="anchor" href="#configuring-access-to-streamnative-cloud"></a>9.1.3. StreamNative Cloud へのアクセスの設定</h4>
+<div class="paragraph">
+<p>StreamNative Cloud は、フルマネージドの Pulsar-as-a-Service です。完全ホスト型、パブリッククラウド上で StreamNative によって管理する方式、Kubernetes 上で自己管理する方式など、さまざまなデプロイ方法で利用できます。</p>
+</div>
+<div class="paragraph">
+<p>StreamNative Pulsar クラスターは Oauth2 認証を使用します。そのため、アプリケーションが使用している <a href="https://docs.streamnative.io/docs/access-control#authorize-namespaces">Pulsar namespace/トピックへの権限</a> を持つ <a href="https://docs.streamnative.io/docs/service-account">サービスアカウント</a> が存在することを確認する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>次に、サービスアカウントの <strong>キーファイル</strong> (<strong>秘密鍵</strong> として機能します) をダウンロードし、<strong>発行者 URL</strong> (通常は <code><a href="https://auth.streamnative.cloud/" class="bare">https://auth.streamnative.cloud/</a></code>) とクラスターの <strong>オーディエンス</strong> (<code>urn:sn:pulsar:o-rf3ol:redhat</code> など) をメモする必要があります。
+この手順を行う際には、StreamNative Cloud コンソールの <strong>Admin</strong> セクションにある <strong>Pulsar Clients</strong> ページが役立ちます。</p>
+</div>
+<div class="paragraph">
+<p>Pulsar Oauth2 認証を使用してアプリケーションを設定するには、以下のように指定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">pulsar.tenant=public
+pulsar.namespace=default
+pulsar.client.serviceUrl=pulsar+ssl://quarkus-71eaadbf-a6f3-4355-85d2-faf436b23d86.aws-euc1-prod-snci-pool-slug.streamnative.aws.snio.cloud:6651
+pulsar.client.authPluginClassName=org.apache.pulsar.client.impl.auth.oauth2.AuthenticationOAuth2
+pulsar.client.authParams={"type":"client_credentials","privateKey":"data:application/json;base64,&lt;base64-encoded value&gt;","issuerUrl":"https://auth.streamnative.cloud/","audience":"urn:sn:pulsar:o-rfwel:redhat"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>pulsar.client.authParams</code> 設定には、<code>issuerUrl</code>、<code>audience</code>、および <code>data:application/json;base64,&lt;base64-encoded-key-file&gt;</code> という形式の <code>privateKey</code> を含む Json 文字列が含まれていることに注意してください。</p>
+</div>
+<div class="paragraph">
+<p>または、プログラムで認証を設定することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.pulsar;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.apache.pulsar.client.impl.auth.oauth2.AuthenticationFactoryOAuth2;
+import org.apache.pulsar.client.impl.conf.ClientConfigurationData;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import io.smallrye.common.annotation.Identifier;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
+
+@ApplicationScoped
+public class PulsarAuth {
+
+    @ConfigProperty(name = "pulsar.issuerUrl")
+    String issuerUrl;
+
+    @ConfigProperty(name = "pulsar.credentials")
+    String credentials;
+
+    @ConfigProperty(name = "pulsar.audience")
+    String audience;
+
+    @Produces
+    @Identifier("pulsar-auth")
+    public ClientConfigurationData pulsarClientConfig() throws MalformedURLException {
+        var data = new ClientConfigurationData();
+        data.setAuthentication(AuthenticationFactoryOAuth2.clientCredentials(new URL(issuerUrl), PulsarAuth.class.getResource(credentials), audience));
+        return data;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これは、キーファイルがリソースとしてアプリケーションクラスパスに含まれていることを前提としています。この場合、設定は次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.incoming.prices.client-configuration=pulsar-auth
+
+pulsar.tenant=public
+pulsar.namespace=default
+pulsar.client.serviceUrl=pulsar+ssl://quarkus-71eaadbf-a6f3-4355-85d2-faf436b23d86.aws-euc1-prod-snci-pool-slug.streamnative.aws.snio.cloud:6651
+pulsar.issuerUrl=https://auth.streamnative.cloud/
+pulsar.audience=urn:sn:pulsar:o-rfwel:redhat
+pulsar.credentials=/o-rfwel-quarkus-app.json</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>pulsar-auth</code> で識別されるクライアント設定を使用するチャネルには、<code>client-configuration</code> 属性を設定する必要があることに注意してください。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="pulsar-health-check"><a class="anchor" href="#pulsar-health-check"></a>10. ヘルスチェック</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus エクステンションは、Pulsar コネクターによって管理される各チャネルの起動、準備状況、および稼働状況を報告します。
+ヘルスチェックは、Pulsar クライアントに依存してブローカーとの接続が確立されていることを確認します。</p>
+</div>
+<div class="paragraph">
+<p>着信チャネルと発信チャネルの <strong>Startup</strong> および <strong>Readiness</strong> プローブは、ブローカーとの接続が確立されると、<strong>OK</strong> を報告します。</p>
+</div>
+<div class="paragraph">
+<p>着信チャネルと発信チャネルの <strong>Liveness</strong> プローブは、ブローカーとの接続が確立され、<strong>かつ</strong> 失敗が発見されなかった場合に、<strong>OK</strong> を報告します。</p>
+</div>
+<div class="paragraph">
+<p>メッセージ処理が失敗すると、メッセージが <strong>否定応答</strong> されることに注意してください。その場合、メッセージは失敗ストラテジーによって処理されます。失敗ストラテジーは、失敗を報告し、liveness チェックの結果に影響を与えます。失敗ストラテジー `fail`は、失敗を報告するため、liveness チェックも失敗を報告します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration-reference"><a class="anchor" href="#configuration-reference"></a>11. 設定リファレンス</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>以下は、Pulsar コネクターのチャネル、コンシューマー、プロデューサー、およびクライアントの設定属性のリストです。
+Pulsar クライアントの設定方法の詳細は、<a href="#pulsar-client-configuration">Pulsar クライアントの設定</a> を参照してください。</p>
+</div>
+<div class="sect2">
+<h3 id="incoming-channel-configuration-receiving-from-pulsar"><a class="anchor" href="#incoming-channel-configuration-receiving-from-pulsar"></a>11.1. 着信チャネル設定 (Pulsar からの受信)</h3>
+<div class="paragraph">
+<p>以下の属性は以下のように設定します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.incoming.your-channel-name.attribute=value</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. Incoming Attributes of the 'smallrye-pulsar' connector</caption>
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">属性 (<em>alias</em>)</th>
+<th class="tableblock halign-left valign-top">説明</th>
+<th class="tableblock halign-left valign-top">タイプ</th>
+<th class="tableblock halign-left valign-top">必須</th>
+<th class="tableblock halign-left valign-top">デフォルト</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>ack-strategy</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specify the commit strategy to apply when a message produced from a record is acknowledged. Values can be <code>ack</code>, <code>cumulative</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ack</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>ackTimeout.redeliveryBackoff</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Comma separated values for configuring ack timeout MultiplierRedeliveryBackoff, min delay, max delay, multiplier.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>batchReceive</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether batch receive is used to consume messages</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>client-configuration</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Identifier of a CDI bean that provides the default Pulsar client configuration for this channel. The channel configuration can still override any attribute. The bean must have a type of Map&lt;String, Object&gt; and must use the @io.smallrye.common.annotation.Identifier qualifier to set the identifier.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>consumer-configuration</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Identifier of a CDI bean that provides the default Pulsar consumer configuration for this channel. The channel configuration can still override any attribute. The bean must have a type of Map&lt;String, Object&gt; and must use the @io.smallrye.common.annotation.Identifier qualifier to set the identifier.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>deadLetterPolicy.deadLetterTopic</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the dead letter topic where the failing messages will be sent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>deadLetterPolicy.initialSubscriptionName</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the initial subscription name of the dead letter topic</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>deadLetterPolicy.maxRedeliverCount</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum number of times that a message will be redelivered before being sent to the dead letter topic</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>deadLetterPolicy.retryLetterTopic</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the retry topic where the failing messages will be sent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>failure-strategy</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specify the failure strategy to apply when a message produced from a record is acknowledged negatively (nack). Values can be <code>nack</code> (default), <code>fail</code>, <code>ignore</code> or `reconsume-later</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>nack</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>health-enabled</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether health reporting is enabled (default) or disabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>negativeAck.redeliveryBackoff</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Comma separated values for configuring negative ack MultiplierRedeliveryBackoff, min delay, max delay, multiplier.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>reconsumeLater.delay</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default delay for reconsume failure-strategy, in seconds</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>3</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>schema</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Pulsar schema type of this channel. When configured a schema is built with the given SchemaType and used for the channel. When absent, the schema is resolved searching for a CDI bean typed <code>Schema</code> qualified with <code>@Identifier</code> and the channel name. As a fallback AUTO_CONSUME or AUTO_PRODUCE are used.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>serviceUrl</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The service URL for the Pulsar service</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pulsar://localhost:6650</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>topic</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The consumed / populated Pulsar topic. If not set, the channel name is used</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>tracing-enabled</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether tracing is enabled (default) or disabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>基盤となる Pulsar コンシューマーがサポートするプロパティーを設定することもできます。</p>
+</div>
+<div class="paragraph">
+<p>これらのプロパティーは、<code>pulsar.consumer</code> 接頭辞を使用してグローバルに設定することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">pulsar.consumer.subscriptionInitialPosition=Earliest</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 2. Pulsar consumer Attributes</caption>
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">属性</th>
+<th class="tableblock halign-left valign-top">説明</th>
+<th class="tableblock halign-left valign-top">タイプ</th>
+<th class="tableblock halign-left valign-top">設定ファイル</th>
+<th class="tableblock halign-left valign-top">デフォルト</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>topicNames</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">トピック名</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">[]</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>topicsPattern</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Topic pattern</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pattern</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>subscriptionName</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subscription name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>subscriptionType</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subscription type.<br>
+Four subscription types are available:<br>
+* Exclusive<br>
+* Failover<br>
+* Shared<br>
+* Key_Shared</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SubscriptionType</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Exclusive</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>subscriptionProperties</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Map</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>subscriptionMode</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SubscriptionMode</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Durable</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>messageListener</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MessageListener</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>consumerEventListener</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ConsumerEventListener</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>negativeAckRedeliveryBackoff</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interface for custom message is negativeAcked policy. You can specify <code>RedeliveryBackoff</code> for a consumer.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RedeliveryBackoff</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>ackTimeoutRedeliveryBackoff</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interface for custom message is ackTimeout policy. You can specify <code>RedeliveryBackoff</code> for a consumer.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RedeliveryBackoff</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>receiverQueueSize</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Size of a consumer&#8217;s receiver queue.<br>
+For example, the number of messages accumulated by a consumer before an application calls <code>Receive</code>.<br>
+A value higher than the default value increases consumer throughput, though at the expense of more memory utilization.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>acknowledgementsGroupTimeMicros</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Group a consumer acknowledgment for a specified time.<br>
+By default, a consumer uses 100ms grouping time to send out acknowledgments to a broker.<br>
+Setting a group time of 0 sends out acknowledgments immediately.<br>
+A longer ack group time is more efficient at the expense of a slight increase in message re-deliveries after a failure.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>maxAcknowledgmentGroupSize</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Group a consumer acknowledgment for the number of messages.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>negativeAckRedeliveryDelayMicros</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Delay to wait before redelivering messages that failed to be processed.<br>
+When an application uses <code>Consumer#negativeAcknowledge(Message)</code>, failed messages are redelivered after a fixed timeout.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">60000000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>maxTotalReceiverQueueSizeAcrossPartitions</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The max total receiver queue size across partitions.<br>
+This setting reduces the receiver queue size for individual partitions if the total receiver queue size exceeds this value.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">50000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>consumerName</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Consumer name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>ackTimeoutMillis</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Timeout of unacked messages</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>tickDurationMillis</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Granularity of the ack-timeout redelivery.<br>
+Using an higher <code>tickDurationMillis</code> reduces the memory overhead to track messages when setting ack-timeout to a bigger value (for example, 1 hour).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>priorityLevel</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Priority level for a consumer to which a broker gives more priority while dispatching messages in Shared subscription type.<br>
+The broker follows descending priorities. For example, 0=max-priority, 1, 2,&#8230;&#8203;<br>
+In Shared subscription type, the broker <strong>first dispatches messages to the max priority level consumers if they have permits</strong>. Otherwise, the broker considers next priority level consumers.<br>
+<strong>Example 1</strong><br>
+If a subscription has consumerA with <code>priorityLevel</code> 0 and consumerB with <code>priorityLevel</code> 1, then the broker <strong>only dispatches messages to consumerA until it runs out permits</strong> and then starts dispatching messages to consumerB.<br>
+<strong>Example 2</strong><br>
+Consumer Priority, Level, Permits<br>
+C1, 0, 2<br>
+C2, 0, 1<br>
+C3, 0, 1<br>
+C4, 1, 2<br>
+C5, 1, 1<br></p>
+<p class="tableblock">Order in which a broker dispatches messages to consumers is: C1, C2, C3, C1, C4, C5, C4.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>maxPendingChunkedMessage</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum size of a queue holding pending chunked messages. When the threshold is reached, the consumer drops pending messages to optimize memory utilization.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>autoAckOldestChunkedMessageOnQueueFull</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to automatically acknowledge pending chunked messages when the threshold of <code>maxPendingChunkedMessage</code> is reached. If set to <code>false</code>, these messages will be redelivered by their broker.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>expireTimeOfIncompleteChunkedMessageMillis</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The time interval to expire incomplete chunks if a consumer fails to receive all the chunks in the specified time period. The default value is 1 minute.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">60000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>cryptoKeyReader</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CryptoKeyReader</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>messageCrypto</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MessageCrypto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>cryptoFailureAction</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Consumer should take action when it receives a message that can not be decrypted.<br>
+* <strong>FAIL</strong>: this is the default option to fail messages until crypto succeeds.<br>
+* <strong>DISCARD</strong>:silently acknowledge and not deliver message to an application.<br>
+* <strong>CONSUME</strong>: deliver encrypted messages to applications. It is the application&#8217;s responsibility to decrypt the message.</p>
+<p class="tableblock">The decompression of message fails.</p>
+<p class="tableblock">If messages contain batch messages, a client is not be able to retrieve individual messages in batch.</p>
+<p class="tableblock">Delivered encrypted message contains <code>EncryptionContext</code> which contains encryption and compression information in it using which application can decrypt consumed message payload.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ConsumerCryptoFailureAction</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FAIL</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>properties</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A name or value property of this consumer.</p>
+<p class="tableblock"><code>properties</code> is application defined metadata attached to a consumer.</p>
+<p class="tableblock">When getting a topic stats, associate this metadata with the consumer stats for easier identification.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SortedMap</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">{}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>readCompacted</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If enabling <code>readCompacted</code>, a consumer reads messages from a compacted topic rather than reading a full message backlog of a topic.</p>
+<p class="tableblock">A consumer only sees the latest value for each key in the compacted topic, up until reaching the point in the topic message when compacting backlog. Beyond that point, send messages as normal.</p>
+<p class="tableblock">Only enabling <code>readCompacted</code> on subscriptions to persistent topics, which have a single active consumer (like failure or exclusive subscriptions).</p>
+<p class="tableblock">Attempting to enable it on subscriptions to non-persistent topics or on shared subscriptions leads to a subscription call throwing a <code>PulsarClientException</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>subscriptionInitialPosition</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Initial position at which to set cursor when subscribing to a topic at first time.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SubscriptionInitialPosition</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Latest</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>patternAutoDiscoveryPeriod</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Topic auto discovery period when using a pattern for topic&#8217;s consumer.</p>
+<p class="tableblock">The default and minimum value is 1 minute.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">60</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>regexSubscriptionMode</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">When subscribing to a topic using a regular expression, you can pick a certain type of topics.</p>
+<p class="tableblock">* <strong>PersistentOnly</strong>: only subscribe to persistent topics.<br>
+* <strong>NonPersistentOnly</strong>: only subscribe to non-persistent topics.<br>
+* <strong>AllTopics</strong>: subscribe to both persistent and non-persistent topics.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RegexSubscriptionMode</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PersistentOnly</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>deadLetterPolicy</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Dead letter policy for consumers.</p>
+<p class="tableblock">By default, some messages are probably redelivered many times, even to the extent that it never stops.</p>
+<p class="tableblock">By using the dead letter mechanism, messages have the max redelivery count. <strong>When exceeding the maximum number of redeliveries, messages are sent to the Dead Letter Topic and acknowledged automatically</strong>.</p>
+<p class="tableblock">You can enable the dead letter mechanism by setting <code>deadLetterPolicy</code>.</p>
+<p class="tableblock">When specifying the dead letter policy while not specifying <code>ackTimeoutMillis</code>, you can set the ack timeout to 30000 millisecond.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DeadLetterPolicy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>retryEnable</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>batchReceivePolicy</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BatchReceivePolicy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>autoUpdatePartitions</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If <code>autoUpdatePartitions</code> is enabled, a consumer subscribes to partition increase automatically.</p>
+<p class="tableblock"><strong>Note</strong>: this is only for partitioned consumers.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>autoUpdatePartitionsIntervalSeconds</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">60</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>replicateSubscriptionState</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If <code>replicateSubscriptionState</code> is enabled, a subscription state is replicated to geo-replicated clusters.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>resetIncludeHead</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>keySharedPolicy</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">KeySharedPolicy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>batchIndexAckEnabled</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>ackReceiptEnabled</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>poolMessages</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>payloadProcessor</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MessagePayloadProcessor</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>startPaused</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>autoScaledReceiverQueueSizeEnabled</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>topicConfigurations</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">List</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">[]</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="outgoing-channel-configuration-publishing-to-pulsar"><a class="anchor" href="#outgoing-channel-configuration-publishing-to-pulsar"></a>11.2. 発信チャネルの設定 (Pulsar への公開)</h3>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 3. Outgoing Attributes of the 'smallrye-pulsar' connector</caption>
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">属性 (<em>alias</em>)</th>
+<th class="tableblock halign-left valign-top">説明</th>
+<th class="tableblock halign-left valign-top">タイプ</th>
+<th class="tableblock halign-left valign-top">必須</th>
+<th class="tableblock halign-left valign-top">デフォルト</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>client-configuration</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Identifier of a CDI bean that provides the default Pulsar client configuration for this channel. The channel configuration can still override any attribute. The bean must have a type of Map&lt;String, Object&gt; and must use the @io.smallrye.common.annotation.Identifier qualifier to set the identifier.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>health-enabled</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether health reporting is enabled (default) or disabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>maxPendingMessages</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum size of a queue holding pending messages, i.e messages waiting to receive an acknowledgment from a broker</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1000</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>producer-configuration</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Identifier of a CDI bean that provides the default Pulsar producer configuration for this channel. The channel configuration can still override any attribute. The bean must have a type of Map&lt;String, Object&gt; and must use the @io.smallrye.common.annotation.Identifier qualifier to set the identifier.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>schema</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Pulsar schema type of this channel. When configured a schema is built with the given SchemaType and used for the channel. When absent, the schema is resolved searching for a CDI bean typed <code>Schema</code> qualified with <code>@Identifier</code> and the channel name. As a fallback AUTO_CONSUME or AUTO_PRODUCE are used.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>serviceUrl</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The service URL for the Pulsar service</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>pulsar://localhost:6650</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>topic</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The consumed / populated Pulsar topic. If not set, the channel name is used</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>tracing-enabled</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether tracing is enabled (default) or disabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>waitForWriteCompletion</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the client waits for the broker to acknowledge the written record before acknowledging the message</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>基盤となる Pulsar プロデューサーがサポートするプロパティーを設定することもできます。</p>
+</div>
+<div class="paragraph">
+<p>これらのプロパティーは、<code>pulsar.producer</code> 接頭辞を使用してグローバルに設定することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">pulsar.producer.batchingEnabled=false</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 4. Pulsar プロデューサー属性</caption>
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">属性</th>
+<th class="tableblock halign-left valign-top">説明</th>
+<th class="tableblock halign-left valign-top">タイプ</th>
+<th class="tableblock halign-left valign-top">設定ファイル</th>
+<th class="tableblock halign-left valign-top">デフォルト</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>topicName</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">トピック名</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>producerName</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Producer name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>sendTimeoutMs</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Message send timeout in ms.<br>
+If a message is not acknowledged by a server before the <code>sendTimeout</code> expires, an error occurs.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">30000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>blockIfQueueFull</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If it is set to <code>true</code>, when the outgoing message queue is full, the <code>Send</code> and <code>SendAsync</code> methods of producer block, rather than failing and throwing errors.<br>
+If it is set to <code>false</code>, when the outgoing message queue is full, the <code>Send</code> and <code>SendAsync</code> methods of producer fail and <code>ProducerQueueIsFullError</code> exceptions occur.</p>
+<p class="tableblock">The <code>MaxPendingMessages</code> parameter determines the size of the outgoing message queue.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>maxPendingMessages</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum size of a queue holding pending messages.</p>
+<p class="tableblock">For example, a message waiting to receive an acknowledgment from a <a href="https://pulsar.apache.org/docs/reference-terminology#broker">broker</a>.</p>
+<p class="tableblock">By default, when the queue is full, all calls to the <code>Send</code> and <code>SendAsync</code> methods fail <strong>unless</strong> you set <code>BlockIfQueueFull</code> to <code>true</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>maxPendingMessagesAcrossPartitions</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of pending messages across partitions.</p>
+<p class="tableblock">Use the setting to lower the max pending messages for each partition (<code>#setMaxPendingMessages(int)</code>) if the total number exceeds the configured value.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>messageRoutingMode</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Message routing logic for producers on <a href="https://pulsar.apache.org/docs/concepts-architecture-overview#partitioned-topics">partitioned topics</a>.<br>
+Apply the logic only when setting no key on messages.<br>
+Available options are as follows:<br>
+* <code>pulsar.RoundRobinDistribution</code>: round robin<br>
+* <code>pulsar.UseSinglePartition</code>: publish all messages to a single partition<br>
+* <code>pulsar.CustomPartition</code>: a custom partitioning scheme</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MessageRoutingMode</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>hashingScheme</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hashing function determining the partition where you publish a particular message (partitioned topics only).<br>
+Available options are as follows:<br>
+* <code>pulsar.JavastringHash</code>: the equivalent of <code>string.hashCode()</code> in Java<br>
+* <code>pulsar.Murmur3_32Hash</code>: applies the <a href="https://en.wikipedia.org/wiki/MurmurHash">Murmur3</a> hashing function<br>
+* <code>pulsar.BoostHash</code>: applies the hashing function from C++'s <a href="https://www.boost.org/doc/libs/1_62_0/doc/html/hash.html">Boost</a> library</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HashingScheme</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JavaStringHash</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>cryptoFailureAction</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Producer should take action when encryption fails.<br>
+* <strong>FAIL</strong>: if encryption fails, unencrypted messages fail to send.<br>
+* <strong>SEND</strong>: if encryption fails, unencrypted messages are sent.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ProducerCryptoFailureAction</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FAIL</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>customMessageRouter</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MessageRouter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>batchingMaxPublishDelayMicros</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Batching time period of sending messages.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>batchingPartitionSwitchFrequencyByPublishDelay</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>batchingMaxMessages</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of messages permitted in a batch.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>batchingMaxBytes</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">131072</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>batchingEnabled</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enable batching of messages.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>batcherBuilder</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BatcherBuilder</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>chunkingEnabled</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enable chunking of messages.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>chunkMaxMessageSize</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>cryptoKeyReader</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CryptoKeyReader</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>messageCrypto</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MessageCrypto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>encryptionKeys</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">[]</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>compressionType</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Message data compression type used by a producer.<br>
+Available options:<br>
+* <a href="https://github.com/lz4/lz4">LZ4</a><br>
+* <a href="https://zlib.net/">ZLIB</a><br>
+* <a href="https://facebook.github.io/zstd/">ZSTD</a><br>
+* <a href="https://google.github.io/snappy/">SNAPPY</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CompressionType</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NONE</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>initialSequenceId</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Long</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>autoUpdatePartitions</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>autoUpdatePartitionsIntervalSeconds</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">60</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>multiSchema</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>accessMode</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ProducerAccessMode</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Shared</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>lazyStartPartitionedProducers</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>properties</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SortedMap</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">{}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>initialSubscriptionName</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Use this configuration to automatically create an initial subscription when creating a topic. If this field is not set, the initial subscription is not created.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="pulsar-client-configuration"><a class="anchor" href="#pulsar-client-configuration"></a>11.3. Pulsar クライアントの設定</h3>
+<div class="paragraph">
+<p>以下は、基盤となる <code>PulsarClient</code> の設定リファレンスです。
+これらのオプションは、チャネル属性を使用して設定できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.incoming.your-channel-name.numIoThreads=4</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>または、<code>pulsar.client</code> 接頭辞を使用してグローバルに設定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">pulsar.client.serviceUrl=pulsar://pulsar:6650</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 5. Pulsar client Attributes</caption>
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">属性</th>
+<th class="tableblock halign-left valign-top">説明</th>
+<th class="tableblock halign-left valign-top">タイプ</th>
+<th class="tableblock halign-left valign-top">設定ファイル</th>
+<th class="tableblock halign-left valign-top">デフォルト</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>serviceUrl</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pulsar cluster HTTP URL to connect to a broker.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>serviceUrlProvider</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The implementation class of ServiceUrlProvider used to generate ServiceUrl.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ServiceUrlProvider</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>authentication</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Authentication settings of the client.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">認証</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>authPluginClassName</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Class name of authentication plugin of the client.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>authParams</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Authentication parameter of the client.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>authParamMap</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Authentication map of the client.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Map</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>operationTimeoutMs</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Client operation timeout (in milliseconds).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">30000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>lookupTimeoutMs</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Client lookup timeout (in milliseconds).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>statsIntervalSeconds</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Interval to print client stats (in seconds).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">60</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>numIoThreads</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IOスレッド数。</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>numListenerThreads</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of consumer listener threads.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>connectionsPerBroker</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of connections established between the client and each Broker. A value of 0 means to disable connection pooling.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>connectionMaxIdleSeconds</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Release the connection if it is not used for more than [connectionMaxIdleSeconds] seconds. If  [connectionMaxIdleSeconds] &lt; 0, disabled the feature that auto release the idle connections</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">180</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>useTcpNoDelay</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to use TCP NoDelay option.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>useTls</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to use TLS.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>tlsKeyFilePath</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Path to the TLS key file.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>tlsCertificateFilePath</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Path to the TLS certificate file.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>tlsTrustCertsFilePath</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Path to the trusted TLS certificate file.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>tlsAllowInsecureConnection</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the client accepts untrusted TLS certificates from the broker.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>tlsHostnameVerificationEnable</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the hostname is validated when the client creates a TLS connection with brokers.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>concurrentLookupRequest</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of concurrent lookup requests that can be sent on each broker connection. Setting a maximum prevents overloading a broker.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>maxLookupRequest</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum number of lookup requests allowed on each broker connection to prevent overloading a broker.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">50000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>maxLookupRedirects</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum times of redirected lookup requests.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>maxNumberOfRejectedRequestPerConnection</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum number of rejected requests of a broker in a certain time frame (60 seconds) after the current connection is closed and the client creating a new connection to connect to a different broker.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">50</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>keepAliveIntervalSeconds</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Seconds of keeping alive interval for each client broker connection.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">30</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>connectionTimeoutMs</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Duration of waiting for a connection to a broker to be established.If the duration passes without a response from a broker, the connection attempt is dropped.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>requestTimeoutMs</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum duration for completing a request.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">60000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>readTimeoutMs</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum read time of a request.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">60000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>autoCertRefreshSeconds</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Seconds of auto refreshing certificate.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">300</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>initialBackoffIntervalNanos</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Initial backoff interval (in nanosecond).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100000000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>maxBackoffIntervalNanos</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Max backoff interval (in nanosecond).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">60000000000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>enableBusyWait</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable BusyWait for EpollEventLoopGroup.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>listenerName</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Listener name for lookup. Clients can use listenerName to choose one of the listeners as the service URL to create a connection to the broker as long as the network is accessible."advertisedListeners" must enabled in broker side.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>useKeyStoreTls</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set TLS using KeyStore way.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>sslProvider</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The TLS provider used by an internal client to authenticate with other Pulsar brokers.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>tlsKeyStoreType</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TLS KeyStore type configuration.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JKS</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>tlsKeyStorePath</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Path of TLS KeyStore.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>tlsKeyStorePassword</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Password of TLS KeyStore.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>tlsTrustStoreType</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TLS TrustStore type configuration. You need to set this configuration when client authentication is required.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JKS</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>tlsTrustStorePath</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Path of TLS TrustStore.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>tlsTrustStorePassword</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Password of TLS TrustStore.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>tlsCiphers</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set of TLS Ciphers.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">[]</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>tlsProtocols</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Protocols of TLS.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">[]</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>memoryLimitBytes</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Limit of client memory usage (in byte). The 64M default can guarantee a high producer throughput.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">67108864</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>proxyServiceUrl</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URL of proxy service. proxyServiceUrl and proxyProtocol must be mutually inclusive.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>proxyProtocol</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Protocol of proxy service. proxyServiceUrl and proxyProtocol must be mutually inclusive.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ProxyProtocol</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>enableTransaction</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable transaction.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>clock</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Clock</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>dnsLookupBindAddress</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Pulsar client dns lookup bind address, default behavior is bind on 0.0.0.0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>dnsLookupBindPort</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Pulsar client dns lookup bind port, takes effect when dnsLookupBindAddress is configured, default value is 0.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>socks5ProxyAddress</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Address of SOCKS5 proxy.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">InetSocketAddress</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>socks5ProxyUsername</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User name of SOCKS5 proxy.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>socks5ProxyPassword</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Password of SOCKS5 proxy.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>description</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The extra description of the client version. The length cannot exceed 64.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>設定ファイルで設定できない (シリアライズできない) 設定プロパティーは、<code>Config file</code> 列にその旨が記載されています。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="going-further"><a class="anchor" href="#going-further"></a>12. さらに詳しく</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、Quarkus を使用して Pulsar と対話する方法を説明しました。
+Quarkus は、Quarkus Messaging を利用してデータストリーミングアプリケーションを構築します。</p>
+</div>
+<div class="paragraph">
+<p>さらに詳しく知りたい場合は、Quarkusで使用されている実装、 <a href="https://smallrye.io/smallrye-reactive-messaging">SmallRye Reactive Messaging</a> のドキュメントを確認してください。</p>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#introduction">1. はじめに</a></li>
+<li><a href="#quarkus-extension-for-apache-pulsar">2. Apache Pulsar のための Quarkus エクステンション</a></li>
+<li><a href="#configuring-smallrye-pulsar-connector">3. SmallRye Pulsar コネクターの設定</a></li>
+<li><a href="#receiving-messages-from-pulsar">4. Pulsar からのメッセージの受信</a>
+<ul class="sectlevel2">
+<li><a href="#example">4.1. 例</a></li>
+<li><a href="#blocking-processing">4.2. ブロッキング処理</a></li>
+<li><a href="#pulsar-subscription-types">4.3. Pulsar のサブスクリプションタイプ</a></li>
+<li><a href="#deserialization-and-pulsar-schema">4.4. デシリアライゼーションと Pulsar Schema</a></li>
+<li><a href="#acknowledgement-strategies">4.5. 確認応答ストラテジー</a></li>
+<li><a href="#failure-handling-strategies">4.6. 失敗処理ストラテジー</a></li>
+<li><a href="#receiving-pulsar-messages-in-batches">4.7. Pulsar メッセージの一括受信</a></li>
+</ul>
+</li>
+<li><a href="#sending-messages-to-pulsar">5. Pulsar へのメッセージの送信</a>
+<ul class="sectlevel2">
+<li><a href="#example-2">5.1. 例</a></li>
+<li><a href="#serialization-and-pulsar-schema">5.2. シリアライゼーションと Pulsar Schema</a></li>
+<li><a href="#sending-keyvalue-pairs">5.3. キー/値のペアの送信</a></li>
+<li><a href="#acknowledgement">5.4. 確認</a></li>
+<li><a href="#back-pressure-and-inflight-records">5.5. バックプレッシャーとインフライトレコード</a></li>
+<li><a href="#producer-batching">5.6. プロデューサーのバッチ処理</a></li>
+</ul>
+</li>
+<li><a href="#pulsar-transactions-and-exactly-once-processing">6. Pulsar トランザクションと exactly-once 処理</a>
+<ul class="sectlevel2">
+<li><a href="#exactly-once-processing">6.1. Exactly-Once 処理</a></li>
+</ul>
+</li>
+<li><a href="#pulsar-schema-configuration">7. Pulsar Schema 設定と自動スキーマ検出</a>
+<ul class="sectlevel2">
+<li><a href="#auto-schema-discovery">7.1. 自動スキーマ検出</a></li>
+</ul>
+</li>
+<li><a href="#pulsar-dev-services">8. Dev Services for Pulsar</a>
+<ul class="sectlevel2">
+<li><a href="#enabling-disabling-dev-services-for-pulsar">8.1. Enabling / Disabling Dev Services for Pulsar</a></li>
+<li><a href="#shared-broker">8.2. 共有ブローカー</a></li>
+<li><a href="#setting-the-port">8.3. ポートの設定</a></li>
+<li><a href="#configuring-the-image">8.4. イメージの設定</a></li>
+<li><a href="#configuring-the-pulsar-broker">8.5. Configuring the Pulsar broker</a></li>
+</ul>
+</li>
+<li><a href="#configuring-pulsar-clients">9. Pulsar クライアントの設定</a>
+<ul class="sectlevel2">
+<li><a href="#configuring-pulsar-authentication">9.1. Pulsar認証の設定</a></li>
+</ul>
+</li>
+<li><a href="#pulsar-health-check">10. ヘルスチェック</a></li>
+<li><a href="#configuration-reference">11. 設定リファレンス</a>
+<ul class="sectlevel2">
+<li><a href="#incoming-channel-configuration-receiving-from-pulsar">11.1. 着信チャネル設定 (Pulsar からの受信)</a></li>
+<li><a href="#outgoing-channel-configuration-publishing-to-pulsar">11.2. 発信チャネルの設定 (Pulsar への公開)</a></li>
+<li><a href="#pulsar-client-configuration">11.3. Pulsar クライアントの設定</a></li>
+</ul>
+</li>
+<li><a href="#going-further">12. さらに詳しく</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same extensions</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/pulsar-dev-services">Dev Services for Pulsar</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/pulsar-getting-started">Apache PulsarによるQuarkusメッセージングの開始</a></li>
+      </ul>
+    </div>
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/pulsar-dev-services">Dev Services for Pulsar</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/pulsar-getting-started">Apache PulsarによるQuarkusメッセージングの開始</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/kafka">Apache Kafka リファレンスガイド</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/rabbitmq-dev-services">Dev Services for RabbitMQ</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/kafka-getting-started">Apache Kafkaを使用したQuarkusメッセージング入門</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/rabbitmq">RabbitMQを使用したQuarkusメッセージング入門</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/messaging">Quarkus Messagingエクステンション</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/messaging-virtual-threads">Reactive MessagingによるQuarkus仮想スレッドのサポート</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/rabbitmq-reference">リアクティブメッセージング RabbitMQ コネクターのリファレンスドキュメント</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/amqp-dev-services">Dev Services for AMQP</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/apicurio-registry-dev-services">Dev Services for Apicurio Registry</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/kafka-dev-services">Dev Services for Kafka</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/amqp">AMQP 1.0を使用したQuarkusのメッセージング入門</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/kafka-dev-ui">Kafka Dev UI</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/amqp-reference">リアクティブメッセージング AMQP1.0 コネクターリファレンスドキュメント</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/kafka-streams">Apache Kafka ストリームの使用</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/kafka-schema-registry-avro"> Schema RegistryとAvroと共にApache Kafkaを使用</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/kafka-schema-registry-json-schema">スキーマレジストリとJSONスキーマと共にApache Kafkaを使用する</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/jms">JMSの使用</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/reactive-event-bus">イベントバスの使用</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

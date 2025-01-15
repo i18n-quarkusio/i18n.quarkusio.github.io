@@ -1,0 +1,2705 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>HTTPリファレンス - 3.15 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.15/guides/http-reference" />
+  <meta property="og:title" content="HTTPリファレンス - 3.15" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/http-reference">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.15/guides/http-reference">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.15/guides/http-reference" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.15/guides/http-reference">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.15/guides/http-reference">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.15/guides/http-reference">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.15/guides/http-reference">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.15/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" selected>3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">HTTPリファレンス </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このドキュメントでは、Quarkusで利用可能なさまざまなHTTP機能について説明します。</p>
+</div>
+<div class="paragraph">
+<p>Eclipse Vert.xは、基本的なHTTPレイヤーを提供します。
+Servletのサポートのために、QuarkusはVert.xの上で動作するカスタマイズされたUndertowバージョンを使用し、Jakarta RESTのサポートはRESTEasyを通じて提供されます。</p>
+</div>
+<div class="paragraph">
+<p>Undertowがある場合、RESTEasyはServletフィルタとして機能します。
+Undertowがない場合、RESTEasyはServletを介さずにVert.x上で直接動作します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="serving-static-resources"><a class="anchor" href="#serving-static-resources"></a>1. 静的リソースの提供</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you are looking to use Quarkus for a web application, look at the <a href="web">Quarkus for the Web</a> guide.</p>
+</div>
+<div class="sect2">
+<h3 id="from-the-application-jar"><a class="anchor" href="#from-the-application-jar"></a>1.1. アプリケーションjarから</h3>
+<div class="paragraph">
+<p>アプリケーションjarから静的リソースを提供するには、それらをアプリケーションの <code>META-INF/resources</code> ディレクトリに配置する必要があります。この場所は、Servlet仕様で定義されている <code>jar</code> ファイルのリソースの標準的な場所として選択されています。QuarkusはServletなしで使用できますが、この規約に従って、リソースをこの場所に配置する既存のコードを正しく機能させることができます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="from-web-dependencies-like-webjars-or-mvnpm"><a class="anchor" href="#from-web-dependencies-like-webjars-or-mvnpm"></a>1.2. From web dependencies like webjars or mvnpm</h3>
+<div class="paragraph">
+<p>Look at the <a href="web-dependency-locator">Web dependency locator</a> guide for details on how to use <a href="https://www.webjars.org">WebJars</a>, <a href="https://mvnpm.org">mvnpm</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap">importmaps</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="from-a-local-directory"><a class="anchor" href="#from-a-local-directory"></a>1.3. ローカルディレクトリから</h3>
+<div class="paragraph">
+<p>Vert.xルーターに追加ルートをインストールすることで、静的リソースをローカルディレクトリから提供できます。</p>
+</div>
+<div class="paragraph">
+<p>例えば、 <a href="http://localhost:8080/static/" class="bare">http://localhost:8080/static/</a> でカレントパスから相対的に、 <code>static/</code> ディレクトリからリソースを提供するには、以下のルートをインストールします：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import io.quarkus.runtime.StartupEvent;
+import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.StaticHandler;
+import jakarta.enterprise.event.Observes;
+
+
+public class StaticResources {
+
+    void installRoute(@Observes StartupEvent startupEvent, Router router) {
+        router.route()
+                .path("/static/*")
+                .handler(StaticHandler.create("static/"));
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="http-compression"><a class="anchor" href="#http-compression"></a>1.4. HTTP圧縮</h3>
+<div class="paragraph">
+<p>静的リソースのレスポンスボディは、デフォルトでは圧縮されません。 HTTP 圧縮のサポートは <code>quarkus.http.enable-compression=true</code> によって有効にすることができます。 圧縮サポートが有効な場合、リソースのファイル名から得られる <code>Content-Type</code> ヘッダーが <code>quarkus.http.compress-media-types</code> で設定された圧縮メディアタイプであれば、レスポンスボディは圧縮されます。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+By default, the following list of media types is compressed: <code>text/html</code>, <code>text/plain</code>, <code>text/xml</code>, <code>text/css</code>, <code>text/javascript</code>, <code>application/javascript</code>, <code>application/graphql+json</code>. It means some other noteworthy media types such as <code>application/json</code>, <code>application/xhtml+xml</code> are NOT compressed by default.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If the client does not indicate its support for HTTP compression in a request header, e.g. <code>Accept-Encoding: deflate, gzip, br</code>, then the response body is not compressed.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Brotli compression is not available by default. You can enable it by setting <code>quarkus.http.compressors=deflate,gzip,br</code>. In case of building native image, it adds around 1MB to your executable size.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="static-resources-config"><a class="anchor" href="#static-resources-config"></a>1.5. その他の設定</h3>
+<div class="paragraph">
+<p>さらに、静的リソースのインデックスページをデフォルトの <code>index.html</code> から変更すること、隠しファイル（ドットファイルなど）を提供しないことを示すこと、範囲要求を無効にすること、キャッシュ対応（ヘッダーのキャッシュ、ファイルのプロパティのキャッシュなど）を設定することができます。</p>
+</div>
+<div class="paragraph configuration-legend">
+<p><span class="icon"><i class="fa fa-lock" title="ビルド時に固定"></i></span> ビルド時に固定される設定プロパティ - それ以外の設定プロパティは実行時に上書き可能</p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference configuration-reference-all-rows">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><span class="header-title">Configuration property</span></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-static-resources_quarkus-http-static-resources-index-page"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-static-resources_quarkus-http-static-resources-index-page"><code>quarkus.http.static-resources.index-page</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-1" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set the index page when serving static resources.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29133">QUARKUS_HTTP_STATIC_RESOURCES_INDEX_PAGE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29133" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>index.html</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-static-resources_quarkus-http-static-resources-include-hidden"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-static-resources_quarkus-http-static-resources-include-hidden"><code>quarkus.http.static-resources.include-hidden</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-2" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set whether hidden files should be served.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29134">QUARKUS_HTTP_STATIC_RESOURCES_INCLUDE_HIDDEN</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29134" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-static-resources_quarkus-http-static-resources-enable-range-support"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-static-resources_quarkus-http-static-resources-enable-range-support"><code>quarkus.http.static-resources.enable-range-support</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-3" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set whether range requests (resumable downloads; media streaming) should be enabled.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29135">QUARKUS_HTTP_STATIC_RESOURCES_ENABLE_RANGE_SUPPORT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29135" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-static-resources_quarkus-http-static-resources-caching-enabled"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-static-resources_quarkus-http-static-resources-caching-enabled"><code>quarkus.http.static-resources.caching-enabled</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-4" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set whether cache handling is enabled.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29136">QUARKUS_HTTP_STATIC_RESOURCES_CACHING_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29136" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-static-resources_quarkus-http-static-resources-cache-entry-timeout"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-static-resources_quarkus-http-static-resources-cache-entry-timeout"><code>quarkus.http.static-resources.cache-entry-timeout</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-5" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set the cache entry timeout. The default is <code>30</code> seconds.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29137">QUARKUS_HTTP_STATIC_RESOURCES_CACHE_ENTRY_TIMEOUT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29137" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-vertx-http_quarkus-http-static-resources"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>30S</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-static-resources_quarkus-http-static-resources-max-age"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-static-resources_quarkus-http-static-resources-max-age"><code>quarkus.http.static-resources.max-age</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-6" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set value for max age in caching headers. The default is <code>24</code> hours.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29138">QUARKUS_HTTP_STATIC_RESOURCES_MAX_AGE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29138" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-vertx-http_quarkus-http-static-resources"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>24H</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-static-resources_quarkus-http-static-resources-max-cache-size"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-static-resources_quarkus-http-static-resources-max-cache-size"><code>quarkus.http.static-resources.max-cache-size</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-7" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set the max cache size.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29139">QUARKUS_HTTP_STATIC_RESOURCES_MAX_CACHE_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29139" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>10000</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-static-resources_quarkus-http-static-resources-content-encoding"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-static-resources_quarkus-http-static-resources-content-encoding"><code>quarkus.http.static-resources.content-encoding</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-8" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Content encoding for text related files</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29140">QUARKUS_HTTP_STATIC_RESOURCES_CONTENT_ENCODING</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29140" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/charset/Charset.html">Charset</a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>UTF-8</code></p></td>
+</tr>
+</tbody>
+</table>
+<div id="duration-note-anchor-quarkus-vertx-http_quarkus-http-static-resources" class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">期間フォーマットについて</div>
+<div class="paragraph">
+<p>To write duration values, use the standard <code>java.time.Duration</code> format.
+See the <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html#parse(java.lang.CharSequence)">Duration#parse() Java API documentation</a> for more information.</p>
+</div>
+<div class="paragraph">
+<p>数字で始まる簡略化した書式を使うこともできます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値のみの場合は、秒単位の時間を表します。</p>
+</li>
+<li>
+<p>数値の後に <code>ms</code> が続く場合は、ミリ秒単位の時間を表します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>その他の場合は、簡略化されたフォーマットが解析のために <code>java.time.Duration</code> フォーマットに変換されます：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値の後に <code>h</code> 、 <code>m</code> 、 <code>s</code> が続く場合は、その前に <code>PT</code> が付けられます。</p>
+</li>
+<li>
+<p>数値の後に <code>d</code> が続く場合は、その前に <code>P</code> が付けられます。</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="context-path"><a class="anchor" href="#context-path"></a>2. コンテキストパスの設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>デフォルトでは、 Quarkus はルートコンテキストの下からコンテンツを提供します。これを変更したい場合は、 <code>quarkus.http.root-path</code> 設定キーを使用してコンテキストパスを設定することができます。</p>
+</div>
+<div class="paragraph">
+<p>Servlet を使用している場合は、<code>quarkus.servlet.context-path</code> を通して Servlet のコンテキストパスを制御することができます。この項目は、上記の http ルートに相対的で、Servlet と、Servlet の上で実行されるものにのみ影響します。多くのアプリケーションでは、Quarkus が提供するすべてのサービスに影響するため、HTTP ルートを使用することをお勧めします。</p>
+</div>
+<div class="paragraph">
+<p>両方を指定した場合、サーブレット以外のすべてのウェブエンドポイントは <code>quarkus.http.root-path</code> からの相対的なものになり、サーブレットは <code>{quarkus.http.root-path}/{quarkus.servlet.context-path}</code> からの相対的なものになります。</p>
+</div>
+<div class="paragraph">
+<p>テストに REST Assured を使用し、<code>quarkus.http.root-path</code> が設定されている場合、Quarkus は自動的に Quarkus テストで使用するためのベース URL を設定します。そのため、テストの URL はルートパスには含めないでください。</p>
+</div>
+<div class="paragraph">
+<p>一般に、ウェブコンテンツのパス設定は、 <code>quarkus.http.root-path</code> ( デフォルトでは / ) からの相対パスとして解釈されます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>このコンテキストルート内のパスを指定するには、スラッシュで始まらない相対パスを使用します。</p>
+</li>
+<li>
+<p>URIを明示的に指定し、 <code>quarkus.http.root-path</code> の値にかかわらず常に同じになるようにしたい場合は、スラッシュで始まる絶対パスを使用します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>例として、エクステンションが <code>service</code> というパスを設定した場合、そのエンドポイントは <code>${quarkus.http.root-path}/service</code> から提供されます。 そのパスの設定を <code>/service</code> に変更した場合、そのエンドポイントは <code>/service</code> から提供されるようになります。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://quarkus.io/blog/path-resolution-in-quarkus/">Quarkus のパス解決</a>に関するブログ記事では、ユーザー定義パスとエクステンション定義パスの両方に対するパス解決の仕組みについて詳しく説明しています。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="title">マネジメントインターフェース</div>
+<div class="paragraph">
+<p><code>quarkus.http.root-path</code> は、メインの HTTP サーバーにのみ使用されます。マネジメントインターフェイスを有効にした場合（ <code>quarkus.management.enabled=true</code> プロパティを使用）、マネジメントインターフェイスのルートパスは、次のように設定できます: <code>quarkus.management.root-path</code> 。</p>
+</div>
+<div class="paragraph">
+<p>詳しくは、 <a href="./management-interface-reference">マネジメントインターフェイスのリファレンス</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ssl"><a class="anchor" href="#ssl"></a>3. TLS/SSLによる安全な接続のサポート</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusで安全な接続をサポートするには、証明書と関連するキーファイルを提供するか、キーストアを提供する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>いずれの場合も、パスワードを提供する必要があります。提供方法の詳細については、指定の段落を参照してください。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルでの TLS/SSL サポートを有効にするには、 <a href="native-and-ssl">ネイティブ実行可能ファイルでの SSL の使用ガイド</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="using-the-tls-centralized-configuration"><a class="anchor" href="#using-the-tls-centralized-configuration"></a>3.1. Using the TLS centralized configuration</h3>
+<div class="paragraph">
+<p>Quarkus provides a <a href="./tls-registry-reference">TLS centralized configuration</a> that can be used to configure the server&#8217;s TLS context.
+It is the recommended approach to configure HTTPS.</p>
+</div>
+<div class="paragraph">
+<p>HTTPS を使用するために HTTP サーバーを設定するには、次の設定を使用できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.tls.key-store.pem.0.cert=server.crt
+quarkus.tls.key-store.pem.0.key=server.key
+quarkus.http.insecure-requests=disabled # Reject HTTP requests</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To use a <code>p12</code> (PKCS12) key store, apply the following configuration:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.tls.key-store.p12.path=server-keystore.p12
+quarkus.tls.key-store.p12.password=secret
+quarkus.http.insecure-requests=disabled # Reject HTTP requests</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>デフォルト設定の代わりに、名前付き設定を使用できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.tls.https.key-store.p12.path=server-keystore.p12
+quarkus.tls.https.key-store.p12.password=secret
+quarkus.http.insecure-requests=disabled
+quarkus.http.tls-configuration-name=https</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuring-the-http-server-directly"><a class="anchor" href="#configuring-the-http-server-directly"></a>3.2. Configuring the HTTP server directly</h3>
+<div class="paragraph">
+<p>If you do not want to use the TLS registry, you can configure the HTTP server directly.</p>
+</div>
+<div class="paragraph">
+<p>証明書がキーストアにロードされていない場合は、以下のプロパティーを使用して直接提供することができます。Quarkus はまず、与えられたファイルをリソースとしてロードしようとし、ファイルシステムをフォールバックとして使用します。証明書/キーペアは、起動時に新しく作成されたキーストアにロードされます。</p>
+</div>
+<div class="paragraph">
+<p><code>application.properties</code> は次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.ssl.certificate.files=/path/to/certificate
+quarkus.http.ssl.certificate.key-files=/path/to/key</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>別の解決策としては、すでに証明書付きのデフォルトのエントリーを含むキーストアを直接提供する方法もあります。
+少なくともファイルとパスワードを提供する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>証明書とキーファイルの組み合わせと同様に、Quarkus はまず、ファイルシステムからの読み込みを試みる前に、指定されたパスをリソースとして解決しようとします。</p>
+</div>
+<div class="paragraph">
+<p>次のプロパティーを <code>application.properties</code> に追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.ssl.certificate.key-store-file=/path/to/keystore</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>オプションのヒントとして、キーストアのタイプをオプションの1つとして指定できます。
+タイプが指定されていない場合、Quarkusはファイルの拡張子から推測しようとします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.ssl.certificate.key-store-file-type=[one of JKS, JCEKS, P12, PKCS12, PFX]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>前述のいずれのシナリオでも、キーストアを作成/ロードするためにパスワードを指定する必要があります。パスワードは、以下のプロパティーを使用して <code>application.properties</code> で (プレーンテキストで) 設定できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.ssl.certificate.key-store-password=your-password</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>しかし、設定ファイルでパスワードをプレーンテキストとして提供する代わりに (これは悪い習慣と考えられています)、環境変数 <code>QUARKUS_HTTP_SSL_CERTIFICATE_KEY_STORE_PASSWORD</code> として ( <a href="https://microprofile.io/project/eclipse/microprofile-config">MicroProfile config </a> を使用して) パスワードを提供することができます。これは、 <a href="https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables">Kubernetes secrets</a> と連動します。</p>
+</div>
+<div class="paragraph">
+<p><em>注意：Quarkusの以前のバージョン（0.16以前）との互換性を保つため、デフォルトのパスワードは "password "に設定されています。そのため、必須パラメータではありません！</em></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configure-the-https-port"><a class="anchor" href="#configure-the-https-port"></a>3.3. HTTP ポートの設定</h3>
+<div class="paragraph">
+<p>デフォルトでは、Quarkusは、SSLで保護された接続にポート8443を、テストの実行時にはポート8444をリッスンします。</p>
+</div>
+<div class="paragraph">
+<p>これらのポートは、 <code>application.properties</code> のプロパティ <code>quarkus.http.ssl-port</code> と <code>quarkus.http.test-ssl-port</code> で設定することができます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="disable-the-http-port"><a class="anchor" href="#disable-the-http-port"></a>3.4. HTTP ポートの無効化</h3>
+<div class="paragraph">
+<p>HTTP ポートを無効にして、セキュアなリクエストのみをサポートすることも可能です。これは <code>application.properties</code> の <code>quarkus.http.insecure-requests</code> プロパティーで行います。3 つの値を利用できます。</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>enabled</code></dt>
+<dd>
+<p>デフォルトでは、HTTP は通常通りに動作します。</p>
+</dd>
+<dt class="hdlist1"><code>redirect</code></dt>
+<dd>
+<p>HTTP リクエストは HTTPS ポートにリダイレクトされます。</p>
+</dd>
+<dt class="hdlist1"><code>disabled</code></dt>
+<dd>
+<p>HTTP ポートは開けません。</p>
+</dd>
+</dl>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>redirect</code> または <code>disabled</code> を使用していて、SSL 証明書またはキーストアを追加していない場合は、サーバーは起動しません。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="reloading-the-certificates"><a class="anchor" href="#reloading-the-certificates"></a>3.5. 証明書の再読込</h3>
+<div class="paragraph">
+<p>きーストア、トラスト・ストア、および証明書ファイルは、定期的にリロードできます。 
+<code>quarkus.http.ssl.certificate.reload-period</code> プロパティを設定して、証明書をリロードする間隔を指定します：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.ssl.certificate.files=/mount/certs/tls.crt
+quarkus.http.ssl.certificate.key-files=/mount/certs/tls.key
+quarkus.http.ssl.certificate.reload-period=1h</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ファイルは最初に読み込まれたのと同じ場所から再読み込みされます。
+内容に変更がない場合、リロードは失敗します。
+リロードに失敗した場合、サーバは以前の証明書を使い続けます。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="additional-http-headers"><a class="anchor" href="#additional-http-headers"></a>4. 追加の HTTP ヘッダー</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>すべてのレスポンスに HTTP ヘッダーを送信するようにするには、以下のプロパティーを追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.header."X-Content-Type-Options".value=nosniff</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、アプリケーション内の任意のリソースに対して実行されるリクエストのレスポンスに、 <code>X-Content-Type-Options: nosniff</code> HTTP ヘッダーが含まれます。</p>
+</div>
+<div class="paragraph">
+<p>また、ヘッダーを適用する必要がある <code>path</code> パターンと HTTP <code>methods</code> を指定することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.header.Pragma.value=no-cache
+quarkus.http.header.Pragma.path=/headers/pragma
+quarkus.http.header.Pragma.methods=GET,HEAD</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、 <code>/headers/pragma</code> リソースが <code>GET</code> または <code>HEAD</code> メソッドで呼び出された場合にのみ、 <code>Pragma</code> ヘッダーが適用されます。</p>
+</div>
+<div class="paragraph configuration-legend">
+<p><span class="icon"><i class="fa fa-lock" title="ビルド時に固定"></i></span> ビルド時に固定される設定プロパティ - それ以外の設定プロパティは実行時に上書き可能</p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference configuration-reference-all-rows">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><span class="header-title">Configuration property</span></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-header_quarkus-http-header-header-path"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-header_quarkus-http-header-header-path"><code>quarkus.http.header."header".path</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-9" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The path this header should be applied</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29141">QUARKUS_HTTP_HEADER__HEADER__PATH</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29141" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>/*</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-header_quarkus-http-header-header-value"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-header_quarkus-http-header-header-value"><code>quarkus.http.header."header".value</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-10" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The value for this header configuration</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29142">QUARKUS_HTTP_HEADER__HEADER__VALUE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29142" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">required <span class="icon"><i class="fa fa-exclamation-circle" title="Configuration property is required"></i></span></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-header_quarkus-http-header-header-methods"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-header_quarkus-http-header-header-methods"><code>quarkus.http.header."header".methods</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-11" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The HTTP methods for this header configuration</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29143">QUARKUS_HTTP_HEADER__HEADER__METHODS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29143" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="additional-http-headers-per-path"><a class="anchor" href="#additional-http-headers-per-path"></a>4.1. パスごとの追加の HTTP ヘッダー</h3>
+<div class="paragraph">
+<p>パスによって異なるヘッダー値が必要な場合は、以下のように設定することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.filter.index.header."Cache-Control"=none
+quarkus.http.filter.index.matches=/index.html</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、 <code>/index.html</code> が呼び出されたときに、 <code>Cache-Control</code> のヘッダに <code>none</code> が設定されます。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+キーの <code>quarkus.http.filter</code> の後の <code>index</code> はグループ分けに使用され、 ( 例として ) 好きな名前を付けることができます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>パスには正規表現を使用でき、また HTTP ヘッダーが設定される HTTP メソッドを指定することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.filter.static.header."Cache-Control"=max-age=31536000
+quarkus.http.filter.static.methods=GET,HEAD
+quarkus.http.filter.static.matches=/static/.*</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>設定でパスが重複している場合、順序を指定することができます ( 値の大きい方が優先されます ) 。例えば、以下のような設定を持つ場合を考えます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.filter.just-order.order=10
+quarkus.http.filter.just-order.header."Cache-Control"=max-age=5000
+quarkus.http.filter.just-order.matches=/paths/order
+
+quarkus.http.filter.any-order.order=11
+quarkus.http.filter.any-order.header."Cache-Control"=max-age=1
+quarkus.http.filter.any-order.matches=/paths/order.*</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>/paths/order</code> が要求されたときに <code>Cache-Control: max-age=1</code> ヘッダを含めます。</p>
+</div>
+<div class="paragraph configuration-legend">
+<p><span class="icon"><i class="fa fa-lock" title="ビルド時に固定"></i></span> ビルド時に固定される設定プロパティ - それ以外の設定プロパティは実行時に上書き可能</p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference configuration-reference-all-rows">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><span class="header-title">Configuration property</span></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-filter_quarkus-http-filter-filter-matches"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-filter_quarkus-http-filter-filter-matches"><code>quarkus.http.filter."filter".matches</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-12" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>A regular expression for the paths matching this configuration</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29144">QUARKUS_HTTP_FILTER__FILTER__MATCHES</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29144" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">required <span class="icon"><i class="fa fa-exclamation-circle" title="Configuration property is required"></i></span></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-filter_quarkus-http-filter-filter-header-header-name"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-filter_quarkus-http-filter-filter-header-header-name"><code>quarkus.http.filter."filter".header."header-name"</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-13" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Additional HTTP Headers always sent in the response</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29145">QUARKUS_HTTP_FILTER__FILTER__HEADER__HEADER_NAME_</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29145" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Map&lt;String,String&gt;</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-filter_quarkus-http-filter-filter-methods"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-filter_quarkus-http-filter-filter-methods"><code>quarkus.http.filter."filter".methods</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-14" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The HTTP methods for this path configuration</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29146">QUARKUS_HTTP_FILTER__FILTER__METHODS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29146" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-filter_quarkus-http-filter-filter-order"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-filter_quarkus-http-filter-filter-order"><code>quarkus.http.filter."filter".order</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-15" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Order in which this path config is applied. Higher priority takes precedence</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29147">QUARKUS_HTTP_FILTER__FILTER__ORDER</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29147" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="support-100-continue-in-vert-x"><a class="anchor" href="#support-100-continue-in-vert-x"></a>5. Vert.xにおける 100-continue のサポート</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>100-continue</code> をサポートするには、 <code>quarkus.http.handle-100-continue-automatically</code> オプションを明示的に有効にする必要があります。
+詳細については、 <a href="https://datatracker.ietf.org/doc/html/rfc7231#section-5.1.1">100-continue</a> と
+関連する <a href="https://vertx.io/docs/apidocs/io/vertx/core/http/HttpServerOptions.html#DEFAULT_HANDLE_100_CONTINE_AUTOMATICALLY">Vert.x ドキュメント</a> を参照してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.handle-100-continue-automatically=true</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="http2-support"><a class="anchor" href="#http2-support"></a>6. HTTP/2 サポート</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>HTTP/2はデフォルトで有効になっており、SSLが使用されている場合はブラウザで使用されます。
+SSL が使用されていない場合でも、クリアテキストアップグレードによる HTTP/2 はサポートされており、ブラウザ以外のクライアントで使用される可能性があります。</p>
+</div>
+<div class="paragraph">
+<p>HTTP/2 を無効にしたい場合は、以下を設定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.http2=false</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>いくつかの設定属性はHTTP/2に固有であることに注意してください。例えば、最大ヘッダーリストサイズ (~ヘッダー) を設定するには、 <code>quarkus.http.limits.max-header-list-size</code> 属性を設定する必要があります。また、 <code>quarkus.http.http2-push-enabled</code> を使用して、HTTP/2プッシュを有効または無効にすることもできます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="listening-on-a-random-port"><a class="anchor" href="#listening-on-a-random-port"></a>7. ランダムポートでの待ち受け</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ポートを指定したくない場合は、<code>quarkus.http.port=0</code> または <code>quarkus.http.test-port=0</code> を指定することができます。ランダムに開いているポートが OS によって選ばれ、コンソールにログメッセージが表示されます。ポートがバインドされると、<code>quarkus.http.port</code> システムプロパティーには選択された実際のポートが設定されます。そのため、これを利用して、アプリケーション内から実際のポート番号を取得できます。テスト中の場合は普通に URL を注入することができ、これは実際のポートで設定され、REST Assured も適切に設定されます。</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+これはシステムプロパティを設定するものなので、MicroProfile Config から <code>quarkus.http.port</code> にアクセスできます。ただし、インジェクションを使用した場合は、注入された値が常に正しいとは限りません。このポート割り当ては、Quarkus の起動時に最後に起こることの 1 つなので、インジェクションされるオブジェクトがポートが開く前にしきりに作成された場合、インジェクションされた値は正しくなりません。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cors-filter"><a class="anchor" href="#cors-filter"></a>8. CORS フィルター</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusアプリケーションを別のドメインで実行されている別のアプリケーションからアクセスできるようにするには、クロスオリジンリソース共有（CORS）を設定する必要があります。
+Quarkusが提供するCORSフィルターの詳細については、クロスオリジンリソース共有ガイドのQuarkus <a href="security-cors#cors-filter">CORSフィルター</a> のセクションを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="http-limits-configuration"><a class="anchor" href="#http-limits-configuration"></a>9. HTTP 制限の設定</h2>
+<div class="sectionbody">
+<div class="paragraph configuration-legend">
+<p><span class="icon"><i class="fa fa-lock" title="ビルド時に固定"></i></span> ビルド時に固定される設定プロパティ - それ以外の設定プロパティは実行時に上書き可能</p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference configuration-reference-all-rows">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><span class="header-title">Configuration property</span></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-header-size"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-header-size"><code>quarkus.http.limits.max-header-size</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-16" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The maximum length of all headers.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29148">QUARKUS_HTTP_LIMITS_MAX_HEADER_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29148" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">MemorySize <a href="#memory-size-note-anchor-quarkus-vertx-http_quarkus-http-limits"><span class="icon"><i class="fa fa-question-circle" title="More information about the MemorySize format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>20K</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-body-size"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-body-size"><code>quarkus.http.limits.max-body-size</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-17" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The maximum size of a request body.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29149">QUARKUS_HTTP_LIMITS_MAX_BODY_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29149" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">MemorySize <a href="#memory-size-note-anchor-quarkus-vertx-http_quarkus-http-limits"><span class="icon"><i class="fa fa-question-circle" title="More information about the MemorySize format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>10240K</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-chunk-size"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-chunk-size"><code>quarkus.http.limits.max-chunk-size</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-18" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The max HTTP chunk size</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29150">QUARKUS_HTTP_LIMITS_MAX_CHUNK_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29150" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">MemorySize <a href="#memory-size-note-anchor-quarkus-vertx-http_quarkus-http-limits"><span class="icon"><i class="fa fa-question-circle" title="More information about the MemorySize format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>8192</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-initial-line-length"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-initial-line-length"><code>quarkus.http.limits.max-initial-line-length</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-19" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The maximum length of the initial line (e.g. <code>"GET / HTTP/1.0"</code>).</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29151">QUARKUS_HTTP_LIMITS_MAX_INITIAL_LINE_LENGTH</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29151" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>4096</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-form-attribute-size"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-form-attribute-size"><code>quarkus.http.limits.max-form-attribute-size</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-20" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The maximum length of a form attribute.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29152">QUARKUS_HTTP_LIMITS_MAX_FORM_ATTRIBUTE_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29152" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">MemorySize <a href="#memory-size-note-anchor-quarkus-vertx-http_quarkus-http-limits"><span class="icon"><i class="fa fa-question-circle" title="More information about the MemorySize format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>2048</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-form-fields"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-form-fields"><code>quarkus.http.limits.max-form-fields</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-21" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set the maximum number of fields of a form. Set to <code>-1</code> to allow unlimited number of attributes.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29153">QUARKUS_HTTP_LIMITS_MAX_FORM_FIELDS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29153" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>256</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-form-buffered-bytes"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-form-buffered-bytes"><code>quarkus.http.limits.max-form-buffered-bytes</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-22" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set the maximum number of bytes a server can buffer when decoding a form. Set to <code>-1</code> to allow unlimited length</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29154">QUARKUS_HTTP_LIMITS_MAX_FORM_BUFFERED_BYTES</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29154" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">MemorySize <a href="#memory-size-note-anchor-quarkus-vertx-http_quarkus-http-limits"><span class="icon"><i class="fa fa-question-circle" title="More information about the MemorySize format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>1K</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-parameters"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-parameters"><code>quarkus.http.limits.max-parameters</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-23" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The maximum number of HTTP request parameters permitted for incoming requests.</p>
+</div>
+<div class="paragraph">
+<p>If a client sends more than this number of parameters in a request, the connection is closed.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29155">QUARKUS_HTTP_LIMITS_MAX_PARAMETERS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29155" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>1000</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-connections"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-connections"><code>quarkus.http.limits.max-connections</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-24" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The maximum number of connections that are allowed at any one time. If this is set it is recommended to set a short idle timeout.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29156">QUARKUS_HTTP_LIMITS_MAX_CONNECTIONS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29156" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-header-table-size"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-header-table-size"><code>quarkus.http.limits.header-table-size</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-25" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set the SETTINGS_HEADER_TABLE_SIZE HTTP/2 setting.</p>
+</div>
+<div class="paragraph">
+<p>Allows the sender to inform the remote endpoint of the maximum size of the header compression table used to decode header blocks, in octets. The encoder can select any size equal to or less than this value by using signaling specific to the header compression format inside a header block. The initial value is <code>4,096</code> octets.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29157">QUARKUS_HTTP_LIMITS_HEADER_TABLE_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29157" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-concurrent-streams"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-concurrent-streams"><code>quarkus.http.limits.max-concurrent-streams</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-26" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set SETTINGS_MAX_CONCURRENT_STREAMS HTTP/2 setting.</p>
+</div>
+<div class="paragraph">
+<p>Indicates the maximum number of concurrent streams that the sender will allow. This limit is directional: it applies to the number of streams that the sender permits the receiver to create. Initially, there is no limit to this value. It is recommended that this value be no smaller than 100, to not unnecessarily limit parallelism.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29158">QUARKUS_HTTP_LIMITS_MAX_CONCURRENT_STREAMS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29158" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-frame-size"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-frame-size"><code>quarkus.http.limits.max-frame-size</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-27" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set the SETTINGS_MAX_FRAME_SIZE HTTP/2 setting. Indicates the size of the largest frame payload that the sender is willing to receive, in octets. The initial value is <code>2^14</code> (16,384) octets.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29159">QUARKUS_HTTP_LIMITS_MAX_FRAME_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29159" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-header-list-size"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-max-header-list-size"><code>quarkus.http.limits.max-header-list-size</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-28" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set the SETTINGS_MAX_HEADER_LIST_SIZE HTTP/2 setting. This advisory setting informs a peer of the maximum size of header list that the sender is prepared to accept, in octets. The value is based on the uncompressed size of header fields, including the length of the name and value in octets plus an overhead of 32 octets for each header field. The default value is <code>8192</code></p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29160">QUARKUS_HTTP_LIMITS_MAX_HEADER_LIST_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29160" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">long</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-rst-flood-max-rst-frame-per-window"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-rst-flood-max-rst-frame-per-window"><code>quarkus.http.limits.rst-flood-max-rst-frame-per-window</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-29" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set the max number of RST frame allowed per time window, this is used to prevent <a href="https://github.com/netty/netty/security/advisories/GHSA-xpw8-rcwv-8f8p">HTTP/2 RST frame flood DDOS attacks</a>. The default value is <code>200</code>, setting zero or a negative value, disables flood protection.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29161">QUARKUS_HTTP_LIMITS_RST_FLOOD_MAX_RST_FRAME_PER_WINDOW</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29161" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-rst-flood-window-duration"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-limits_quarkus-http-limits-rst-flood-window-duration"><code>quarkus.http.limits.rst-flood-window-duration</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-30" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set the duration of the time window when checking the max number of RST frames, this is used to prevent <a href="https://github.com/netty/netty/security/advisories/GHSA-xpw8-rcwv-8f8p">HTTP/2 RST frame flood DDOS attacks</a>.. The default value is <code>30 s</code>, setting zero or a negative value, disables flood protection.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29162">QUARKUS_HTTP_LIMITS_RST_FLOOD_WINDOW_DURATION</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29162" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-vertx-http_quarkus-http-limits"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+</tbody>
+</table>
+<div id="duration-note-anchor-quarkus-vertx-http_quarkus-http-limits" class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">期間フォーマットについて</div>
+<div class="paragraph">
+<p>To write duration values, use the standard <code>java.time.Duration</code> format.
+See the <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html#parse(java.lang.CharSequence)">Duration#parse() Java API documentation</a> for more information.</p>
+</div>
+<div class="paragraph">
+<p>数字で始まる簡略化した書式を使うこともできます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値のみの場合は、秒単位の時間を表します。</p>
+</li>
+<li>
+<p>数値の後に <code>ms</code> が続く場合は、ミリ秒単位の時間を表します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>その他の場合は、簡略化されたフォーマットが解析のために <code>java.time.Duration</code> フォーマットに変換されます：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値の後に <code>h</code> 、 <code>m</code> 、 <code>s</code> が続く場合は、その前に <code>PT</code> が付けられます。</p>
+</li>
+<li>
+<p>数値の後に <code>d</code> が続く場合は、その前に <code>P</code> が付けられます。</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="memory-size-note-anchor-quarkus-vertx-http_quarkus-http-limits" class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">About the MemorySize format</div>
+<div class="paragraph">
+<p>A size configuration option recognizes strings in this format (shown as a regular expression): <code>[0-9]+[KkMmGgTtPpEeZzYy]?</code>.</p>
+</div>
+<div class="paragraph">
+<p>If no suffix is given, assume bytes.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configure-traffic-shaping"><a class="anchor" href="#configure-traffic-shaping"></a>10. トラフィックシェーピングの設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>トラフィックシェーピングを使用すると、開いているチャネルの数に関係なく、すべてのチャネル（つまり接続）の帯域幅を制限することができます。
+これは、ネットワーク全体のトラフィックを制御して輻輳を防止したり、特定の種類のトラフィックを優先したりする場合に便利です。</p>
+</div>
+<div class="paragraph">
+<p>トラフィック・シェーピングを有効にするには、アプリケーション・コンフィグレーションに以下のプロパティを追加する：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.traffic-shaping.enabled=true # Required to enable traffic shaping</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>トラフィックシェーピングでは、書き込みと読み取りの制限（1秒あたりのバイト数）、チェック間隔（帯域幅の2回の計算間の遅延）、最大待機時間など、さまざまなパラメータを設定できます：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.traffic-shaping.enabled=true # Required to enable traffic shaping
+quarkus.http.traffic-shaping.check-interval=30s
+quarkus.http.traffic-shaping.outbound-global-bandwidth=1M
+quarkus.http.traffic-shaping.inbound-global-bandwidth=1M
+quarkus.http.traffic-shaping.max-delay=10s</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>チェック間隔は、トラフィックが計算される期間を表し、間隔が大きいほど、トラフィックシェーピングの精度が低くなる可能性があります。
+0が受け入れられるにもかかわらず（アカウンティングなし）、トラフィックシェーピングの精度はトラフィックが計算される期間に依存するため、チェック間隔には高くても正の値を設定することを推奨します。
+この場合、5分または10分に近い値が推奨されます。</p>
+</div>
+<div class="paragraph">
+<p><code>outbound-global-bandwidth</code> 、 <code>inbound-global-bandwidth</code> パラメータは、それぞれ書き込みと読み出し操作の1秒あたりの最大バイト数を表します。
+また、読み取りまたは書き込み操作のオブジェクト・サイズを、必要な帯域幅に比較的適合させることも考慮する必要があります。
+例えば、10KB/秒に対して10MBのオブジェクトがあるとバースト効果が生じますが、1MB/秒に対して100KBのオブジェクトがあれば、トラフィックシェーピングによってスムーズに処理できるはずです。</p>
+</div>
+<div class="paragraph">
+<p>さらに、最大待機時間 ( <code>max-delay</code> ) を設定できます。これは、タイムシェーピングの上限を指定するものです。
+デフォルトでは 15 秒に設定されています。
+これは HTTP タイムアウトより小さくなければなりません。
+しきい値のいずれかに達すると、その期間書き込みは行われません。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-http-access-logs"><a class="anchor" href="#configuring-http-access-logs"></a>11. HTTP アクセスログの設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>application.properties</code> で設定することで、HTTP リクエストのロギングを追加することができます。ロギングには、標準の JBoss ロギング出力にロギングするか、専用ファイルにロギングするかの 2 つのオプションがあります。</p>
+</div>
+<div class="paragraph configuration-legend">
+<p><span class="icon"><i class="fa fa-lock" title="ビルド時に固定"></i></span> ビルド時に固定される設定プロパティ - それ以外の設定プロパティは実行時に上書き可能</p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference configuration-reference-all-rows">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><span class="header-title">Configuration property</span></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-enabled"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-enabled"><code>quarkus.http.access-log.enabled</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-31" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If access logging is enabled. By default this will log via the standard logging facility</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29163">QUARKUS_HTTP_ACCESS_LOG_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29163" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-exclude-pattern"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-exclude-pattern"><code>quarkus.http.access-log.exclude-pattern</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-32" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>A regular expression that can be used to exclude some paths from logging.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29164">QUARKUS_HTTP_ACCESS_LOG_EXCLUDE_PATTERN</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29164" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-pattern"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-pattern"><code>quarkus.http.access-log.pattern</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-33" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The access log pattern.</p>
+</div>
+<div class="paragraph">
+<p>If this is the string <code>common</code>, <code>combined</code> or <code>long</code> then this will use one of the specified named formats:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>common: <code>%h %l %u %t "%r" %s %b</code></p>
+</li>
+<li>
+<p>combined: <code>%h %l %u %t "%r" %s %b "%{i,Referer}" "%{i,User-Agent}"</code></p>
+</li>
+<li>
+<p>long: <code>%r\n%{ALL_REQUEST_HEADERS}</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Otherwise, consult the Quarkus documentation for the full list of variables that can be used.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29165">QUARKUS_HTTP_ACCESS_LOG_PATTERN</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29165" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>common</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-log-to-file"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-log-to-file"><code>quarkus.http.access-log.log-to-file</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-34" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If logging should be done to a separate file.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29166">QUARKUS_HTTP_ACCESS_LOG_LOG_TO_FILE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29166" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-base-file-name"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-base-file-name"><code>quarkus.http.access-log.base-file-name</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-35" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The access log file base name, defaults to 'quarkus' which will give a log file name of 'quarkus.log'.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29167">QUARKUS_HTTP_ACCESS_LOG_BASE_FILE_NAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29167" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>quarkus</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-log-directory"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-log-directory"><code>quarkus.http.access-log.log-directory</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-36" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The log directory to use when logging access to a file If this is not set then the current working directory is used.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29168">QUARKUS_HTTP_ACCESS_LOG_LOG_DIRECTORY</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29168" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-log-suffix"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-log-suffix"><code>quarkus.http.access-log.log-suffix</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-37" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The log file suffix</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29169">QUARKUS_HTTP_ACCESS_LOG_LOG_SUFFIX</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29169" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>.log</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-category"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-category"><code>quarkus.http.access-log.category</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-38" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The log category to use if logging is being done via the standard log mechanism (i.e. if base-file-name is empty).</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29170">QUARKUS_HTTP_ACCESS_LOG_CATEGORY</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29170" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>io.quarkus.http.access-log</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-rotate"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-rotate"><code>quarkus.http.access-log.rotate</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-39" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If the log should be rotated daily</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29171">QUARKUS_HTTP_ACCESS_LOG_ROTATE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29171" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-consolidate-rerouted-requests"></a> <span class="property-path"><a href="#quarkus-vertx-http_quarkus-http-access-log_quarkus-http-access-log-consolidate-rerouted-requests"><code>quarkus.http.access-log.consolidate-rerouted-requests</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-40" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If rerouted requests should be consolidated into one log entry</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-29172">QUARKUS_HTTP_ACCESS_LOG_CONSOLIDATE_REROUTED_REQUESTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-29172" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-ends grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">属性</th>
+<th class="tableblock halign-left valign-top">ショートフォーム</th>
+<th class="tableblock halign-left valign-top">ロングフォーム</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">リモート IP アドレス</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%a</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{REMOTE_IP}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ローカル IP アドレス</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%A</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{LOCAL_IP}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HTTP ヘッダーを除いた、送信済みバイト数。送信されなかった場合は '-'。</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%b</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">送信済みバイト数 (HTTP ヘッダーを除く)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%B</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{BYTES_SENT}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">リモートホスト名</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%h</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{REMOTE_HOST}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">要求プロトコル</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%H</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{PROTOCOL}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">要求メソッド</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%m</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{METHOD}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ローカルポート</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%p</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{LOCAL_PORT}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">クエリー文字列 (存在する場合は '?' が前に付き、そうでない場合は空文字列)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%q</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{QUERY_STRING}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">要求の最初の行</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%r</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{REQUEST_LINE}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">応答の HTTP ステータスコード</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%s</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{RESPONSE_CODE}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Common Log Format 形式の日時</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%t</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{DATE_TIME}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Date and time as defined by a DateTimeFormatter compliant string</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{time,date_fime_formatter_string}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">認証されたリモートユーザー</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%u</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{REMOTE_USER}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">要求された URL パス</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%U</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{REQUEST_URL}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">相対パスのリクエスト</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%R</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{REQUEST_URL}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ローカルサーバー名</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%v</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{LOCAL_SERVER_NAME}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">リクエストの処理にかかった時間 (ミリ秒)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%D</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{RESPONSE_TIME}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">要求の処理にかかった時間 (秒単位)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%T</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">リクエストの処理にかかった時間 (マイクロ秒)</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{RESPONSE_TIME_MICROS}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">リクエストの処理にかかった時間 (ナノ秒)</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{RESPONSE_TIME_NANOS}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">現在のリクエストスレッド名</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%I</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{THREAD_NAME}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SSL 暗号</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{SSL_CIPHER}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SSL クライアント証明書</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{SSL_CLIENT_CERT}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SSL セッション ID</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{SSL_SESSION_ID}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">すべてのリクエストヘッダー</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{ALL_REQUEST_HEADERS}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">クッキーの値</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{c,cookie_name}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">クエリーパラメーター</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{q,query_param_name}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">リクエストヘッダー</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{i,request_header_name}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">レスポンスヘッダー</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{o,response_header_name}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Vert.x Routing Context の内部データ</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{d,map_key}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Vert.x Mapped Diagnostic Context ( MDC ) データ ( OpenTelemetry の 'traceId' など)</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{X,mdc-key}</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>修飾子 <code>&lt;</code> のサポートを有効にするには <code>quarkus.http.access-log.consolidate-rerouted-requests=true</code> を設定します。この修飾子は、元のリクエストを参照するために内部的にリダイレクトされた リクエストに使用できます。
+以下の属性がこの修飾子をサポートしています：</p>
+</div>
+<table class="tableblock frame-ends grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">属性</th>
+<th class="tableblock halign-left valign-top">ショートフォーム</th>
+<th class="tableblock halign-left valign-top">ロングフォーム</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">要求の最初の行</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%&lt;r</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{&lt;REQUEST_LINE}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">要求メソッド</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%&lt;m</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{&lt;METHOD}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">相対パスのリクエスト</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%&lt;R</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{&lt;REQUEST_PATH}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">要求された URL パス</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%&lt;U</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{&lt;REQUEST_URL}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">クエリー文字列 (存在する場合は '?' が前に付き、そうでない場合は空文字列)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%&lt;q</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{&lt;QUERY_STRING}</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">クエリーパラメーター</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%{&lt;q,query_param_name}</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>リクエストの処理にかかった時間のロギングに関連する属性のいずれかを使用する場合は、 <code>quarkus.http.record-request-start-time=true</code> を設定し、リクエスト開始時間の記録を有効にして下さい。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>アプリケーションのセキュリティが設定されていると仮定すると（詳細は <a href="security-overview">ガイド</a> を参照）、
+ロギング属性 <code>Remote user that was authenticated</code> には <code>io.quarkus.security.identity.SecurityIdentity</code> プリンシパルの値が設定されます。
+アプリケーションがカスタム <a href="security-customization#jaxrs-security-context">Jakarta REST SecurityContext</a> を使用する場合、代わりにコンテキストプリンシパルが使用されます。
+コンテキストログ情報を自分で追加する方法については、 <a href="logging">ロギングガイド</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>quarkus.http.access-log.exclude-pattern=/some/path/.*</code> を使用すると、パス <code>/some/path/…​</code> （ <em>それ以降のパスも含む</em> ）に関するすべてのエントリーをログから除外します。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="arbitrary-customizations"><a class="anchor" href="#arbitrary-customizations"></a>12. 任意のカスタマイズ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusでは、 <code>io.quarkus.vertx.http.HttpServerOptionsCustomizer</code> を使用して、Quarkusが起動するHTTPサーバーのオプションを任意にカスタマイズできます。
+例えば、HTTPポートをプログラムで設定する必要がある場合、次のコードを使用できます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.inject.Singleton;
+import io.quarkus.vertx.http.HttpServerOptionsCustomizer;
+
+@Singleton <i class="conum" data-value="1"></i><b>(1)</b>
+public class MyCustomizer implements HttpServerOptionsCustomizer {
+
+    @Override
+    public void customizeHttpServer(HttpServerOptions options) { <i class="conum" data-value="2"></i><b>(2)</b>
+        options.setPort(9998);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>クラスをマネージドBeanにすることで、QuarkusはVert.xサーバーの起動時にカスタマイザーを考慮します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>この場合、HTTPサーバーのカスタマイズにしか関心がないので、 <code>customizeHttpServer</code> メソッドをオーバーライドするだけですが、 <code>HttpServerOptionsCustomizer</code> ではHTTPSサーバーとドメイン・ソケット・サーバーも設定できることに注意して下さい。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="how-to-execute-logic-when-http-server-started"><a class="anchor" href="#how-to-execute-logic-when-http-server-started"></a>13. How to execute logic when HTTP server started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In order to execute some custom action when the HTTP server is started you&#8217;ll need to declare an <em>asynchronous</em> CDI observer method.
+Quarkus <em>asynchronously</em> fires CDI events of types <code>io.quarkus.vertx.http.HttpServerStart</code>, <code>io.quarkus.vertx.http.HttpsServerStart</code> and <code>io.quarkus.vertx.http.DomainSocketServerStart</code> when the corresponding HTTP server starts listening on the configured host and port.</p>
+</div>
+<div class="listingblock">
+<div class="title"><code>HttpServerStart</code> example</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+public class MyListener {
+
+   void httpStarted(@ObservesAsync HttpServerStart start) { <i class="conum" data-value="1"></i><b>(1)</b>
+      // ...notified when the HTTP server starts listening
+   }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>An asynchronous <code>HttpServerStart</code> observer method may be declared by annotating an <code>HttpServerStart</code> parameter with <code>@jakarta.enterprise.event.ObservesAsync</code>.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+It&#8217;s not possible to use the <code>StartupEvent</code> for this particular use case because this CDI event is fired before the HTTP server is started.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="reverse-proxy"><a class="anchor" href="#reverse-proxy"></a>14. リバースプロキシーの背後での実行</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus は、プロキシーサーバーが関与すると変更されたり失われたりするクライアント側の情報を保持するために、追加でヘッダー ( 例： <code>X-Forwarded-Host</code> ) を生成するプロキシーを介してアクセスされる可能性があります。このようなシナリオでは、 Quarkus は、これらのヘッダーの値を反映して、プロトコル、ホスト、ポート、 URI などの情報を自動的に更新するように設定することができます。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+この機能を有効にすると、サーバーはいくつかのセキュリティ上の問題（情報の偽装など）にさらされます。リバースプロキシーを利用している場合のみ、この機能を有効にすることを検討してください。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>この機能を設定するには、 <code>src/main/resources/application.properties</code> に以下の行を記述してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.proxy.proxy-address-forwarding=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>デファクトスタンダードのヘッダー ( <code>Forwarded</code> header ) だけを考慮するためには、 <code>src/main/resources/application.properties</code> に以下の行を記述してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.proxy.allow-forwarded=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>非標準のヘッダーのみを考慮するには、代わりに以下の行を <code>src/main/resources/application.properties</code> に記述してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.proxy.proxy-address-forwarding=true
+quarkus.http.proxy.allow-x-forwarded=true
+quarkus.http.proxy.enable-forwarded-host=true
+quarkus.http.proxy.enable-forwarded-prefix=true
+quarkus.http.proxy.trusted-proxies=127.0.0.1 <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>信頼できるプロキシをIPアドレス <code>127.0.0.1</code> で設定します。それ以外のアドレスからのリクエストヘッダーは無視されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>標準ヘッダーと非標準ヘッダーに関連する設定はどちらも組み合わせることが できるますが、標準ヘッダーの設定が優先されます。しかしながら、これらを組み合わせることは、クライアントがプロキシにーよって上書きされない転送 ( forward ) ヘッダーを持つリクエストを偽造することができるため、セキュリティ上の影響があります。したがって、プロキシーはクライアントから予期しない <code>X-Forwarded</code> ヘッダまたは <code>X-Forwarded-*</code> ヘッダを取り除く必要があります。</p>
+</div>
+<div class="paragraph">
+<p>サポートされている転送アドレスヘッダは以下の通りです。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Forwarded</code></p>
+</li>
+<li>
+<p><code>X-Forwarded-Proto</code></p>
+</li>
+<li>
+<p><code>X-Forwarded-Host</code></p>
+</li>
+<li>
+<p><code>X-Forwarded-Port</code></p>
+</li>
+<li>
+<p><code>X-Forwarded-Ssl</code></p>
+</li>
+<li>
+<p><code>X-Forwarded-Prefix</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="same-site-cookie"><a class="anchor" href="#same-site-cookie"></a>15. SameSite クッキー</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>例えば、クッキー名と <code>SameSite</code> 属性を記載することで、 Quarkus のエンドポイントによって設定された任意のクッキーに <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite">SameSite</a> クッキープロパティを簡単に追加することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.same-site-cookie.jwt.value=Lax
+quarkus.http.same-site-cookie.session.value=Strict</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この設定では、 <code>jwt</code> クッキーは <code>SameSite=Lax</code> 属性を持ち、 <code>session</code> クッキーは <code>SameSite=Strict</code> 属性を持つことになります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="servlet-config"><a class="anchor" href="#servlet-config"></a>16. サーブレット設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Servlet を使用するには、明示的に <code>quarkus-undertow</code> を含める必要があります。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-undertow&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-undertow")</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="undertow-handlers-conf"><a class="anchor" href="#undertow-handlers-conf"></a>16.1. undertow-handlers.conf</h3>
+<div class="paragraph">
+<p><code>undertow-handlers.conf</code> ファイルを使用することで、 Undertow 述語言語を利用することができます。このファイルは、アプリケーション jar の <code>META-INF</code> ディレクトリーに配置する必要があります。このファイルには、<a href="https://undertow.io/undertow-docs/undertow-docs-2.0.0/index.html#predicates-attributes-and-handlers">Undertow 述語言語</a> を使用して定義されたハンドラーが含まれています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="web-xml"><a class="anchor" href="#web-xml"></a>16.2. web.xml</h3>
+<div class="paragraph">
+<p>設定ファイルとして <code>web.xml</code> ファイルを使用している場合は、<code>src/main/resources/META-INF</code> ディレクトリーに配置します。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="built-in-route-order-values"><a class="anchor" href="#built-in-route-order-values"></a>16.3. 組み込みのルート・オーダー値</h3>
+<div class="paragraph">
+<p>ルートオーダーの値は、Vert.x のルート <code>io.vertx.ext.web.Route.order(int)</code> 関数で指定される値です。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusは、特定のオーダー値を持ついくつかのルートを登録します。
+定数は <code>io.quarkus.vertx.http.runtime.RouteConstants</code> クラスで定義され、以下の表に記載されています。
+カスタムルートは、Quarkusやエクステンションが提供する機能を妨げないように、値20000以上のオーダーを定義する必要があります。</p>
+</div>
+<div class="paragraph">
+<p><code>io.quarkus.vertx.http.runtime.RouteConstants</code> で定義されているルート順定数および既知の拡張：</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ルートオーダー値</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">定数名</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">起源</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Integer.MIN_VALUE</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ROUTE_ORDER_ACCESS_LOG_HANDLER</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">コンフィギュレーションで有効になっていれば、アクセスログハンドラ。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Integer.MIN_VALUE</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ROUTE_ORDER_RECORD_START_TIME</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">コンフィギュレーションで有効になっていれば、開始時間を追加するハンドラ。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Integer.MIN_VALUE</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ROUTE_ORDER_HOT_REPLACEMENT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-代替ボディ・ハンドラー。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Integer.MIN_VALUE</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ROUTE_ORDER_BODY_HANDLER_MANAGEMENT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">管理ルーターのボディハンドラ。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Integer.MIN_VALUE</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ROUTE_ORDER_HEADERS</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">コンフィギュレーションで指定されたヘッダーを追加するハンドラ。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Integer.MIN_VALUE</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ROUTE_ORDER_CORS_MANAGEMENT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">管理ルーターのCORS-Originハンドラ。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Integer.MIN_VALUE + 1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ROUTE_ORDER_BODY_HANDLER</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ボディハンドラー</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>-2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ROUTE_ORDER_UPLOAD_LIMIT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">アップロードボディのサイズ制限を実施するルート。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ROUTE_ORDER_COMPRESSION</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">圧縮ハンドラ。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1000</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ROUTE_ORDER_BEFORE_DEFAULT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">デフォルトルートよりも優先されるルート（この値からオフセットを追加する）。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10000</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ROUTE_ORDER_DEFAULT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">デフォルトのルート順序（すなわち、静的リソース、サーブレット）。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>20000</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ROUTE_ORDER_AFTER_DEFAULT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">デフォルトルートより優先されないルート（この値からオフセットを追加）</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#serving-static-resources">1. 静的リソースの提供</a>
+<ul class="sectlevel2">
+<li><a href="#from-the-application-jar">1.1. アプリケーションjarから</a></li>
+<li><a href="#from-web-dependencies-like-webjars-or-mvnpm">1.2. From web dependencies like webjars or mvnpm</a></li>
+<li><a href="#from-a-local-directory">1.3. ローカルディレクトリから</a></li>
+<li><a href="#http-compression">1.4. HTTP圧縮</a></li>
+<li><a href="#static-resources-config">1.5. その他の設定</a></li>
+</ul>
+</li>
+<li><a href="#context-path">2. コンテキストパスの設定</a></li>
+<li><a href="#ssl">3. TLS/SSLによる安全な接続のサポート</a>
+<ul class="sectlevel2">
+<li><a href="#using-the-tls-centralized-configuration">3.1. Using the TLS centralized configuration</a></li>
+<li><a href="#configuring-the-http-server-directly">3.2. Configuring the HTTP server directly</a></li>
+<li><a href="#configure-the-https-port">3.3. HTTP ポートの設定</a></li>
+<li><a href="#disable-the-http-port">3.4. HTTP ポートの無効化</a></li>
+<li><a href="#reloading-the-certificates">3.5. 証明書の再読込</a></li>
+</ul>
+</li>
+<li><a href="#additional-http-headers">4. 追加の HTTP ヘッダー</a>
+<ul class="sectlevel2">
+<li><a href="#additional-http-headers-per-path">4.1. パスごとの追加の HTTP ヘッダー</a></li>
+</ul>
+</li>
+<li><a href="#support-100-continue-in-vert-x">5. Vert.xにおける 100-continue のサポート</a></li>
+<li><a href="#http2-support">6. HTTP/2 サポート</a></li>
+<li><a href="#listening-on-a-random-port">7. ランダムポートでの待ち受け</a></li>
+<li><a href="#cors-filter">8. CORS フィルター</a></li>
+<li><a href="#http-limits-configuration">9. HTTP 制限の設定</a></li>
+<li><a href="#configure-traffic-shaping">10. トラフィックシェーピングの設定</a></li>
+<li><a href="#configuring-http-access-logs">11. HTTP アクセスログの設定</a></li>
+<li><a href="#arbitrary-customizations">12. 任意のカスタマイズ</a></li>
+<li><a href="#how-to-execute-logic-when-http-server-started">13. How to execute logic when HTTP server started</a></li>
+<li><a href="#reverse-proxy">14. リバースプロキシーの背後での実行</a></li>
+<li><a href="#same-site-cookie">15. SameSite クッキー</a></li>
+<li><a href="#servlet-config">16. サーブレット設定</a>
+<ul class="sectlevel2">
+<li><a href="#undertow-handlers-conf">16.1. undertow-handlers.conf</a></li>
+<li><a href="#web-xml">16.2. web.xml</a></li>
+<li><a href="#built-in-route-order-values">16.3. 組み込みのルート・オーダー値</a></li>
+</ul>
+</li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same extensions</h3>
+      <ul class="related-content">
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/security-authorize-web-endpoints-reference">ウェブエンドポイントの認可</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.15/guides/security-basic-authentication">Basic認証</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.15/guides/security-cors">クロスオリジンリソース共有</a></li>
+      
+        
+        <li class="howto"><a href="/version/3.15/guides/security-basic-authentication-howto">ベーシック認証の有効化</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.15/guides/security-getting-started-tutorial">Basic認証とJakarta Persistenceを使ったセキュリティ入門</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/management-interface-reference">マネジメントインターフェースリファレンス</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.15/guides/security-proactive-authentication">プロアクティブ認証</a></li>
+      </ul>
+    </div>
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/web-dependency-locator">Web dependency locator</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/web">Web 向け Quarkus</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/reactive-routes">リアクティブルートの使用</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/security-authorize-web-endpoints-reference">ウェブエンドポイントの認可</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.15/guides/security-basic-authentication">Basic認証</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/security-csrf-prevention">クロスサイトリクエストフォージェリー対策</a></li>
+      
+        
+        <li class="howto"><a href="/version/3.15/guides/security-basic-authentication-howto">ベーシック認証の有効化</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.15/guides/security-getting-started-tutorial">Basic認証とJakarta Persistenceを使ったセキュリティ入門</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.15/guides/websockets-next-tutorial">Getting started with WebSockets Next</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/load-shedding-reference">Load Shedding reference guide</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/tls-registry-reference">TLS レジストリーリファレンス</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/websockets">WebSocketの使用</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/websockets-next-reference">WebSockets Next エクステンションリファレンスガイド</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

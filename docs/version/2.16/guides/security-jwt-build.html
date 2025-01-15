@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>JSONウェブトークン (JWT) のビルド、署名、暗号化 - 2.16 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/2.16/guides/security-jwt-build" />
+  <meta property="og:title" content="JSONウェブトークン (JWT) のビルド、署名、暗号化 - 2.16" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/security-jwt-build">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/2.16/guides/security-jwt-build">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/2.16/guides/security-jwt-build" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/2.16/guides/security-jwt-build">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/2.16/guides/security-jwt-build">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/2.16/guides/security-jwt-build">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/2.16/guides/security-jwt-build">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/2.16/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" selected>2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">JSONウェブトークン (JWT) のビルド、署名、暗号化 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://datatracker.ietf.org/doc/html/rfc7519">RFC7519</a> によると、JSON Web Token (JWT) は、使用される JSON オブジェクトとしてエンコードされたクレームを表すコンパクトで URL セーフな手段です。JSON Web Signature (JWS) 構造のペイロードとして、または JSON Web Encryption (JWE) 構造のプレーンテキストとして、クレームにデジタル署名したり、メッセージ認証コード (MAC) で完全に保護したり、暗号化したりできます。</p>
+</div>
+<div class="paragraph">
+<p>クレームへの署名は、クレームを保護するために最も頻繁に使用されます。今日において JWT トークンとして知られているものは、通常、<a href="https://tools.ietf.org/html/rfc7515">JSON Web 署名</a> の仕様で説明されている手順を使用して、JSON 形式でクレームに署名することによって生成されます。</p>
+</div>
+<div class="paragraph">
+<p>ただし、クレームが機密である場合は、<a href="https://tools.ietf.org/html/rfc7516">JSON Web 暗号化</a> の仕様に記載されている手順に従って暗号化されたクレームを含む JWT を生成することにより、機密性を保証できます。</p>
+</div>
+<div class="paragraph">
+<p>さらに、クレームに署名してからネストされた JWT トークンを暗号化することにより、クレームの機密性と整合性の両方を強化できます。</p>
+</div>
+<div class="paragraph">
+<p>SmallRye JWT Build は、これらすべてのオプションを使用して JWT クレームを保護するための API を提供します。<a href="https://bitbucket.org/b_c/jose4j/wiki/Home">Jose4J</a> は、この API をサポートするために内部で使用されます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dependency"><a class="anchor" href="#dependency"></a>依存関係</h2>
+<div class="sectionbody">
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-smallrye-jwt-build&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-smallrye-jwt-build")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>quarkus-smallrye-jwt</code> でサポートされている MicroProfile JWT エンドポイントを作成しなくても、Smallrye JWT Build API を使用できることに留意してください。MP JWT エンドポイントが JWT トークンを生成する必要がない場合は、<code>quarkus-smallrye-jwt</code> から除外することもできます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-jwtclaimsbuilder-and-set-the-claims"><a class="anchor" href="#create-jwtclaimsbuilder-and-set-the-claims"></a>JwtClaimsBuilder の作成とクレームの設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>最初のステップとして、以下のオプションの 1 つを使用して <code>JwtClaimsBuilder</code> を初期化し、それにいくつかのクレームを追加します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.util.Collections;
+import javax.json.Json;
+import javax.json.JsonObject;
+import io.smallrye.jwt.build.Jwt;
+import io.smallrye.jwt.build.JwtClaimsBuilder;
+import org.eclipse.microprofile.jwt.JsonWebToken;
+...
+// Create an empty builder and add some claims
+JwtClaimsBuilder builder1 = Jwt.claims();
+builder1.claim("customClaim", "custom-value").issuer("https://issuer.org");
+// Or start typing the claims immediately:
+// JwtClaimsBuilder builder1 = Jwt.upn("Alice");
+
+// Builder created from the existing claims
+JwtClaimsBuilder builder2 = Jwt.claims("/tokenClaims.json");
+
+// Builder created from a map of claims
+JwtClaimsBuilder builder3 = Jwt.claims(Collections.singletonMap("customClaim", "custom-value"));
+
+// Builder created from JsonObject
+JsonObject userName = Json.createObjectBuilder().add("username", "Alice").build();
+JsonObject userAddress = Json.createObjectBuilder().add("city", "someCity").add("street", "someStreet").build();
+JsonObject json = Json.createObjectBuilder(userName).add("address", userAddress).build();
+JwtClaimsBuilder builder4 = Jwt.claims(json);
+
+// Builder created from JsonWebToken
+@Inject JsonWebToken token;
+JwtClaimsBuilder builder5 = Jwt.claims(token);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これは fluent API であるため、ビルダーの初期化は fluent API シーケンスの一部として実行できます。</p>
+</div>
+<div class="paragraph">
+<p>ビルダーは、<code>iat</code> (発行日) を現在の時刻に設定し、<code>exp</code> (有効期限) を現在の時刻から 5 分後に設定し (<code>smallrye.jwt.new-token.lifespan</code> プロパティーでカスタマイズ可能)、未設定の場合は <code>jti</code> (一意のトークン識別子) クレームも設定します。</p>
+</div>
+<div class="paragraph">
+<p><code>smallrye.jwt.new-token.issuer</code> プロパティーと <code>smallrye.jwt.new-token.audience</code> プロパティーを設定し、ビルダー API を使用した発行者とオーディエンスの直接設定を省略することもできます。</p>
+</div>
+<div class="paragraph">
+<p>次のステップでは、クレームの保護方法を決定します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sign-claims"><a class="anchor" href="#sign-claims"></a>クレームへの署名</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>クレームは、すぐに署名するか、 <code>JSON Web Signature</code> ヘッダーが設定された後に署名できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.smallrye.jwt.build.Jwt;
+...
+
+// Sign the claims using an RSA private key loaded from the location set with a 'smallrye.jwt.sign.key.location' property.
+// No 'jws()' transition is necessary. Default algorithm is RS256.
+String jwt1 = Jwt.claims("/tokenClaims.json").sign();
+
+// Set the headers and sign the claims with an RSA private key loaded in the code (the implementation of this method is omitted).
+// Note a 'jws()' transition to a 'JwtSignatureBuilder', Default algorithm is RS256.
+String jwt2 = Jwt.claims("/tokenClaims.json").jws().keyId("kid1").header("custom-header", "custom-value").sign(getPrivateKey());</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>alg</code> (アルゴリズム) ヘッダーはデフォルトで <code>RS256</code> に設定されていることに注意してください。 <code>kid</code> プロパティーを含む単一の JSON Web Key (JWK) を使用する場合、署名キー識別子 ( <code>kid</code> ヘッダー) を設定する必要はありません。</p>
+</div>
+<div class="paragraph">
+<p>クレームの署名には、RSAや楕円曲線（EC）の秘密鍵のほか、対称性のある秘密鍵も使用できます。 <code>ES256</code> と <code>HS256</code> は、それぞれEC秘密鍵と対称鍵アルゴリズムのためのdefautアルゴリズムです。</p>
+</div>
+<div class="paragraph">
+<p>署名アルゴリズムはカスタマイズできます。以下はその例です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.smallrye.jwt.SignatureAlgorithm;
+import io.smallrye.jwt.build.Jwt;
+
+// Sign the claims using an RSA private key loaded from the location set with a 'smallrye.jwt.sign.key.location' property. Algorithm is PS256.
+String jwt = Jwt.upn("Alice").jws().algorithm(SignatureAlgorithm.PS256).sign();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>または、 <code>smallrye.jwt.new-token.signature-algorithm</code> プロパティーを使用することもできます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">smallrye.jwt.new-token.signature-algorithm=PS256</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>より単純な API シーケンスを記述します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.smallrye.jwt.build.Jwt;
+
+// Sign the claims using an RSA private key loaded from the location set with a 'smallrye.jwt.sign.key.location' property. Algorithm is PS256.
+String jwt = Jwt.upn("Alice").sign();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>sign</code> ステップは、<a href="#encrypt-claims">encrypt</a> ステップと組み合わせて <code>inner-signed and encrypted</code> を生成することもできることに注意してください。詳細は、<a href="#innersign-encrypt-claims">クレームへの署名とネストされた JWT トークンの暗号化</a> セクションを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="encrypt-claims"><a class="anchor" href="#encrypt-claims"></a>クレームの暗号化</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>クレームは、すぐに暗号化することも、 <code>JSON Web Encryption</code> ヘッダーを署名するのと同じ方法で設定した後に暗号化することもできます。唯一の小さな違いは、API がクレームの署名と内部署名をサポートするように最適化されている場合、クレームの暗号化には常に <code>jwe()</code> <code>JwtEncryptionBuilder</code> 遷移が必要になることです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.smallrye.jwt.build.Jwt;
+...
+
+// Encrypt the claims using an RSA public key loaded from the location set with a 'smallrye.jwt.encrypt.key.location' property. Default key encryption algorithm is RSA-OAEP.
+String jwt1 = Jwt.claims("/tokenClaims.json").jwe().encrypt();
+
+// Set the headers and encrypt the claims with an RSA public key loaded in the code (the implementation of this method is omitted).  Default key encryption algorithm is A256KW.
+String jwt2 = Jwt.claims("/tokenClaims.json").jwe().header("custom-header", "custom-value").encrypt(getSecretKey());</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>デフォルトでは、<code>alg</code> (キー管理アルゴリズム) ヘッダーが <code>RSA-OAEP</code> に設定され、<code>enc</code> (コンテンツ暗号化ヘッダー) が <code>A256GCM</code> に設定されていることに注意してください。</p>
+</div>
+<div class="paragraph">
+<p>RSA および Elliptic Curve (EC) 公開鍵、および対称秘密鍵を使用して、クレームを暗号化できます。<code>ECDH-ES</code> と <code>A256KW</code> は、それぞれ EC 公開鍵と対称鍵の暗号化アルゴリズムのデフォルトアルゴリズムです。</p>
+</div>
+<div class="paragraph">
+<p>暗号化されたトークンを作成する際には、2つの暗号化処理が行われることに注意してください。</p>
+</div>
+<div class="paragraph">
+<p>1) 生成されたコンテンツ暗号化キーは、 <code>RSA-OAEP</code> などのキー暗号化アルゴリズムを使用して、API で提供されたキーによって暗号化されます。 
+2) クレームは、 <code>A256GCM</code> などのコンテンツ暗号化アルゴリズムを使用して、生成されたコンテンツ暗号化キーによって暗号化されます。</p>
+</div>
+<div class="paragraph">
+<p>キーとコンテンツの暗号化アルゴリズムはカスタマイズできます。以下はその例です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.smallrye.jwt.KeyEncryptionAlgorithm;
+import io.smallrye.jwt.ContentEncryptionAlgorithm;
+import io.smallrye.jwt.build.Jwt;
+
+// Encrypt the claims using an RSA public key loaded from the location set with a 'smallrye.jwt.encrypt.key.location' property.
+// Key encryption algorithm is RSA-OAEP-256, content encryption algorithm is A256CBC-HS512.
+String jwt = Jwt.subject("Bob").jwe()
+    .keyAlgorithm(KeyEncryptionAlgorithm.RSA_OAEP_256)
+    .contentAlgorithm(ContentEncryptionAlgorithm.A256CBC_HS512)
+    .encrypt();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>また、 <code>smallrye.jwt.new-token.key-encryption-algorithm</code> と <code>smallrye.jwt.new-token.content-encryption-algorithm</code> のプロパティでキーとコンテンツの暗号化アルゴリズムをカスタマイズすることが可能です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">smallrye.jwt.new-token.key-encryption-algorithm=RSA-OAEP-256
+smallrye.jwt.new-token.content-encryption-algorithm=A256CBC-HS512</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>より単純な API シーケンスを記述します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.smallrye.jwt.build.Jwt;
+
+// Encrypt the claims using an RSA public key loaded from the location set with a 'smallrye.jwt.encrypt.key.location' property.
+// Key encryption algorithm is RSA-OAEP-256, content encryption algorithm is A256CBC-HS512.
+String jwt = Jwt.subject("Bob").encrypt();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>トークンが公開 RSA または EC キーによって直接暗号化されている場合、トークンの送信元は確認できないことに注意してください。したがって、トークンを直接暗号化するには秘密鍵を使用する必要があります。たとえば、JWT を Cookie として使用する場合、秘密鍵は Quarkus エンドポイントによって管理され、このエンドポイントのみが暗号化されたトークンのプロデューサーとコンシューマーになります。</p>
+</div>
+<div class="paragraph">
+<p>RSA または EC 公開鍵を使用してトークンを暗号化する場合、署名鍵が使用可能であれば最初にトークンに署名することをお勧めします。詳細については、次の<a href="#innersign-encrypt-claims">クレームへの署名とネストされた JWT トークンの暗号化</a> セクションを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="innersign-encrypt-claims"><a class="anchor" href="#innersign-encrypt-claims"></a>クレームへの署名とネストされた JWT トークンの暗号化</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>クレームに署名してから、署名と暗号化の手順を組み合わせて、ネストされた JWT トークンを暗号化できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.smallrye.jwt.build.Jwt;
+...
+
+// Sign the claims and encrypt the nested token using the private and public keys loaded from the locations set with the 'smallrye.jwt.sign.key.location' and 'smallrye.jwt.encrypt.key.location' properties respectively. Signature algorithm is RS256, key encryption algorithm is RSA-OAEP-256.
+String jwt = Jwt.claims("/tokenClaims.json").innerSign().encrypt();</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="fast-jwt-generation"><a class="anchor" href="#fast-jwt-generation"></a>JWT の迅速な生成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>smallrye.jwt.sign.key.location</code> や <code>smallrye.jwt.encrypt.key.location</code> プロパティーが設定されている場合、既存のクレーム (リソース、マップ、JsonObjects) を 1 回の呼び出しで保護できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// More compact than Jwt.claims("/claims.json").sign();
+Jwt.sign("/claims.json");
+
+// More compact than Jwt.claims("/claims.json").jwe().encrypt();
+Jwt.encrypt("/claims.json");
+
+// More compact than Jwt.claims("/claims.json").innerSign().encrypt();
+Jwt.signAndEncrypt("/claims.json");</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上記のように、必要に応じて、 <code>iat</code> (発行日)、 <code>exp</code> (有効期限)、 <code>jti</code> (トークン識別子)、 <code>iss</code> (発行者)、および <code>aud</code> (オーディエンス) クレームが追加されます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dealing-with-the-keys"><a class="anchor" href="#dealing-with-the-keys"></a>キーの取り扱い</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>smallrye.jwt.sign.key.location</code> プロパティーと <code>smallrye.jwt.encrypt.key.location</code> プロパティーを使用して、署名キーと暗号化キーの場所を指定できます。キーは、ローカルファイルシステムやクラスパスに配置するか、リモートエンドポイントから取得でき、 <code>PEM</code> または <code>JSON Web Key</code> ( <code>JWK</code> ) 形式にすることができます。以下はその例です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">smallrye.jwt.sign.key=privateKey.pem
+smallrye.jwt.encrypt.key=publicKey.pem</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>MicroProfile <code>ConfigSource</code> を使用して、<a href="https://quarkiverse.github.io/quarkiverse-docs/quarkus-vault/dev/index.html">HashiCorp Vault</a> や他のシークレットマネージャーなどの外部サービスからキーを取得し、代わりに <code>smallrye.jwt.sign.key</code> プロパティーと <code>smallrye.jwt.encrypt.key</code> プロパティーを使用することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">smallrye.jwt.sign.key=${private.key.from.vault}
+smallrye.jwt.encrypt.key=${public.key.from.vault}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この場合、<code>private.key.from.vault</code> と <code>public.key.from.vault</code> はどちらも、カスタムの <code>ConfigSource</code> によって提供される <code>PEM</code> または <code>JWK</code> 形式のキー値です。<code>smallrye.jwt.sign.key</code> と <code>smallrye.jwt.encrypt.key</code> には、Base64 でエンコードされた秘密鍵または公開鍵の値のみ含めることができます。</p>
+</div>
+<div class="paragraph">
+<p>ただし、設定に秘密鍵を直接インライン化することはお勧めしません。リモートシークレットマネージャーから署名キー値を取得する必要がある場合にのみ、<code>smallrye.jwt.sign.key</code> プロパティーを使用してください。</p>
+</div>
+<div class="paragraph">
+<p>キーは、JWT ビルド API に提供される、トークンをビルドするコードによってロードすることもできます。</p>
+</div>
+<div class="paragraph">
+<p>対称秘密鍵を使用してトークンに署名および/または暗号化する必要がある場合は、<code>io.smallrye.jwt.util.KeyUtils</code> を使用して必要な長さの秘密鍵を生成することを検討してください。</p>
+</div>
+<div class="paragraph">
+<p>たとえば、<code>HS512</code> アルゴリズム (<code>512/8</code>) を使用して署名するには 64 バイトのキーが必要であり、<code>A256KW</code> アルゴリズム (<code>256/8</code>) を使用してコンテンツ暗号化キーを暗号化するには 32 バイトのキーが必要です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import javax.crypto.SecretKey;
+import io.smallrye.jwt.KeyEncryptionAlgorithm;
+import io.smallrye.jwt.SignatureAlgorithm;
+import io.smallrye.jwt.build.Jwt;
+import io.smallrye.jwt.util.KeyUtils;
+
+SecretKey signingKey = KeyUtils.generateSecretKey(SignatureAlgorithm.HS512);
+SecretKey encryptionKey = KeyUtils.generateSecretKey(KeyEncryptionAlgorithm.A256KW);
+String jwt = Jwt.claim("sensitiveClaim", getSensitiveClaim()).innerSign(signingKey).encrypt(encryptionKey);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>また、<code>JSON Web Key</code> (JWK) または <code>JSON Web Key Set</code> (JWK Set) 形式を使用して秘密鍵を安全なファイルシステムに保存し、 <code>smallrye.jwt.sign.key.location</code> または <code>smallrye.jwt.encrypt.key.location</code> プロパティーを使用してそれを参照する方法もあります。以下はその例です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+ "kty":"oct",
+ "kid":"secretKey",
+ "k":"Fdh9u8rINxfivbrianbbVT1u232VQBZYKx1HGAGPt2I"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+ "keys": [
+   {
+     "kty":"oct",
+     "kid":"secretKey1",
+     "k":"Fdh9u8rINxfivbrianbbVT1u232VQBZYKx1HGAGPt2I"
+   },
+   {
+     "kty":"oct",
+     "kid":"secretKey2",
+     "k":"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow"
+   }
+ ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>io.smallrye.jwt.util.KeyUtils</code> を使用して、非対称 RSA または EC キーのペアを生成することもできます。これらのキーは、 <code>JWK</code> 、 <code>JWK Set</code> 、または <code>PEM</code> 形式を使用して保存できます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="smallrye-jwt-builder-configuration"><a class="anchor" href="#smallrye-jwt-builder-configuration"></a>SmallRye JWT Builder の設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>SmallRye JWT は、クレームの署名や暗号化の方法をカスタマイズするために使用できる次のプロパティーをサポートしています。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">プロパティ名</th>
+<th class="tableblock halign-left valign-top">デフォルト</th>
+<th class="tableblock halign-left valign-top">説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.sign.key.location</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><code>none</code></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">引数なし <code>sign()</code> または <code>innerSign()</code> メソッドが呼び出されたときに、クレームに署名するために使用される秘密鍵の場所。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.sign.key</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">引数なし <code>sign()</code> または <code>innerSign()</code> メソッドが呼び出されたときに、クレームに署名するために使用されるキー値。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.sign.key.id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><code>none</code></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JWK キーを使用する場合にのみチェックされる署名キー識別子。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.encrypt.key.location</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><code>none</code></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">引数無し <code>encrypt()</code> メソッドが呼び出された際に、クレームまたは内部 JWT を暗号化するために使用される公開鍵の位置。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.sign.relax-key-validation</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">署名キーの検証を緩和します。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.encrypt.key</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">引数なし <code>encrypt()</code> メソッドが呼び出された際に、クレームまたは内部 JWT を暗号化するために使用されるキー値。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.encrypt.key.id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><code>none</code></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JWK キーを使用する場合にのみチェックされる暗号化キー識別子。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.encrypt.relax-key-validation</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">暗号化キーの検証を緩和します。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.new-token.signature-algorithm</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>RS256</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">署名アルゴリズム。このプロパティーは、JWT 署名ビルダーが署名アルゴリズムをまだ設定していない場合にチェックされます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.new-token.key-encryption-algorithm</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>RSA-OAEP</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">キー暗号化アルゴリズム。このプロパティーは、JWT 暗号化ビルダーがキー暗号化アルゴリズムをまだ設定していない場合にチェックされます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.new-token.content-encryption-algorithm</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>A256GCM</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">コンテンツ暗号化アルゴリズム。このプロパティーは、JWT 暗号化ビルダーがコンテンツ暗号化アルゴリズムをまだ設定していない場合にチェックされます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.new-token.lifespan</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>300</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">exp (expiry) クレームがまだ設定されていない場合、このクレーム値を計算するために使用される トークン生存期間の秒数。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.new-token.issuer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>iss</code> (発行者)クレームがまだ設定されていない場合に、このクレーム値を設定するために使用できるトークン発行者。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.new-token.audience</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>aud</code> (オーディエンス) クレームがまだ設定されていない場合に、このクレーム値を設定するために使用できるトークンオーディエンス。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.new-token.override-matching-claims</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">既に初期化されている <code>iss</code> （発行者）と <code>aud</code> （視聴者）のクレームを <code>smallrye.jwt.new-token.issuer</code> と <code>smallrye.jwt.new-token.audience</code> の値で上書きするために、 このプロパティを <code>true</code> に設定します。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.keystore.type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><code>JKS</code></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">このプロパティは、 <code>smallrye.jwt.sign.key.location</code> または <code>smallrye.jwt.encrypt.key.location</code> のいずれか、あるいはこれらのプロパティの両方が <code>KeyStore</code> ファイルを指している場合に、キーストアタイプをカスタマイズするために使用することができます。このプロパティが設定されていない場合、ファイル名をチェックしてキーストアの種類を決定し、デフォルトで <code>JKS</code> に設定されます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.keystore.provider</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">このプロパティは、 <code>smallrye.jwt.sign.key.location</code> または <code>smallrye.jwt.encrypt.key.location</code> が <code>KeyStore</code> ファイルを指している場合に、 <code>KeyStore</code> プロバイダをカスタマイズするために使用できます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.keystore.password</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">キーストアのパスワード。 <code>smallrye.jwt.sign.key.location</code> または <code>smallrye.jwt.encrypt.key.location</code> が <code>KeyStore</code> ファイルを指している場合、このプロパティを設定する必要があります。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.keystore.encrypt.key.alias</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">このプロパティは、 <code>smallrye.jwt.encrypt.key.location</code> が <code>KeyStore</code> ファイルを指している場合、一致する証明書によって <code>KeyStore</code> から抽出される公開暗号鍵を特定するために設定される必要があります。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.keystore.sign.key.alias</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">このプロパティは、 <code>smallrye.jwt.sign.key.location</code> が <code>KeyStore</code> ファイルを指している場合、秘密署名鍵を特定するために設定する必要があります。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.keystore.sign.key.password</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">このプロパティは、 <code>smallrye.jwt.sign.key.location</code> が <code>KeyStore</code> ファイルを指しているときに、<code>KeyStore</code> にある秘密署名鍵のパスワードが <code>smallrye.jwt.keystore.password</code> と異なる場合に設定される場合があります。</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="references"><a class="anchor" href="#references"></a>参照</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/smallrye/smallrye-jwt">SmallRye JWT</a></p>
+</li>
+<li>
+<p><a href="https://tools.ietf.org/html/rfc7519">JSON Web Token</a></p>
+</li>
+<li>
+<p><a href="https://tools.ietf.org/html/rfc7515">JSON Web Signature</a></p>
+</li>
+<li>
+<p><a href="https://tools.ietf.org/html/rfc7516">JSON Web Encryption</a></p>
+</li>
+<li>
+<p><a href="https://tools.ietf.org/html/rfc7518">JSON Web Algorithms</a></p>
+</li>
+<li>
+<p><a href="https://bitbucket.org/b_c/jose4j/wiki/Home">Jose4J</a></p>
+</li>
+<li>
+<p><a href="security-openid-connect">OpenID Connect を使用したサービスアプリケーションの保護</a></p>
+</li>
+<li>
+<p><a href="security-jwt">Smallrye JWT を使用したサービスアプリケーションの保護</a></p>
+</li>
+<li>
+<p><a href="security-overview-concept">Quarkus Security 概要</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#dependency">依存関係</a></li>
+<li><a href="#create-jwtclaimsbuilder-and-set-the-claims">JwtClaimsBuilder の作成とクレームの設定</a></li>
+<li><a href="#sign-claims">クレームへの署名</a></li>
+<li><a href="#encrypt-claims">クレームの暗号化</a></li>
+<li><a href="#innersign-encrypt-claims">クレームへの署名とネストされた JWT トークンの暗号化</a></li>
+<li><a href="#fast-jwt-generation">JWT の迅速な生成</a></li>
+<li><a href="#dealing-with-the-keys">キーの取り扱い</a></li>
+<li><a href="#smallrye-jwt-builder-configuration">SmallRye JWT Builder の設定</a></li>
+<li><a href="#references">参照</a></li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

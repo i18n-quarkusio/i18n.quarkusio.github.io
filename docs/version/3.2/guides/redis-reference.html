@@ -1,0 +1,2162 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Redis エクステンションのリファレンスガイド - 3.2 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.2/guides/redis-reference" />
+  <meta property="og:title" content="Redis エクステンションのリファレンスガイド - 3.2" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/redis-reference">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.2/guides/redis-reference">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.2/guides/redis-reference" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.2/guides/redis-reference">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.2/guides/redis-reference">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.2/guides/redis-reference">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.2/guides/redis-reference">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.2/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" selected>3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">Redis エクステンションのリファレンスガイド </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Redis は、データベース、キャッシュ、ストリーミングエンジン、メッセージブローカーとして使用されるインメモリーデータストアです。Quarkus Redis エクステンションを使用すると、Quarkus アプリケーションと Redis を統合することができます。</p>
+</div>
+<div class="paragraph">
+<p>このエクステンションを使うには、ユーザーが Redis に精通していること、特にコマンドの仕組みとその設定について理解していることが必要です。一般的には、以下を推奨します。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Redis を紹介する <a href="https://try.redis.io/">インタラクティブなチュートリアル</a>。</p>
+</li>
+<li>
+<p>Redis コマンドを説明し、リファレンスドキュメントへのリンクが掲載されている <a href="https://redis.io/commands/">コマンドリファレンス</a>。</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>このエクステンションは、命令型とリアクティブ型の API、および低レベルと高レベルの (タイプセーフな) クライアントを提供します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="installation"><a class="anchor" href="#installation"></a>1. インストール</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このエクステンションを使用する場合は、最初に <code>io.quarkus:quarkus-redis</code> エクステンションを追加する必要があります。<code>pom.xml</code> ファイルに、以下を追加します。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-redis-client&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-redis-client")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この依存関係があれば、次に Redis クライアントや <em>データソース</em> (高レベル、タイプセーフの API) を注入することができます。以下に例を示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.redis.datasource.RedisDataSource;
+
+// ...
+@Inject RedisAPI lowLevelClient;
+@Inject RedisDataSource highLevelApi;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>quarkus-redisエクステンションが提供するさまざまなAPIの詳細については、 <a href="#apis">1つのエクステンション、複数のAPI</a> のセクションを参照してください。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Redisをキャッシュバックエンドとして使用するには、 <a href="cache-redis-reference">Redisキャッシュバックエンドのリファレンス</a> を参照してください。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="apis"><a class="anchor" href="#apis"></a>2. 1 つのエクステンション、複数の API</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このエクステンションは、Redis と対話する複数の方法を提供します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>低レベルの</em> Vert.x クライアント: 完全にリアクティブで、ノンブロッキングかつ非同期なクライアントです。詳細は <a href="https://vertx.io/docs/vertx-redis-client/java/">Vert.x Redis クライアントドキュメント</a> を参照してください。2 つの API (<code>io.vertx.redis.client.Redis</code> および <code>io.vertx.redis.client.RedisAPI</code>) が公開されています。接続を自分で管理する必要がある場合を除き、通常は後者を利用することになります。</p>
+</li>
+<li>
+<p>Vert.x API の <em>低レベルの</em> Mutiny バリアント :以前のものとは異なり、Mutiny API を公開し、リアクティブ型と命令型の両方のメソッド (接尾辞は <code>andAwait()</code>) が提供されます。2 つの API (<code>io.vertx.mutiny.redis.client.Redis</code> および <code>io.vertx.mutiny.redis.client.RedisAPI</code>) が公開されています。自分で接続を管理する必要がある場合を除いて、通常は後者を使用します。</p>
+</li>
+<li>
+<p><em>高レベルの</em> リアクティブデータソース: Redis と対話するための、タイプセーフな高レベル API です。この API は完全にリアクティブで非同期です。これは、Mutiny API を公開します。<code>io.quarkus.redis.datasource.ReactiveRedisDataSource</code> インターフェイスを公開します。</p>
+</li>
+<li>
+<p><em>高レベルの</em> 命令型データソース: Redis と対話するための、タイプセーフな高レベル API です。これはリアクティブデータソースの命令型バリアントです。<code>io.quarkus.redis.datasource.RedisDataSource</code> インターフェイスを公開します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>適切な API を選択できるように、いくつかの推奨事項を以下に示します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Redis と統合する命令型 (<em>classic</em>) の Quarkus アプリケーションを構築する場合、 <code>io.quarkus.redis.datasource.RedisDataSource</code> を使用します。</p>
+</li>
+<li>
+<p>Redis と統合したリアクティブな Quarkus アプリケーションを構築する場合は、<code>io.quarkus.redis.datasource.ReactiveRedisDataSource</code> を使用します。</p>
+</li>
+<li>
+<p>細かい制御が必要な場合や、汎用的な方法でコマンドを実行する場合は、<code>io.vertx.mutiny.redis.client.RedisAPI</code> を使用します。</p>
+</li>
+<li>
+<p>既存の Vert.x コードがある場合は、<code>io.vertx.redis.client.RedisAPI</code> を使用します。</p>
+</li>
+<li>
+<p>カスタムコマンドを発行する必要がある場合は、データソース (リアクティブ型または命令型) または <code>io.vertx.mutiny.redis.client.Redis</code> を使用することができます。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="default-and-named-clients"><a class="anchor" href="#default-and-named-clients"></a>3. デフォルトクライアントと名前付きクライアント</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このエクステンションでは、<em>デフォルトの</em> Redis クライアント/データソースまたは <em>名前付き</em> ソースを設定することができます。後者は、複数の Redis インスタンスに接続する必要がある場合に不可欠となります。</p>
+</div>
+<div class="paragraph">
+<p>デフォルトの接続は、<code>quarkus.redis.*</code> プロパティーを使用して設定されます。たとえば、デフォルトの Redis クライアントを設定するには、以下を使用します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.redis.hosts=redis://localhost/</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>デフォルトの接続を使用する場合、<em>プレーン</em> <code>@Inject</code> を使用してさまざまな APIS を注入することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+public class RedisExample {
+    @Inject ReactiveRedisDataSource reactiveDataSource;
+    @Inject RedisDataSource redisDataSource;
+    @Inject RedisAPI redisAPI;
+    // ...
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+一般的には、1 つだけ注入します。先ほどのスニペットは単なる一例です。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><em>名前付き</em> クライアントは <code>quarkus.redis.&lt;name&gt;.*</code> プロパティーを使用して設定されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.redis.my-redis-1.hosts=redis://localhost/
+quarkus.redis.my-redis-2.hosts=redis://my-other-redis:6379</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>API にアクセスするためには、<code>@RedisClientName</code> 修飾子が必要です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+public class RedisExample {
+    @Inject @RedisClientName("my-redis-1") ReactiveRedisDataSource reactiveDataSource;
+    @Inject @RedisClientName("my-redis-2") RedisDataSource redisDataSource;
+    // ...
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<code>@RedisClientName</code> を使用する場合、 <code>@Inject</code> アノテーションを省略することができます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="connection-to-redis"><a class="anchor" href="#connection-to-redis"></a>4. Redisへの接続</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Redis エクステンションは、4 つの異なるモードで動作することができます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>シンプルなクライアント (おそらくほとんどのユーザーが必要としているもの)。</p>
+</li>
+<li>
+<p>Sentinel (高可用性モードで Redis を使用する場合)。</p>
+</li>
+<li>
+<p>クラスター (Redis を Clustered モードで動作させる場合)。</p>
+</li>
+<li>
+<p>レプリケーション (シングルシャード、1 ノード書き込み、マルチ読み取り)。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>接続 URL は、以下のように <code>quarkus.redis.hosts</code> (または <code>quarkus.redis.&lt;name&gt;.hosts</code>) で設定されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.redis.hosts=redis://[:password@]host[:port][/db-number]</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="unix-socket"><a class="anchor" href="#unix-socket"></a>4.1. Unix Socket</h3>
+<div class="paragraph">
+<p>unix-socket を使用する場合、以下が必要です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.redis.hosts=unix://[:password@]/domain/docker.sock[?select=db-number]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="sentinel-mode"><a class="anchor" href="#sentinel-mode"></a>4.2. Sentinel モード</h3>
+<div class="paragraph">
+<p>Sentinel を使用する場合、複数の <em>ホスト urls</em> を渡し、クライアントのタイプを <code>sentinel</code> に設定する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.redis.hosts=redis://localhost:5000,redis://localhost:5001,redis://localhost:5002
+quarkus.redis.client-type=sentinel
+
+# Optional
+quarkus.redis.master-name=my-sentinel # Default is my-master
+quarkus.redis.role=master # master is the default</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cluster-mode"><a class="anchor" href="#cluster-mode"></a>4.3. クラスターモード</h3>
+<div class="paragraph">
+<p>Redis をクラスターモードで使用する場合、複数の <em>ホスト urls</em> を渡し、クライアントのタイプを <code>cluster</code> に設定し、<code>replicas</code> モードを設定する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.redis.hosts=redis://localhost:7000,redis://localhost:7001,redis://localhost:7002
+quarkus.redis.client-type=cluster
+quarkus.redis.replicas=share</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="replication-mode"><a class="anchor" href="#replication-mode"></a>4.4. レプリケーションモード</h3>
+<div class="paragraph">
+<p>レプリケーションモードを使用する場合、単一のホスト URL を渡し、タイプを <code>replication</code> に設定する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.redis.hosts=redis://localhost:7000
+quarkus.redis.client-type=replication</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="redis-cloud"><a class="anchor" href="#redis-cloud"></a>4.5. Redis Cloud</h3>
+<div class="paragraph">
+<p>redis クラウドに接続するためには、以下のプロパティーが必要です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.redis.hosts=&lt;the redis cloud url such as redis://redis-12436.c14.us-east-1-3.ec2.cloud.redislabs.com:12436&gt;
+quarkus.redis.password=&lt;the password&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="authentication"><a class="anchor" href="#authentication"></a>4.6. 認証</h3>
+<div class="paragraph">
+<p>Redis のパスワードは、<code>redis://</code> URL で設定するか、 <code>quarkus.redis.password</code> プロパティーで設定することができますが、後者での設定をお勧めします。可能であれば、シークレットや環境変数を使ってパスワードを設定することをお勧めします。</p>
+</div>
+<div class="paragraph">
+<p>関連する環境変数は <code>QUARKUS_REDIS_PASSWORD</code> で、名前付きクライアントの場合は <code>QUARKUS_REDIS_&lt;NAME&gt;_PASSWORD</code> となります。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="quarkus-client-api-for-data-sources"><a class="anchor" href="#quarkus-client-api-for-data-sources"></a>5. データソースのためのQuarkusクライアントAPI</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus は、Redis 上で高レベルの API を公開します。この API はタイプセーフで <a href="https://redis.io/commands/command-docs/">Redis コマンド編成</a> から継承された <em>グループ</em> の概念を中心とした構造となっています。この API を使用すると、Redis コマンドをより便利かつ安全に実行することができます。</p>
+</div>
+<div class="sect2">
+<h3 id="inject-data-sources"><a class="anchor" href="#inject-data-sources"></a>5.1. データソースの注入</h3>
+<div class="paragraph">
+<p>設定された各 Redis クライアントに対して、2 つの Redis データソースが公開されます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>io.quarkus.redis.datasource.RedisDataSource</code>: 命令型の (ブロッキング) Redis データソースです。各操作は、レスポンスを受信するか、タイムアウトに達するまでブロックされます。</p>
+</li>
+<li>
+<p><code>io.quarkus.redis.datasource.ReactiveRedisDataSource</code>: <code>Uni&lt;X&gt;</code> または <code>Multi&lt;X&gt;</code> を返すリアクティブ型 Redis データソースです。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><em>デフォルトの</em> Redis クライアントを設定した場合、以下を使用してデータソースを注入することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject RedisDataSource defaultRedisDataSource;
+@Inject ReactiveRedisDataSource defaultReactiveRedisDataSource;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><em>名前付きの</em> Redis クライアントを設定した場合、<code>io.quarkus.redis.RedisClientName</code> 修飾子を使用して、正しいクライアントを選択する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@RedisClientName("my-redis") RedisDataSource myRedisDataSource;
+@RedisClientName("my-redis") ReactiveRedisDataSource myReactiveRedisDataSource;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><em>ブロッキング</em> バリアントを使う場合は、以下を使用してデフォルトのタイムアウトを設定することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.redis.timeout=5s
+quarkus.redis.my-redis.timeout=5s</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>デフォルトのタイムアウトは 10 秒に設定されています。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">デリゲーションに関するすべて</div>
+<div class="paragraph">
+<p>ブロッキングデータソース (<code>io.quarkus.redis.datasource.RedisDataSource</code>) はリアクティブデータソース (<code>io.quarkus.redis.datasource.ReactiveRedisDataSource</code>) の上に実装されています。<code>ReactiveRedisDataSource</code> は <code>io.vertx.mutiny.redis.Redis</code> API の上に実装されています。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="data-source-groups"><a class="anchor" href="#data-source-groups"></a>5.1.1. データソースグループ</h4>
+<div class="paragraph">
+<p>前述の通り、API はグループに分かれています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>bitmap - <code>.bitmap()</code></p>
+</li>
+<li>
+<p>bitmap - <code>.bitmap()</code></p>
+</li>
+<li>
+<p>key (generic) - <code>.key()</code></p>
+</li>
+<li>
+<p>geo - <code>.geo(memberType)</code></p>
+</li>
+<li>
+<p>hash - <code>.hash(`valueType)</code></p>
+</li>
+<li>
+<p>hyperloglog - <code>.hyperloglog(memberType)</code></p>
+</li>
+<li>
+<p>list - <code>.list(memberType)</code></p>
+</li>
+<li>
+<p>pubsub - <code>pubsub()</code></p>
+</li>
+<li>
+<p>set - <code>.set(memberType)</code></p>
+</li>
+<li>
+<p>sorted-set - <code>.sortedSet(memberType)</code></p>
+</li>
+<li>
+<p>string - <code>.value(valueType)</code></p>
+</li>
+<li>
+<p>stream - <code>.stream(`valueType</code>)</p>
+</li>
+<li>
+<p>transactions - <code>withTransaction</code></p>
+</li>
+<li>
+<p>json - <code>.json()</code> (サーバー側に <a href="https://redis.com/modules/redis-json/">RedisJSON</a> モジュールが必要)</p>
+</li>
+<li>
+<p>bloom - <code>.bloom()</code> (サーバー側に <a href="https://redis.com/modules/redis-bloom/">RedisBloom</a> モジュールが必要)</p>
+</li>
+<li>
+<p>cuckoo - <code>.cuckoo()</code> (サーバ側に <a href="https://redis.com/modules/redis-bloom/">rRedisBloom</a> モジュールが必要で、cuckoo のフィルタコマンドも提供します)</p>
+</li>
+<li>
+<p>count-min - <code>.countmin()</code> （サーバー側に <a href="https://redis.com/modules/redis-bloom/">RedisBloom</a> モジュールが必要で、count-minフィルターコマンドも提供されます。）</p>
+</li>
+<li>
+<p>top-k - <code>.topk()</code> (サーバー側に <a href="https://redis.com/modules/redis-bloom/">RedisBloom</a> モジュールが必要で、top-kフィルターコマンドも提供します)</p>
+</li>
+<li>
+<p>graph - <code>.graph()</code> (requires the <a href="https://redis.com/modules/redis-graph/">RedisGraph</a> module on the server side).
+These commands are marked as experimental, as we would need feedback before making them stable.</p>
+</li>
+<li>
+<p>search - <code>.search()</code> (サーバー側に <a href="https://redis.com/modules/redis-search/">RedisSearch</a> モジュールが必要です)。</p>
+</li>
+<li>
+<p>auto-suggest - <code>.autosuggest()</code> (サーバー側に <a href="https://redis.com/modules/redis-search/">RedisSearch</a> モジュールが必要です)。</p>
+</li>
+<li>
+<p>time-series - <code>.timeseries()</code> (サーバー側に <a href="https://redis.com/modules/redis-timeseries/">Redis Time Series</a> モジュールが必要です)。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>これらのコマンドは、stableになる前にフィードバックを必要とするため、experimentalとしてマークされています。</p>
+</div>
+<div class="paragraph">
+<p>これらのメソッドはそれぞれ、そのグループに関連するコマンドを実行することができるオブジェクトを返します。以下のスニペットは、<em>ハッシュ</em> グループの使い方を示しています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+public class MyRedisService {
+
+    private static final String MY_KEY = "my-key";
+
+    private final HashCommands&lt;String, String, Person&gt; commands;
+
+    public MyRedisService(RedisDataSource ds) { <i class="conum" data-value="1"></i><b>(1)</b>
+        commands = ds.hash(Person.class); <i class="conum" data-value="2"></i><b>(2)</b>
+    }
+
+    public void set(String field, Person value) {
+        commands.hset(MY_KEY, field, value);  <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+
+    public Person get(String field) {
+        return commands.hget(MY_KEY, field);  <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>コンストラクターに <code>RedisDataSource</code> を注入します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>HashCommands</code> オブジェクトを作成します。このオブジェクトには 3 つのタイプ (キーのタイプ、フィールドのタイプ、メンバーのタイプ) のパラメーターがあります。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>作成した <code>commands</code> を使用して、フィールド <code>field</code> と値 <code>value</code> を関連付けます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>作成した <code>commands</code> を使用して、フィールド <code>field</code> の値を取得します。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="serialization-and-deserialization"><a class="anchor" href="#serialization-and-deserialization"></a>5.2. シリアライズとデシリアライズ</h3>
+<div class="paragraph">
+<p>データソース API は、シリアライズとデシリアライズを自動的に処理します。非標準のタイプが使われる場合、オブジェクトは JSON にシリアライズされ、JSON からデシリアライズされます。この場合、<code>quarkus-jackson</code> が使用されます。</p>
+</div>
+<div class="paragraph">
+<p>バイナリーデータを格納するには、<code>byte[]</code> を使用します。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-value-group"><a class="anchor" href="#the-value-group"></a>5.3. <code>value</code> グループ</h3>
+<div class="paragraph">
+<p><code>value</code> グループは <a href="https://redis.io/docs/manual/data-types/#strings">Redis 文字列</a> を操作するために使用されます。したがって、このグループは Java の文字列に限定されることなく、整数 (カウンターなど) やバイナリーコンテンツ (イメージなど) にも使用することができます。</p>
+</div>
+<div class="sect3">
+<h4 id="work-with-cached-values"><a class="anchor" href="#work-with-cached-values"></a>5.3.1. キャッシュされた値を扱う</h4>
+<div class="paragraph">
+<p>Redis をキャッシュとして使用するには、<code>setex</code> コマンドを使用します。このコマンドは、指定したキーに指定した値を指定した期間だけ格納します。以下のスニペットは、このようなコマンドを使用して <code>BusinessObject</code> を 1 秒間格納する方法を示しています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+public static class MyRedisCache {
+
+    private final ValueCommands&lt;String, BusinessObject&gt; commands;
+
+    public MyRedisCache(RedisDataSource ds) {
+        commands = ds.value(BusinessObject.class);
+    }
+
+    public BusinessObject get(String key) {
+        return commands.get(key);
+    }
+
+    public void set(String key, BusinessObject bo) {
+        commands.setex(key, 1, bo); // Expires after 1 second
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>setnx</code> メソッドは、指定したキーに対応する値が格納されていない場合に、値を設定するためだけに使用することができます。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<code>key</code> グループは、各キーの有効期限や ttl をより細かく制御します。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>set</code> メソッドは、動作を変更するための <code>SetArgs</code> 引数を受け取ることもできます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>ex(seconds)</code>: 指定された有効期限を秒単位で設定します。</p>
+</li>
+<li>
+<p><code>px(milliseconds)</code>: 指定した有効期限をミリ秒単位で設定します。</p>
+</li>
+<li>
+<p><code>exat(timestamp-seconds)</code>: キーの有効期限が切れる Unix 時間を秒単位で設定します。</p>
+</li>
+<li>
+<p><code>pxat(timestamp-milliseconds)</code>: キーの有効期限が切れる Unix 時間をミリ秒単位で設定します。</p>
+</li>
+<li>
+<p><code>nx()</code>: キーがまだ存在しない場合にのみ、キーを設定します。</p>
+</li>
+<li>
+<p><code>xx()</code>: キーがすでに存在する場合にのみ、キーを設定します。</p>
+</li>
+<li>
+<p><code>keepttl()</code>: キーに関連付けられた有効期限を保持します。</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="store-binary-data"><a class="anchor" href="#store-binary-data"></a>5.3.2. バイナリーデータの格納</h4>
+<div class="paragraph">
+<p>Redis の <em>文字列</em> は、イメージのようなバイナリーデータを格納するために使用することができます。この場合、値のタイプとして <code>byte[]</code> を使用します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+public static class MyBinaryRepository {
+
+    private final ValueCommands&lt;String, byte[]&gt; commands;
+
+    public MyBinaryRepository(RedisDataSource ds) {
+        commands = ds.value(byte[].class);
+    }
+
+    public byte[] get(String key) {
+        byte[] bytes = commands.get(key);
+        if (bytes == null) {
+            throw new NoSuchElementException("`" + key + "` not found");
+        }
+        return bytes;
+    }
+
+    public void add(String key, byte[] bytes) {
+        commands.set(key, bytes);
+    }
+
+    public void addIfAbsent(String key, byte[] bytes) {
+        commands.setnx(key, bytes);
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="store-a-counter"><a class="anchor" href="#store-a-counter"></a>5.3.3. カウンターの格納</h4>
+<div class="paragraph">
+<p>以下に示すように、Redis にカウンターを格納することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+public static class MyRedisCounter {
+
+    private final ValueCommands&lt;String, Long&gt; commands;
+
+    public MyRedisCounter(RedisDataSource ds) {
+        commands = ds.value(Long.class); <i class="conum" data-value="1"></i><b>(1)</b>
+    }
+
+    public long get(String key) {
+        Long l = commands.get(key);  <i class="conum" data-value="2"></i><b>(2)</b>
+        if (l == null) {
+            return 0L;
+        }
+        return l;
+    }
+
+    public void incr(String key) {
+        commands.incr(key);  <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>コマンドを取得します。今回は <code>Long</code> 値を操作します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>与えられた <code>key</code> に対応するカウンターを取得します。カウンターが格納されていない場合は、<code>0L</code> を返します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>値を増やします。キーのカウンターが格納されていない場合は、<code>incr</code> コマンドは 0 を値とみなします (したがって <code>incr</code> は値を 1 に設定します)。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>他にも、カウンターを操作する際に便利なメソッドがあります。以下に例を示します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>incrby</code>: 増分値 (正または負) を設定することができます。</p>
+</li>
+<li>
+<p><code>incrbyfloat</code> - float/double として増分値を設定できます (格納される値は double になります)。</p>
+</li>
+<li>
+<p><code>set</code>: 必要に応じて初期値を設定します．</p>
+</li>
+<li>
+<p><code>decr</code> および <code>decrby</code>: 格納された値を減らすことができます。</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="communicate-with-pubsub"><a class="anchor" href="#communicate-with-pubsub"></a>5.3.4. pub/subとの通信</h4>
+<div class="paragraph">
+<p>Redisでは、チャンネルに <em>メッセージ</em> を送信したり、そのメッセージをリッスンしたりすることができます。これらの機能は、 <code>pubsub</code> グループから利用できます。</p>
+</div>
+<div class="paragraph">
+<p>以下のスニペットは、<em>キャッシュ</em> が <code>set</code> ごとに <code>Notification</code> を発行する方法と、サブスクライバーがその通知を受信する方法を示しています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public static final class Notification {
+    public String key;
+    public BusinessObject bo;
+
+    public Notification() {
+
+    }
+
+    public Notification(String key, BusinessObject bo) {
+        this.key = key;
+        this.bo = bo;
+    }
+}
+
+@ApplicationScoped
+@Startup // We want to create the bean instance on startup to subscribe to the channel.
+public static class MySubscriber implements Consumer&lt;Notification&gt; {
+    private final PubSubCommands&lt;Notification&gt; pub;
+    private final PubSubCommands.RedisSubscriber subscriber;
+
+    public MySubscriber(RedisDataSource ds) {
+        pub = ds.pubsub(Notification.class);
+        subscriber = pub.subscribe("notifications", this);
+    }
+
+    @Override
+    public void accept(Notification notification) {
+        // Receive the notification
+    }
+
+    @PreDestroy
+    public void terminate() {
+        subscriber.unsubscribe(); // Unsubscribe from all subscribed channels
+    }
+}
+
+@ApplicationScoped
+public static class MyCache {
+
+    private final ValueCommands&lt;String, BusinessObject&gt; commands;
+    private final PubSubCommands&lt;Notification&gt; pub;
+
+    public MyCache(RedisDataSource ds) {
+        commands = ds.value(BusinessObject.class);
+        pub = ds.pubsub(Notification.class);
+    }
+
+    public BusinessObject get(String key) {
+        return commands.get(key);
+    }
+
+    public void set(String key, BusinessObject bo) {
+        commands.set(key, bo);
+        pub.publish("notifications", new Notification(key, bo));
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="redis-transactions"><a class="anchor" href="#redis-transactions"></a>5.3.5. Redisトランザクション</h4>
+<div class="paragraph">
+<p>Redis トランザクションは、リレーショナルデータベースのトランザクションとは少し異なります。Redis トランザクションは、まとめて実行されるコマンドのバッチです。</p>
+</div>
+<div class="paragraph">
+<p>Redis トランザクションはキーのセットを <em>監視</em> することができ、トランザクションの実行中にこれらのキーのいずれかが更新された場合、トランザクションを <em>破棄</em> します。</p>
+</div>
+<div class="paragraph">
+<p>トランザクション内でキューに入れられたコマンドは、トランザクション全体が実行される前に実行されることはありません。つまり、トランザクションの最中に結果を取得することはできません。結果はトランザクションの完了後にアクセスする <code>TransactionResult</code> オブジェクトに蓄積されます。このオブジェクトには、トランザクションが成功したか破棄されたかに関係なく含まれ、成功した場合は各コマンドの結果 (コマンドの順番でインデックス化されています) が含まれます。</p>
+</div>
+<div class="paragraph">
+<p>トランザクションを開始するには、<code>withTransaction</code> メソッドを使用します。このメソッドは <code>Consumer&lt;TransactionalRedisDataSource&gt;</code> を受け取ります。これは、コマンドが <code>void</code> (リアクティブバリアントでは <code>Uni&lt;Void&gt;</code>) を返すことを除けば、通常の <code>RedisDataSource</code> と同じ API となります。そのコンシューマーが返されたとき、トランザクションは <em>実行</em> されます。</p>
+</div>
+<div class="paragraph">
+<p>次のスニペットは、2 つの関連する <em>書き込み</em> を実行するトランザクションを作成する方法を示しています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject RedisDataSource ds;
+
+// ...
+
+TransactionResult result = ds.withTransaction(tx -&gt; {
+        TransactionalHashCommands&lt;String, String, String&gt; hash = tx.hash(String.class);
+        hash.hset(KEY, "field-1", "hello");
+        hash.hset(KEY, "field-2", "hello");
+    });</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>受け取った <code>tx</code> オブジェクトは、<code>tx.discard();</code> を使用してトランザクションを <em>破棄</em> するために使用することもできます。返された <code>TransactionResult</code> により、各コマンドの結果を取得することができます。</p>
+</div>
+<div class="paragraph">
+<p>データソースのリアクティブバリアントを使用する場合、渡されるコールバックは <code>Function&lt;ReactiveTransactionalRedisDataSource, Uni&lt;Void&gt;&gt;</code>: となります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject ReactiveRedisDataSource ds;
+
+// ...
+
+Uni&lt;TransactionResult&gt; result = ds.withTransaction(tx -&gt; {
+        ReactiveTransactionalHashCommands&lt;String, String, String&gt; hash = tx.hash(String.class);
+        return hash.hset(KEY, "field-1", "hello")
+            .chain(() -&gt; hash.hset(KEY, "field-2", "hello"));
+});</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>トランザクションの実行は、<em>キー</em> によって条件付けることができます。渡されたキーがトランザクションの実行中に変更された場合、トランザクションは破棄されます。キーは <code>withTransaction</code> メソッドの第 2 パラメーターとして <code>String</code> として渡されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">TransactionResult result = ds.withTransaction(tx -&gt; {
+    TransactionalHashCommands&lt;String, String, String&gt; hash = tx.hash(String.class);
+    hash.hset(KEY, "field-1", "hello");
+    hash.hset(KEY, "field-2", "hello");
+}, KEY);</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+トランザクションの中から pub/sub 機能を使用することはできません。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="optimistic-locking"><a class="anchor" href="#optimistic-locking"></a>5.3.6. 楽観的ロック</h4>
+<div class="paragraph">
+<p>楽観ロックを使用するには、<code>withTransaction</code> メソッドのバリアントを使用する必要があり、トランザクションが始まる前にコードを実行できるようにします。つまり、以下のように実行されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">WATCH key
+
+// Pre-transaction block
+// ....
+// Produce a result
+
+MULTI
+  // In transaction code, receive the result produced by the pre-transaction block.
+EXEC</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>たとえば、フィールドが存在する場合にのみハッシュの値を更新する必要がある場合は、以下のような API を使用することになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">OptimisticLockingTransactionResult&lt;Boolean&gt; result = blocking.withTransaction(ds -&gt; {
+    // The pre-transaction block:
+    HashCommands&lt;String, String, String&gt; hashCommands = ds.hash(String.class);
+    return hashCommands.hexists(key, "field"); // Produce a result (boolean in this case)
+},
+ (exists, tx) -&gt; { // The transactional block, receives the result and the transactional data source
+        if (exists) {
+            tx.hash(String.class).hset(key, "field", "new value");
+        } else {
+            tx.discard();
+        }
+ },
+  key); // The watched key</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>プレトランザクションブロックまたはトランザクションブロックの実行前または実行中に監視されているキーの 1 つがタッチされた場合、トランザクションは中断されます。プレトランザクションブロックは、トランザクションブロックが使用できる結果を生成します。トランザクション内では、コマンドは結果を生成しないので、この構成は必要です。結果は、トランザクションの実行後にのみ取得することができます。</p>
+</div>
+<div class="paragraph">
+<p>プレトランザクションブロックとトランザクションブロックは、同じ Redis 接続で呼び出されます。その結果、プレトランザクションブロックは、渡されたデータソースを使用してコマンドを実行する必要があります。したがって、コマンドはその接続から発行されます。これらのコマンドは、監視されたキーを変更することはできません。</p>
+</div>
+<div class="paragraph">
+<p>プレトランザクションブロックが例外をスローした場合 (またはリアクティブ API を使用している場合はエラーを生成した場合)、トランザクションは中断されます。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="execute-custom-commands"><a class="anchor" href="#execute-custom-commands"></a>5.3.7. カスタムコマンドの実行</h4>
+<div class="paragraph">
+<p>カスタムコマンドや API でサポートされていないコマンドを実行するには、以下の方法を使用します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject ReactiveRedisDataSource ds;
+
+// ...
+
+Response response = ds.execute("my-command", param1, param2, param3);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>execute</code> メソッドは Redis にコマンドを送信し、<code>Response</code> を取得します。コマンド名は最初のパラメーターとして渡されます。コマンドには、任意の数の <strong>String</strong> パラメーターを追加することができます。結果は <code>Response</code> オブジェクトにラップされます。</p>
+</div>
+<div class="paragraph">
+<p>リアクティブバリアントは <code>Uni&lt;Response&gt;</code> を返します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+また、トランザクション内でカスタムコマンドを実行することも可能です。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="preload-data-into-redis"><a class="anchor" href="#preload-data-into-redis"></a>6. Redisにデータをプリロードする</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>起動時に、RedisクライアントはRedisデータベースにデータをプリロードするように設定することができます。</p>
+</div>
+<div class="sect2">
+<h3 id="load-scripts"><a class="anchor" href="#load-scripts"></a>6.1. スクリプトのロード</h3>
+<div class="paragraph">
+<p>使用する <em>ロードスクリプト</em> を指定します：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.redis.load-script=import.redis # import.redis is the default in dev mode, no-file is the default in production mode
+quarkus.redis.my-redis.load-script=actors.redis, movies.redis</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<code>load-script</code> はビルド時のプロパティであり、実行時にオーバーライドすることはできません。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>各クライアントは異なるスクリプトを持つことができ、スクリプトのリストを持つこともできることに注意してください。リストの場合、データはリストの順番でインポートされます（たとえば、最初に <code>actors.redis</code> 、次に <code>my-redis</code> クライアントのための <code>movies.redis</code> ）。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="load-script-format"><a class="anchor" href="#load-script-format"></a>6.2. ロードスクリプトフォーマット</h3>
+<div class="paragraph">
+<p><code>.redis</code> ファイルは、 <em>1行に1コマンド</em> の形式をとっています：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text"># Line starting with # and -- are ignored, as well as empty lines
+
+-- One command per line:
+HSET foo field1 abc field2 123
+
+-- Parameters with spaces must be wrapped into single or double quotes
+HSET bar field1 "abc def" field2 '123 456 '
+
+-- Parameters with double quotes must be wrapped into single quotes and the opposite
+SET key1 'A value using "double-quotes"'
+SET key2 "A value using 'single-quotes'"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Quarkusは、1つのファイルからすべてのコマンドを一括して送信します。読み込み処理はエラーがあると失敗しますが、前の命令が実行されている可能性があります。それを避けるために、コマンドをRedis <em>トランザクション</em> にラップすることができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">-- Run inside a transaction
+MULTI
+SET key value
+SET space:key 'another value'
+INCR counter
+EXEC</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuration"><a class="anchor" href="#configuration"></a>6.3. 設定</h3>
+<div class="paragraph">
+<p>アプリケーションの起動時にデータを読み込みます。デフォルトでは、インポートする前にデータベース全体をドロップします。これを防ぐには、 <code>quarkus.redis.flush-before-load=false</code> を使用します。</p>
+</div>
+<div class="paragraph">
+<p>また、インポート処理は、データベースが空（キーなし）の場合のみ実行されます。 <code>quarkus.redis.load-only-if-empty=false</code> を使用すれば、データがあっても強制的にインポートすることができます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="devtest-vs-prod"><a class="anchor" href="#devtest-vs-prod"></a>6.4. Dev/Test vs. Prod</h3>
+<div class="paragraph">
+<p>上記のように、devやtestモードでは、Quarkusは <code>src/main/resources/import.redis</code> を探してデータをインポートしようとします。この動作は <em>prod</em> モードでは無効になっており、実稼働環境でもインポートしたい場合は、以下を追加します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">%prod.quarkus.redis.load-script=import.redis</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><em>prod</em> モードでインポートする前に、 <code>quarkus.redis.flush-before-load</code> を適切に設定してください。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+devモードでは、 <code>.redis</code> ロードスクリプトの内容を再読み込みするため、 <code>%dev.quarkus.vertx.caching=false</code> を追加する必要があります
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="vert-x-redis-client"><a class="anchor" href="#vert-x-redis-client"></a>7. Vert.x Redis クライアント</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>高レベルの API に加えて、Vertx Redis クライアントをコードで直接使用することができます。Vert.x Redis クライアントのドキュメントは <a href="https://vertx.io/docs/vertx-redis-client/java/">Vert.x Web サイト</a> で公開されています。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="redis-health-check"><a class="anchor" href="#redis-health-check"></a>8. Redis ヘルスチェック</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>quarkus-smallrye-health</code> エクステンションを使用している場合、<code>quarkus-redis</code> は Redis サーバーへの接続を検証するための readiness ヘルスチェックを自動的に追加します。</p>
+</div>
+<div class="paragraph">
+<p>そのため、アプリケーションの <code>/q/health/ready</code> エンドポイントにアクセスすると、接続の検証状況に関する情報が表示されます。</p>
+</div>
+<div class="paragraph">
+<p>この動作は、 <code>application.properties</code> の <code>quarkus.redis.health.enabled</code> プロパティーを <code>false</code> に設定することで無効にできます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="programmatic-redis-hosts"><a class="anchor" href="#programmatic-redis-hosts"></a>9. プログラマティックRedisホスト</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>RedisHostsProvider</code> はプログラムによって Redis ホストを提供します。これにより、他のソースから取得した redis 接続パスワードのようなプロパティーを設定することができます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>これは、application.properties に機密データを格納する必要がなくなるので便利です。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+@Identifier("hosts-provider") // the name of the host provider
+public class ExampleRedisHostProvider implements RedisHostsProvider {
+    @Override
+    public Set&lt;URI&gt; getHosts() {
+        // do stuff to get the host
+        String host = "redis://localhost:6379/3";
+        return Collections.singleton(URI.create(host));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>以下に示すように、ホストプロバイダーを使用して redis クライアントを設定することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.redis.hosts-provider-name=hosts-provider</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="customize-the-redis-options-programmatically"><a class="anchor" href="#customize-the-redis-options-programmatically"></a>10. プログラムによる Redis オプションのカスタマイズ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Redis クライアントのオプションをカスタマイズするために、<code>io.quarkus.redis.client.RedisOptionsCustomizer</code> インターフェイスを実装した Bean を公開することができます。この Bean は、設定された各 Redis クライアントに対して呼び出されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+public static class MyExampleCustomizer implements RedisOptionsCustomizer {
+
+    @Override
+    public void customize(String clientName, RedisOptions options) {
+        if (clientName.equalsIgnoreCase("my-redis")
+                || clientName.equalsIgnoreCase(RedisConfig.DEFAULT_CLIENT_NAME)) {
+            // modify the given options
+        } else {
+            throw new IllegalStateException("Unknown client name: " + clientName);
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="dev-services"><a class="anchor" href="#dev-services"></a>10.1. Dev Services</h3>
+<div class="paragraph">
+<p><a href="redis-dev-services">Redis Dev Service</a> を参照してください。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="redis-client-metrics"><a class="anchor" href="#redis-client-metrics"></a>11. Redisクライアントメトリクス</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="enable-metrics-collection"><a class="anchor" href="#enable-metrics-collection"></a>11.1. メトリクスの収集の有効化</h3>
+<div class="paragraph">
+<p>Redisクライアント・メトリクスは、アプリケーションが <a href="telemetry-micrometer"><code>quarkus-micrometer</code></a> エクステンションを使用している場合は、自動的に有効になります。micrometerは、アプリケーションが実装するすべてのRedisクライアントのメトリクスを収集します。</p>
+</div>
+<div class="paragraph">
+<p>例えば、メトリクスをPrometheusにエクスポートすると、以下のように取得できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text"># HELP redis_commands_duration_seconds The duration of the operations (commands of batches
+# TYPE redis_commands_duration_seconds summary
+redis_commands_duration_seconds_count{client_name="&lt;default&gt;",} 3.0
+redis_commands_duration_seconds_sum{client_name="&lt;default&gt;",} 0.047500042
+# HELP redis_commands_duration_seconds_max The duration of the operations (commands of batches
+# TYPE redis_commands_duration_seconds_max gauge
+redis_commands_duration_seconds_max{client_name="&lt;default&gt;",} 0.033273167
+# HELP redis_pool_active The number of resources from the pool currently used
+# TYPE redis_pool_active gauge
+redis_pool_active{pool_name="&lt;default&gt;",pool_type="redis",} 0.0
+# HELP redis_pool_ratio Pool usage ratio
+# TYPE redis_pool_ratio gauge
+redis_pool_ratio{pool_name="&lt;default&gt;",pool_type="redis",} 0.0
+# HELP redis_pool_queue_size Number of pending elements in the waiting queue
+# TYPE redis_pool_queue_size gauge
+redis_pool_queue_size{pool_name="&lt;default&gt;",pool_type="redis",} 0.0
+# HELP redis_commands_failure_total The number of operations (commands or batches) that have been failed
+# TYPE redis_commands_failure_total counter
+redis_commands_failure_total{client_name="&lt;default&gt;",} 0.0
+# HELP redis_commands_success_total The number of operations (commands or batches) that have been executed successfully
+# TYPE redis_commands_success_total counter
+redis_commands_success_total{client_name="&lt;default&gt;",} 3.0
+# HELP redis_pool_idle The number of resources from the pool currently used
+# TYPE redis_pool_idle gauge
+redis_pool_idle{pool_name="&lt;default&gt;",pool_type="redis",} 6.0
+# HELP redis_pool_completed_total Number of times resources from the pool have been acquired
+# TYPE redis_pool_completed_total counter
+redis_pool_completed_total{pool_name="&lt;default&gt;",pool_type="redis",} 3.0
+# HELP redis_commands_count_total The number of operations (commands or batches) executed
+# TYPE redis_commands_count_total counter
+redis_commands_count_total{client_name="&lt;default&gt;",} 3.0
+# HELP redis_pool_usage_seconds Time spent using resources from the pool
+# TYPE redis_pool_usage_seconds summary
+redis_pool_usage_seconds_count{pool_name="&lt;default&gt;",pool_type="redis",} 3.0
+redis_pool_usage_seconds_sum{pool_name="&lt;default&gt;",pool_type="redis",} 0.024381375
+# HELP redis_pool_usage_seconds_max Time spent using resources from the pool
+# TYPE redis_pool_usage_seconds_max gauge
+redis_pool_usage_seconds_max{pool_name="&lt;default&gt;",pool_type="redis",} 0.010671542
+# HELP redis_pool_queue_delay_seconds Time spent in the waiting queue before being processed
+# TYPE redis_pool_queue_delay_seconds summary
+redis_pool_queue_delay_seconds_count{pool_name="&lt;default&gt;",pool_type="redis",} 3.0
+redis_pool_queue_delay_seconds_sum{pool_name="&lt;default&gt;",pool_type="redis",} 0.022341249
+# HELP redis_pool_queue_delay_seconds_max Time spent in the waiting queue before being processed
+# TYPE redis_pool_queue_delay_seconds_max gauge
+redis_pool_queue_delay_seconds_max{pool_name="&lt;default&gt;",pool_type="redis",} 0.021926083</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Redisクライアント名は、 <em>タグ</em> で確認できます。</p>
+</div>
+<div class="paragraph">
+<p>メトリクスには、Redis接続プールのメトリクス（ <code>redis_pool_*</code> ）と、コマンド実行に関するメトリクス（ <code>redis_commands_*</code> ）（コマンド数、成功、失敗、継続時間など）の両方が含まれています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="disable-metrics-collection"><a class="anchor" href="#disable-metrics-collection"></a>11.2. メトリクスの収集の無効化</h3>
+<div class="paragraph">
+<p><code>quarkus-micrometer</code> が使用されている時にRedisクライアントメトリクスを無効にするには、アプリケーション設定に次のプロパティを追加します：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.micrometer.binder.redis.enabled=false</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="redis-configuration-reference"><a class="anchor" href="#redis-configuration-reference"></a>12. 設定リファレンス</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="ビルド時に固定"></i></span>ビルド時に固定される構成プロパティ - 他のすべての構成プロパティは実行時にオーバーライド可能 <input type="search" id="config-search-0" placeholder="FILTER CONFIGURATION" disabled></p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference searchable configuration-reference-all-rows">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-redis-client_configuration"></a><a href="#quarkus-redis-client_configuration">Configuration property</a></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">型</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus-redis-load-script"></a><code><a href="#quarkus-redis-client_quarkus-redis-load-script">quarkus.redis.load-script</a></code></p>
+</div>
+<div id="conf-collapsible-desc-1" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>A list of files allowing to pre-load data into the Redis server. The file is formatted as follows:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>One instruction per line</p>
+</li>
+<li>
+<p>Each instruction is a Redis command and its parameter such as <code>HSET foo field value</code></p>
+</li>
+<li>
+<p>Parameters can be wrapped into double-quotes if they include spaces</p>
+</li>
+<li>
+<p>Parameters can be wrapped into single-quote if they include spaces</p>
+</li>
+<li>
+<p>Parameters including double-quotes must be wrapped into single-quotes</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38695">QUARKUS_REDIS_LOAD_SCRIPT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38695" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>import.redis in DEV, TEST ; no-file otherwise</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus-redis-flush-before-load"></a><code><a href="#quarkus-redis-client_quarkus-redis-flush-before-load">quarkus.redis.flush-before-load</a></code></p>
+</div>
+<div id="conf-collapsible-desc-2" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>When using <code>redisLoadScript</code>, indicates if the Redis database must be flushed (erased) before importing.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38696">QUARKUS_REDIS_FLUSH_BEFORE_LOAD</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38696" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus-redis-load-only-if-empty"></a><code><a href="#quarkus-redis-client_quarkus-redis-load-only-if-empty">quarkus.redis.load-only-if-empty</a></code></p>
+</div>
+<div id="conf-collapsible-desc-3" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>When using <code>redisLoadScript</code>, indicates if the import should only happen if the database is empty (no keys).</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38697">QUARKUS_REDIS_LOAD_ONLY_IF_EMPTY</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38697" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus-redis-health-enabled"></a><code><a href="#quarkus-redis-client_quarkus-redis-health-enabled">quarkus.redis.health.enabled</a></code></p>
+</div>
+<div id="conf-collapsible-desc-4" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Whether a health check is published in case the smallrye-health extension is present.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38698">QUARKUS_REDIS_HEALTH_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38698" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus-redis-devservices-enabled"></a><code><a href="#quarkus-redis-client_quarkus-redis-devservices-enabled">quarkus.redis.devservices.enabled</a></code></p>
+</div>
+<div id="conf-collapsible-desc-5" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If DevServices has been explicitly enabled or disabled. DevServices is generally enabled by default, unless there is an existing configuration present.</p>
+</div>
+<div class="paragraph">
+<p>When DevServices is enabled Quarkus will attempt to automatically configure and start a database when running in Dev or Test mode and when Docker is running.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38699">QUARKUS_REDIS_DEVSERVICES_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38699" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus-redis-devservices-image-name"></a><code><a href="#quarkus-redis-client_quarkus-redis-devservices-image-name">quarkus.redis.devservices.image-name</a></code></p>
+</div>
+<div id="conf-collapsible-desc-6" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The container image name to use, for container based DevServices providers. If you want to use Redis Stack modules (bloom, graph, search&#8230;&#8203;), use: <code>redis/redis-stack-server:latest</code>.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38700">QUARKUS_REDIS_DEVSERVICES_IMAGE_NAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38700" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus-redis-devservices-port"></a><code><a href="#quarkus-redis-client_quarkus-redis-devservices-port">quarkus.redis.devservices.port</a></code></p>
+</div>
+<div id="conf-collapsible-desc-7" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Optional fixed port the dev service will listen to.</p>
+</div>
+<div class="paragraph">
+<p>If not defined, the port will be chosen randomly.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38701">QUARKUS_REDIS_DEVSERVICES_PORT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38701" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus-redis-devservices-shared"></a><code><a href="#quarkus-redis-client_quarkus-redis-devservices-shared">quarkus.redis.devservices.shared</a></code></p>
+</div>
+<div id="conf-collapsible-desc-8" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Indicates if the Redis server managed by Quarkus Dev Services is shared. When shared, Quarkus looks for running containers using label-based service discovery. If a matching container is found, it is used, and so a second one is not started. Otherwise, Dev Services for Redis starts a new container.</p>
+</div>
+<div class="paragraph">
+<p>The discovery uses the <code>quarkus-dev-service-redis</code> label. The value is configured using the <code>service-name</code> property.</p>
+</div>
+<div class="paragraph">
+<p>Container sharing is only used in dev mode.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38702">QUARKUS_REDIS_DEVSERVICES_SHARED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38702" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus-redis-devservices-service-name"></a><code><a href="#quarkus-redis-client_quarkus-redis-devservices-service-name">quarkus.redis.devservices.service-name</a></code></p>
+</div>
+<div id="conf-collapsible-desc-9" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The value of the <code>quarkus-dev-service-redis</code> label attached to the started container. This property is used when <code>shared</code> is set to <code>true</code>. In this case, before starting a container, Dev Services for Redis looks for a container with the <code>quarkus-dev-service-redis</code> label set to the configured value. If found, it will use this container instead of starting a new one. Otherwise, it starts a new container with the <code>quarkus-dev-service-redis</code> label set to the specified value.</p>
+</div>
+<div class="paragraph">
+<p>This property is used when you need multiple shared Redis servers.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38703">QUARKUS_REDIS_DEVSERVICES_SERVICE_NAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38703" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>redis</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus-redis-redis-client-name-load-script"></a><code><a href="#quarkus-redis-client_quarkus-redis-redis-client-name-load-script">quarkus.redis."redis-client-name".load-script</a></code></p>
+</div>
+<div id="conf-collapsible-desc-10" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>A list of files allowing to pre-load data into the Redis server. The file is formatted as follows:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>One instruction per line</p>
+</li>
+<li>
+<p>Each instruction is a Redis command and its parameter such as <code>HSET foo field value</code></p>
+</li>
+<li>
+<p>Parameters can be wrapped into double-quotes if they include spaces</p>
+</li>
+<li>
+<p>Parameters can be wrapped into single-quote if they include spaces</p>
+</li>
+<li>
+<p>Parameters including double-quotes must be wrapped into single-quotes</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38704">QUARKUS_REDIS__REDIS_CLIENT_NAME__LOAD_SCRIPT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38704" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>import.redis in DEV, TEST ; no-file otherwise</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus-redis-redis-client-name-flush-before-load"></a><code><a href="#quarkus-redis-client_quarkus-redis-redis-client-name-flush-before-load">quarkus.redis."redis-client-name".flush-before-load</a></code></p>
+</div>
+<div id="conf-collapsible-desc-11" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>When using <code>redisLoadScript</code>, indicates if the Redis database must be flushed (erased) before importing.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38705">QUARKUS_REDIS__REDIS_CLIENT_NAME__FLUSH_BEFORE_LOAD</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38705" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus-redis-redis-client-name-load-only-if-empty"></a><code><a href="#quarkus-redis-client_quarkus-redis-redis-client-name-load-only-if-empty">quarkus.redis."redis-client-name".load-only-if-empty</a></code></p>
+</div>
+<div id="conf-collapsible-desc-12" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>When using <code>redisLoadScript</code>, indicates if the import should only happen if the database is empty (no keys).</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38706">QUARKUS_REDIS__REDIS_CLIENT_NAME__LOAD_ONLY_IF_EMPTY</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38706" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus-redis-devservices-container-env-container-env"></a><code><a href="#quarkus-redis-client_quarkus-redis-devservices-container-env-container-env">quarkus.redis.devservices.container-env</a></code></p>
+</div>
+<div id="conf-collapsible-desc-13" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Environment variables that are passed to the container.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38707">QUARKUS_REDIS_DEVSERVICES_CONTAINER_ENV</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38707" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>Map&lt;String,String&gt;</code></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus-redis-additional-redis-clients-devservices-enabled"></a><code><a href="#quarkus-redis-client_quarkus-redis-additional-redis-clients-devservices-enabled">quarkus.redis."additional-redis-clients".devservices.enabled</a></code></p>
+</div>
+<div id="conf-collapsible-desc-14" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If DevServices has been explicitly enabled or disabled. DevServices is generally enabled by default, unless there is an existing configuration present.</p>
+</div>
+<div class="paragraph">
+<p>When DevServices is enabled Quarkus will attempt to automatically configure and start a database when running in Dev or Test mode and when Docker is running.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38708">QUARKUS_REDIS__ADDITIONAL_REDIS_CLIENTS__DEVSERVICES_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38708" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus-redis-additional-redis-clients-devservices-image-name"></a><code><a href="#quarkus-redis-client_quarkus-redis-additional-redis-clients-devservices-image-name">quarkus.redis."additional-redis-clients".devservices.image-name</a></code></p>
+</div>
+<div id="conf-collapsible-desc-15" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The container image name to use, for container based DevServices providers. If you want to use Redis Stack modules (bloom, graph, search&#8230;&#8203;), use: <code>redis/redis-stack-server:latest</code>.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38709">QUARKUS_REDIS__ADDITIONAL_REDIS_CLIENTS__DEVSERVICES_IMAGE_NAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38709" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus-redis-additional-redis-clients-devservices-port"></a><code><a href="#quarkus-redis-client_quarkus-redis-additional-redis-clients-devservices-port">quarkus.redis."additional-redis-clients".devservices.port</a></code></p>
+</div>
+<div id="conf-collapsible-desc-16" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Optional fixed port the dev service will listen to.</p>
+</div>
+<div class="paragraph">
+<p>If not defined, the port will be chosen randomly.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38710">QUARKUS_REDIS__ADDITIONAL_REDIS_CLIENTS__DEVSERVICES_PORT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38710" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus-redis-additional-redis-clients-devservices-shared"></a><code><a href="#quarkus-redis-client_quarkus-redis-additional-redis-clients-devservices-shared">quarkus.redis."additional-redis-clients".devservices.shared</a></code></p>
+</div>
+<div id="conf-collapsible-desc-17" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Indicates if the Redis server managed by Quarkus Dev Services is shared. When shared, Quarkus looks for running containers using label-based service discovery. If a matching container is found, it is used, and so a second one is not started. Otherwise, Dev Services for Redis starts a new container.</p>
+</div>
+<div class="paragraph">
+<p>The discovery uses the <code>quarkus-dev-service-redis</code> label. The value is configured using the <code>service-name</code> property.</p>
+</div>
+<div class="paragraph">
+<p>Container sharing is only used in dev mode.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38711">QUARKUS_REDIS__ADDITIONAL_REDIS_CLIENTS__DEVSERVICES_SHARED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38711" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus-redis-additional-redis-clients-devservices-service-name"></a><code><a href="#quarkus-redis-client_quarkus-redis-additional-redis-clients-devservices-service-name">quarkus.redis."additional-redis-clients".devservices.service-name</a></code></p>
+</div>
+<div id="conf-collapsible-desc-18" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The value of the <code>quarkus-dev-service-redis</code> label attached to the started container. This property is used when <code>shared</code> is set to <code>true</code>. In this case, before starting a container, Dev Services for Redis looks for a container with the <code>quarkus-dev-service-redis</code> label set to the configured value. If found, it will use this container instead of starting a new one. Otherwise, it starts a new container with the <code>quarkus-dev-service-redis</code> label set to the specified value.</p>
+</div>
+<div class="paragraph">
+<p>This property is used when you need multiple shared Redis servers.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38712">QUARKUS_REDIS__ADDITIONAL_REDIS_CLIENTS__DEVSERVICES_SERVICE_NAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38712" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>redis</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-redis-client_quarkus-redis-additional-redis-clients-devservices-container-env-container-env"></a><code><a href="#quarkus-redis-client_quarkus-redis-additional-redis-clients-devservices-container-env-container-env">quarkus.redis."additional-redis-clients".devservices.container-env</a></code></p>
+</div>
+<div id="conf-collapsible-desc-19" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Environment variables that are passed to the container.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38713">QUARKUS_REDIS__ADDITIONAL_REDIS_CLIENTS__DEVSERVICES_CONTAINER_ENV</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38713" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>Map&lt;String,String&gt;</code></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#installation">1. インストール</a></li>
+<li><a href="#apis">2. 1 つのエクステンション、複数の API</a></li>
+<li><a href="#default-and-named-clients">3. デフォルトクライアントと名前付きクライアント</a></li>
+<li><a href="#connection-to-redis">4. Redisへの接続</a>
+<ul class="sectlevel2">
+<li><a href="#unix-socket">4.1. Unix Socket</a></li>
+<li><a href="#sentinel-mode">4.2. Sentinel モード</a></li>
+<li><a href="#cluster-mode">4.3. クラスターモード</a></li>
+<li><a href="#replication-mode">4.4. レプリケーションモード</a></li>
+<li><a href="#redis-cloud">4.5. Redis Cloud</a></li>
+<li><a href="#authentication">4.6. 認証</a></li>
+</ul>
+</li>
+<li><a href="#quarkus-client-api-for-data-sources">5. データソースのためのQuarkusクライアントAPI</a>
+<ul class="sectlevel2">
+<li><a href="#inject-data-sources">5.1. データソースの注入</a></li>
+<li><a href="#serialization-and-deserialization">5.2. シリアライズとデシリアライズ</a></li>
+<li><a href="#the-value-group">5.3. <code>value</code> グループ</a></li>
+</ul>
+</li>
+<li><a href="#preload-data-into-redis">6. Redisにデータをプリロードする</a>
+<ul class="sectlevel2">
+<li><a href="#load-scripts">6.1. スクリプトのロード</a></li>
+<li><a href="#load-script-format">6.2. ロードスクリプトフォーマット</a></li>
+<li><a href="#configuration">6.3. 設定</a></li>
+<li><a href="#devtest-vs-prod">6.4. Dev/Test vs. Prod</a></li>
+</ul>
+</li>
+<li><a href="#vert-x-redis-client">7. Vert.x Redis クライアント</a></li>
+<li><a href="#redis-health-check">8. Redis ヘルスチェック</a></li>
+<li><a href="#programmatic-redis-hosts">9. プログラマティックRedisホスト</a></li>
+<li><a href="#customize-the-redis-options-programmatically">10. プログラムによる Redis オプションのカスタマイズ</a>
+<ul class="sectlevel2">
+<li><a href="#dev-services">10.1. Dev Services</a></li>
+</ul>
+</li>
+<li><a href="#redis-client-metrics">11. Redisクライアントメトリクス</a>
+<ul class="sectlevel2">
+<li><a href="#enable-metrics-collection">11.1. メトリクスの収集の有効化</a></li>
+<li><a href="#disable-metrics-collection">11.2. メトリクスの収集の無効化</a></li>
+</ul>
+</li>
+<li><a href="#redis-configuration-reference">12. 設定リファレンス</a></li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

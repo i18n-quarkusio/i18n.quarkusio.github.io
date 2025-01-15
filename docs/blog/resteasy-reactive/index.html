@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>RESTEasy Reactiveの発表 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/blog/resteasy-reactive/" />
+  <meta property="og:title" content="RESTEasy Reactiveの発表" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/blog/resteasy-reactive/">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="post">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/blog/resteasy-reactive/">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="active">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/blog/resteasy-reactive/" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/blog/resteasy-reactive/">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/blog/resteasy-reactive/">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/blog/resteasy-reactive/">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/blog/resteasy-reactive/">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    <div class="full-width-breadcrumb-bg align-self">
+  <div class="width-12-12">
+      <p class="returnlink"><a href="/blog">Blog</a> <i class="fas fa-chevron-right"></i> RESTEasy Reactiveの発表</p>
+  </div>
+</div>
+
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+    <div class="grid-wrapper">
+      <div class="width-12-12">
+        <div class="post-date">
+          December 07, 2020 
+          
+            <span class="tags"><a href="/blog/tag/reactive">#reactive</a><a href="/blog/tag/web">#web</a><a href="/blog/tag/rest">#rest</a><a href="/blog/tag/resteasy">#resteasy</a></span>
+          
+        </div>
+        <h1 class="post-title">RESTEasy Reactiveの発表</h1>
+        <div class="grid-wrapper">
+          <div class="width-8-12 width-12-12-m byline-wrapper">
+            
+            
+              <img class="headshot" src="https://www.gravatar.com/avatar/dd57c2732aea5fe7eb686d17cfe14b44">
+            
+            <p class="byline">By <a href="/author/geoand">Georgios Andrianakis</a></p>
+          </div>
+          <div class="width-12-12">
+              <div class="paragraph">
+<p>QuarkusチームとRESTEasyチームは、QuarkusでのRESTEasyReactive統合がメインのQuarkusレポジトリ <sup class="footnote" id="_footnote_disclaimer">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> に取り込まれたことを発表できることを非常に嬉しく思います。 そして次のQuarkusリリース1.11の一部になります。</p>
+</div>
+<div class="paragraph">
+<p>皆さまにテストしていただき、できるだけ多くのフィードバックを提供していただけると幸いです。 典型的なQuarkusのやり方で、このプロジェクトは新しいエクステンションのセットとして利用可能です。</p>
+</div>
+<div class="sect1">
+<h2 id="what-is-it"><a class="anchor" href="#what-is-it"></a>それは何ですか?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>名前からお察しの通り、この作品は共通の <strong>Vert.x</strong> レイヤー上で動作するように一から書かれた <strong>新しいJAX-RSの実装</strong> であり、完全に <strong>リアクティブ</strong> であると同時に、 <strong>Quarkusと緊密に統合されて</strong> いるため、フレームワーク固有の作業(アノテーションスキャンやメタモデル生成など)の多くを <strong>ビルド時に</strong> 移行させることができます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="why-should-i-care"><a class="anchor" href="#why-should-i-care"></a>なぜ重要なのでしょうか?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>最も単純な答えは、アプリケーションの REST レイヤを公開する為に広く使われている非常に強力な JAX-RS API を活用し続けながら、アプリケーションが達成できる最大スループットを大幅に向上できるということです。また、アプリケーションは起動が少し速くなり、メモリーの消費量が少し減るはずです。</p>
+</div>
+<div class="paragraph">
+<p>ベンチマークでは、この新しいエクステンションを使った測定可能なパフォーマンスは、QuarkusのReactive Routes API(それ自体は非常に興味深いAPIですが、一般的には低レベルなものです)とほぼ同等です。</p>
+</div>
+<div class="paragraph">
+<p>さらに、アノテーションベースのRESTレイヤーを提供する他の競合するエンタープライズJavaフレームワークと結果を比較すると、ベンチマークによっては、Quarkusは2倍ものスループットを提供しました。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-other-benefits-are-there"><a class="anchor" href="#what-other-benefits-are-there"></a>他にはどんなメリットがあるのでしょうか?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>おなじみのAPIと、新しいエクステンションの大幅に改善されたランタイム特性だけでは十分ではないかのように、コミュニティからの要望に基づき、あるいは開発者の経験を向上させ、仕様の粗いエッジを和らげてくれると我々が考える、本当にエキサイティングで便利な新機能(JAX-RS仕様の一部ではありません)をいくつか追加しました。これらの新機能は以下の通りです:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">デフォルトでノンブロッキング</dt>
+<dd>
+<p>デフォルトではすべてのエンドポイントが IO スレッド上で実行されます。 <code>@Blocking</code> を使えばこれを変更出来ます。</p>
+</dd>
+<dt class="hdlist1">スコアリングシステム</dt>
+<dd>
+<p>開発モードで起動すると、アプリケーションはエンドポイントのリストを表示し、エンドポイントが最適なバージョンよりも遅い理由を示すパフォーマンススコアを表示します。これは、REST のパフォーマンスを向上させる方法を見つけるのに非常に役立ちます。</p>
+</dd>
+<dt class="hdlist1">リクエスト/レスポンスフィルターの新しい設計</dt>
+<dd>
+<p>JAX-RSのフィルターは、インターフェースを実装し、コンテキストオブジェクトをフィールドとして注入する必要がありますが、これはコストがかかり、柔軟性に欠けます。Quarkus ビルドシステムでの成功に基づき、フィルタは単にアノテーション付きのメソッドになり、全てのパラメーターは自動的に注入されるようになりました:</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class CustomContainerRequestFilter {
+
+   @ServerRequestFilter
+   public void whatever(UriInfo uriInfo, HttpHeaders httpHeaders, ContainerRequestContext requestContext) {
+       String customHeaderValue = uriInfo.getPath() + "-" + httpHeaders.getHeaderString("some-input");
+       requestContext.getHeaders().putSingle("custom-header", customHeaderValue);
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>さらに、フィルタがブロッキング操作を行う必要がある場合は <code>Uni&lt;Void&gt;</code> を返すことができ、RESTEasy Reactive はフィルタを実行している間はイベントループスレッドをブロックしません。</p>
+</div>
+<div class="paragraph">
+<p>最後に、まだ実施していませんが、このアプローチは他のタイプのJAX-RSプロバイダにも簡単に拡張でき、コード中で <code>@Context</code> を使用する必要が完全になくなります。</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">新しい <code>*Param</code> アノテーション</dt>
+<dd>
+<p>これらのアノテーションは、JAX-RSの <code>@PathParam</code>, <code>@QueryParam</code> などのアノテーションの代わりに、名前を指定することなく使用することを意図しています。  同じアノテーション名を再利用しないことにしたのは、JAX-RSや他のEE仕様との衝突を避けるためです。</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@POST
+@Path("params/{p}")
+public String params(@RestPath String p,
+                    @RestQuery String q,
+                    @RestHeader int h,
+                    @RestForm String f,
+                    @RestMatrix String m,
+                    @RestCookie String c) {
+   return "params: p: " + p + ", q: " + q + ", h: " + h + ", f: " + f + ", m: " + m + ", c: " + c;
+}</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">よりシンプルなパラメーターとコンテキストインジェクション</dt>
+<dd>
+<p>RESTEasy Reactive では、パラメーターがパスパラメーターと同じ名前であれば <code>@PathParam</code> や <code>@RestPath</code> を使用する必要はありませんし、同様に、既知のすべてのコンテキストタイプに対して <code>@Context</code> を省略することができます。</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@POST
+@Path("params/{p}")
+public String params(String p, UriInfo info) {
+   return "params: p: " + p + ", info: " + info;
+}</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">新しい最適なメッセージボディのリーダー/ライター</dt>
+<dd>
+<p>エンドポイントがサービスされるときにフィルタやインターセプタが呼び出されない場合、 リフレクションやアノテーションを必要としない、vert.x に直接書き込む、更に効率的なメッセージボディライターを使うことができます。</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Provider
+public class ServerVertxBufferMessageBodyWriter extends VertxBufferMessageBodyWriter
+       implements ServerMessageBodyWriter&lt;Buffer&gt; {
+
+   @Override
+   public boolean isWriteable(Class&lt;?&gt; type, ResteasyReactiveResourceInfo target, MediaType mediaType) {
+       return true;
+   }
+
+   @Override
+   public void writeResponse(Buffer buffer, ServerRequestContext context) {
+       context.serverResponse().end(buffer.getBytes());
+   }
+}</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">デフォルトのコンテンツタイプ</dt>
+<dd>
+<p>String を返すエンドポイントは、デフォルトで text/plain を生成します。JSON やその他の型についても同様のことを行う予定です。</p>
+</dd>
+<dt class="hdlist1">CDIの統合</dt>
+<dd>
+<p>JAX-RSの@Contextを介したインジェクションはすべてArcに委譲されます。これにより、ユーザーは、ArcがQuarkusの他のすべての部分にもたらすビルドタイムインジェクションのメリットを得ることができます。</p>
+</dd>
+<dt class="hdlist1">クラスごとの例外マッパー</dt>
+<dd>
+<p>JAX-RS仕様では、特定のJAX-RSリソースクラスに対して異なる例外を処理する方法はありません - すべての例外のマッピングはグローバルな方法で行われます。</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>しかし、RESTEasy Reactive では、次のようなことができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Path("first")
+public class FirstResource {
+
+   @GET
+   @Produces("text/plain")
+   public String throwsVariousExceptions(@RestQuery String name) {
+       if (name.startsWith("IllegalArgument")) {
+           throw new IllegalArgumentException();
+       } else if (name.startsWith("IllegalState")) {
+           throw new IllegalStateException("IllegalState");
+       } else if (name.startsWith("My")) {
+           throw new MyException();
+       }
+       throw new RuntimeException();
+   }
+
+   @ServerExceptionMapper({ IllegalStateException.class, IllegalArgumentException.class })
+   public Response handleIllegal() {
+       return Response.status(409).build();
+   }
+
+   @ServerExceptionMapper(MyException.class)
+   public Response handleMy(SimpleResourceInfo simplifiedResourceInfo, MyException myException,
+           ContainerRequestContext containerRequestContext, UriInfo uriInfo, HttpHeaders httpHeaders, Request request) {
+       return Response.status(410).entity(uriInfo.getPath() + "-&gt;" + simplifiedResourceInfo.getMethodName()).build();
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>特定のリソースクラスの例外処理をカスタマイズする為です。</p>
+</div>
+<div class="paragraph">
+<p>また、<code>@ServerExceptionMapper`は、JAX-RSが`ExceptionMapper`を使うのと同じように、グローバルな方法で例外を扱うことができることにも注意する必要があります。  そのためには、Resourceクラスに属さないメソッドに `@ServerExceptionMapper</code> をアノテーションするだけで大丈夫です。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="do-other-extensions-work-with-it"><a class="anchor" href="#do-other-extensions-work-with-it"></a>他のエクステンションでも動作しますか?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>勿論!</p>
+</div>
+<div class="paragraph">
+<p>既存のquarkus-resteasyエクステンションと統合するエクステンションは、quarkus-resteasy-reactiveエクステンションとも統合されます。そのため、<em>CDI</em>、<em>Security</em>、<em>Metrics</em>、<em>JSON</em>、<em>Qute</em>、<em>Bean Validation</em>、_OpenAPI_を使い続けることができ、素晴らしいアウトオブボックスと完全な開発体験を楽しむことができます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="how-can-i-try-it-out"><a class="anchor" href="#how-can-i-try-it-out"></a>どうやって試してみたらいいのでしょうか?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このプロジェクトはQuarkus masterブランチにありますので、試してみたい方は、https://github.com/quarkusio/quarkus/blob/master/CONTRIBUTING.md#building-master[this]のようにソースからQuarkusをビルドし、https://github.com/quarkusio/quarkus/blob/master/CONTRIBUTING.md#updating-the-version[this]のように適切なBOMとバージョンを使用してください。</p>
+</div>
+<div class="paragraph">
+<p>さらに、バージョン <code>999-SNAPSHOT</code> をQuarkusのバージョンとして指定し、BOMとして <code>quarkus-universe-bom</code> の代わりに <code>quarkus-bom</code> を使用することで、Mavenのスナップショットを使用することもできます(Quarkusのスナップショットビルドは1日1回Sonatypeにアップロードされるため)。  Mavenでスナップショットバージョンを有効にするには、さまざまな方法があります。 <a href="https://stackoverflow.com/a/7717234/2504224">This</a> StackOverflowの回答では、プロジェクト単位でもグローバルでも使える設定が示されています。</p>
+</div>
+<div class="paragraph">
+<p>利用可能な RESTEasy Reactive エクステンションは以下の通りです:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>quarkus-resteasy-reactive</p>
+</li>
+<li>
+<p>quarkus-resteasy-reactive-jackson</p>
+</li>
+<li>
+<p>quarkus-resteasy-reactive-jsonb</p>
+</li>
+<li>
+<p>quarkus-resteasy-reactive-qute</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>これらのエクステンションは、既存の <em>quarkus-resteasy</em>* エクステンションと同等ですので、アプリケーション内で <em>quarkus-resteasy-jackson</em> から <em>quarkus-resteasy-reactive-jackson</em> に切り替えるだけで、Jackson 統合による RESTEasy Reactive を試すことができるようになります。</p>
+</div>
+<div class="paragraph">
+<p>さらに、JAX-RSクライアントを使用する必要がある場合は、<em>quarkus-jaxrs-client</em> エクステンションを使用することができます (これは宣言型MicroProfile RESTクライアントではなく、JAX-RS仕様で定義されたプログラマティッククライアントです)。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-should-i-be-careful-of"><a class="anchor" href="#what-should-i-be-careful-of"></a>どんなことに気をつければいいのでしょうか?</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>最初に注意しなければならないのは、当面の間、この一連のエクステンションは実験的なものと考えられているということです。このプロジェクトはJAX-RS TCKのほぼ全体を通過していますが、まだ最初のリリースに過ぎませんので、典型的な実績のあるライブラリよりも多くのバグがあるかもしれないことを覚えておいてください。 これは最初のリリースですが、近い将来、このライブラリがQuarkusのデフォルトのRESTレイヤーになることを見通しています。</p>
+</li>
+<li>
+<p>新機能のセクションで述べたように、デフォルトではリクエストはイベントループスレッド上で処理されます。これは最大のスループットを保証しますが、これらのスレッドでブロッキング作業を行うべきではないことも意味します。ブロッキング IO を使用する場合 (例えば、Hibernate Panache でデータベースにアクセスするなど)、メソッドまたはクラスのいずれかで <code>@Blocking</code> アノテーションを必ず使用してください。  これにより、リクエストがワーカースレッドで処理されるようになります。言うまでもなく、このデフォルトについてのフィードバックも非常に興味を持っています。</p>
+</li>
+<li>
+<p>ドキュメントはまだありません。ドキュメントは正式な1.11リリースの前に追加され、徐々に強化されていく予定です。  このメールには開始に必要な情報がすべて含まれているはずですが、何か問題が発生した場合は、通常のチャネル(Zulip チャット、メーリングリスト、GitHub Issues、StackOverflow)のいずれかで支援を受けることができます。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-jax-rs-features-are-missing"><a class="anchor" href="#what-jax-rs-features-are-missing"></a>どのJAX-RSの機能が欠けていますか?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>私たちは、JAX-RS TCK が必要とする機能をすべて実装するのではなく、ほとんどのユーザーが最新の REST レイヤから必要とするものに焦点を当てることにしました。  そのため、RESTEasy Reactive には XML サポートがなく、仕様の様々な難解な機能もサポートされていません(<em>javax.activation.DataSource</em>, <em>javax.annotation.ManagedBean</em>, <em>javax.ws.rs.core.StreamingOutput</em> のようなもの)。</p>
+</div>
+<div class="paragraph">
+<p>さらに、最初のリリースには、 (専用のエクステンションが存在する) 新しい JAX-RS Clientをベースにした MicroProfile REST Client の実装が含まれていないことも注目に値する。これは近い将来に変更される可能性が高い。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="whats-next"><a class="anchor" href="#whats-next"></a>次のステップ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>新しいエクステンションは通常の <em>1.11</em> リリースで利用可能になりますが、新しいエクステンションを出来る限り簡単に試せるように、そしてフィードバックを簡単に出来るように、私たちは <code>1.11.0.Alpha1</code> リリースを行うことを検討しています。</p>
+</div>
+<div class="paragraph">
+<p>プロジェクトのさらなる改善の為に、RESTEasy ReactiveをQuarkusで使用した感想や経験を是非お聞かせ下さい。</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. 現在、メインのRESTEasy Reactiveコンポーネントは、メインのQuarkusリポジトリのhttps://github.com/quarkusio/quarkus/tree/main/independent-projects/resteasy-reactiveにあります。 ただし、問題が解決すると、このコードはhttps://github.com/resteasy/resteasy-reactiveに移動する予定です。 この動きは、quarkus-resteasy-reactiveエクステンションのユーザーにはまったく影響を与えないはずです。将来、誰かがこのブログ投稿を読んで見つからない場合は、注意が必要です。
+</div>
+</div>
+              
+          </div>
+          <div class="width-12-12"><div class="share-page">
+  <a class="share-linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=https://quarkus.io/blog/resteasy-reactive/&title=RESTEasy Reactiveの発表" rel="nofollow" target="_blank" title="Share on LinkedIn">
+    <i class="fa-brands fa-linkedin fa-xl"></i>
+  </a>
+  <a class="share-x" href="https://x.com/intent/tweet?text=RESTEasy Reactiveの発表&url=https://quarkus.io/blog/resteasy-reactive/&via=quarkusio&related=quarkusio" rel="nofollow" target="_blank" title="Share on X">
+    <i class="fa-brands fa-square-x-twitter fa-xl"></i>
+  </a>
+  <a class="share-facebook" href="https://facebook.com/sharer.php?u=https://quarkus.io/blog/resteasy-reactive/" rel="nofollow" target="_blank" title="Share on Facebook">
+    <i class="fa-brands fa-square-facebook fa-xl"></i>
+  </a>
+  <a class="share-reddit" href="http://www.reddit.com/submit?url=https://quarkus.io/blog/resteasy-reactive/" onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;" title="Share on Reddit" >
+    <i class="fa-brands fa-square-reddit fa-xl"></i>
+  </a>
+  <a class="share-email" href="mailto:?subject=RESTEasy Reactiveの発表&amp;body=RESTEasy Reactiveの発表 https://quarkus.io/blog/resteasy-reactive/" title="Share via Email" >
+    <i class="fa-solid fa-envelope fa-xl"></i>
+  </a>
+</div>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+  <script src="https://giscus.app/client.js"
+        data-repo="quarkusio/quarkus"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkxMzk5MTQ5MzI="
+        data-category="Quarkus Blog/Website"
+        data-category-id="DIC_kwDOCFbutM4CAFFV"
+        data-mapping="og:title"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+  </script>
+  </div>
+</div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Quarkus によるスクリプティング - main - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/main/guides/scripting" />
+  <meta property="og:title" content="Quarkus によるスクリプティング - main" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/scripting">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/main/guides/scripting">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/main/guides/scripting" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/main/guides/scripting">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/main/guides/scripting">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/main/guides/scripting">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/main/guides/scripting">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/main/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" selected>Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <a class="editlink" href="https://github.com/quarkusio/quarkus/edit/main/docs/src/main/asciidoc/scripting.adoc">このページを編集</a>
+      
+      <h1 class="text-caps">Quarkus によるスクリプティング </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusは <a href="https://jbang.dev">jbang</a> との統合を提供しており、MavenもGradleも必要としないJavaスクリプト/アプリケーションを書くことができます。</p>
+</div>
+<div class="paragraph">
+<p>このガイドでは、1つのJavaファイルだけを使ってRESTアプリケーションを書く方法を見ていきます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>この技術は、previewと考えられています。</p>
+</div>
+<div class="paragraph">
+<p><em>preview</em> では、下位互換性やエコシステムでの存在は保証されていません。具体的な改善には設定や API の変更が必要になるかもしれませんが、 <em>stable</em> になるための計画は現在進行中です。フィードバックは <a href="https://groups.google.com/d/forum/quarkus-dev">メーリングリスト</a> や <a href="https://github.com/quarkusio/quarkus/issues">GitHub の課題管理</a> で受け付けています。</p>
+</div>
+<div class="paragraph">
+<p>とりうるステータスの完全なリストについては、 <a href="https://quarkus.io/faq/#extension-status">FAQの項目</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ざっと 5 minutes</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 17+がインストールされ、 <code>JAVA_HOME</code> が適切に設定されていること</p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルをビルドしたい場合、MandrelまたはGraalVM（あるいはネイティブなコンテナビルドを使用する場合はDocker）をインストールし、 <a href="building-native-image.html#configuring-graalvm">適切に設定</a>していること</p>
+</li>
+<li>
+<p><a href="https://jbang.dev/download">JBang</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution"><a class="anchor" href="#solution"></a>ソリューション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>通常はGitリポジトリにリンクしてクローンするのですが、今回は以下のみで追加ファイルはありません。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">//usr/bin/env jbang "$0" "$@" ; exit $?
+//DEPS io.quarkus:quarkus-bom:999-SNAPSHOT@pom
+//DEPS io.quarkus:quarkus-rest
+//JAVAC_OPTIONS -parameters
+//JAVA_OPTIONS -Djava.util.logging.manager=org.jboss.logmanager.LogManager
+
+import io.quarkus.runtime.Quarkus;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/hello")
+@ApplicationScoped
+public class quarkusapp {
+
+    @GET
+    public String sayHello() {
+        return "hello";
+    }
+
+    public static void main(String[] args) {
+        Quarkus.run(args);
+    }
+
+    @Inject
+    GreetingService service;
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/greeting/{name}")
+    public String greeting(String name) {
+        return service.greeting(name);
+    }
+
+    @ApplicationScoped
+    static public class GreetingService {
+
+        public String greeting(String name) {
+            return "hello " + name;
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="architecture"><a class="anchor" href="#architecture"></a>アーキテクチャ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、 <code>hello</code> エンドポイントを提供する簡単なアプリケーションを、 <code>pom.xml</code> や <code>build.gradle</code> のような追加のビルドファイルを必要とせず、単一のソースファイルで作成します。依存関係の注入を実証するために、このエンドポイントは <code>greeting</code> Beanを使用します。</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="./images/getting-started-architecture.png" alt="Architecture">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-initial-file"><a class="anchor" href="#creating-the-initial-file"></a>初期ファイルの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>最初に、Java ファイルが必要です。JBang を使うと、次のように初期バージョンの Java ファイルを作成することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">jbang init scripting/quarkusapp.java
+cd scripting</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>jbang quarkusapp.java</code> このコマンドは.javaファイルを生成し、LinuxやmacOS、つまり <code>./quarkusapp.java</code> で直接実行できるようにします。</p>
+</div>
+<div class="paragraph">
+<p>この初期バージョンは、実行すると <code>Hello World</code> が表示されます。</p>
+</div>
+<div class="paragraph">
+<p>生成された <code>quarkusapp.java</code> ファイルを確認します。</p>
+</div>
+<div class="paragraph">
+<p>一番上にこんな感じの行があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">//usr/bin/env jbang "$0" "$@" ; exit $?</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この行は、LinuxやmacOSでスクリプトとして実行できるようにするためのものです。Windowsではこの行は無視されます。</p>
+</div>
+<div class="paragraph">
+<p>次の行</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">//DEPS &lt;dependency1&gt; &lt;dependency2&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このスクリプトに依存関係を追加する方法を示しています。これは <code>jbang</code> の機能です。</p>
+</div>
+<div class="paragraph">
+<p>この行を更新して、 <code>quarkus-bom</code> と <code>quarkus-rest</code> の依存関係を追加します：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">//DEPS io.quarkus:quarkus-bom:999-SNAPSHOT@pom
+//DEPS io.quarkus:quarkus-rest</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ここで <code>jbang quarkusapp.java</code> を実行すると、 <code>jbang</code> がこの依存関係を解決し、Quarkus の jbang 統合の機能を利用して jar をビルドしていることがわかります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ jbang quarkusapp.java
+
+[jbang] Resolving dependencies...
+[jbang]     Resolving io.quarkus:quarkus-resteasy:999-SNAPSHOT...Done
+[jbang] Dependencies resolved
+[jbang] Building jar...
+[jbang] Post build with io.quarkus.launcher.JBangIntegration
+Mar 22, 2023 9:47:51 A.M. org.jboss.threads.Version &lt;clinit&gt;
+INFO: JBoss Threads version 3.5.0.Final
+Mar 22, 2023 9:47:51 A.M. io.quarkus.deployment.QuarkusAugmentor run
+INFO: Quarkus augmentation completed in 722ms
+Hello World</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>今のところ、アプリケーションは何も新しいことをしていません。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="title">このファイルを編集してコンテンツアシストを受けるにはどうすればいいですか?</div>
+<div class="paragraph">
+<p>JBangスクリプトをコンテンツアシストのあるIDE/エディタで編集するには、 <code>jbang edit quarkusapp.java</code> または <code>jbang edit quarkusapp.java</code> を実行します。</p>
+</div>
+<div class="paragraph">
+<p>詳細は <a href="https://www.jbang.dev/documentation/guide/latest/editing.html">JBangのドキュメント</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="the-jakarta-rest-resources"><a class="anchor" href="#the-jakarta-rest-resources"></a>Jakarta RESTリソース</h3>
+<div class="paragraph">
+<p>ここで、Quarkusの機能を使用するクラスに置き換えてみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.runtime.Quarkus;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+@Path("/hello")
+@ApplicationScoped
+public class quarkusapp {
+
+    @GET
+    public String sayHello() {
+        return "hello";
+    }
+
+    public static void main(String[] args) {
+        Quarkus.run(args);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>RESTエンドポイントでQuarkusを起動し、「/hello」上のリクエストに「hello」を返すメインメソッドを持つ非常にシンプルなクラスです。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="title">なぜそこに <code>main</code> メソッドがあるのか?</div>
+<div class="paragraph">
+<p>現時点で <code>jbang</code> の統合が動作するためには <code>main</code> メソッドが必要です。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application"><a class="anchor" href="#running-the-application"></a>アプリケーションの実行</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>これでアプリケーションを実行すると、Quarkusが起動するのがわかります。</p>
+</div>
+<div class="paragraph">
+<p>使用方法: <code>jbang quarkusapp.java</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ jbang quarkusapp.java
+
+[jbang] Building jar...
+[jbang] Post build with io.quarkus.launcher.JBangIntegration
+Mar 22, 2023 9:48:39 A.M. org.jboss.threads.Version &lt;clinit&gt;
+INFO: JBoss Threads version 3.5.0.Final
+Mar 22, 2023 9:48:39 A.M. io.quarkus.deployment.QuarkusAugmentor run
+INFO: Quarkus augmentation completed in 521ms
+__  ____  __  _____   ___  __ ____  ______
+ --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
+ -/ /_/ / /_/ / __ |/ , _/ ,&lt; / /_/ /\ \
+--\___\_\____/_/ |_/_/|_/_/|_|\____/___/
+2023-03-22 09:48:39,891 INFO  [io.quarkus] (main) quarkus 999-SNAPSHOT on JVM (powered by Quarkus 999-SNAPSHOT) started in 0.283s. Listening on: http://0.0.0.0:8080
+2023-03-22 09:48:39,904 INFO  [io.quarkus] (main) Profile prod activated.
+2023-03-22 09:48:39,904 INFO  [io.quarkus] (main) Installed features: [cdi, rest, smallrye-context-propagation, vertx]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>起動したら、提供されたエンドポイントにリクエストすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ curl -w "\n" http://localhost:8080/hello
+hello</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>その後、 <code>CTRL+C</code> を叩いてアプリケーションを停止させます。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="title"><code>curl -w "\n"</code> で自動的に改行を追加します。</div>
+<div class="paragraph">
+<p>例では、 <code>curl -w "\n"</code> を使用して、結果と次のコマンドプロンプトが同じ行に表示されるのを防止しています。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="title">なぜ <code>quarkus-rest</code> は解決されないのでしょうか？</div>
+<div class="paragraph">
+<p>この2回目の実行では、JBangが実行の間に依存関係の解決をキャッシュするので、 <code>quarkus-rest</code> を解決しているという行は表示されないはずです。
+キャッシュをクリアして強制的に解決したい場合は、 <code>jbang cache clear</code> を使ってください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-injection"><a class="anchor" href="#using-injection"></a>インジェクションの使用</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusの依存性インジェクションは、Quarkusのアーキテクチャに合わせて調整されたCDIベースの依存性インジェクションソリューションであるArCをベースにしています。ArCの詳細については、 <a href="cdi-reference">コンテキストと依存性注入ガイド</a> を参照してください。</p>
+</div>
+<div class="paragraph">
+<p>ArC は <code>quarkus-rest</code> の依存関係として提供されているので、既に手元にあります。</p>
+</div>
+<div class="paragraph">
+<p>アプリケーションを修正してコンパニオンBeanを追加してみましょう。</p>
+</div>
+<div class="paragraph">
+<p>通常は別のクラスを追加しますが、一つのファイルにまとめようとしているので、入れ子クラスを追加します。</p>
+</div>
+<div class="paragraph">
+<p><code>quarkusapp</code> クラスのボディ <strong>内に</strong> 以下を追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+static public class GreetingService {
+
+    public String greeting(String name) {
+        return "hello " + name;
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="title">ネストされた静的パブリッククラスの使用</div>
+<div class="paragraph">
+<p>トップレベルのクラスではなく、ネストされた静的パブリッククラスを使用しているのには、2つの理由があります。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>現在、 jbang は複数のソースファイルをサポートしていません。</p>
+</li>
+<li>
+<p>イントロスペクションに依存するすべてのJavaフレームワークは、トップレベルのクラスを使用することに課題があります。</p>
+</li>
+</ol>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>quarksapp</code> クラスを編集して <code>GreetingService</code> を注入し、それを使って新しいエンドポイントを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">//usr/bin/env jbang "$0" "$@" ; exit $?
+//DEPS io.quarkus.platform:quarkus-bom:999-SNAPSHOT@pom
+//DEPS io.quarkus:quarkus-rest
+
+import io.quarkus.runtime.Quarkus;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/hello")
+@ApplicationScoped
+public class quarkusapp {
+
+    @GET
+    public String sayHello() {
+        return "hello";
+    }
+
+    public static void main(String[] args) {
+        Quarkus.run(args);
+    }
+
+    @Inject
+    GreetingService service;
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/greeting/{name}")
+    public String greeting(String name) {
+        return service.greeting(name);
+    }
+
+    @ApplicationScoped
+    static public class GreetingService {
+
+        public String greeting(String name) {
+            return "hello " + name;
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これで、 <code>jbang quarkusapp.java</code> を実行すると、新しいエンドポイントが何を返すかを確認することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ curl -w "\n" http://localhost:8080/hello/greeting/quarkus
+hello null</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>さて、予想に反して、なぜそれは <code>hello quarkus</code> ではなく <code>hello null</code> を返しているのでしょうか?</p>
+</div>
+<div class="paragraph">
+<p>Quarkus REST（旧RESTEasy Reactive）では、 <code>{name}</code> を <code>name</code> パラメータにマッピングするために、 <code>-parameters</code> コンパイラフラグが設定されている必要があるためです。</p>
+</div>
+<div class="paragraph">
+<p>ファイルに以下のコメント命令を追加することで修正しています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">//JAVAC_OPTIONS -parameters</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これで、 <code>jbang quarkusapp.java</code> で実行すると、エンドポイントは期待通りの値を返すようになりました。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ curl -w "\n" http://localhost:8080/hello/greeting/quarkus
+hello quarkus</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="debugging"><a class="anchor" href="#debugging"></a>デバッグ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>jbang --debug=5005 quarkusapp.java</code> アプリケーションのデバッグには <code>jbang --debug quarkusapp.java</code> を使用し、IDEを使用してポート4004で接続することができます。</p>
+</div>
+<div class="paragraph">
+<p>注意: <code>jbang</code> デバッグは常に一時停止しているため、アプリケーションを実行させためるにはデバッガーを接続する必要があります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="logging"><a class="anchor" href="#logging"></a>ロギング</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>jbang による Quarkus スクリプトでロギングを使用するには、通常通りロガーを設定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public static final Logger LOG = Logger.getLogger(quarkusapp.class);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これを動作させるには、ロギングが適切に初期化されるように Java オプションを追加する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">//JAVA_OPTIONS -Djava.util.logging.manager=org.jboss.logmanager.LogManager</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これで <code>jbang quarkusapp.java</code> を実行すると、期待通りにログが記録され、レンダリングされます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-application"><a class="anchor" href="#configuring-application"></a>アプリケーションの設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To configure the application you can use the <code>application.properties</code> file as usual, but you need to <em>add</em> it to the script:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">//FILES application.properties
+
+// ...
+@ConfigProperty(name = "prefix", defaultValue = "WG -")
+String prefix;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will make the <code>application.properties</code> file available to the script, and process the configuration as usual.</p>
+</div>
+<div class="paragraph">
+<p>You can also use the <code>application.yaml</code> file.
+For this, you need to <em>add</em> it to the <code>application.yaml</code> file to the script and include the <code>quarkus-config-yaml</code> dependency:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">//DEPS io.quarkus:quarkus-config-yaml
+//FILES application.yaml</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The path to the <code>application.properties</code> and <code>application.yaml</code> files are relative to the script file.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-as-a-native-application"><a class="anchor" href="#running-as-a-native-application"></a>ネイティブアプリケーションとしての実行</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>native-image</code> のバイナリがインストールされ、 <code>GRAALVM_HOME</code> が設定されているか、Linux にコンテナランタイム（podman や docker など）がインストールされていれば、 <code>jbang --native quarkusapp.java</code> を使ってネイティブ実行可能ファイルをビルドし、実行することができます：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ jbang --native quarkusapp.java
+[jbang] Building jar...
+[jbang] Post build with io.quarkus.launcher.JBangIntegration
+Mar 22, 2023 9:58:47 A.M. org.jboss.threads.Version &lt;clinit&gt;
+INFO: JBoss Threads version 3.5.0.Final
+Mar 22, 2023 9:58:47 A.M. io.quarkus.deployment.pkg.steps.JarResultBuildStep buildNativeImageThinJar
+INFO: Building native image source jar: /tmp/quarkus-jbang8082065952748314720/quarkus-application-native-image-source-jar/quarkus-application-runner.jar
+Mar 22, 2023 9:58:47 A.M. io.quarkus.deployment.pkg.steps.NativeImageBuildStep build
+INFO: Building native image from /tmp/quarkus-jbang8082065952748314720/quarkus-application-native-image-source-jar/quarkus-application-runner.jar
+Mar 22, 2023 9:58:47 A.M. io.quarkus.deployment.pkg.steps.NativeImageBuildStep getNativeImageBuildRunner
+WARN: Cannot find the `native-image` in the GRAALVM_HOME, JAVA_HOME and System PATH. Attempting to fall back to container build.
+Mar 22, 2023 9:58:47 A.M. io.quarkus.deployment.pkg.steps.NativeImageBuildContainerRunner &lt;init&gt;
+INFO: Using docker to run the native image builder
+Mar 22, 2023 9:58:47 A.M. io.quarkus.deployment.pkg.steps.NativeImageBuildContainerRunner setup
+INFO: Checking image status quay.io/quarkus/ubi-quarkus-mandrel-builder-image:22.3-java17
+Mar 22, 2023 9:58:51 A.M. io.quarkus.deployment.pkg.steps.NativeImageBuildStep checkGraalVMVersion
+INFO: Running Quarkus native-image plugin on native-image 22.3.1.0-Final Mandrel Distribution (Java Version 17.0.6+10)
+Mar 22, 2023 9:58:51 A.M. io.quarkus.deployment.pkg.steps.NativeImageBuildRunner build
+INFO: docker run --env LANG=C --rm --user 1000:1000 -v /tmp/quarkus-jbang8082065952748314720/quarkus-application-native-image-source-jar:/project:z --name build-native-XaZUc quay.io/quarkus/ubi-quarkus-mandrel-builder-image:22.3-java17 -J-Dsun.nio.ch.maxUpdateArraySize=100 -J-Djava.util.logging.manager=org.jboss.logmanager.LogManager -J-Dlogging.initial-configurator.min-level=500 -J-Dvertx.logger-delegate-factory-class-name=io.quarkus.vertx.core.runtime.VertxLogDelegateFactory -J-Dvertx.disableDnsResolver=true -J-Dio.netty.noUnsafe=true -J-Dio.netty.leakDetection.level=DISABLED -J-Dio.netty.allocator.maxOrder=3 -J-Duser.language=en -J-Duser.country=IE -J-Dfile.encoding=UTF-8 --features=io.quarkus.runner.Feature,io.quarkus.runtime.graal.DisableLoggingFeature -J--add-exports=java.security.jgss/sun.security.krb5=ALL-UNNAMED -J--add-opens=java.base/java.text=ALL-UNNAMED -J--add-opens=java.base/java.io=ALL-UNNAMED -J--add-opens=java.base/java.lang.invoke=ALL-UNNAMED -J--add-opens=java.base/java.util=ALL-UNNAMED -H:+CollectImageBuildStatistics -H:ImageBuildStatisticsFile=quarkus-application-runner-timing-stats.json -H:BuildOutputJSONFile=quarkus-application-runner-build-output-stats.json -H:+AllowFoldMethods -J-Djava.awt.headless=true --no-fallback --link-at-build-time -H:+ReportExceptionStackTraces -H:-AddAllCharsets --enable-url-protocols=http -H:NativeLinkerOption=-no-pie -H:-UseServiceLoaderFeature -H:+StackTrace -J--add-exports=org.graalvm.sdk/org.graalvm.nativeimage.impl=ALL-UNNAMED --exclude-config io\.netty\.netty-codec /META-INF/native-image/io\.netty/netty-codec/generated/handlers/reflect-config\.json --exclude-config io\.netty\.netty-handler /META-INF/native-image/io\.netty/netty-handler/generated/handlers/reflect-config\.json quarkus-application-runner -jar quarkus-application-runner.jar
+Mar 22, 2023 9:37:56 A.M. io.quarkus.deployment.pkg.steps.NativeImageBuildRunner runCommand
+INFO: docker run --env LANG=C --rm --user 1000:1000 -v /tmp/quarkus-jbang9315448339582904220/quarkus-application-native-image-source-jar:/project:z --entrypoint /bin/bash quay.io/quarkus/ubi-quarkus-mandrel-builder-image:22.3-java17 -c objcopy --strip-debug quarkus-application-runner
+Mar 22, 2023 9:37:57 A.M. io.quarkus.deployment.QuarkusAugmentor run
+INFO: Quarkus augmentation completed in 31729ms
+__  ____  __  _____   ___  __ ____  ______
+ --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
+ -/ /_/ / /_/ / __ |/ , _/ ,&lt; / /_/ /\ \
+--\___\_\____/_/ |_/_/|_/_/|_|\____/___/
+2023-03-22 09:37:57,471 INFO  [io.quarkus] (main) quarkus 999-SNAPSHOT native (powered by 999-SNAPSHOT) started in 0.009s. Listening on: http://0.0.0.0:8080
+2023-03-22 09:37:57,472 INFO  [io.quarkus] (main) Profile prod activated.
+2023-03-22 09:37:57,472 INFO  [io.quarkus] (main) Installed features: [cdi, rest, smallrye-context-propagation, vertx]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このネイティブビルドは最初の実行には時間がかかりますが、その後は ( <code>quarkusapp.java</code> を変更せずに) jbang キャッシュのおかげですぐに実行できるようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ jbang --native quarkusapp.java
+__  ____  __  _____   ___  __ ____  ______
+ --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
+ -/ /_/ / /_/ / __ |/ , _/ ,&lt; / /_/ /\ \
+--\___\_\____/_/ |_/_/|_/_/|_|\____/___/
+2023-03-22 09:38:45,450 INFO  [io.quarkus] (main) quarkus 999-SNAPSHOT native (powered by 999-SNAPSHOT) started in 0.009s. Listening on: http://0.0.0.0:8080
+2023-03-22 09:38:45,450 INFO  [io.quarkus] (main) Profile prod activated.
+2023-03-22 09:38:45,450 INFO  [io.quarkus] (main) Installed features: [cdi, rest, smallrye-context-propagation, vertx]</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-qute"><a class="anchor" href="#using-qute"></a>Using Qute</h3>
+<div class="paragraph">
+<p>You can use the <a href="./qute">Qute templating engine</a> in your JBang script by adding the <code>quarkus-qute</code> dependency.
+You also need to include the <code>templates</code> directory in the script:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">//DEPS io.quarkus:quarkus-qute
+//FILES templates/=templates/*
+
+// ...
+
+ @Inject
+ Template template; // Locate and load the `templates/template.html` file</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If your <code>templates</code> directory includes sub-directories, use <code>templates/=templates/<strong>*/</strong></code> instead.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="conclusion"><a class="anchor" href="#conclusion"></a>まとめ</h3>
+<div class="paragraph">
+<p>Quarkusを使い始めたい、または何かを素早くコーディングしたい場合、 jbang による Quarkus スクリプティングを使用すると便利です。Java ファイルだけでよく、Maven や Gradle は必要ありません。このガイドでは、JBang を使用した Quarkus の基本的な使い方を説明しました。JBangでできることの詳細については、 <a href="https://jbang.dev" class="bare">https://jbang.dev</a> を参照してください。</p>
+</div>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#solution">ソリューション</a></li>
+<li><a href="#architecture">アーキテクチャ</a></li>
+<li><a href="#creating-the-initial-file">初期ファイルの作成</a>
+<ul class="sectlevel2">
+<li><a href="#the-jakarta-rest-resources">Jakarta RESTリソース</a></li>
+</ul>
+</li>
+<li><a href="#running-the-application">アプリケーションの実行</a></li>
+<li><a href="#using-injection">インジェクションの使用</a></li>
+<li><a href="#debugging">デバッグ</a></li>
+<li><a href="#logging">ロギング</a></li>
+<li><a href="#configuring-application">アプリケーションの設定</a></li>
+<li><a href="#running-as-a-native-application">ネイティブアプリケーションとしての実行</a>
+<ul class="sectlevel2">
+<li><a href="#using-qute">Using Qute</a></li>
+<li><a href="#conclusion">まとめ</a></li>
+</ul>
+</li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Quarkusのエクステンションで問題を解く (1/n) - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/blog/solving-problems-with-extensions/" />
+  <meta property="og:title" content="Quarkusのエクステンションで問題を解く (1/n)" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/blog/solving-problems-with-extensions/">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="post">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/blog/solving-problems-with-extensions/">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="active">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/blog/solving-problems-with-extensions/" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/blog/solving-problems-with-extensions/">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/blog/solving-problems-with-extensions/">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/blog/solving-problems-with-extensions/">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/blog/solving-problems-with-extensions/">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    <div class="full-width-breadcrumb-bg align-self">
+  <div class="width-12-12">
+      <p class="returnlink"><a href="/blog">Blog</a> <i class="fas fa-chevron-right"></i> Quarkusのエクステンションで問題を解く (1/n)</p>
+  </div>
+</div>
+
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+    <div class="grid-wrapper">
+      <div class="width-12-12">
+        <div class="post-date">
+          April 20, 2022 
+          
+            <span class="tags"><a href="/blog/tag/extension">#extension</a><a href="/blog/tag/development-tips">#development-tips</a></span>
+          
+        </div>
+        <h1 class="post-title">Quarkusのエクステンションで問題を解く (1/n)</h1>
+        <div class="grid-wrapper">
+          <div class="width-8-12 width-12-12-m byline-wrapper">
+            
+            
+              <img class="headshot" src="https://www.gravatar.com/avatar/ec96387a1a8295b6fd6dffb68f80c352">
+            
+            <p class="byline">By <a href="/author/gsmet">Guillaume Smet</a></p>
+          </div>
+          <div class="width-12-12">
+              <div class="paragraph">
+<p>この記事は、Quarkus独自のビルドインフラとエクステンションフレームワークを活用して複雑な問題を解決する方法を紹介する、数回にわたる連載の最初の記事です。</p>
+</div>
+<div class="paragraph">
+<p>まず最初に、Quarkusエクステンションのブートストラップは簡単です。1つのコマンドで、雛形ができ、実際の実装に取り掛かることができます。しかし、それはこの記事の主題ではありません!</p>
+</div>
+<div class="paragraph">
+<p>エクステンションは、アプリケーションにランタイムコードを提供するだけでなく、アプリケーションのビルドを調整し、ビルドレベルであらゆる種類のことを行うことができます。このシリーズでは、この点に焦点を当てます。</p>
+</div>
+<div class="paragraph">
+<p><strong>今日の問題:</strong> バイナリ互換性を確保するために、Hub4j GitHub APIは、Mockito、特にByteBuddyを混乱させ、最終的に我々のテストの信頼性を低下させるいくつかのブリッジ・メソッドを導入しています。どうすればそれを解決できるでしょうか？</p>
+</div>
+<div class="sect1">
+<h2 id="some-context"><a class="anchor" href="#some-context"></a>いくつかのコンテキスト</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://github.com/quarkiverse/quarkus-github-app">私のQuarkus GitHub Appエクステンション</a>は、QuarkusをベースにしたGitHubアプリを、ほとんど定型文を使わずに軽快に開発できます（恥知らずな宣伝：素晴らしいです！）。</p>
+</div>
+<div class="paragraph">
+<p>私の親愛なる同僚である <a href="https://github.com/yrodiere">Yoann Rodière</a>（彼も素晴らしい！）は、 <a href="https://site.mockito.org">Mockito</a>（これはフードの下で <a href="https://bytebuddy.net/">ByteBuddy</a>を使用します）に基づいて、そのためのテストインフラをいくつか書きました。しかし、すべて順調だったのは、Mockitoが実際に期待するメソッドを呼び出さないことがあり、テストが混乱したり、再現性のない失敗をしたりすることに気づくまででした。</p>
+</div>
+<div class="paragraph">
+<p>問題の原因は、バイナリ互換性を確保するために、Quarkus GitHub Appで使用している <a href="https://github.com/hub4j/github-api">Hub4j GitHub API</a>では、バイトコードにブリッジメソッドを導入していることです。</p>
+</div>
+<div class="paragraph">
+<p>たとえば、GitHub API の <code>GitHub</code> クラスのこのメソッドを例に挙げてみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    @WithBridgeMethods(value = GHUser.class)
+    public GHMyself getMyself() throws IOException {
+        client.requireCredential();
+        return setMyself();
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>歴史的に見ると、以前は <code>GHUser</code> を返していたが、新しいバージョンでは <code>GHMyself</code> を返すようになり、バイナリ互換性が壊れました。</p>
+</div>
+<div class="paragraph">
+<p>これを復元するために、 <code>@WithBridgeMethods</code> アノテーションの助けを借りて、GitHub API ビルドはバイトコードに 2 つのメソッドを作成します。1 つは <code>GHMyself</code> を返し、もう 1 つは <code>GHUser</code> を返します。これは、GitHub APIの古いバージョンでアプリケーションをコンパイルしていて、アプリケーションを再コンパイルせずに新しいバージョンを使いたい場合に非常に便利です。一般的にJenkinsの場合、GitHub APIを使用するJenkinsプラグインをすべて再コンパイルすることなく、GitHub APIの新しいバージョンに切り替えることができます。</p>
+</div>
+<div class="paragraph">
+<p>バイトコードレベルでは、以下のようなものになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    public GHMyself getMyself() throws IOException {
+        client.requireCredential();
+        return setMyself();
+    }
+
+    public GHUser getMyself() throws IOException {
+        return getMyself(); <i class="conum" data-value="1"></i><b>(1)</b>
+    }</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>GHMyself</code> を返す`getMyself()<code>の `invokevirtual</code></td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>また、既存のコンパイル済みコードが <code>GHUser getMyself()</code> を呼び出す場合、戻り値の型を変更した後も動作します。</p>
+</div>
+<div class="paragraph">
+<p>このブリッジ・メソッドのアプローチは実際の問題を解決するもので、開発者にとっては完全に透過的なので、それほど大きな問題ではありません&#8230;&#8203; <a href="https://github.com/raphw/byte-buddy/issues/1162">ByteBuddyの問題</a>でMockitoを使い始める場合を除けば。ByteBuddyは、同じシグネチャで異なる戻り値の型を持つメソッドが複数ある場合、混乱することがあります。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>ByteBuddyは素晴らしいライブラリであり、このブログ記事はByteBuddyの批評として見るべきではありません。これは標準的なバイトコードでは起きない極端なコーナーケースです。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>この問題は、ByteBuddyがMockitoマジックを適用するために間違った方法を選択することがあり、テストの信頼性を低下させる原因となっていました。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="how-can-we-work-around-this"><a class="anchor" href="#how-can-we-work-around-this"></a>どうすれば回避できるのか？</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus GitHub Appの場合、バイナリ互換性はあまり気にしません。GitHub APIの新しいバージョンにアップグレードする場合、ユーザーはアプリケーションを再ビルドすることになります。</p>
+</div>
+<div class="paragraph">
+<p>ですから、これらのブリッジ方式が問題であることを考えると、これを廃止することが一つの解決策になると思います。</p>
+</div>
+<div class="paragraph">
+<p>もちろん、GitHub API をフォークしてブリッジメソッドを生成しないようにすることもできます。</p>
+</div>
+<div class="paragraph">
+<p>しかし、フォークして永遠に維持することは、避けられるのであれば絶対に考えるべきことではありません。特に、GitHub API の将来の改良の恩恵を受け続けたいのですから。</p>
+</div>
+<div class="paragraph">
+<p>そこで、ライブラリは標準のまま、アプリケーションのビルド時にQuarkusでバイトコードを調整することはできないでしょうか。</p>
+</div>
+<div class="paragraph">
+<p>急いでいるのなら、短い答えは「イエス」です。では、（そうではない）長い答えに行きましょう。</p>
+</div>
+<div class="sect2">
+<h3 id="lets-identify-the-methods"><a class="anchor" href="#lets-identify-the-methods"></a>メソッドを特定しよう</h3>
+<div class="paragraph">
+<p>Quarkusでは、Jandexでアノテーションのインデックスを作成できます。完璧な世界では、JandexでGitHub API jarのインデックスを作成し（他の目的ですでに行っています）、Jandexに問い合わせて、 <code>@WithBridgeMethods</code> でアノテーションされたすべてのメソッドを取得することができます。</p>
+</div>
+<div class="listingblock nowrap">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Collection&lt;AnnotationInstance&gt; withBridgeMethodsAnnotations =
+    index.getAnnotations(DotName.createSimple(WithBridgeMethods.class.getName));</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Unfortunately, <code>@WithBridgeMethods</code> has a <code>CLASS</code> retention policy
+- which makes perfect sense for its usage -
+and Jandex only considers annotations with a <code>RUNTIME</code> retention policy.</p>
+</div>
+<div class="paragraph">
+<p>この制限はJandex 3で緩和される予定ですが、当面はJandexを使用することはできません。</p>
+</div>
+<div class="paragraph">
+<p>残念ながら、それまでは、ここに多くの選択肢はありません。手動でメソッドをリストアップするしかないのです。</p>
+</div>
+<div class="paragraph">
+<p>より柔軟に対応するために、 <code>BuildItem</code> を導入しました。</p>
+</div>
+<div class="listingblock nowrap">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public final class GitHubApiClassWithBridgeMethodsBuildItem extends MultiBuildItem {
+
+    private final String className;
+    private final Set&lt;String&gt; methodNames;
+
+    GitHubApiClassWithBridgeMethodsBuildItem(String className, String... methodsWithBridges) {
+        this.className = className;
+        this.methodNames = new HashSet&lt;&gt;(Arrays.asList(methodsWithBridges));
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public Set&lt;String&gt; getMethodsWithBridges() {
+        return methodNames;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、各クラスごとに <code>GitHubApiClassWithBridgeMethodsBuildItem</code> を作成します。</p>
+</div>
+<div class="listingblock nowrap">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// ...
+
+classesWithBridgeMethods.produce(new GitHubApiClassWithBridgeMethodsBuildItem(
+        "org.kohsuke.github.GHPullRequestCommitDetail$Commit", "getAuthor", "getCommitter"));
+
+// ...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これが完了すると、どのQuarkus <code>@BuildStep</code> からでも、 <code>GitHubApiClassWithBridgeMethodsBuildItem</code> を消費できるようになるので、このリストはQuarkusビルドで一般的に利用できるようになります。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Quarkusのビルドプロセスの詳細は省きますが、その原理は極めてシンプルです。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ビルドステップ（ <code>@BuildStep</code> でアノテーションされたメソッド）で構成されています。</p>
+</li>
+<li>
+<p>ビルドステップはビルドアイテムを消費することができます。</p>
+</li>
+<li>
+<p>ビルドステップはビルドアイテムを生成します。</p>
+</li>
+<li>
+<p>あとは、ビルドステップの依存関係を解決して、最終結果であるアプリケーションを完成させるだけです。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><a href="/guides/writing-extensions#build-step-processors">Writing extensionsガイド</a>で詳しく解説しています。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="removing-the-methods"><a class="anchor" href="#removing-the-methods"></a>メソッドの削除</h3>
+<div class="paragraph">
+<p>これでメソッドのリストが手元に揃ったので、次のステップではメソッドを削除します。</p>
+</div>
+<div class="paragraph">
+<p>ビルド中にバイトコードを操作するために、Quarkusは <code>BytecodeTransformerBuildItem</code> を提供します。 クラスのバイトコードを調整するには、与えられたクラスに対してバイトコードを生成するだけです。</p>
+</div>
+<div class="paragraph">
+<p>たとえば、GitHub API のメソッドからブリッジメソッドを削除するには、次のようなビルドステップをエクステンションに追加します。</p>
+</div>
+<div class="listingblock nowrap">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@BuildStep
+void removeCompatibilityBridgeMethodsFromGitHubApi(
+        BuildProducer&lt;BytecodeTransformerBuildItem&gt; bytecodeTransformers, <i class="conum" data-value="1"></i><b>(1)</b>
+        List&lt;GitHubApiClassWithBridgeMethodsBuildItem&gt; gitHubApiClassesWithBridgeMethods) { <i class="conum" data-value="2"></i><b>(2)</b>
+
+    for (GitHubApiClassWithBridgeMethodsBuildItem gitHubApiClassWithBridgeMethods : gitHubApiClassesWithBridgeMethods) {
+        bytecodeTransformers.produce(new BytecodeTransformerBuildItem.Builder()
+                .setClassToTransform(gitHubApiClassWithBridgeMethods.getClassName())
+                .setVisitorFunction((ignored, visitor) -&gt; new RemoveBridgeMethodsClassVisitor(visitor,
+                        gitHubApiClassWithBridgeMethods.getClassName(),
+                        gitHubApiClassWithBridgeMethods.getMethodsWithBridges()))
+                .build());
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>`BytecodeTransformerBuildItem`sを作成します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>先に生産された `GitHubApiClassWithBridgeMethodsBuildItem`s を消費します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>RemoveBridgeMethodsClassVisitor</code> は、バイトコードを修正する古典的な <a href="https://asm.ow2.io">ASM</a> <code>ClassVisitor</code> です。</p>
+</div>
+<div class="listingblock nowrap">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class RemoveBridgeMethodsClassVisitor extends ClassVisitor {
+
+    private final String className;
+    private final Set&lt;String&gt; methodsWithBridges;
+
+    public RemoveBridgeMethodsClassVisitor(ClassVisitor visitor, String className, Set&lt;String&gt; methodsWithBridges) {
+        super(Gizmo.ASM_API_VERSION, visitor);
+
+        this.className = className;
+        this.methodsWithBridges = methodsWithBridges;
+    }
+
+    @Override
+    public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
+        if (methodsWithBridges.contains(name) &amp;&amp; ((access &amp; Opcodes.ACC_BRIDGE) != 0)
+                &amp;&amp; ((access &amp; Opcodes.ACC_SYNTHETIC) != 0)) { <i class="conum" data-value="1"></i><b>(1)</b>
+
+            return null; <i class="conum" data-value="2"></i><b>(2)</b>
+        }
+
+        return super.visitMethod(access, name, descriptor, signature, exceptions); <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>メソッド名が一致し、そのメソッドがブリッジで合成メソッドである場合&#8230;&#8203;</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>&#8230;&#8203; `null`を返すことで、バイトコードからそれを削除します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>そうでない場合は、バイトコードにそのメソッドを組み込むスーパークラスのメソッドに委ねるだけです。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>以上です!</p>
+</div>
+<div class="paragraph">
+<p>ビルドプロセスで、Quarkusは修正されたバイトコードを含むクラスファイルを作成し、GitHub API jarから来るクラスの代わりにそれを使用します。そのため、削除したいブリッジメソッドがByteBuddyから見えることはありません。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="conclusion"><a class="anchor" href="#conclusion"></a>まとめ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>カンファレンスでは、Quarkusは他のフレームワークとは異なることを行っており、その革新的なビルドプロセスに魔法がかかっているとよく言われます。</p>
+</div>
+<div class="paragraph">
+<p>このビルドプロセスが、Quarkusのメモリフットプリントの少なさと起動時間の速さの秘訣です。</p>
+</div>
+<div class="paragraph">
+<p><strong>しかし、アプリケーションのビルドをカスタマイズするための非常に強力なツールでもあるのです。</strong></p>
+</div>
+</div>
+</div>
+              
+          </div>
+          <div class="width-12-12"><div class="share-page">
+  <a class="share-linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=https://quarkus.io/blog/solving-problems-with-extensions/&title=Quarkusのエクステンションで問題を解く (1/n)" rel="nofollow" target="_blank" title="Share on LinkedIn">
+    <i class="fa-brands fa-linkedin fa-xl"></i>
+  </a>
+  <a class="share-x" href="https://x.com/intent/tweet?text=Quarkusのエクステンションで問題を解く (1/n)&url=https://quarkus.io/blog/solving-problems-with-extensions/&via=quarkusio&related=quarkusio" rel="nofollow" target="_blank" title="Share on X">
+    <i class="fa-brands fa-square-x-twitter fa-xl"></i>
+  </a>
+  <a class="share-facebook" href="https://facebook.com/sharer.php?u=https://quarkus.io/blog/solving-problems-with-extensions/" rel="nofollow" target="_blank" title="Share on Facebook">
+    <i class="fa-brands fa-square-facebook fa-xl"></i>
+  </a>
+  <a class="share-reddit" href="http://www.reddit.com/submit?url=https://quarkus.io/blog/solving-problems-with-extensions/" onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;" title="Share on Reddit" >
+    <i class="fa-brands fa-square-reddit fa-xl"></i>
+  </a>
+  <a class="share-email" href="mailto:?subject=Quarkusのエクステンションで問題を解く (1/n)&amp;body=Quarkusのエクステンションで問題を解く (1/n) https://quarkus.io/blog/solving-problems-with-extensions/" title="Share via Email" >
+    <i class="fa-solid fa-envelope fa-xl"></i>
+  </a>
+</div>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+  <script src="https://giscus.app/client.js"
+        data-repo="quarkusio/quarkus"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkxMzk5MTQ5MzI="
+        data-category="Quarkus Blog/Website"
+        data-category-id="DIC_kwDOCFbutM4CAFFV"
+        data-mapping="og:title"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+  </script>
+  </div>
+</div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

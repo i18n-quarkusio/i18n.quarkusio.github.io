@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>ReactとPatternflyでQuarkusアプリにEyecandyを追加する - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/blog/gui-react-patternfly/" />
+  <meta property="og:title" content="ReactとPatternflyでQuarkusアプリにEyecandyを追加する" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/blog/gui-react-patternfly/">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="post">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/blog/gui-react-patternfly/">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="active">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/blog/gui-react-patternfly/" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/blog/gui-react-patternfly/">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/blog/gui-react-patternfly/">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/blog/gui-react-patternfly/">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/blog/gui-react-patternfly/">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    <div class="full-width-breadcrumb-bg align-self">
+  <div class="width-12-12">
+      <p class="returnlink"><a href="/blog">Blog</a> <i class="fas fa-chevron-right"></i> ReactとPatternflyでQuarkusアプリにEyecandyを追加する</p>
+  </div>
+</div>
+
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+    <div class="grid-wrapper">
+      <div class="width-12-12">
+        <div class="post-date">
+          April 15, 2021 
+          
+            <span class="tags"><a href="/blog/tag/web">#web</a><a href="/blog/tag/gui">#gui</a><a href="/blog/tag/react">#react</a><a href="/blog/tag/patternfly">#patternfly</a></span>
+          
+        </div>
+        <h1 class="post-title">ReactとPatternflyでQuarkusアプリにEyecandyを追加する</h1>
+        <div class="grid-wrapper">
+          <div class="width-8-12 width-12-12-m byline-wrapper">
+            
+            
+              <img class="headshot" src="https://www.gravatar.com/avatar/e00f2988f7bd221d8c7e6ee0485673e5">
+            
+            <p class="byline">By <a href="/author/dbrintzi">Daniel Brintzinger</a></p>
+          </div>
+          <div class="width-12-12">
+              <div class="paragraph">
+<p>コンテナ化された分散型のQuarkusアプリケーションで一般的なパターンとして、別のフロントエンドアプリケーションのための効率的でスケーラブルなバックエンドとして機能することがあります。Kubernetesの世界では、フロントエンドアプリケーションはReact、Angular、Vue.jsなどの純粋なウェブレイヤーPodであり、すべてのRESTコールをQuarkusのサービスレイヤーPodに委ねることができます。</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="/assets/images/posts/gui-react-patternfly/frontend_pod_pattern.png" alt="frontend pod pattern">
+</div>
+</div>
+<div class="paragraph">
+<p>このアプローチには、独立したコンテナのスケーリングと独立したライフサイクルという利点がありますが、小規模なアプリケーションには過剰なエンジニアリングとなる場合があります。</p>
+</div>
+<div class="paragraph">
+<p>最新のWeb GUI技術に妥協することなく、自己完結型の小さなCRUDアプリケーションを作りたいと思っているのではないでしょうか？ <a href="https://quarkus.io/blog/quarkus-and-web-ui-development-mode/">Angular</a>でこれを実現する方法を見てきましたが、少なくともGitHubの星の数において、人気の点でAngularを上回っているReactはどうでしょうか？今回は、Reactを統合するだけでなく、 <a href="https://www.patternfly.org/">Patternfly</a>と呼ばれるWebコンポーネントフレームワークを使用する方法を紹介します。Patternflyは、リッチで一貫性のあるインタラクティブなGUIを作成するためのパターン、コンポーネント、スタイルを集めたものです。</p>
+</div>
+<div class="paragraph">
+<p>React/Patternflyのテーブルに表示される原子パーティクルオブジェクトを提供するRESTエンドポイントを持つQuarkus Appを作成してみましょう。最終的なアプリケーションのソースコードは <a href="https://github.com/nexus-Six/quarkus-gui-react-patternfly">こちら</a>にあります。</p>
+</div>
+<div class="sect1">
+<h2 id="step-1-generate-the-quarkus-project"><a class="anchor" href="#step-1-generate-the-quarkus-project"></a>ステップ1 - Quarkusプロジェクトの生成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>スタータープロジェクトを生成するには、 <a href="https://code.quarkus.io" class="bare">https://code.quarkus.io</a>  にアクセスします。Maven Groupとして "io.quarkus" 、Artifactとして "quarkus-react" を入力します。エクステンションのリストで、 <strong>RESTEasy JAX-RS</strong> と <strong>RESTEasy JSON-B</strong> を選択します。その後、プロジェクトを生成してダウンロードし、ローカル・マシンで解凍して、お気に入りのIDEでプロジェクト・フォルダを開きます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="step-2-add-the-quarkus-rest-endpoint"><a class="anchor" href="#step-2-add-the-quarkus-rest-endpoint"></a>ステップ2 - Quarkus RESTエンドポイントの追加</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>サンプルの <strong>GreetingResource.java</strong> が存在するJavaパッケージフォルダ/src/main/java/io/quarkusに、 <strong>Particle.java</strong> という名前の新しいBeanクラスを以下の内容で作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus;
+
+public class Particle {
+
+    private String name;
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public String getName()
+    {
+        return this.name;
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ここで、 <strong>ParticleResource.java</strong> という新しいRESTリソースクラスを作成し、いくつかのテストパーティクルを返します（ここでは原子物理学的な意味合いは無視します）。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Set;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+@Path("/particles")
+public class ParticleResource {
+
+    @GET
+    public Set&lt;Particle&gt; getUsers() {
+
+        Set &lt;Particle&gt; particleList = Collections.newSetFromMap(Collections.synchronizedMap(new LinkedHashMap&lt;&gt;()));
+
+        Particle particle = new Particle();
+        particle.setName("Graviton");
+        particleList.add(particle);
+
+        Particle particle2 = new Particle();
+        particle2.setName("Pentaquark");
+        particleList.add(particle2);
+        return particleList;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>開発モードでQuarkusを起動して、すべてが動作するかどうかをテストします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ mvn quarkus:dev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>新しい端末で、エンドポイントを呼び出して、パーティクルの応答を確認します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl http://localhost:8080/particles
+
+[{"name":"Graviton"},{"name":"Pentaquark"}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Quarkusのデータレイヤーの準備ができたので、次はReactのGUIを作りましょう。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="step-3-generate-the-react-project"><a class="anchor" href="#step-3-generate-the-react-project"></a>ステップ3 - Reactプロジェクトの生成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>お使いのシステムに <strong>Node.js</strong> と <strong>npm</strong> がインストールされていることを確認してください。必要に応じて、 <a href="https://nodejs.org/en/download/">公式ドキュメント</a>を参照してください。</p>
+</div>
+<div class="paragraph">
+<p>プロジェクト内に新しいフォルダ/src/main/ <strong>webapp</strong> を作成し、これをReactプロジェクトのベースフォルダとします。このフォルダで別のターミナルを開き、Reactプロジェクトイニシャライザを実行して、Patternfly Nodeモジュールを追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ npx create-react-app .
+$ npm install @patternfly/patternfly --save</code></pre>
+</div>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+Reactアプリを起動すると、デフォルトではポート3000で実行されます。その後、ポート8080でQuarkusのエンドポイントにアクセスしようとすると、 <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">CORSセキュリティポリシー</a>のためにブラウザがこれを阻止します。本番環境では、コンパイルされた静的なReactアプリがポート8080でQuarkusから提供されるため、これは問題になりませんが、開発中はこれが問題になります。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>幸いなことに、Reactには未知のエンドポイントへのすべてのリクエストを別のURLに転送する <strong>proxy</strong> というちょっとした機能があります。 <strong>webapp</strong> フォルダで <strong>package.json</strong> ファイルを開き、proxyの行を追加して、すべてのリクエストをQuarkusのポート8080に転送します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "name": "webapp",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-scripts": "4.0.3",
+    "web-vitals": "^1.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "proxy": "http://localhost:8080/",
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      "&gt;0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="step-4-create-a-patternfly-table-component-to-populate-with-our-data"><a class="anchor" href="#step-4-create-a-patternfly-table-component-to-populate-with-our-data"></a>ステップ4 - Patternflyのテーブルコンポーネントを作成して、データで埋める</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Reactプロジェクトの <strong>/webapp/index.js</strong> にPatternflyのCSSをインポートします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">...
+import './index.css';
+import '@patternfly/patternfly/patternfly.css';
+import App from './App';
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>webapp/srcに <strong>components</strong> という新しいフォルダを作り、その中に <strong>particles.js</strong> というファイルを作り、パーティクルオブジェクトのリストをループさせてPatternflyのテーブルを生成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">import React from 'react'
+
+const Particles = ({ particles }) =&gt; {
+    return (
+        &lt;div&gt;
+            &lt;center&gt;&lt;h1&gt;Particles List&lt;/h1&gt;&lt;/center&gt;
+            &lt;table class="pf-c-table pf-m-grid-md" role="grid" aria-label="Supersonic Subatomic Particles" id="table-basic"&gt;
+                &lt;caption&gt;Supersonic Subatomic Particles&lt;/caption&gt;
+                &lt;thead&gt;
+                    &lt;tr role="row"&gt;
+                        &lt;th role="columnheader" scope="col"&gt;Name&lt;/th&gt;
+                    &lt;/tr&gt;
+                &lt;/thead&gt;
+                {particles.map((particle) =&gt; (
+                    &lt;tbody role="rowgroup"&gt;
+                        &lt;tr role="row"&gt;
+                            &lt;td role="cell" data-label="Particle name"&gt;{particle.name}&lt;/td&gt;
+                        &lt;/tr&gt;
+                    &lt;/tbody&gt;
+                ))}
+            &lt;/table&gt;
+        &lt;/div&gt;
+
+    )
+};
+
+export default Particles</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、 <strong>/webapp/src/App.js</strong> を調整して、Quarkusサービスのエンドポイントを呼び出し、レスポンスデータを使ってパーティクルコンポーネントをレンダリングします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">import React, {Component} from 'react';
+import Particles from './components/particles'
+
+class App extends Component {
+  state = {
+    particles: []
+  }
+
+  componentDidMount() {
+    fetch('/particles')
+    .then(res =&gt; res.json())
+    .then((data) =&gt; {
+      this.setState({ particles: data })
+    })
+    .catch(console.log)
+  }
+
+  render () {
+    return (
+      &lt;Particles particles={this.state.particles} /&gt;
+    );
+  }
+}
+
+export default App;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これで、Reactの開発モードでGUIをテストする準備が整いました。</p>
+</div>
+<div class="paragraph">
+<p>別のターミナルでQuarkusがまだ起動していることを確認します。</p>
+</div>
+<div class="paragraph">
+<p><strong>/webapp</strong> フォルダ内で実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ npm start</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ブラウザで <a href="http://localhost:3000" class="bare">http://localhost:3000</a> を開きます。開かない場合は、そのURLに移動してください。Quarkusのパーティクルバックエンドからテーブルが動的に入力されているのがわかると思います。ブラウザの開発者ツールでは、データが実際に <a href="http://localhost:3000/particles" class="bare">http://localhost:3000/particles</a> から取得されていることがわかります。</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="/assets/images/posts/gui-react-patternfly/patternfly_table.png" alt="patternfly table">
+</div>
+</div>
+<div class="paragraph">
+<p>現在、ダブルデベロッパーモードで運用しています。JavaとJavascriptのどちらかのコードに加えられた変更は、すぐに適用されます。これは開発者にとって至福の時ではないでしょうか。</p>
+</div>
+<div class="paragraph">
+<p>しかし、コンテナを使ったデプロイについてはどうでしょうか？新しいGUIアプリが完成したら、実行可能なjarやイメージを作成するために、いくつかの調整が必要になります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="step-5-prepare-our-project-for-production-build"><a class="anchor" href="#step-5-prepare-our-project-for-production-build"></a>ステップ5 - プロジェクトの本番ビルドへの準備</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><strong>webapp/package.json</strong> にprodのビルドフェーズを追加:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">...
+ "eject": "react-scripts eject",
+ "prod": "react-scripts build --dest &amp;&amp; rsync -a build/* ../resources/META-INF/resources"
+  },
+  "proxy": "http://localhost:8080/",
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、静的なReactアセットのプロダクションビルドが行われ、Quarkusのデフォルトの静的ファイル用ディレクトリにコピーされます。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+rsyncコマンドは、Linux専用です。他のOSの場合は、同等のコマンドで代用してください。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>最後のステップでは、優れた <a href="https://github.com/eirslett/frontend-maven-plugin">frontend-maven-plugin</a>を pom.xml に追加して、通常の maven ビルドから React のビルドフェーズを起動します。npmとnodeのバージョンを、ローカルにインストールされているものに合わせて調整します。mavenのインストールフェーズでは、実際にこれらの2つのパッケージがインストールされますが、これはCI/CDビルドやこのプロジェクトの起動時に便利です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;build&gt;
+...
+ &lt;plugin&gt;
+  &lt;groupId&gt;com.github.eirslett&lt;/groupId&gt;
+  &lt;artifactId&gt;frontend-maven-plugin&lt;/artifactId&gt;
+  &lt;version&gt;1.11.2&lt;/version&gt;
+  &lt;configuration&gt;
+    &lt;workingDirectory&gt;${project.basedir}/src/main/webapp&lt;/workingDirectory&gt;
+    &lt;installDirectory&gt;target&lt;/installDirectory&gt;
+  &lt;/configuration&gt;
+  &lt;executions&gt;
+    &lt;execution&gt;
+      &lt;id&gt;install node and npm&lt;/id&gt;
+      &lt;goals&gt;
+        &lt;goal&gt;install-node-and-npm&lt;/goal&gt;
+      &lt;/goals&gt;
+      &lt;configuration&gt;
+        &lt;nodeVersion&gt;v14.15.4&lt;/nodeVersion&gt;
+        &lt;npmVersion&gt;6.14.10&lt;/npmVersion&gt;
+      &lt;/configuration&gt;
+    &lt;/execution&gt;
+    &lt;execution&gt;
+      &lt;id&gt;npm install&lt;/id&gt;
+      &lt;goals&gt;
+        &lt;goal&gt;npm&lt;/goal&gt;
+      &lt;/goals&gt;
+      &lt;configuration&gt;
+        &lt;arguments&gt;install&lt;/arguments&gt;
+      &lt;/configuration&gt;
+    &lt;/execution&gt;
+    &lt;execution&gt;
+      &lt;id&gt;npm run build&lt;/id&gt;
+      &lt;goals&gt;
+        &lt;goal&gt;npm&lt;/goal&gt;
+      &lt;/goals&gt;
+      &lt;configuration&gt;
+        &lt;arguments&gt;run prod&lt;/arguments&gt;
+      &lt;/configuration&gt;
+    &lt;/execution&gt;
+  &lt;/executions&gt;
+&lt;/plugin&gt;
+&lt;/build&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>それでは、実行可能なjarをビルドしてみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ mvn clean package</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>他の稼働中の環境をすべて停止してポートを空け、実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ java -jar target/quarkus-app/quarkus-run.jar</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ブラウザで <a href="http://localhost:8080" class="bare">http://localhost:8080</a> を開くと、最適化された単一のQuarkus jarから実行されているテーブルが表示されます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="take-away"><a class="anchor" href="#take-away"></a>まとめ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>いくつかの簡単なステップで、ReactとPatternflyの力を使って、Quarkusアプリに洗練された見た目のインタラクティブなGUIを追加することができます。</p>
+</div>
+<div class="paragraph">
+<p>このアプリを次は <a href="https://quarkus.io/guides/building-native-image">ネイティブ</a>にコンパイルして、極めて軽量なWebアプリを展開するのはどうでしょうか。あるいは、他の <a href="https://www.patternfly.org/v4/get-started/develop/">Patternflyコンポーネント</a>を使用して、より洗練されたウェブインターフェイスを作成することもできます。いずれにしても、Quarkusアプリを輝かせるためには、あなたの創造性以外に制限はありません。</p>
+</div>
+</div>
+</div>
+              
+          </div>
+          <div class="width-12-12"><div class="share-page">
+  <a class="share-linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=https://quarkus.io/blog/gui-react-patternfly/&title=ReactとPatternflyでQuarkusアプリにEyecandyを追加する" rel="nofollow" target="_blank" title="Share on LinkedIn">
+    <i class="fa-brands fa-linkedin fa-xl"></i>
+  </a>
+  <a class="share-x" href="https://x.com/intent/tweet?text=ReactとPatternflyでQuarkusアプリにEyecandyを追加する&url=https://quarkus.io/blog/gui-react-patternfly/&via=quarkusio&related=quarkusio" rel="nofollow" target="_blank" title="Share on X">
+    <i class="fa-brands fa-square-x-twitter fa-xl"></i>
+  </a>
+  <a class="share-facebook" href="https://facebook.com/sharer.php?u=https://quarkus.io/blog/gui-react-patternfly/" rel="nofollow" target="_blank" title="Share on Facebook">
+    <i class="fa-brands fa-square-facebook fa-xl"></i>
+  </a>
+  <a class="share-reddit" href="http://www.reddit.com/submit?url=https://quarkus.io/blog/gui-react-patternfly/" onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;" title="Share on Reddit" >
+    <i class="fa-brands fa-square-reddit fa-xl"></i>
+  </a>
+  <a class="share-email" href="mailto:?subject=ReactとPatternflyでQuarkusアプリにEyecandyを追加する&amp;body=ReactとPatternflyでQuarkusアプリにEyecandyを追加する https://quarkus.io/blog/gui-react-patternfly/" title="Share via Email" >
+    <i class="fa-solid fa-envelope fa-xl"></i>
+  </a>
+</div>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+  <script src="https://giscus.app/client.js"
+        data-repo="quarkusio/quarkus"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkxMzk5MTQ5MzI="
+        data-category="Quarkus Blog/Website"
+        data-category-id="DIC_kwDOCFbutM4CAFFV"
+        data-mapping="og:title"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+  </script>
+  </div>
+</div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

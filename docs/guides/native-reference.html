@@ -1,0 +1,3412 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>ネイティブリファレンスガイド - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/guides/native-reference" />
+  <meta property="og:title" content="ネイティブリファレンスガイド" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/native-reference">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/guides/native-reference">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/guides/native-reference" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/guides/native-reference">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/guides/native-reference">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/guides/native-reference">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/guides/native-reference">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" selected>3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <a class="editlink" href="https://github.com/quarkusio/quarkus/edit/main/docs/src/main/asciidoc/native-reference.adoc">このページを編集</a>
+      
+      <h1 class="text-caps">ネイティブリファレンスガイド </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドは、<a href="building-native-image">ネイティブ実行可能ファイルのビルド</a>、<a href="native-and-ssl">ネイティブイメージでのSSLの使用</a>、<a href="writing-native-applications-tips">ネイティブアプリケーションの作成</a> の各ガイドに付随するものです。ユーザーが問題を診断し、信頼性を高め、ネイティブ実行可能ファイルのランタイム パフォーマンスを向上させるのに役立つ高度なトピックについて説明します。 これらは、このガイドにある高レベルのセクションです:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#native-memory-management">ネイティブメモリ管理</a></p>
+</li>
+<li>
+<p><a href="#inspecting-and-debugging">ネイティブ実行可能ファイルの検査とデバッグ</a></p>
+</li>
+<li>
+<p><a href="#native-faq">よくある質問</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="native-memory-management"><a class="anchor" href="#native-memory-management"></a>ネイティブメモリ管理</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Memory management for Quarkus native executables is enabled by GraalVM’s SubstrateVM runtime system.</p>
+</div>
+<div class="paragraph">
+<p>For detailed explanations about the memory management component in GraalVM, see the <a href="https://www.graalvm.org/jdk21/reference-manual/native-image/optimizations-and-performance/MemoryManagement">GraalVM Memory Management</a> guide.</p>
+</div>
+<div class="paragraph">
+<p>This guide complements the information available in the GraalVM website with further observations particularly relevant to Quarkus applications.</p>
+</div>
+<div class="sect2">
+<h3 id="garbage-collectors"><a class="anchor" href="#garbage-collectors"></a>ガベージコレクター</h3>
+<div class="paragraph">
+<p>Quarkusのユーザーが利用できるガベージコレクタは、現在、Serial GCとEpsilon GCです。</p>
+</div>
+<div class="sect3">
+<h4 id="serial-gc"><a class="anchor" href="#serial-gc"></a>シリアルGC</h4>
+<div class="paragraph">
+<p>GraalVMとQuarkusのデフォルトオプションであるシリアルGCは、HotSpotのシリアルGCと同様にシングルスレッドで非同期のGCです。しかし、GraalVMの実装はHotSpotのものと異なっており、実行時の動作に大きな違いがある場合があります。</p>
+</div>
+<div class="paragraph">
+<p>HotSpotのシリアルGCとGraalVMのシリアルGCの主な違いの1つは、完全なGCサイクルを実行する方法です。HotSpotで使用されるアルゴリズムはmark-sweep-compactであるのに対し、GraalVMではmark-copyです。どちらもすべてのライブオブジェクトをトラバースする必要がありますが、マークコピーでは、このトラバーサルは、セカンダリ空間または半空間にライブオブジェクトをコピーするためにも使用されます。オブジェクトが半空間から別の半空間へコピーされる際に、オブジェクトもコンパクトになります。mark-sweep-compactでは、コンパクト化にはライブ・オブジェクトに対する2回目のパスが必要です。このため、mark-copyのフルGCは、mark-sweep-compactよりも時間効率（各GCサイクルに費やされる時間という意味で）が高くなっています。個々のフルGCサイクルを短くするために、mark-copyが行うトレードオフはスペースです。semi-spaces の使用は、アプリケーションがmark-sweepが達成するのと同じGCパフォーマンス（1秒あたりの割り当てMB数）を維持するために、2倍のメモリ量を必要とすることを意味します。</p>
+</div>
+<div class="sect4">
+<h5 id="gc-collection-policy"><a class="anchor" href="#gc-collection-policy"></a>GCコレクションポリシー</h5>
+<div class="paragraph">
+<p>GraalVMのシリアルGC実装は、2つの異なる収集ポリシー間の選択を提供します。デフォルトは "adaptive" と呼ばれ、代替は "space/time"と呼ばれます。</p>
+</div>
+<div class="paragraph">
+<p>“adaptive” コレクションポリシーは、HotSpotのParallelGC adaptiveサイズポリシーがベースになっています。HotSpotとの主な違いは、GraalVMがメモリフットプリントに重点を置いていることです。つまり、GraalVMの adaptive GCポリシーは、メモリ消費を抑えるために積極的にGCをトリガーしようとします。</p>
+</div>
+<div class="paragraph">
+<p>バージョン2.13までのQuarkusでは、デフォルトで “space/time” GCコレクションポリシーが使用されていました。しかし、バージョン2.14から、代わりに “adaptive” ポリシーを使用するように変更されました。Quarkusが当初 “space/time” を選択した理由は、当時は“adaptive” よりもパフォーマンスがかなり向上していたためです。しかし、最近の性能実験によると、 “space/time” ポリシーは “adaptive”ポリシーに比べて、すぐに使える体験が悪くなると同時に、 “adaptive”ポリシーに改良が加えられた後は、かつて提供していた利点がかなり減少していることがわかりました。その結果、 “adaptive”ポリシーは、すべてとは言わないまでも、ほとんどのQuarkusアプリケーションにとって最適な選択肢であるように思われます。この切り替えの詳細については、 <a href="https://github.com/quarkusio/quarkus/issues/28267">このissue</a> をご覧ください。</p>
+</div>
+<div class="paragraph">
+<p>GraalVMの <code>-H:InitialCollectionPolicy</code> フラグを使用して、GCコレクションポリシーを変更することはまだ可能です。"space/time"ポリシーへの切り替えは、コマンドライン経由で以下を渡すことで行うことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">-Dquarkus.native.additional-build-args=-H:InitialCollectionPolicy=com.oracle.svm.core.genscavenge.CollectionPolicy\$BySpaceAndTime</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>または、 <code>application.properties</code> ファイルにこれを追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.native.additional-build-args=-H:InitialCollectionPolicy=com.oracle.svm.core.genscavenge.CollectionPolicy$BySpaceAndTime</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Bash でコマンドラインから渡す場合、"space/time" GC collection ポリシーを設定するために <code>$</code> 文字をエスケープすることが必要です。他のコマンドライン環境では、同様の要件があるかもしれません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="epsilon-gc"><a class="anchor" href="#epsilon-gc"></a>Epsilon GC</h4>
+<div class="paragraph">
+<p>Epsilon GCは、メモリの再利用を行わないノーオペ・ガベージコレクタです。Quarkusの観点からは、このガベージコレクタに最も関連するユースケースは、サーバーレス機能などの極めて短命のジョブです。epsilon GCを使用してQuarkusネイティブをビルドするには、ビルド時に次の引数を渡します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">-Dquarkus.native.additional-build-args=--gc=epsilon</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="memory-management-options"><a class="anchor" href="#memory-management-options"></a>メモリ管理オプション</h3>
+<div class="paragraph">
+<p>For information about options to control maximum heap size, young space, and other typical use cases found in the JVM, see the <a href="https://www.graalvm.org/jdk21/reference-manual/native-image/optimizations-and-performance/MemoryManagement">GraalVM Memory Management</a> guide.
+Setting the maximum heap size, either as a percentage or an explicit value, is generally recommended.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="gc-logging"><a class="anchor" href="#gc-logging"></a>GCロギング</h3>
+<div class="paragraph">
+<p>ガベージコレクションサイクルに関する情報を表示するための複数のオプションが必要な詳細度に応じて存在します。最小限の詳細は、 <code>-XX:+PrintGC</code> で提供され、発生した各GCサイクルのメッセージを表示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ quarkus-project-0.1-SNAPSHOT-runner -XX:+PrintGC -Xmx64m
+...
+[Incremental GC (CollectOnAllocation) 20480K-&gt;11264K, 0.0003223 secs]
+[Full GC (CollectOnAllocation) 19456K-&gt;5120K, 0.0031067 secs]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このオプションを <code>-XX:+VerboseGC</code> と組み合わせると、GC サイクルごとにメッセージが表示されますが、これには追加の情報が含まれています。また、このオプションを追加すると、GCアルゴリズムが起動時に行ったサイジングの決定が表示されます：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ quarkus-project-0.1-SNAPSHOT-runner -XX:+PrintGC -XX:+VerboseGC -Xmx64m
+[Heap policy parameters:
+YoungGenerationSize: 25165824
+MaximumHeapSize: 67108864
+MinimumHeapSize: 33554432
+AlignedChunkSize: 1048576
+LargeArrayThreshold: 131072]
+...
+[[5378479783321 GC: before  epoch: 8  cause: CollectOnAllocation]
+[Incremental GC (CollectOnAllocation) 16384K-&gt;9216K, 0.0003847 secs]
+[5378480179046 GC: after   epoch: 8  cause: CollectOnAllocation  policy: adaptive  type: incremental
+collection time: 384755 nanoSeconds]]
+[[5379294042918 GC: before  epoch: 9  cause: CollectOnAllocation]
+[Full GC (CollectOnAllocation) 17408K-&gt;5120K, 0.0030556 secs]
+[5379297109195 GC: after   epoch: 9  cause: CollectOnAllocation  policy: adaptive  type: complete
+collection time: 3055697 nanoSeconds]]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この2つのオプションの他に、 <code>-XX:+PrintHeapShape</code> と <code>-XX:+TraceHeapChunks</code> は、異なるメモリ領域を構築するためのメモリチャンクに関するさらに低いレベルの詳細を提供します。</p>
+</div>
+<div class="paragraph">
+<p>GCロギングフラグについての最新情報は、ネイティブ実行可能ファイルに渡すことができるフラグのリストを表示することで得ることができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ quarkus-project-0.1-SNAPSHOT-runner -XX:PrintFlags=
+...
+  -XX:±PrintGC                                 Print summary GC information after each collection. Default: - (disabled).
+  -XX:±PrintGCSummary                          Print summary GC information after application main method returns. Default: - (disabled).
+  -XX:±PrintGCTimeStamps                       Print a time stamp at each collection, if +PrintGC or +VerboseGC. Default: - (disabled).
+  -XX:±PrintGCTimes                            Print the time for each of the phases of each collection, if +VerboseGC. Default: - (disabled).
+  -XX:±PrintHeapShape                          Print the shape of the heap before and after each collection, if +VerboseGC. Default: - (disabled).
+...
+  -XX:±TraceHeapChunks                         Trace heap chunks during collections, if +VerboseGC and +PrintHeapShape. Default: - (disabled).
+  -XX:±VerboseGC                               Print more information about the heap before and after each collection. Default: - (disabled).</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="rss"><a class="anchor" href="#rss"></a>Resident Set Size (RSS)</h3>
+<div class="paragraph">
+<p><a href="performance-measure">パフォーマンスの測定ガイド</a> で説明したように、Quarkusアプリケーションのフットプリントは、resident set size（RSS）を使用して測定されます。これはネイティブアプリケーションにも適用可能ですが、この場合のフットプリントを管理するランタイムエンジンは、JVMではなく、ネイティブの実行ファイル自体に組み込まれています。</p>
+</div>
+<div class="paragraph">
+<p><a href="performance-measure">パフォーマンスの測定ガイド</a> で指定されているレポート手法は、ネイティブアプリケーションにも適用可能ですが、RSSが高くなったり低くなったりする原因は、生成されたネイティブ実行可能ファイルがどのように動作するかに特有のものです。</p>
+</div>
+<div class="paragraph">
+<p>ネイティブバージョンで、あるアプリケーションが別のアプリケーションと比較しRSSが高くなる場合、まず以下のチェックを行う必要があります:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Check the <a href="#native-reports">native build time reports</a>
+and see if there are big discrepancies in the number of used packages, used classes or used methods.
+A bigger universe will result in bigger memory footprint.</p>
+</li>
+<li>
+<p>バイナリーのサイズに違いがないか確認する。 <code>readelf</code> を使って、異なるセクションのサイズを観察し、比較することができます。特に、コードが存在する <code>.text</code> セクションと、ビルド時に生成されるヒープが存在する <code>.svm_heap</code> セクションは興味深いです。</p>
+</li>
+<li>
+<p>Generate <a href="#heap-dumps">heap dumps</a> and inspect them with tools such as VisualVM or Eclipse MAT.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>アプリケーションのプロファイリング、インストルメンテーション、トレースは、しばしば、物事がどのように動作するかを把握するための最良の方法となります。RSSやネイティブアプリケーションの場合、Brendan Greggが <a href="https://www.brendangregg.com/FlameGraphs/memoryflamegraphs.html">メモリリーク（と成長）フレームグラフ</a> ガイドで説明しているテクニックが特に有効です。このセクションでは、その記事の情報を応用して、 <code>perf</code> 、 <a href="https://github.com/iovisor/bcc">bcc/eBPF</a> を使用して、Quarkusのネイティブ実行ファイルが起動時にメモリを消費する原因を理解する方法を紹介します。</p>
+</div>
+<div class="sect3">
+<h4 id="rss-perf"><a class="anchor" href="#rss-perf"></a>Perf</h4>
+<div class="paragraph">
+<p>eBPFは新しいLinuxカーネルを必要とするのに対し、 <code>perf</code> は古いLinuxシステムで動作します。 <code>perf</code> のオーバーヘッドは eBPF よりも大きいですが、eBPF では扱えない DWARF デバッグシンボルで生成されたスタックトレースを扱えます。</p>
+</div>
+<div class="paragraph">
+<p>GraalVMのコンテキストでは、DWARFスタックトレースは、フレームポインタで生成されたものよりも詳細な情報を含み、理解しやすくなっています。最初のステップとして、デバッグ情報を有効にし、いくつかのフラグを追加したQuarkusネイティブ実行可能ファイルをビルドします。1つは最適化を無効にするフラグ、もう1つはインライン化されたメソッドがスタックトレースから省かれるのを避けるためのフラグです。この2つのフラグは、できるだけ多くの情報を含むスタックトレースを取得するために追加されています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ mvn package -DskipTests -Dnative \
+  -Dquarkus.native.debug.enabled \
+  -Dquarkus.native.additional-build-args=-O0,-H:-OmitInlinedMethodDebugLineInfo</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>最適化を無効にすると、 <code>perf</code> の使い方を学びやすくなり、スタックトレースをできるだけ詳細に取得することができます。これは、何がどこで呼び出されるのかについてより多くの情報を示すためです。しかし、そうすることで、最適化が適用されていれば起こらないような、より多くのアロケーションが発生する可能性があります。言い換えれば、 <code>-O0</code> を渡すと、エスケープ分析やデッドコード除去などの最適化が無効になるため、多くのアプリケーションでアロケーションパターンが変化します。本番環境に導入されたアプリケーションのアロケーションを適切に評価するには、デフォルトの最適化( <code>-O2</code> )で実行します。デフォルトの最適化では、 <code>perf</code> で得られたスタックトレースを解読するのは難しいかもしれません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>この特定の環境で、Quarkusのネイティブ実行可能ファイルが起動時にどれだけのRSSを消費するかを測定してみましょう:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ ps -o pid,rss,command -p $(pidof code-with-quarkus-1.0.0-SNAPSHOT-runner)
+      PID   RSS COMMAND
+     1915 35472 ./target/code-with-quarkus-1.0.0-SNAPSHOT-runner -Xmx128m</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>How come this Quarkus native executable consumes ~35MB RSS on startup?
+To get an understanding of this number, this section will use <code>perf</code> to trace calls to <code>syscalls:sys_enter_mmap</code>.
+Assuming the default <a href="https://www.graalvm.org/jdk21/reference-manual/native-image/optimizations-and-performance/MemoryManagement/#serial-garbage-collector">GraalVM Serial Garbage Collector</a> is in use, this system call is particularly interesting for native executables generated by GraalVM&#8217;s <code>native-image</code> because of how it allocates heap.
+In native executables generated by GraalVM&#8217;s <code>native-image</code>, the heap is allocated using either aligned or unaligned heap chunks.
+All non-array objects get allocated in thread local aligned chunks.
+Each of these are 1MB in size by default.
+For arrays, if they are bigger than 1/8 of the aligned chunk size,
+they will be allocated in unaligned heap chunks which have a size dependant on the object itself.
+The very first time a thread allocates an object or small array,
+it will request an aligned heap chunk that it will use exclusively until it has run out of space in that chunk,
+in which case it will request another aligned heap chunk.
+So by tracing these system calls,
+the code paths that end up requesting new aligned or unaligned heap chunks will be recorded.
+Next, run the Quarkus native executable through <code>perf record</code> tracing the <code>mmap</code> system call:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ sudo perf record -e syscalls:sys_enter_mmap --call-graph dwarf -a -- target/code-with-quarkus-1.0.0-SNAPSHOT-runner -Xmx128m</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>整列ヒープチャンクのサイズは、ネイティブビルド時に変更することができます。カスタム値（バイト数）は、 <code>-H:AlignedHeapChunkSize</code> フラグで渡すことができます。注意点として、この値は4096（4KB）の倍数である必要があります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>起動が完了したら、プロセスを停止し、スタックを生成します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ perf script &gt; out.stacks</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>最後に、生成されたスタックを用いて <a href="https://github.com/brendangregg/FlameGraph">フレームグラフ</a> を生成します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ export FG_HOME=...
+$ ${FG_HOME}/stackcollapse-perf.pl &lt; out.stacks | ${FG_HOME}/flamegraph.pl \
+    --color=mem --title="mmap Flame Graph" --countname="calls" &gt; out.svg</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>flamegraphはこのような形になるはずです:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/guides/images/mmap.svg" alt="mmap flamegraph">
+</div>
+</div>
+<div class="paragraph">
+<p>そこには、いくつかの気になる点があります:</p>
+</div>
+<div class="paragraph">
+<p>まず、 <code>com.oracle.svm.core.genscavenge.ThreadLocalAllocation</code> のメソッドコールを含むスタックトレースは、上で説明した整列または非整列ヒープチャンク割り当てに関連しています。前述のように、大半の割り当てでは、これらのチャンクはデフォルトで1MBになるので、割り当てられた各チャンクがRSS消費量にかなりの影響を与えるため、興味深いものです。</p>
+</div>
+<div class="paragraph">
+<p>次に、スレッド割り当てスタックのうち、 <code>start_thread</code> の下にあるものが特に明らかになっています。この環境では、渡された <code>-Xmx</code> の値を考慮すると、Quarkusは12個のイベントループスレッドを作成します。それとは別に、6つの余分なスレッドがあります。これら18個のスレッドの名前は、すべて16文字を超えます。これは、 <code>ps</code> コマンドで確認することができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ ps -e -T | grep $(pidof code-with-quarkus-1.0.0-SNAPSHOT-runner)
+   2320    2320 pts/0    00:00:00 code-with-quark
+   2320    2321 pts/0    00:00:00 ference Handler
+   2320    2322 pts/0    00:00:00 gnal Dispatcher
+   2320    2324 pts/0    00:00:00 ecutor-thread-0
+   2320    2325 pts/0    00:00:00 -thread-checker
+   2320    2326 pts/0    00:00:00 ntloop-thread-0
+   2320    2327 pts/0    00:00:00 ntloop-thread-1
+   2320    2328 pts/0    00:00:00 ntloop-thread-2
+   2320    2329 pts/0    00:00:00 ntloop-thread-3
+   2320    2330 pts/0    00:00:00 ntloop-thread-4
+   2320    2331 pts/0    00:00:00 ntloop-thread-5
+   2320    2332 pts/0    00:00:00 ntloop-thread-6
+   2320    2333 pts/0    00:00:00 ntloop-thread-7
+   2320    2334 pts/0    00:00:00 ntloop-thread-8
+   2320    2335 pts/0    00:00:00 ntloop-thread-9
+   2320    2336 pts/0    00:00:00 tloop-thread-10
+   2320    2337 pts/0    00:00:00 tloop-thread-11
+   2320    2338 pts/0    00:00:00 ceptor-thread-0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これらのスレッドが行う最初の割り当ては、スレッド名を取得し、カーネルが強制する文字数制限内に収まるようにトリミングすることです。これらの割り当てのそれぞれについて、2つの <code>mmap</code> 呼び出しがあります。1つはメモリを予約するため、もう1つはそれをコミットするためです。 <code>syscalls:sys_enter_mmap</code> システムコールを記録する場合、 <code>perf</code> の実装は、以下の呼び出しを追跡します。 <code><em>GI</em> <em>mmap64</code> .しかし、このglibc <code>_GI</em> <em>mmap64</code> の実装では、別の呼び出しが行われます。 <code>_GI</em> _mmap64</code> :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">(gdb) break __GI___mmap64
+(gdb) set scheduler-locking step
+...
+Thread 2 "code-with-quark" hit Breakpoint 1, __GI___mmap64 (offset=0, fd=-1, flags=16418, prot=0, len=2097152, addr=0x0) at ../sysdeps/unix/sysv/linux/mmap64.c:58
+58	  return (void *) MMAP_CALL (mmap, addr, len, prot, flags, fd, offset);
+(gdb) bt
+#0  __GI___mmap64 (offset=0, fd=-1, flags=16418, prot=0, len=2097152, addr=0x0) at ../sysdeps/unix/sysv/linux/mmap64.c:58
+#1  __GI___mmap64 (addr=0x0, len=2097152, prot=0, flags=16418, fd=-1, offset=0) at ../sysdeps/unix/sysv/linux/mmap64.c:46
+#2  0x00000000004f4033 in com.oracle.svm.core.posix.headers.Mman$NoTransitions::mmap (__0=&lt;optimized out&gt;, __1=&lt;optimized out&gt;, __2=&lt;optimized out&gt;, __3=&lt;optimized out&gt;, __4=&lt;optimized out&gt;, __5=&lt;optimized out&gt;)
+#3  0x00000000004f194e in com.oracle.svm.core.posix.PosixVirtualMemoryProvider::reserve (this=0x7ffff7691220, nbytes=0x100000, alignment=0x100000, executable=false) at com/oracle/svm/core/posix/PosixVirtualMemoryProvider.java:126
+#4  0x00000000004ef3b3 in com.oracle.svm.core.os.AbstractCommittedMemoryProvider::allocate (this=0x7ffff7658cb0, size=0x100000, alignment=0x100000, executable=false) at com/oracle/svm/core/os/AbstractCommittedMemoryProvider.java:124
+#5  0x0000000000482f40 in com.oracle.svm.core.os.AbstractCommittedMemoryProvider::allocateAlignedChunk (this=0x7ffff7658cb0, nbytes=0x100000, alignment=0x100000) at com/oracle/svm/core/os/AbstractCommittedMemoryProvider.java:107
+#6  com.oracle.svm.core.genscavenge.HeapChunkProvider::produceAlignedChunk (this=0x7ffff7444398) at com/oracle/svm/core/genscavenge/HeapChunkProvider.java:112
+#7  0x0000000000489485 in com.oracle.svm.core.genscavenge.ThreadLocalAllocation::slowPathNewArrayLikeObject0 (hub=0x7ffff6ff6110, length=15, size=0x20, podReferenceMap=0x7ffff6700000) at com/oracle/svm/core/genscavenge/ThreadLocalAllocation.java:306
+#8  0x0000000000489165 in com.oracle.svm.core.genscavenge.ThreadLocalAllocation::slowPathNewArrayLikeObject (objectHeader=0x8f6110 &lt;io.smallrye.common.expression.ExpressionNode::toString+160&gt;, length=15, podReferenceMap=0x7ffff6700000) at com/oracle/svm/core/genscavenge/ThreadLocalAllocation.java:279
+#9  0x0000000000489066 in com.oracle.svm.core.genscavenge.ThreadLocalAllocation::slowPathNewArray (objectHeader=0x8f6110 &lt;io.smallrye.common.expression.ExpressionNode::toString+160&gt;, length=15) at com/oracle/svm/core/genscavenge/ThreadLocalAllocation.java:242
+#10 0x0000000000d202a1 in java.util.Arrays::copyOfRange (original=0x7ffff6a33410, from=2, to=17) at java/util/Arrays.java:3819
+#11 0x0000000000acf8e6 in java.lang.StringLatin1::newString (val=0x7ffff6a33410, index=2, len=15) at java/lang/StringLatin1.java:769
+#12 0x0000000000acac59 in java.lang.String::substring (this=0x7ffff6dc0d48, beginIndex=2, endIndex=17) at java/lang/String.java:2712
+#13 0x0000000000acaba2 in java.lang.String::substring (this=0x7ffff6dc0d48, beginIndex=2) at java/lang/String.java:2680
+#14 0x00000000004f96cd in com.oracle.svm.core.posix.thread.PosixPlatformThreads::setNativeName (this=0x7ffff7658d10, thread=0x7ffff723fb30, name=0x7ffff6dc0d48) at com/oracle/svm/core/posix/thread/PosixPlatformThreads.java:163
+#15 0x00000000004f9285 in com.oracle.svm.core.posix.thread.PosixPlatformThreads::beforeThreadRun (this=0x7ffff7658d10, thread=0x7ffff723fb30) at com/oracle/svm/core/posix/thread/PosixPlatformThreads.java:212
+#16 0x00000000005237a2 in com.oracle.svm.core.thread.PlatformThreads::threadStartRoutine (threadHandle=0x1) at com/oracle/svm/core/thread/PlatformThreads.java:760
+#17 0x00000000004f9627 in com.oracle.svm.core.posix.thread.PosixPlatformThreads::pthreadStartRoutine (data=0x2a06e20) at com/oracle/svm/core/posix/thread/PosixPlatformThreads.java:203
+#18 0x0000000000462ab0 in com.oracle.svm.core.code.IsolateEnterStub::PosixPlatformThreads_pthreadStartRoutine_38d96cbc1a188a6051c29be1299afe681d67942e (__0=&lt;optimized out&gt;) at com/oracle/svm/core/code/IsolateEnterStub.java:1
+#19 0x00007ffff7e4714d in start_thread (arg=&lt;optimized out&gt;) at pthread_create.c:442
+#20 0x00007ffff7ec8950 in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:81</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Quarkusのネイティブ実行可能ファイルが <code>gdb</code> を介して実行されているときに <code>set scheduler-locking step</code> を設定すると、マルチスレッドアプリケーションのデバッグが容易になります。これは、現在のスレッドがステップスルーされるのを先取りして、他のスレッドが「プロンプトをつかむ」のを阻止することにより、シングルステッピングを最適化します。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>このように、上記のフレームグラフでは、合計72回もの呼び出しを <code><em>GI</em> _mmap64</code> Quarkusのネイティブ実行可能ファイルが18スレッドで実行されていることを考えると、スレッド名の省略形スタックトレースで使用されます。</p>
+</div>
+<div class="paragraph">
+<p>A third, and final observation,
+is that if you capture the <code>syscalls:sys_enter_munmmap</code> event,
+you might observe that some allocations also result in calls to <code>munmap</code>.
+When calculating the size to reserve,
+the requested size to allocate can be rounded up to the page size.
+The maintain alignment,
+1MB in case of aligned chunks or 1 byte for unaligned chunks,
+some of the reserved memory might be unreserved.
+That is where these <code>munmap</code> calls would come from.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>フレームグラフを見て、スレッドのローカル割り当てを起点とする <code>mmap</code> 呼び出しの数を数えるだけで、Quarkusネイティブ実行ファイルが起動時に使用するRSSをおおよそ推定することができます。この推定は、完全に正確なものではありません。なぜなら、非整列ヒープチャンクの場合、スタックトレースにチャンクのサイズが記録されないからです。また、追加のビルド引数が削除された場合、インライン最適化によって要求された配列割り当てチャンクのタイプが不明瞭になり、割り当てが整列チャンクか非整列チャンクかを判断できない可能性があります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="rss-ebpf"><a class="anchor" href="#rss-ebpf"></a>bcc/eBPF</h4>
+<div class="paragraph">
+<p>スタックトレースができるバージョンの <a href="https://github.com/iovisor/bcc">bcc/</a> <a href="https://ebpf.io/">eBPF</a> は、Linuxカーネル4.8以降でのみ利用可能です。カーネル内サマリーを行うことができるため、より効率的でオーバーヘッドが少なくなっています。しかし、DWARFデバッグシンボルを理解できないため、得られる情報は読みづらく、詳細な情報が含まれていない可能性があります。</p>
+</div>
+<div class="paragraph">
+<p>bcc/eBPFは非常に拡張性が優れているため、特定のメトリクスを追跡するスクリプトを作るのが簡単です。 <code>bcc</code> プロジェクトには <code>stackcount</code> プログラムがあり、前のセクションで <code>perf</code> が行ったのと同様の方法でスタックトレースをカウントするために使用することができます。しかし、場合によっては、システムコールの呼び出し回数以外のメトリクスがあった方が便利なこともあります。 <code>malloc</code> はそのような例の1つです。 <code>malloc</code> の呼び出し回数はそれほど重要ではなく、むしろアロケーションの大きさが重要です。そのため、サンプル数を示すフレームグラフではなく、割り当てられたバイトを示すフレームグラフを生成することができます。</p>
+</div>
+<div class="paragraph">
+<p><code>mmap</code> 以外に、 <code>malloc</code> システムコールも GraalVM が生成するネイティブ実行可能ファイルに存在します。bcc/eBPF を使って、 <code>malloc</code> を使って割り当てられたバイトのフレームグラフを生成してみましょう。</p>
+</div>
+<div class="paragraph">
+<p>そのためには、まずQuarkusのネイティブ実行ファイルを生成し直し、bcc/eBPFが理解できないデバッグ情報を削除し、代わりにローカルシンボルを含むフレームポインタを使用してスタックトレースを取得します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ mvn package -DskipTests -Dnative \
+  -Dquarkus.native.additional-build-args=-H:-DeleteLocalSymbols,-H:+PreserveFramePointer</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>mallocstacks.py bcc/eBPF スクリプトは、 <code>malloc</code> スタックトレースをその割り当てられたサイズとともにキャプチャするために使用されます。このスクリプトや他の典型的な bcc/eBPF スクリプト (例えば <code>stackcount</code> ) には、プロセス ID (PID) を与える必要があります。このため、起動をトレースしたい場合は少し厄介ですが、 <code>gdb</code> (デバッグ情報を有効にしていなくても) を使用すると、最初の命令でアプリケーションを停止できるため、この問題を回避することが可能です。まず、 <code>gdb</code> を使ってネイティブ実行ファイルを実行してみましょう:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ gdb --args ./target/code-with-quarkus-1.0.0-SNAPSHOT-runner -Xmx128m
+...
+(No debugging symbols found in ./target/code-with-quarkus-1.0.0-SNAPSHOT-runner)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>starti</code> は、プログラム実行の一番最初の命令に一時的なブレークポイントを設定する <code>gdb</code> のコマンドです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">(gdb) starti
+Starting program: &lt;..&gt;/code-with-quarkus/target/code-with-quarkus-1.0.0-SNAPSHOT-runner -Xmx128m
+Program stopped.
+0x00007ffff7fe4790 in _start () from /lib64/ld-linux-x86-64.so.2</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Next invoke the bcc/eBPF script giving it the PID of the Quarkus process,
+so that it can track the <code>malloc</code> calls,
+capture stack traces and dump them to a file for post-processing:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ sudo ./mallocstacks.py -p $(pidof code-with-quarkus-1.0.0-SNAPSHOT-runner) -f &gt; out.stacks</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then go back to the <code>gdb</code> shell and instruct it to continue the startup procedure after hitting the first instruction:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">(gdb) continue
+Continuing.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+[New Thread 0x7ffff65ff6c0 (LWP 3342)]
+...
+[New Thread 0x7fffc6ffd6c0 (LWP 3359)]
+__  ____  __  _____   ___  __ ____  ______
+ --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
+ -/ /_/ / /_/ / __ |/ , _/ ,&lt; / /_/ /\ \
+--\___\_\____/_/ |_/_/|_/_/|_|\____/___/
+2023-02-09 18:02:32,794 INFO  [io.quarkus] (main) code-with-quarkus 1.0.0-SNAPSHOT native (powered by Quarkus 2.16.1.Final) started in 0.011s. Listening on: http://0.0.0.0:8080
+2023-02-09 18:02:32,794 INFO  [io.quarkus] (main) Profile prod activated.
+2023-02-09 18:02:32,794 INFO  [io.quarkus] (main) Installed features: [cdi, rest, smallrye-context-propagation, vertx]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>起動が完了したら、 <code>stackcount</code> シェルで <code>Ctrl-C</code> を押してください。</p>
+</div>
+<div class="paragraph">
+<p>Then process the stacks file as a flamegraph.
+Note that the stacks generated by this script are already collapsed,
+so the flamegraph can be generated just like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ cat out.stacks | ${FG_HOME}/flamegraph.pl --color=mem --title="malloc bytes Flame Graph" --countname="bytes" &gt; out.svg</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>生成されたflamegraphは、次のようなものです:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/guides/images/malloc-bytes.svg" alt="malloc bytes flamegraph">
+</div>
+</div>
+<div class="paragraph">
+<p>This shows that most of the memory requested using <code>malloc</code> comes from epoll in Java NIO,
+but the overall amount allocated via <code>malloc</code> is barely 268KB.
+This amount of 274,269 bytes can be observed by hovering on top of <code>all</code> at the bottom of flamegraph
+(you might need to ask the browser to open the flamegraph in a different tab or window to observe this).
+This is very small compared with the amount allocated for the heap with <code>mmap</code>.</p>
+</div>
+<div class="paragraph">
+<p>最後に、他のbcc/eBPFコマンドと、それらをflamegraphに変換する方法について簡単に触れておきます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ sudo /usr/share/bcc/tools/stackcount -P -p $(pidof code-with-quarkus-1.0.0-SNAPSHOT-runner) \
+  -U "t:syscalls:sys_enter_m*" # count stacks for mmap and munmap
+
+$ sudo /usr/share/bcc/tools/stackcount -P -p $(pidof code-with-quarkus-1.0.0-SNAPSHOT-runner) \
+  -U "c:*alloc" # count stacks for malloc, calloc and realloc
+
+$ sudo /usr/share/bcc/tools/stackcount -P -p $(pidof code-with-quarkus-1.0.0-SNAPSHOT-runner) \
+  -U "c:free" # count stacks for free
+
+$ sudo /usr/share/bcc/tools/stackcount -P -p $(pidof code-with-quarkus-1.0.0-SNAPSHOT-runner) \
+  -U "t:exceptions:page_fault_*" # count stacks for page faults</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>stackcount</code> で生成されたスタックは、flamegraph に変換する前に折りたたむ必要があります。例えば、以下のような感じです:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">${FG_HOME}/stackcollapse.pl &lt; out.stacks | ${FG_HOME}/flamegraph.pl \
+  --color=mem --title="mmap munmap Flame Graph" --countname="calls" &gt; out.svg</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="native-image-agent-integration"><a class="anchor" href="#native-image-agent-integration"></a>Native Image Tracing Agent Integration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus users that want to integrate new libraries/components into native image process
+(e.g. <a href="https://github.com/hierynomus/smbj">smbj</a>),
+or want to use JDK APIs that require extensive native image configuration to work (e.g. graphical user interfaces),
+face a considerable challenge coming up with the native image configuration to make their use cases work.
+These users can tweak their applications to run in JVM mode with the native image agent in order to
+auto-generate native image configuration that will help them get a head start getting applications to work as native executables.</p>
+</div>
+<div class="paragraph">
+<p>The native image tracing agent is a JVM tool interface (JVMTI) agent available within both GraalVM and Mandrel that
+tracks all usages of dynamic features such as reflection, JNI, dynamic proxies, access classpath resources&#8230;&#8203;etc,
+during an application&#8217;s regular JVM execution.
+When the JVM stops, it dumps the information on the dynamic features used during the run
+onto a collection of native image configuration files that can be used in subsequent native image builds.</p>
+</div>
+<div class="paragraph">
+<p>Using the agent and applying the generated data can be difficult for Quarkus users.
+First, the agent can be cumbersome because it requires the JVM arguments to be modified,
+and the generated configuration needs to be placed in a specific location such that the subsequent native image builds picks them up.
+Secondly, the native image configuration produced contains a lot of superfluous configuration that the Quarkus integration takes care of.</p>
+</div>
+<div class="paragraph">
+<p>Native image tracing agent integration is included in Quarkus to make the agent easier to consume.
+In this section you will learn about the integration and how to apply it to your Quarkus application.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The integration is currently only available for Maven applications.
+<a href="https://github.com/quarkusio/quarkus/issues/40361">Gradle integration</a> will follow up.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="integration-testing-with-the-tracing-agent"><a class="anchor" href="#integration-testing-with-the-tracing-agent"></a>Integration Testing with the Tracing Agent</h3>
+<div class="paragraph">
+<p>Quarkus users can now run JVM mode integration tests on Quarkus Maven applications transparently with the native image tracing agent.
+To do this make sure a container runtime is available,
+because JVM mode integration tests will run using the JVM within the default Mandrel builder container image.
+This image contains the agent libraries required to produce native image configuration,
+hence avoiding the need for a local Mandrel or GraalVM installation.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>It is highly recommended to align the Mandrel version used in integration testing
+with the Mandrel version used to build native executables.
+Doing in-container native builds with the default Mandrel builder image,
+is the safest way to keep both versions aligned.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Additionally make sure that the <code>native-image-agent</code> goal is present in the <code>quarkus-maven-plugin</code> configuration:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">&lt;plugin&gt;
+    &lt;groupId&gt;${quarkus.platform.group-id}&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-maven-plugin&lt;/artifactId&gt;
+    ...
+    &lt;executions&gt;
+        &lt;execution&gt;
+            &lt;goals&gt;
+                ...
+                &lt;goal&gt;native-image-agent&lt;/goal&gt;
+            &lt;/goals&gt;
+        &lt;/execution&gt;
+    &lt;/executions&gt;
+&lt;/plugin&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With a container runtime running,
+invoke Maven&#8217;s <code>verify</code> goal with <code>-DskipITs=false -Dquarkus.test.integration-test-profile=test-with-native-agent</code> to run the JVM mode integration tests and
+generate the native image configuration.
+For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ ./mvnw verify -DskipITs=false -Dquarkus.test.integration-test-profile=test-with-native-agent
+...
+[INFO] --- failsafe:3.5.0:integration-test (default) @ new-project ---
+...
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running org.acme.GreetingResourceIT
+2024-05-14 16:29:53,941 INFO  [io.qua.tes.com.DefaultDockerContainerLauncher] (main) Executing "podman run --name quarkus-integration-test-PodgW -i --rm --user 501:20 -p 8081:8081 -p 8444:8444 --entrypoint java -v /tmp/new-project/target:/project --env QUARKUS_LOG_CATEGORY__IO_QUARKUS__LEVEL=INFO --env QUARKUS_HTTP_PORT=8081 --env QUARKUS_HTTP_SSL_PORT=8444 --env TEST_URL=http://localhost:8081 --env QUARKUS_PROFILE=test-with-native-agent --env QUARKUS_TEST_INTEGRATION_TEST_PROFILE=test-with-native-agent quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21 -agentlib:native-image-agent=access-filter-file=quarkus-access-filter.json,caller-filter-file=quarkus-caller-filter.json,config-output-dir=native-image-agent-base-config, -jar quarkus-app/quarkus-run.jar"
+...
+[INFO]
+[INFO] --- quarkus:3.17.6:native-image-agent (default) @ new-project ---
+[INFO] Discovered native image agent generated files in /tmp/new-project/target/native-image-agent-final-config
+[INFO]
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When the Maven invocation completes,
+you can inspect the generated configuration in the <code>target/native-image-agent-final-config</code> folder:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ cat ./target/native-image-agent-final-config/reflect-config.json
+[
+...
+{
+  "name":"org.acme.Alice",
+  "methods":[{"name":"&lt;init&gt;","parameterTypes":[] }, {"name":"sayMyName","parameterTypes":[] }]
+},
+{
+  "name":"org.acme.Bob"
+},
+...
+]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="informative-by-default"><a class="anchor" href="#informative-by-default"></a>Informative By Default</h3>
+<div class="paragraph">
+<p>By default the generated native image configuration files are not used by subsequent native image building processes.
+This precaution is taken to avoid situations where seemingly unrelated actions have unintended consequences on the native executable produced,
+e.g. disabling randomly failing tests.</p>
+</div>
+<div class="paragraph">
+<p>Quarkus users are free to copy the files from the folder reported in the build,
+store them under source control and evolve as needed.
+Ideally these files should be stored under the <code>src/main/resources/META-INF/native-image/&lt;group-id&gt;/&lt;artifact-id&gt;`</code> folder,
+in which case the native image process will automatically pick them up.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If managing native image agent configuration files manually,
+it is highly recommended to regenerate them each time a Mandrel version update occurs,
+because the configuration necessary to make the application work might have varied due to internal Mandrel changes.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>It is possible to instruct Quarkus to optionally apply the generated native image configuration files into subsequent native image processes,
+by setting the -Dquarkus.native.agent-configuration-apply` property.
+This can be useful to verify that the native integration tests work as expected,
+assuming that the JVM unit tests have generated the correct native image configuration.
+The typical workflow here would be to first run the integration tests with the native image agent as shown in the previous section:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ ./mvnw verify -DskipITs=false -Dquarkus.test.integration-test-profile=test-with-native-agent
+...
+[INFO] --- quarkus:3.17.6:native-image-agent (default) @ new-project ---
+[INFO] Discovered native image agent generated files in /tmp/new-project/target/native-image-agent-final-config</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And then request a native build passing in the configuration apply flag.
+A message during the native build process will indicate that the native image agent generated configuration files are being applied:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ ./mvnw verify -Dnative -Dquarkus.native.agent-configuration-apply
+...
+[INFO] --- quarkus:3.17.6:build (default) @ new-project ---
+[INFO] [io.quarkus.deployment.pkg.steps.JarResultBuildStep] Building native image source jar: /tmp/new-project/target/new-project-1.0.0-SNAPSHOT-native-image-source-jar/new-project-1.0.0-SNAPSHOT-runner.jar
+[INFO] [io.quarkus.deployment.steps.ApplyNativeImageAgentConfigStep] Applying native image agent generated files to current native executable build</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="debugging-the-tracing-agent-integration"><a class="anchor" href="#debugging-the-tracing-agent-integration"></a>Debugging the Tracing Agent Integration</h3>
+<div class="paragraph">
+<p>If the generated native image agent configuration is not satisfactory,
+more information can be obtained using any of the following techniques:</p>
+</div>
+<div class="sect3">
+<h4 id="debugging-filters"><a class="anchor" href="#debugging-filters"></a>Debugging Filters</h4>
+<div class="paragraph">
+<p>Quarkus generates native image tracing agent configuration filters.
+These filters exclude commonly used packages for which Quarkus already applies the necessary configuration.</p>
+</div>
+<div class="paragraph">
+<p>If native image agent is generating a configuration that it’s not working as expected,
+you should check that the configuration files include the expected information.
+For example, if some method happens to be accessed via reflection at runtime and you get an error,
+you want to verify that the configuration file contains a reflection entry for that method.</p>
+</div>
+<div class="paragraph">
+<p>If the entry is missing, it could be that some call path is being filtered that maybe shouldn’t have been.
+To verify that, inspect the contents of <code>target/quarkus-caller-filter.json</code> and <code>target/quarkus-access-filter.json</code> files,
+and confirm that the class and/or package making the call or being accessed is not being filtered out.</p>
+</div>
+<div class="paragraph">
+<p>If the missing entry is related to some resource,
+you should inspect the Quarkus build debug output and verify which resource patterns are being discarded, e.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ ./mvnw -X verify -DskipITs=false -Dquarkus.test.integration-test-profile=test-with-native-agent
+...
+[INFO] --- quarkus:3.17.6:native-image-agent (default) @ new-project ---
+...
+[DEBUG] Discarding resources from native image configuration that match the following regular expression: .*(application.properties|jakarta|jboss|logging.properties|microprofile|quarkus|slf4j|smallrye|vertx).*
+[DEBUG] Discarded included resource with pattern: \\QMETA-INF/microprofile-config.properties\\E
+[DEBUG] Discarded included resource with pattern: \\QMETA-INF/services/io.quarkus.arc.ComponentsProvider\\E
+...</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="tracing-agent-logging"><a class="anchor" href="#tracing-agent-logging"></a>Tracing Agent Logging</h4>
+<div class="paragraph">
+<p>The native image tracing agent can log the method invocations that result in the generated configuration to a JSON file.
+This can help understand why a configuration entry is generated.
+To enable this logging,
+<code>-Dquarkus.test.native.agent.output.property.name=trace-output</code> and
+<code>-Dquarkus.test.native.agent.output.property.value=native-image-agent-trace-file.json</code>
+system properties need to be added.
+For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ ./mvnw verify -DskipITs=false \
+    -Dquarkus.test.integration-test-profile=test-with-native-agent \
+    -Dquarkus.test.native.agent.output.property.name=trace-output \
+    -Dquarkus.test.native.agent.output.property.value=native-image-agent-trace-file.json</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When trace output is configured, no native image configuration is generated,
+and instead a <code>target/native-image-agent-trace-file.json</code> file is generated that contains trace information.
+For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">[
+{"tracer":"meta", "event":"initialization", "version":"1"},
+{"tracer":"meta", "event":"phase_change", "phase":"start"},
+{"tracer":"jni", "function":"FindClass", "caller_class":"java.io.ObjectStreamClass", "result":true, "args":["java/lang/NoSuchMethodError"]},
+...
+{"tracer":"reflect", "function":"findConstructorHandle", "class":"io.vertx.core.impl.VertxImpl$1$1$$Lambda/0x000000f80125f4e8", "caller_class":"java.lang.invoke.InnerClassLambdaMetafactory", "result":true, "args":[["io.vertx.core.Handler"]]},
+{"tracer":"meta", "event":"phase_change", "phase":"dead"},
+{"tracer":"meta", "event":"phase_change", "phase":"unload"}
+]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Unfortunately the trace output does not take into account the applied configuration filters,
+so the output contains all configuration decisions made by the agent.
+This is unlikely to change in the near future
+(see <a href="https://github.com/oracle/graal/issues/7635">oracle/graal#7635</a>).</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="configuration-with-origins-experimental"><a class="anchor" href="#configuration-with-origins-experimental"></a>Configuration With Origins (Experimental)</h4>
+<div class="paragraph">
+<p>Alternative to the trace output,
+it is possible to configure the native image agent with an experimental flag that shows the origins of the configuration entries.
+You can enable that with the following additional system property:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ ./mvnw verify -DskipITs=false \
+    -Dquarkus.test.integration-test-profile=test-with-native-agent \
+    -Dquarkus.test.native.agent.additional.args=experimental-configuration-with-origins</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The origins of the configuration entries can be found in text files inside the <code>target/native-image-agent-base-config</code> folder.
+For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ cat target/native-image-agent-base-config/reflect-origins.txt
+root
+├── java.lang.Thread#run()
+│   └── java.lang.Thread#runWith(java.lang.Object,java.lang.Runnable)
+│       └── io.netty.util.concurrent.FastThreadLocalRunnable#run()
+│           └── org.jboss.threads.ThreadLocalResettingRunnable#run()
+│               └── org.jboss.threads.DelegatingRunnable#run()
+│                   └── org.jboss.threads.EnhancedQueueExecutor$ThreadBody#run()
+│                       └── org.jboss.threads.EnhancedQueueExecutor$Task#run()
+│                           └── org.jboss.threads.EnhancedQueueExecutor$Task#doRunWith(java.lang.Runnable,java.lang.Object)
+│                               └── io.quarkus.vertx.core.runtime.VertxCoreRecorder$14#runWith(java.lang.Runnable,java.lang.Object)
+│                                   └── org.jboss.resteasy.reactive.common.core.AbstractResteasyReactiveContext#run()
+│                                       └── io.quarkus.resteasy.reactive.server.runtime.QuarkusResteasyReactiveRequestContext#invokeHandler(int)
+│                                           └── org.jboss.resteasy.reactive.server.handlers.InvocationHandler#handle(org.jboss.resteasy.reactive.server.core.ResteasyReactiveRequestContext)
+│                                               └── org.acme.GreetingResource$quarkusrestinvoker$greeting_709ef95cd764548a2bbac83843a7f4cdd8077016#invoke(java.lang.Object,java.lang.Object[])
+│                                                   └── org.acme.GreetingResource#greeting(java.lang.String)
+│                                                       └── org.acme.GreetingService_ClientProxy#greeting(java.lang.String)
+│                                                           └── org.acme.GreetingService#greeting(java.lang.String)
+│                                                               ├── java.lang.Class#forName(java.lang.String) - [ {   "name":"org.acme.Alice" }, {   "name":"org.acme.Bob" } ]
+│                                                               ├── java.lang.Class#getDeclaredConstructor(java.lang.Class[]) - [ {   "name":"org.acme.Alice",   "methods":[{"name":"&lt;init&gt;","parameterTypes":[] }] } ]
+│                                                               ├── java.lang.reflect.Constructor#newInstance(java.lang.Object[]) - [ {   "name":"org.acme.Alice",   "methods":[{"name":"&lt;init&gt;","parameterTypes":[] }] } ]
+│                                                               ├── java.lang.reflect.Method#invoke(java.lang.Object,java.lang.Object[]) - [ {   "name":"org.acme.Alice",   "methods":[{"name":"sayMyName","parameterTypes":[] }] } ]
+│                                                               └── java.lang.Class#getMethod(java.lang.String,java.lang.Class[]) - [ {   "name":"org.acme.Alice",   "methods":[{"name":"sayMyName","parameterTypes":[] }] } ]
+...</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="debugging-with-gdb"><a class="anchor" href="#debugging-with-gdb"></a>Debugging With GDB</h4>
+<div class="paragraph">
+<p>The native image agent itself is a native executable produced with GraalVM that uses JVMTI to intercept the calls that require native image configuration.
+As a last resort, it is possible to debug the native image agent with GDB,
+see <a href="https://github.com/oracle/graal/blob/master/substratevm/src/com.oracle.svm.agent/README.md">here</a>
+for instructions on how to do that.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="inspecting-and-debugging"><a class="anchor" href="#inspecting-and-debugging"></a>ネイティブ実行可能ファイルの検査とデバッグ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このデバッグガイドでは、開発中または生産中に発生する可能性のあるQuarkusネイティブ実行可能ファイルの問題のデバッグについて、さらに詳しく説明します。</p>
+</div>
+<div class="paragraph">
+<p><a href="get-started">入門ガイド</a> で開発されたアプリケーションを入力として使用します。 このアプリケーションを素早くセットアップする方法は、このガイドに記載されています。</p>
+</div>
+<div class="sect2">
+<h3 id="requirements-and-assumptions"><a class="anchor" href="#requirements-and-assumptions"></a>要件と前提条件</h3>
+<div class="paragraph">
+<p>このデバッグガイドには、次の要件があります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>JDK 17 installed with <code>JAVA_HOME</code> configured appropriately</p>
+</li>
+<li>
+<p>Apache Maven 3.9.9</p>
+</li>
+<li>
+<p>動作するコンテナーランタイム(Docker, podman)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>このガイドでは、Linux 環境内で Quarkus ネイティブ実行可能ファイルをビルドして実行します。すべての環境で同種のエクスペリエンスを提供するために、ガイドはコンテナーランタイム環境に依存して、ネイティブ実行可能ファイルをビルドおよび実行します。以下の手順では例として Docker を使用していますが、podman などの他のコンテナーランタイムでも、よく似たコマンドを実行できます。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルのビルドはコストのかかるプロセスであるため、コンテナーランタイムに十分な CPU とメモリーがあることを確認してください。最低でも 4 つの CPU と 4GB のメモリーが必要です。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>最後に、このガイドでは、ネイティブ実行可能ファイルのビルド用に GraalVM の <a href="https://github.com/graalvm/mandrel">Mandrel distribution</a> の使用を想定しています。これらはコンテナー内にビルドされるため、ホスト上に Mandrel をインストールする必要はありません。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="bootstrapping-the-project"><a class="anchor" href="#bootstrapping-the-project"></a>プロジェクトのブートストラップ</h3>
+<div class="paragraph">
+<p>新しい Quarkus プロジェクトを作成することから始めます。ターミナルを開き、以下のコマンドを実行します。</p>
+</div>
+<div class="paragraph">
+<p>Linux および MacOS ユーザー向け</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:debugging-native \
+    --extension='rest,container-image-docker'
+cd debugging-native</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:3.17.6:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=debugging-native \
+    -Dextensions='rest,container-image-docker'
+cd debugging-native</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Windowsユーザーの場合:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>cmdを使用する場合、（バックスラッシュ <code>\</code> を使用せず、すべてを同じ行に書かないでください）。</p>
+</li>
+<li>
+<p>Powershellを使用する場合は、 <code>-D</code> パラメータを二重引用符で囲んでください。例: <code>"-DprojectArtifactId=debugging-native"</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Windows ユーザー向け</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>cmd を使用する場合は、バックスラッシュ <code>\</code> は使わず、一行で実行します。</p>
+</li>
+<li>
+<p>Powershell を使用する場合は、<code>-D</code> パラメーターを二重引用符で囲みます。例: <code>"-DprojectArtifactId=debugging-native"</code></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configure-quarkus-properties"><a class="anchor" href="#configure-quarkus-properties"></a>Quarkus のプロパティーを設定する</h3>
+<div class="paragraph">
+<p>Quarkusの設定オプションの中には、このデバッグガイドの中で常に使用されるものがあります。そのため、コマンドラインからの呼び出しを減らすために、これらのオプションを <code>application.properties</code> ファイルに追加することをお勧めします。そこで、次のオプションをそのファイルに追加してください：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.native.container-build=true
+quarkus.native.builder-image=quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21
+quarkus.container-image.build=true
+quarkus.container-image.group=test</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="first-debugging-steps"><a class="anchor" href="#first-debugging-steps"></a>最初のデバッグ手順</h3>
+<div class="paragraph">
+<p>最初のステップとして、プロジェクトディレクトリーに移動し、アプリケーションのネイティブ実行可能ファイルをビルドします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw package -DskipTests -Dnative</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>アプリケーションを実行して、期待通りに動作することを確認します。一つの端末で以下を実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker run -i --rm -p 8080:8080 test/debugging-native:1.0.0-SNAPSHOT</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>別のターミナルで以下を実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -w '\n' http://localhost:8080/hello</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このセクションの残りの部分では、追加情報を使用してネイティブ実行可能ファイルをビルドする方法について説明しますが、最初に、実行中のアプリケーションを停止します。<code>-Dquarkus.native.additional-build-args</code> を使用してネイティブイメージビルドオプションを追加することで、ネイティブ実行可能ファイルのビルド中にこの情報を取得できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw package -DskipTests -Dnative \
+    -Dquarkus.native.additional-build-args=--native-image-info</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これを実行すると、次のような追加の出力行が得られます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">...
+# Printing compilation-target information to: /project/reports/target_info_20220223_100915.txt
+…
+# Printing native-library information to: /project/reports/native_library_info_20220223_100925.txt</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>/project</code> は、ネイティブ実行可能ファイルをビルドしているコンテナー内のフォルダーであることに注意してください。したがって、これはホスト環境にあるフォルダーではありません。<code>/project</code> フォルダーは <code>target/debugging-native-1.0.0-SNAPSHOT-native-image-source-jar</code> にマップされているため、そのディレクトリーの <code>reports</code> フォルダーの下にファイルがあります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>ターゲット情報ファイルには、ターゲットプラットフォーム、実行ファイルのコンパイルに使用されたツールチェーン、使用されているCライブラリなどの情報が含まれています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ cat target/*/reports/target_info_*.txt
+Building image for target platform: org.graalvm.nativeimage.Platform$LINUX_AMD64
+Using native toolchain:
+   Name: GNU project C and C++ compiler (gcc)
+   Vendor: redhat
+   Version: 8.5.0
+   Target architecture: x86_64
+   Path: /usr/bin/gcc
+Using CLibrary: com.oracle.svm.core.posix.linux.libc.GLib</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ネイティブライブラリ情報ファイルには、バイナリに追加されるスタティックライブラリと、実行可能ファイルに動的にリンクされるその他のライブラリの情報が含まれています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ cat target/*/reports/native_library_info_*.txt
+Static libraries:
+   ../opt/mandrel/lib/svm/clibraries/linux-amd64/liblibchelper.a
+   ../opt/mandrel/lib/static/linux-amd64/glibc/libnet.a
+   ../opt/mandrel/lib/static/linux-amd64/glibc/libextnet.a
+   ../opt/mandrel/lib/static/linux-amd64/glibc/libnio.a
+   ../opt/mandrel/lib/static/linux-amd64/glibc/libjava.a
+   ../opt/mandrel/lib/static/linux-amd64/glibc/libfdlibm.a
+   ../opt/mandrel/lib/static/linux-amd64/glibc/libsunec.a
+   ../opt/mandrel/lib/static/linux-amd64/glibc/libzip.a
+   ../opt/mandrel/lib/svm/clibraries/linux-amd64/libjvm.a
+Other libraries: stdc++,pthread,dl,z,rt</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ネイティブイメージビルドの追加引数として <code>--verbose</code> を渡すことで、さらに詳細な情報を得ることができます。このオプションは、Quarkusを介して高いレベルで渡されたオプションがネイティブ実行可能ファイルの生成に渡されているのか、あるいはサードパーティのjarにネイティブイメージの設定が埋め込まれていて、それがネイティブイメージの呼び出しに届いているのかを検出するのに非常に役立ちます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw package -DskipTests -Dnative \
+    -Dquarkus.native.additional-build-args=--verbose</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>--verbose</code> で実行すると、ネイティブイメージのビルドプロセスが2つの連続したJavaプロセスであることが分かります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>1番目は非常に短いJavaプロセスで、基本的な検証を行い、2つ目のプロセスのための引数を組み立てます（GraalVMの純正ディストリビューションでは、これはネイティブコードとして実行されます）。</p>
+</li>
+<li>
+<p>2番目のJavaプロセスでは、ネイティブ実行可能ファイル作成の主要部分が行われます。 <code>--verbose</code> オプションは、実際に実行されたJavaプロセスを表示します。出力を受けて、自分で実行することもできます。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>また、複数のネイティブ・ビルド・オプションをコンマで区切って組み合わせることもできます。例:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw package -DskipTests -Dnative \
+    -Dquarkus.native.additional-build-args=--native-image-info,--verbose</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>-Dquarkus.native.additional-build-args</code> の引数に <code>,</code> シンボルが含まれている場合、正しく処理するためには、<code>\\,</code> のようにエスケープする必要があることを覚えておいてください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="inspecting-native-executables"><a class="anchor" href="#inspecting-native-executables"></a>ネイティブ実行可能ファイルの検査</h3>
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルを指定すると、さまざまな Linux ツールを使用して実行可能ファイルを検査できます。さまざまな環境をサポートできるように、検査は Linux コンテナー内から実行されます。このガイドに必要なすべてのツールを使用して、Linux コンテナーイメージを作成しましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-dockerfile hljs" data-lang="dockerfile">FROM fedora:35
+
+RUN dnf install -y \
+binutils \
+gdb \
+git \
+perf \
+perl-open
+
+ENV FG_HOME /opt/FlameGraph
+
+RUN git clone https://github.com/brendangregg/FlameGraph $FG_HOME
+
+WORKDIR /data
+
+ENTRYPOINT /bin/bash</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Linux 以外の環境で docker を使用する場合は、以下を実行し、この Dockerfile を使用してイメージを作成できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker build -t fedora-tools:v1 .</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、プロジェクトの root に移動し、先ほど作成した Docker コンテナーを以下のように実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker run -t -i --rm -v ${PWD}:/data -p 8080:8080 fedora-tools:v1</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>ldd</code> は、実行可能ファイルの共有ライブラリの依存関係を表示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">ldd ./target/debugging-native-1.0.0-SNAPSHOT-runner</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>strings</code> は、バイナリ内のテキストメッセージを探すのに使用できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">strings ./target/debugging-native-1.0.0-SNAPSHOT-runner | grep Hello</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>strings</code> を使えば、指定されたバイナリのMandrel情報を得ることもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">strings ./target/debugging-native-1.0.0-SNAPSHOT-runner | grep core.VM</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>最後に、 <code>readelf</code> を使って、バイナリーのさまざまなセクションを調べることができます。例えば、ヒープセクションとテキストセクションがバイナリの大半を占めていることがわかります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">readelf -SW ./target/debugging-native-1.0.0-SNAPSHOT-runner</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルを実行するために Quarkus によって生成されたランタイムコンテナーには、上記のツールは含まれません。ランタイムコンテナー内のネイティブ実行可能ファイルを調べるには、コンテナー自体を実行してから、実行可能ファイルをローカルで <code>docker cp</code> するのが最適です。次に例を示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker run -i --rm --name=mytest -p 8080:8080 test/debugging-native:1.0.0-SNAPSHOT
+docker cp mytest:/work/application path/on/host/</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そこから、実行可能ファイルを直接検査するか、上記のようなツールコンテナーを使用することができます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="native-reports"><a class="anchor" href="#native-reports"></a>ネイティブレポート</h3>
+<div class="paragraph">
+<p>オプションとして、ネイティブビルドプロセスでは、バイナリに何が入っているかを示すレポートを生成することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw package -DskipTests -Dnative \
+    -Dquarkus.native.enable-reports</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>レポートは、<code>target/debugging-native-1.0.0-SNAPSHOT-native-image-source-jar/reports/</code> の下に作成されます。これらのレポートは、メソッド/クラスが見つからない問題が発生した場合、または Mandrel によって禁止されたメソッドが発生した場合に、最も役立つリソースの一部になります。</p>
+</div>
+<div class="sect3">
+<h4 id="call-tree-reports"><a class="anchor" href="#call-tree-reports"></a>コールツリーレポート</h4>
+<div class="paragraph">
+<p><code>call_tree</code> csv ファイルレポートは、<code>-Dquarkus.native.enable-reports</code> オプションが渡されたときに生成されるデフォルトレポートの一部です。これらの csv ファイルは、Neo4j などのグラフデータベースにインポートして、より簡単に検査できます。呼び出しツリーに対してクエリーを実行します。これは、メソッド/クラスがバイナリーに含まれている理由の概算を取得するのに役立ちます。</p>
+</div>
+<div class="paragraph">
+<p>実際に見てみましょう。</p>
+</div>
+<div class="paragraph">
+<p>まず、Neo4jのインスタンスを起動します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export NEO_PASS=...
+docker run \
+    --detach \
+    --rm \
+    --name testneo4j \
+    -p7474:7474 -p7687:7687 \
+    --env NEO4J_AUTH=neo4j/${NEO_PASS} \
+    neo4j:latest</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>コンテナーが実行されると、 <a href="http://localhost:7474">Neo4j ブラウザー</a> にアクセスできます。ログインする際は、ユーザー名として <code>neo4j</code> を使用し、パスワードとして <code>NEO_PASS</code> の値を使用します。</p>
+</div>
+<div class="paragraph">
+<p>CSVファイルをインポートするためには、CSVファイル内のデータをインポートし、グラフデータベースのノードとエッジを作成する以下のcypherスクリプトが必要です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-cypher hljs" data-lang="cypher">CREATE CONSTRAINT unique_vm_id FOR (v:VM) REQUIRE v.vmId IS UNIQUE;
+CREATE CONSTRAINT unique_method_id FOR (m:Method) REQUIRE m.methodId IS UNIQUE;
+
+LOAD CSV WITH HEADERS FROM 'file:///reports/call_tree_vm.csv' AS row
+MERGE (v:VM {vmId: row.Id, name: row.Name})
+RETURN count(v);
+
+LOAD CSV WITH HEADERS FROM 'file:///reports/call_tree_methods.csv' AS row
+MERGE (m:Method {methodId: row.Id, name: row.Name, type: row.Type, parameters: row.Parameters, return: row.Return, display: row.Display})
+RETURN count(m);
+
+LOAD CSV WITH HEADERS FROM 'file:///reports/call_tree_virtual_methods.csv' AS row
+MERGE (m:Method {methodId: row.Id, name: row.Name, type: row.Type, parameters: row.Parameters, return: row.Return, display: row.Display})
+RETURN count(m);
+
+LOAD CSV WITH HEADERS FROM 'file:///reports/call_tree_entry_points.csv' AS row
+MATCH (m:Method {methodId: row.Id})
+MATCH (v:VM {vmId: '0'})
+MERGE (v)-[:ENTRY]-&gt;(m)
+RETURN count(*);
+
+LOAD CSV WITH HEADERS FROM 'file:///reports/call_tree_direct_edges.csv' AS row
+MATCH (m1:Method {methodId: row.StartId})
+MATCH (m2:Method {methodId: row.EndId})
+MERGE (m1)-[:DIRECT {bci: row.BytecodeIndexes}]-&gt;(m2)
+RETURN count(*);
+
+LOAD CSV WITH HEADERS FROM 'file:///reports/call_tree_override_by_edges.csv' AS row
+MATCH (m1:Method {methodId: row.StartId})
+MATCH (m2:Method {methodId: row.EndId})
+MERGE (m1)-[:OVERRIDEN_BY]-&gt;(m2)
+RETURN count(*);
+
+LOAD CSV WITH HEADERS FROM 'file:///reports/call_tree_virtual_edges.csv' AS row
+MATCH (m1:Method {methodId: row.StartId})
+MATCH (m2:Method {methodId: row.EndId})
+MERGE (m1)-[:VIRTUAL {bci: row.BytecodeIndexes}]-&gt;(m2)
+RETURN count(*);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>スクリプトの内容を <code>import.cypher</code> というファイルにコピー＆ペーストします。</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Mandrel 22.0.0 には、コンテナー内でレポートを生成する際に、インポートサイファーファイルで使用されるシンボリックリンクが正しく設定されないというバグが含まれています (詳細は <a href="https://github.com/oracle/graal/issues/4355">こちら</a> を参照)。これは、以下のスクリプトをファイルにコピーして実行することで回避できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">set -e
+
+project="debugging-native"
+
+pushd target/*-native-image-source-jar/reports
+
+rm -f call_tree_vm.csv
+ln -s call_tree_vm_${project}-* call_tree_vm.csv
+
+rm -f call_tree_direct_edges.csv
+ln -s call_tree_direct_edges_${project}-* call_tree_direct_edges.csv
+
+rm -f call_tree_entry_points.csv
+ln -s call_tree_entry_points_${project}-* call_tree_entry_points.csv
+
+rm -f call_tree_methods.csv
+ln -s call_tree_methods_${project}-* call_tree_methods.csv
+
+rm -f call_tree_virtual_edges.csv
+ln -s call_tree_virtual_edges_${project}-* call_tree_virtual_edges.csv
+
+rm -f call_tree_virtual_methods.csv
+ln -s call_tree_virtual_methods_${project}-* call_tree_virtual_methods.csv
+
+rm -f call_tree_override_by_edges.csv
+ln -s call_tree_override_by_edges_${project}-* call_tree_override_by_edges.csv
+
+popd</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>次に、インポートサイファースクリプトとCSVファイルをNeo4jのインポートフォルダにコピーします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker cp \
+    target/*-native-image-source-jar/reports \
+    testneo4j:/var/lib/neo4j/import
+
+docker cp import.cypher testneo4j:/var/lib/neo4j</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>すべてのファイルをコピーしたら、インポートスクリプトを起動します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker exec testneo4j bin/cypher-shell -u neo4j -p ${NEO_PASS} -f import.cypher</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>インポートの完了 (ほんの数分で完了) 後に、<a href="http://localhost:7474">Neo4j ブラウザー</a> にアクセスすると、簡単なデータのサマリーをグラフで見ることができます。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/guides/images/native-reference-neo4j-db-info.png" alt="Neo4j database information after import">
+</div>
+</div>
+<div class="paragraph">
+<p>上のデータでは、<sub>60000のメソッドがあり、それらの間には</sub>200000のエッジがあることがわかります。ここでデモされているQuarkusアプリケーションは非常に基本的なものなので、調べられることは多くありませんが、グラフをより詳細に調べるために実行できるクエリの例をいくつか紹介します。典型的な例としては、あるメソッドを探すことから始めます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-cypher hljs" data-lang="cypher">match (m:Method) where m.name = "hello" return *</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そこから、特定の型の特定のメソッドに絞ることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-cypher hljs" data-lang="cypher">match (m:Method) where m.name = "hello" and m.type =~ ".*GreetingResource" return *</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>探している特定のメソッドのノードを見つけたら、答えを得たい典型的な質問は、「なぜこのメソッドはコールツリーに含まれるのか」です。そのためには、終点のメソッドから始まる所定の深さの到着接続を探します。たとえば、あるメソッドを直接呼び出すメソッドは、以下のようにして見つけることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-cypher hljs" data-lang="cypher">match (m:Method) &lt;- [*1..1] - (o) where m.name = "hello" and m.type =~ ".*GreetingResource" return *</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そうすれば、深さ2の直接呼び出しを探すことができます。つまり、対象のメソッドを呼び出すメソッドを呼び出すメソッドを探すことになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-cypher hljs" data-lang="cypher">match (m:Method) &lt;- [*1..2] - (o) where m.name = "hello" and m.type =~ ".*GreetingResource" return *</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>階層を上がっていくことはできますが、残念ながらノードの数が多すぎる深度に到達すると、Neo4jブラウザはそれらすべてを可視化することができません。そのような場合は、代わりにcypher shellに対して直接クエリを実行することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker exec testneo4j bin/cypher-shell -u neo4j -p ${NEO_PASS} \
+  "match (m:Method) &lt;- [*1..10] - (o) where m.name = 'hello' and m.type =~ '.*GreetingResource' return *"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>詳細については、上記で説明した手法を使用して、Quarkus Hibernate ORM クイックスタートについて検討している <a href="https://quarkus.io/blog/quarkus-native-neo4j-call-tree">blog 記事</a> を参照してください。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="used-packagesclassesmethods-reports"><a class="anchor" href="#used-packagesclassesmethods-reports"></a>使用されているパッケージ/クラス/メソッドのレポート</h4>
+<div class="paragraph">
+<p><code>used_packages</code>, <code>used_classes</code>, <code>used_methods</code> テキストファイルレポートは、アプリケーションの異なるバージョンを比較する際に便利です。例えば、イメージ作成に時間がかかるのはなぜか？また、なぜイメージが大きくなったのか？</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="further-reports"><a class="anchor" href="#further-reports"></a>更なるレポート</h4>
+<div class="paragraph">
+<p>Mandrelは、 <code>-Dquarkus.native.enable-reports</code> オプションで有効になっているレポート以外にも、様々なレポートを作成することができます。これらはエキスパートオプションと呼ばれ、以下を実行することで詳細を知ることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker run quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21 --expert-options-all</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>これらのエキスパートオプションは、GraalVM ネイティブ Image API の一部とは見なされないため、いつでも変更される可能性があります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>これらのエキスパートオプションを使用するには、 <code>-Dquarkus.native.additional-build-args</code> パラメータにコンマで区切って追加します。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="build-time-vs-run-time-initialization"><a class="anchor" href="#build-time-vs-run-time-initialization"></a>ビルド時と実行時の初期化</h3>
+<div class="paragraph">
+<p>QuarkusはMandrelに対し、ビルド時に可能な限り初期化するよう指示し、実行時の起動を可能な限り高速化しています。これは、起動速度がアプリケーションの動作準備の早さに大きな影響を与えるコンテナ環境では重要です。また、ビルド時の初期化は、サポートされていない機能が実行時の初期化によって到達可能になることによる実行時の失敗のリスクを最小限にし、Quarkusの信頼性を高めています。</p>
+</div>
+<div class="paragraph">
+<p>ビルド時に初期化されるコードの最も一般的な例は、静的変数とブロックです。Mandrelはこれらをデフォルトでは実行時に実行しますが、Quarkusでは先程の理由でビルド時に実行するように指示しています。</p>
+</div>
+<div class="paragraph">
+<p>つまり、インラインで初期化されたスタティック変数や、スタティックブロックで初期化されたスタティック変数は、アプリケーションを再起動しても同じ値を維持します。これは、Javaとして実行した場合とは異なる動作です。</p>
+</div>
+<div class="paragraph">
+<p>これの実際の動作を非常に基本的な例で確認するには、以下のような新しい <code>TimestampResource</code> をアプリケーションに追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/timestamp")
+public class TimestampResource {
+
+    static long firstAccess = System.currentTimeMillis();
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String timestamp() {
+        return "First access " + firstAccess;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次のようにバイナリを再ビルドします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw package -DskipTests -Dnative</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>1 つのターミナルでアプリケーションを実行します (これを実行する前に、他のネイティブ実行可能コンテナーの実行を必ず停止してください)。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker run -i --rm -p 8080:8080 test/debugging-native:1.0.0-SNAPSHOT</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>別のターミナルから <code>GET</code> リクエストを複数回送信してみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -w '\n' http://localhost:8080/timestamp # run this multiple times</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>現在の時刻がどのようにバイナリに焼き付けられているかを確認できます。この時刻は、バイナリのビルド時に計算されたものなので、アプリケーションの再起動が影響しません。</p>
+</div>
+<div class="paragraph">
+<p>状況によっては、ビルド時の初期化により、ネイティブ実行可能ファイルをビルドするときにエラーが発生する可能性があります。1 つの例は、バイナリーにベイクされる JVM のヒープに存在することが禁じられている値が、ビルド時に計算される場合です。これが実際に動作することを確認するには、この REST リソースを追加してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+
+@Path("/encrypt-decrypt")
+public class EncryptDecryptResource {
+
+    static final KeyPairGenerator KEY_PAIR_GEN;
+    static final Cipher CIPHER;
+
+    static {
+        try {
+            KEY_PAIR_GEN = KeyPairGenerator.getInstance("RSA");
+            KEY_PAIR_GEN.initialize(1024);
+
+            CIPHER = Cipher.getInstance("RSA");
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @GET
+    @Path("/{message}")
+    public String encryptDecrypt(String message) throws Exception {
+        KeyPair keyPair = KEY_PAIR_GEN.generateKeyPair();
+
+        byte[] text = message.getBytes(StandardCharsets.UTF_8);
+
+        // Encrypt with private key
+        CIPHER.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
+        byte[] encrypted = CIPHER.doFinal(text);
+
+        // Decrypt with public key
+        CIPHER.init(Cipher.DECRYPT_MODE, keyPair.getPublic());
+        byte[] unencrypted = CIPHER.doFinal(encrypted);
+
+        return new String(unencrypted, StandardCharsets.UTF_8);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>アプリケーションを再ビルドしようとすると、エラーが発生します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw package -DskipTests -Dnative
+...
+Error: Unsupported features in 2 methods
+Detailed message:
+Error: Detected an instance of Random/SplittableRandom class in the image heap. Instances created during image generation have cached seed values and don't behave as expected.  To see how this object got instantiated use --trace-object-instantiation=java.security.SecureRandom. The object was probably created by a class initializer and is reachable from a static field. You can request class initialization at image runtime by using the option --initialize-at-run-time=&lt;class-name&gt;. Or you can write your own initialization methods and call them explicitly from your main entry point.
+Trace: Object was reached by
+	reading field java.security.KeyPairGenerator$Delegate.initRandom of
+		constant java.security.KeyPairGenerator$Delegate@58b0fe1b reached by
+	reading field org.acme.EncryptDecryptResource.KEY_PAIR_GEN
+Error: Detected an instance of Random/SplittableRandom class in the image heap. Instances created during image generation have cached seed values and don't behave as expected.  To see how this object got instantiated use --trace-object-instantiation=java.security.SecureRandom. The object was probably created by a class initializer and is reachable from a static field. You can request class initialization at image runtime by using the option --initialize-at-run-time=&lt;class-name&gt;. Or you can write your own initialization methods and call them explicitly from your main entry point.
+Trace: Object was reached by
+	reading field sun.security.rsa.RSAKeyPairGenerator.random of
+		constant sun.security.rsa.RSAKeyPairGenerator$Legacy@3248a092 reached by
+	reading field java.security.KeyPairGenerator$Delegate.spi of
+		constant java.security.KeyPairGenerator$Delegate@58b0fe1b reached by
+	reading field org.acme.EncryptDecryptResource.KEY_PAIR_GEN</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>したがって、上記のメッセージが示しているのは、アプリケーションが定数としてランダムであると想定される値をキャッシュしているということです。シードがイメージでベイク処理されているため、ランダムであるはずの何かがもはやランダムではないため、これは望ましくありません。上記のメッセージは、何が原因かを非常に明確に示していますが、他の状況では、原因はさらにわかりにくいかもしれません。次のステップとして、ネイティブ実行可能ファイルの生成にいくつかのフラグを追加して、より多くの情報を取得することにします。</p>
+</div>
+<div class="paragraph">
+<p>メッセージにあるように、まずはオブジェクトのインスタンス化を追跡するためのオプションを追加してみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw package -DskipTests -Dnative \
+    -Dquarkus.native.additional-build-args="--trace-object-instantiation=java.security.SecureRandom"
+...
+Error: Unsupported features in 2 methods
+Detailed message:
+Error: Detected an instance of Random/SplittableRandom class in the image heap. Instances created during image generation have cached seed values and don't behave as expected.  Object has been initialized by the com.sun.jndi.dns.DnsClient class initializer with a trace:
+ 	at java.security.SecureRandom.&lt;init&gt;(SecureRandom.java:218)
+	at sun.security.jca.JCAUtil$CachedSecureRandomHolder.&lt;clinit&gt;(JCAUtil.java:59)
+	at sun.security.jca.JCAUtil.getSecureRandom(JCAUtil.java:69)
+	at com.sun.jndi.dns.DnsClient.&lt;clinit&gt;(DnsClient.java:82)
+. Try avoiding to initialize the class that caused initialization of the object. The object was probably created by a class initializer and is reachable from a static field. You can request class initialization at image runtime by using the option --initialize-at-run-time=&lt;class-name&gt;. Or you can write your own initialization methods and call them explicitly from your main entry point.
+Trace: Object was reached by
+	reading field java.security.KeyPairGenerator$Delegate.initRandom of
+		constant java.security.KeyPairGenerator$Delegate@4a5058f9 reached by
+	reading field org.acme.EncryptDecryptResource.KEY_PAIR_GEN
+Error: Detected an instance of Random/SplittableRandom class in the image heap. Instances created during image generation have cached seed values and don't behave as expected.  Object has been initialized by the com.sun.jndi.dns.DnsClient class initializer with a trace:
+ 	at java.security.SecureRandom.&lt;init&gt;(SecureRandom.java:218)
+	at sun.security.jca.JCAUtil$CachedSecureRandomHolder.&lt;clinit&gt;(JCAUtil.java:59)
+	at sun.security.jca.JCAUtil.getSecureRandom(JCAUtil.java:69)
+	at com.sun.jndi.dns.DnsClient.&lt;clinit&gt;(DnsClient.java:82)
+. Try avoiding to initialize the class that caused initialization of the object. The object was probably created by a class initializer and is reachable from a static field. You can request class initialization at image runtime by using the option --initialize-at-run-time=&lt;class-name&gt;. Or you can write your own initialization methods and call them explicitly from your main entry point.
+Trace: Object was reached by
+	reading field sun.security.rsa.RSAKeyPairGenerator.random of
+		constant sun.security.rsa.RSAKeyPairGenerator$Legacy@71880cf1 reached by
+	reading field java.security.KeyPairGenerator$Delegate.spi of
+		constant java.security.KeyPairGenerator$Delegate@4a5058f9 reached by
+	reading field org.acme.EncryptDecryptResource.KEY_PAIR_GEN</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>エラーメッセージは例にあるコードを指していますが、<code>DnsClient</code> への参照が表示されるのは意外なことかもしれません。なぜでしょうか? 重要なのは、<code>KeyPairGenerator.initialize()</code> メソッド呼び出し内で起こっていることです。これは <code>JCAUtil.getSecureRandom()</code> を使用し、これが原因で問題となっていますが、トレースオプションは、実際に起きていることを表さないスタックトレースの一部を表示することがあります。最良のオプションは、ソースコードを調べ、トレース出力を完全な事実としてではなく、ガイダンスとして使用することです。</p>
+</div>
+<div class="paragraph">
+<p>この特定の問題を解決するには、<code>KEY_PAIR_GEN.initialize(1024);</code> 呼び出しを実行時に実行されるメソッド encryptDecrypt に移動するだけで十分です。アプリケーションを再構築し、メッセージを送信して暗号化/復号化エンドポイントが期待どおりに機能することを確認し、応答が受信メッセージと同じかどうかを確認します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ ./mvnw package -DskipTests -Dnative
+...
+$ docker run -i --rm -p 8080:8080 test/debugging-native:1.0.0-SNAPSHOT
+...
+$ curl -w '\n' http://localhost:8080/encrypt-decrypt/hellomandrel
+hellomandrel</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>どのクラスがどのように初期化されるかについての追加情報は、 <code>-Dquarkus.native.additional-build-args</code> を通じて <code>-H:+PrintClassInitialization</code> フラグを渡すことで得ることができます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="profiling"><a class="anchor" href="#profiling"></a>実行時動作のプロファイリング</h3>
+<div class="sect3">
+<h4 id="single-thread"><a class="anchor" href="#single-thread"></a>シングルスレッド</h4>
+<div class="paragraph">
+<p>この演習では、ネイティブ実行可能ファイルにコンパイルされたQuarkusアプリケーションの実行時動作をプロファイリングし、ボトルネックがどこにあるかを判断します。問題がアプリケーションのネイティブバージョンでのみ発生するために、純粋なJavaバージョンのプロファイリングができないシナリオを想定しています。</p>
+</div>
+<div class="paragraph">
+<p>次のコードを使用して REST リソースを追加します (この例は <a href="https://github.com/apangin/java-profiling-presentation/blob/master/src/demo1/StringBuilderTest.java">Andrei Pangin&#8217;s Java Profiling presentation</a> からご提供いただいています):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/string-builder")
+public class StringBuilderResource {
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String appendDelete() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(new char[1_000_000]);
+
+        do
+        {
+            sb.append(12345);
+            sb.delete(0, 5);
+        } while (Thread.currentThread().isAlive());
+
+        return "Never happens";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>アプリケーションを再コンパイルし、バイナリを再ビルドして実行します。単純なcurlを試みても、期待通り完了しません。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ ./mvnw package -DskipTests -Dnative
+...
+$ docker run -i --rm -p 8080:8080 test/debugging-native:1.0.0-SNAPSHOT
+...
+$ curl http://localhost:8080/string-builder # this will never complete</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>しかし、ここで私たちが答えようとしているのは、そのようなコードのボトルネックは何か？文字を追加することか？削除していることか？スレッドが生きているかどうかをチェックしていることか？です。</p>
+</div>
+<div class="paragraph">
+<p>Linux のネイティブ実行可能ファイルを扱っているので、<code>perf</code> のようなツールを直接使用できます。<code>perf</code> を使用するには、プロジェクトの root に移動し、特権ユーザーとして以前に作成したツールコンテナーを起動します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker run --privileged -t -i --rm -v ${PWD}:/data -p 8080:8080 fedora-tools:v1</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>なお、 <code>perf</code> を使用してガイドのネイティブ実行可能ファイルをプロファイルするには、コンテナを特権的に実行するか、 <code>--cap-add sys_admin</code> を使用する必要があります。本番環境では特権コンテナは推奨され <strong>ません</strong> ので、このフラグの使用には注意が必要です。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>コンテナが稼働したら、カーネルがプロファイリングの演習に対応できるようにしておく必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">echo -1 | sudo tee /proc/sys/kernel/perf_event_paranoid
+echo 0 | sudo tee /proc/sys/kernel/kptr_restrict</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>上記のカーネルの変更は、Linux 仮想マシンにも適用されます。ベアメタル Linux マシンで実行している場合は、<code>perf_event_paranoid</code> を微調整するだけで十分です。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>次に、ツールコンテナー内から以下を実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">perf record -F 1009 -g -a ./target/debugging-native-1.0.0-SNAPSHOT-runner</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>上記の <code>perf record</code> コマンドは、1 秒あたり 1009 サンプルを取得します。この値を大きくすると、より多くのサンプルが収集されることを意味し、実行時のパフォーマンスに影響を与える可能性があります。これにより、生成されるデータの量も増加します。生成されるデータが多いほど、処理に時間がかかりますが、アプリケーションが行っていることをより正確に把握できます。したがって、適切な値を見つけることは、バランスをとる作業です。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>perf record</code> の実行中に、別のウィンドウを開き、エンドポイントにアクセスします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:8080/string-builder # this will never complete</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>数秒後、<code>perf record</code> プロセスを停止します。これにより、<code>perf.data</code> ファイルが生成されます。<code>perf report</code> を使用して perf データを検査することができますが、多くの場合、データをフレームグラフとして表示した方が、より良い結果を得ることができます。フレームグラフを生成するには、ツールコンテナー内にすでにインストールされている <a href="https://github.com/brendangregg/FlameGraph">FlameGraph GitHub リポジトリー</a> を使用します。</p>
+</div>
+<div class="paragraph">
+<p>次に、<code>perf record</code> を介してキャプチャされたデータを使用してフレームグラフを生成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">perf script -i perf.data | ${FG_HOME}/stackcollapse-perf.pl | ${FG_HOME}/flamegraph.pl &gt; flamegraph.svg</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>フレームグラフは、Firefox などの Web ブラウザーで簡単に表示できる svg ファイルです。上記の2つのコマンドが完了すると、ブラウザーで <code>flamegraph.svg</code> を開くことができます。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/guides/images/native-reference-perf-flamegraph-no-symbols.svg" alt="Perf flamegraph without symbols">
+</div>
+</div>
+<div class="paragraph">
+<p>メインとなるはずのものに大半の時間が費やされていることがわかりますが、呼び出している <code>StringBuilderResource</code> クラスや <code>StringBuilder</code> クラスの痕跡は見られません。バイナリーのシンボルテーブルを確認する必要があります。クラスと <code>StringBuilder</code> のシンボルを見つけることができますか? 意味のあるデータを取得するためにそれらが必要です。ツールコンテナー内から、シンボルテーブルをクエリーします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">objdump -t ./target/debugging-native-1.0.0-SNAPSHOT-runner | grep StringBuilder
+[no output]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>シンボルテーブルをクエリーすると、出力は表示されません。これが、フレームグラフにコールグラフが表示されない理由です。これは、ネイティブイメージが行う意図的な決定です。デフォルトでは、バイナリーからシンボルを削除します。</p>
+</div>
+<div class="paragraph">
+<p>シンボルを取り戻すには、シンボルを削除しないように GraalVM に指示するバイナリーを再ビルドする必要があります。さらに、DWARF デバッグ情報を有効にして、スタックトレースにその情報を入力できるようにします。ツールコンテナーの外部から、以下を実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw package -DskipTests -Dnative \
+    -Dquarkus.native.debug.enabled \
+    -Dquarkus.native.additional-build-args=-H:-DeleteLocalSymbols</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、終了した場合はツールコンテナーに再度入り、<code>objdump</code> を使用してネイティブ実行可能ファイルを検査し、シンボルがどのように存在するようになったかを確認します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ objdump -t ./target/debugging-native-1.0.0-SNAPSHOT-runner | grep StringBuilder
+000000000050a940 l     F .text	0000000000000091              .hidden ReflectionAccessorHolder_StringBuilderResource_appendDelete_9e06d4817d0208a0cce97ebcc0952534cac45a19_e22addf7d3eaa3ad14013ce01941dc25beba7621
+000000000050a9e0 l     F .text	00000000000000bb              .hidden ReflectionAccessorHolder_StringBuilderResource_constructor_0f8140ea801718b80c05b979a515d8a67b8f3208_12baae06bcd6a1ef9432189004ae4e4e176dd5a4
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そのパターンに一致するシンボルの長いリストが表示されるはずです。</p>
+</div>
+<div class="paragraph">
+<p>次に、実行ファイルを perf で実行すると、 <strong>コールグラフが dwarf であることがわかります</strong>。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">perf record -F 1009 --call-graph dwarf -a ./target/debugging-native-1.0.0-SNAPSHOT-runner</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>もう一度curlコマンドを実行し、バイナリを停止し、フレームグラフを生成して開きます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">perf script -i perf.data | ${FG_HOME}/stackcollapse-perf.pl | ${FG_HOME}/flamegraph.pl &gt; flamegraph.svg</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>フレームグラフを見ると、どこがボトルネックになっているかがわかります。それは、 <code>StringBuilder.delete()</code> が呼び出され、 <code>System.arraycopy()</code> を呼び出すときです。問題は、100万文字を非常に小さな単位でシフトさせる必要があることです。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/guides/images/native-reference-perf-flamegraph-symbols.svg" alt="Perf flamegraph with symbols">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="multi-thread"><a class="anchor" href="#multi-thread"></a>マルチスレッド</h4>
+<div class="paragraph">
+<p>マルチスレッドプログラムは、ランタイムの動作を理解しようとするときに特別な注意が必要になる場合があります。これを実証するために、この <code>MulticastResource</code> コードをプロジェクトに追加します (この例は <a href="https://github.com/apangin/java-profiling-presentation/blob/master/src/demo6/DatagramTest.java">Andrei Pangin&#8217;s Java Profiling presentation</a> からご提供いただいています):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
+
+@Path("/multicast")
+public class MulticastResource
+{
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String send() throws Exception {
+        sendMulticasts();
+        return "Multicast packets sent";
+    }
+
+    static void sendMulticasts() throws Exception {
+        DatagramChannel ch = DatagramChannel.open();
+        ch.bind(new InetSocketAddress(5555));
+        ch.configureBlocking(false);
+
+        ExecutorService pool =
+            Executors.newCachedThreadPool(new ShortNameThreadFactory());
+        for (int i = 0; i &lt; 10; i++) {
+            pool.submit(() -&gt; {
+                final ByteBuffer buf = ByteBuffer.allocateDirect(1000);
+                final InetSocketAddress remoteAddr =
+                    new InetSocketAddress("127.0.0.1", 5556);
+
+                while (true) {
+                    buf.clear();
+                    ch.send(buf, remoteAddr);
+                }
+            });
+        }
+
+        System.out.println("Warming up...");
+        Thread.sleep(3000);
+
+        System.out.println("Benchmarking...");
+        Thread.sleep(5000);
+    }
+
+    private static final class ShortNameThreadFactory implements ThreadFactory {
+
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix = "thread-";
+
+        public Thread newThread(Runnable r) {
+            return new Thread(r, namePrefix + threadNumber.getAndIncrement());
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>デバッグ情報付きでネイティブ実行可能ファイルをビルドします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw package -DskipTests -Dnative \
+    -Dquarkus.native.debug.enabled \
+    -Dquarkus.native.additional-build-args=-H:-DeleteLocalSymbols</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ツールコンテナー内から (特権ユーザーとして)、<code>perf</code> を介してネイティブ実行可能ファイルを実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">perf record -F 1009 --call-graph dwarf -a ./target/debugging-native-1.0.0-SNAPSHOT-runner</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>エンドポイントを呼び出して、マルチキャストパケットを送信します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -w '\n' http://localhost:8080/multicast</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>フレームグラフを作成して開いてください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">perf script -i perf.data | ${FG_HOME}/stackcollapse-perf.pl | ${FG_HOME}/flamegraph.pl &gt; flamegraph.svg</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/guides/images/native-reference-multi-flamegraph-separate-threads.svg" alt="Muti-thread perf flamegraph with separate threads">
+</div>
+</div>
+<div class="paragraph">
+<p>作成されたフレームグラフは奇妙に見えます。すべてのスレッドが同じ作業をしているにもかかわらず、各スレッドが独立して扱われています。これでは、プログラムのボトルネックを明確に把握することができません。</p>
+</div>
+<div class="paragraph">
+<p>これは、 <code>perf</code> の観点から見ると、各スレッドが異なるコマンドであるために起こっています。 <code>perf report</code> を確認するとわかります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">perf report --stdio
+# Children      Self  Command          Shared Object       Symbol
+# ........  ........  ...............  ......................................  ......................................................................................
+...
+     6.95%     0.03%  thread-2         debugging-native-1.0.0-SNAPSHOT-runner  [.] MulticastResource_lambda$sendMulticasts$0_cb1f7b5dcaed7dd4e3f90d18bad517d67eae4d88
+...
+     4.60%     0.02%  thread-10        debugging-native-1.0.0-SNAPSHOT-runner  [.] MulticastResource_lambda$sendMulticasts$0_cb1f7b5dcaed7dd4e3f90d18bad517d67eae4d88
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これは、すべてのスレッドが同じ名前になるように、perfの出力にいくつかの変更を加えることで回避できます。例えば、以下のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">perf script | sed -E "s/thread-[0-9]*/thread/" | ${FG_HOME}/stackcollapse-perf.pl | ${FG_HOME}/flamegraph.pl &gt; flamegraph.svg</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/guides/images/native-reference-multi-flamegraph-joined-threads.svg" alt="Muti-thread perf flamegraph with joined threads">
+</div>
+</div>
+<div class="paragraph">
+<p>フレームグラフを開くと、すべてのスレッドの作業が1つの領域に折りたたまれているのがわかります。そして、パフォーマンスに影響を与える可能性のあるロックがあることがはっきりとわかります。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="debug-info"><a class="anchor" href="#debug-info"></a>ネイティブ・クラッシュのデバッグ</h3>
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルを使用することの欠点の 1 つは、標準の Java デバッガーを使用してデバッグできないことです。代わりに、GNU プロジェクトのデバッガーである <code>gdb</code> を使用してデバッグする必要があります。その方法を示すために、http://localhost:8080/crash にアクセスするときにセグメンテーション違反が原因でクラッシュするネイティブ Quarkus アプリケーションを生成します。これを実現するには、以下の REST リソースをプロジェクトに追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import sun.misc.Unsafe;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import java.lang.reflect.Field;
+
+@Path("/crash")
+public class CrashResource {
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String hello() {
+        Field theUnsafe = null;
+        try {
+            theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
+            theUnsafe.setAccessible(true);
+            Unsafe unsafe = (Unsafe) theUnsafe.get(null);
+            unsafe.copyMemory(0, 128, 256);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return "Never happens";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このコードは、アドレス <code>0x0</code> から <code>0x80</code> へ 256 バイトをコピーしようとするため、セグメンテーションフォールトが発生します。これを確認するには、サンプルアプリケーションをコンパイルして実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ ./mvnw package -DskipTests -Dnative
+...
+$ docker run -i --rm -p 8080:8080 test/debugging-native:1.0.0-SNAPSHOT
+...
+$ curl http://localhost:8080/crash</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、次のような出力が得られます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ docker run -i --rm -p 8080:8080 test/debugging-native:1.0.0-SNAPSHOT
+...
+Segfault detected, aborting process. Use runtime option -R:-InstallSegfaultHandler if you don't want to use SubstrateSegfaultHandler.
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上記の省略された出力には、問題の原因の手がかりが含まれていますが、この演習では情報が提供されなかったと仮定しています。<code>gdb</code> を使用してセグメンテーション違反をデバッグしてみましょう。これを行うには、プロジェクトの root に移動し、ツールコンテナーに入ります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker run -t -i --rm -v ${PWD}:/data -p 8080:8080 fedora-tools:v1 /bin/bash</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>続いて、<code>gdb</code> でアプリケーションを起動し、<code>run</code> を実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">gdb ./target/debugging-native-1.0.0-SNAPSHOT-runner
+...
+Reading symbols from ./target/debugging-native-1.0.0-SNAPSHOT-runner...
+(No debugging symbols found in ./target/debugging-ntaive-1.0.0-SNAPSHOT-runner)
+(gdb) run
+Starting program: /data/target/debugging-native-1.0.0-SNAPSHOT-runner</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、http://localhost:8080/crash へのアクセスを試みます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:8080/crash</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、 <code>gdb</code> に次のようなメッセージが表示されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">Thread 4 "ecutor-thread-0" received signal SIGSEGV, Segmentation fault.
+[Switching to Thread 0x7fe103dff640 (LWP 190)]
+0x0000000000461f6e in ?? ()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このクラッシュの原因となったバックトレースの情報を得ようとすると、十分な情報が得られないことがわかります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">(gdb) bt
+#0  0x0000000000418b5e in ?? ()
+#1  0x00007ffff6f2d328 in ?? ()
+#2  0x0000000000418a04 in ?? ()
+#3  0x00007ffff44062a0 in ?? ()
+#4  0x00000000010c3dd3 in ?? ()
+#5  0x0000000000000100 in ?? ()
+#6  0x0000000000000000 in ?? ()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これは、Quarkus アプリケーションを <code>-Dquarkus.native.debug.enabled</code> でコンパイルしなかったことが原因で、これにより、<code>gdb</code> の最初にある "<em>No debugging symbols found in ./target/debugging-native-1.0.0-SNAPSHOT-runner</em>" メッセージで示されているように、<code>gdb</code> はネイティブ実行ファイルのデバッグシンボルを見つけることができません。</p>
+</div>
+<div class="paragraph">
+<p><code>-Dquarkus.native.debug.enabled</code> でQuarkusアプリケーションを再コンパイルし、 <code>gdb</code> で再実行すると、クラッシュの原因を明らかにするバックトレースを得ることができます。さらに、 <code>-H:-OmitInlinedMethodDebugLineInfo</code> オプションを追加すると、インライン化されたメソッドがバックトレースから省略されるのを防ぐことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw package -DskipTests -Dnative \
+    -Dquarkus.native.debug.enabled \
+    -Dquarkus.native.additional-build-args=-H:-OmitInlinedMethodDebugLineInfo
+...
+$ gdb ./target/debugging-native-1.0.0-SNAPSHOT-runner
+Reading symbols from ./target/debugging-native-1.0.0-SNAPSHOT-runner...
+(gdb) run
+Starting program: /data/target/debugging-native-1.0.0-SNAPSHOT-runner
+...
+$ curl http://localhost:8080/crash</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、 <code>gdb</code> に次のようなメッセージが表示されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">Thread 4 "ecutor-thread-0" received signal SIGSEGV, Segmentation fault.
+[Switching to Thread 0x7fffeffff640 (LWP 362984)]
+com.oracle.svm.core.UnmanagedMemoryUtil::copyLongsBackward(org.graalvm.word.Pointer *, org.graalvm.word.Pointer *, org.graalvm.word.UnsignedWord *) ()
+	at com/oracle/svm/core/UnmanagedMemoryUtil.java:169
+169    com/oracle/svm/core/UnmanagedMemoryUtil.java: No such file or directory.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>gdb</code> は、どのメソッドがクラッシュの原因となったのか、それがソースコードのどこにあるのかを教えてくれることがすでにわかりました。また、この状態に至ったコールグラフのバックトレースも得ることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">(gdb) bt
+#0  com.oracle.svm.core.UnmanagedMemoryUtil::copyLongsBackward(org.graalvm.word.Pointer *, org.graalvm.word.Pointer *, org.graalvm.word.UnsignedWord *) () at com/oracle/svm/core/UnmanagedMemoryUtil.java:169
+#1  0x0000000000461e14 in com.oracle.svm.core.UnmanagedMemoryUtil::copyBackward(org.graalvm.word.Pointer *, org.graalvm.word.Pointer *, org.graalvm.word.UnsignedWord *) () at com/oracle/svm/core/UnmanagedMemoryUtil.java:110
+#2  0x0000000000461dc8 in com.oracle.svm.core.UnmanagedMemoryUtil::copy(org.graalvm.word.Pointer *, org.graalvm.word.Pointer *, org.graalvm.word.UnsignedWord *) () at com/oracle/svm/core/UnmanagedMemoryUtil.java:67
+#3  0x000000000045d3c0 in com.oracle.svm.core.JavaMemoryUtil::unsafeCopyMemory(java.lang.Object *, long, java.lang.Object *, long, long) () at com/oracle/svm/core/JavaMemoryUtil.java:276
+#4  0x00000000013277de in jdk.internal.misc.Unsafe::copyMemory0 () at com/oracle/svm/core/jdk/SunMiscSubstitutions.java:125
+#5  jdk.internal.misc.Unsafe::copyMemory(java.lang.Object *, long, java.lang.Object *, long, long) () at jdk/internal/misc/Unsafe.java:788
+#6  0x00000000013b1a3f in jdk.internal.misc.Unsafe::copyMemory () at jdk/internal/misc/Unsafe.java:799
+#7  sun.misc.Unsafe::copyMemory () at sun/misc/Unsafe.java:585
+#8  org.acme.CrashResource::hello(void) () at org/acme/CrashResource.java:22</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>同様に、他のスレッドのコールグラフのバックトレースを取得できます。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>まず、利用可能なスレッドを以下のように一覧表示できます。</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">(gdb) info threads
+  Id   Target Id                                             Frame
+  1    Thread 0x7fcc62a07d00 (LWP 322) "debugging-nativ" 0x00007fcc62b8b77a in __futex_abstimed_wait_common () from /lib64/libc.so.6
+  2    Thread 0x7fcc60eff640 (LWP 326) "gnal Dispatcher" 0x00007fcc62b8b77a in __futex_abstimed_wait_common () from /lib64/libc.so.6
+* 4    Thread 0x7fcc5b7fe640 (LWP 328) "ecutor-thread-0" com.oracle.svm.core.UnmanagedMemoryUtil::copyLongsBackward(org.graalvm.word.Pointer *, org.graalvm.word.Pointer *, org.graalvm.word.UnsignedWord *) () at com/oracle/svm/core/UnmanagedMemoryUtil.java:169
+  5    Thread 0x7fcc5abff640 (LWP 329) "-thread-checker" 0x00007fcc62b8b77a in __futex_abstimed_wait_common () from /lib64/libc.so.6
+  6    Thread 0x7fcc59dff640 (LWP 330) "ntloop-thread-0" 0x00007fcc62c12c9e in epoll_wait () from /lib64/libc.so.6
+...</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>検査するスレッドを選択します (例: スレッド 1)。</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">(gdb) thread 1
+[Switching to thread 1 (Thread 0x7ffff7a58d00 (LWP 1028851))]
+#0  __futex_abstimed_wait_common64 (private=0, cancel=true, abstime=0x0, op=393, expected=0, futex_word=0x2cd7adc) at futex-internal.c:57
+57	    return INTERNAL_SYSCALL_CANCEL (futex_time64, futex_word, op, expected,</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>そして最後に、スタックトレースを出力します。</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">(gdb) bt
+#0  __futex_abstimed_wait_common64 (private=0, cancel=true, abstime=0x0, op=393, expected=0, futex_word=0x2cd7adc) at futex-internal.c:57
+#1  __futex_abstimed_wait_common (futex_word=futex_word@entry=0x2cd7adc, expected=expected@entry=0, clockid=clockid@entry=0, abstime=abstime@entry=0x0, private=private@entry=0,
+    cancel=cancel@entry=true) at futex-internal.c:87
+#2  0x00007ffff7bdd79f in __GI___futex_abstimed_wait_cancelable64 (futex_word=futex_word@entry=0x2cd7adc, expected=expected@entry=0, clockid=clockid@entry=0, abstime=abstime@entry=0x0,
+    private=private@entry=0) at futex-internal.c:139
+#3  0x00007ffff7bdfeb0 in __pthread_cond_wait_common (abstime=0x0, clockid=0, mutex=0x2ca07b0, cond=0x2cd7ab0) at pthread_cond_wait.c:504
+#4  ___pthread_cond_wait (cond=0x2cd7ab0, mutex=0x2ca07b0) at pthread_cond_wait.c:619
+#5  0x00000000004e2014 in com.oracle.svm.core.posix.headers.Pthread::pthread_cond_wait () at com/oracle/svm/core/posix/thread/PosixJavaThreads.java:252
+#6  com.oracle.svm.core.posix.thread.PosixParkEvent::condWait(void) () at com/oracle/svm/core/posix/thread/PosixJavaThreads.java:252
+#7  0x0000000000547070 in com.oracle.svm.core.thread.JavaThreads::park(void) () at com/oracle/svm/core/thread/JavaThreads.java:764
+#8  0x0000000000fc5f44 in jdk.internal.misc.Unsafe::park(boolean, long) () at com/oracle/svm/core/thread/Target_jdk_internal_misc_Unsafe_JavaThreads.java:49
+#9  0x0000000000eac1ad in java.util.concurrent.locks.LockSupport::park(java.lang.Object *) () at java/util/concurrent/locks/LockSupport.java:194
+#10 0x0000000000ea5d68 in java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject::awaitUninterruptibly(void) ()
+    at java/util/concurrent/locks/AbstractQueuedSynchronizer.java:2018
+#11 0x00000000008b6b30 in io.quarkus.runtime.ApplicationLifecycleManager::run(io.quarkus.runtime.Application *, java.lang.Class *, java.util.function.BiConsumer *, java.lang.String[] *) ()
+    at io/quarkus/runtime/ApplicationLifecycleManager.java:144
+#12 0x00000000008bc055 in io.quarkus.runtime.Quarkus::run(java.lang.Class *, java.util.function.BiConsumer *, java.lang.String[] *) () at io/quarkus/runtime/Quarkus.java:67
+#13 0x000000000045c88b in io.quarkus.runtime.Quarkus::run () at io/quarkus/runtime/Quarkus.java:41
+#14 io.quarkus.runtime.Quarkus::run () at io/quarkus/runtime/Quarkus.java:120
+#15 0x000000000045c88b in io.quarkus.runner.GeneratedMain::main ()
+#16 com.oracle.svm.core.JavaMainWrapper::runCore () at com/oracle/svm/core/JavaMainWrapper.java:150
+#17 com.oracle.svm.core.JavaMainWrapper::run(int, org.graalvm.nativeimage.c.type.CCharPointerPointer *) () at com/oracle/svm/core/JavaMainWrapper.java:186
+#18 0x000000000048084d in com.oracle.svm.core.code.IsolateEnterStub::JavaMainWrapper_run_5087f5482cc9a6abc971913ece43acb471d2631b(int, org.graalvm.nativeimage.c.type.CCharPointerPointer *)
+    () at com/oracle/svm/core/JavaMainWrapper.java:280</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>または、1 つのコマンドですべてのスレッドのバックトレースを一覧表示することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">(gdb) thread apply all backtrace
+
+Thread 22 (Thread 0x7fffc8dff640 (LWP 1028872) "tloop-thread-15"):
+#0  0x00007ffff7c64c2e in epoll_wait (epfd=8, events=0x2ca3880, maxevents=1024, timeout=-1) at ../sysdeps/unix/sysv/linux/epoll_wait.c:30
+#1  0x000000000166e01c in Java_sun_nio_ch_EPoll_wait ()
+#2  0x00000000011bfece in sun.nio.ch.EPoll::wait(int, long, int, int) () at com/oracle/svm/core/stack/JavaFrameAnchors.java:42
+#3  0x00000000011c08d2 in sun.nio.ch.EPollSelectorImpl::doSelect(java.util.function.Consumer *, long) () at sun/nio/ch/EPollSelectorImpl.java:120
+#4  0x00000000011d8977 in sun.nio.ch.SelectorImpl::lockAndDoSelect(java.util.function.Consumer *, long) () at sun/nio/ch/SelectorImpl.java:124
+#5  0x0000000000705720 in sun.nio.ch.SelectorImpl::select () at sun/nio/ch/SelectorImpl.java:141
+#6  io.netty.channel.nio.SelectedSelectionKeySetSelector::select(void) () at io/netty/channel/nio/SelectedSelectionKeySetSelector.java:68
+#7  0x0000000000703c2e in io.netty.channel.nio.NioEventLoop::select(long) () at io/netty/channel/nio/NioEventLoop.java:813
+#8  0x0000000000701a5f in io.netty.channel.nio.NioEventLoop::run(void) () at io/netty/channel/nio/NioEventLoop.java:460
+#9  0x00000000008496df in io.netty.util.concurrent.SingleThreadEventExecutor$4::run(void) () at io/netty/util/concurrent/SingleThreadEventExecutor.java:986
+#10 0x0000000000860762 in io.netty.util.internal.ThreadExecutorMap$2::run(void) () at io/netty/util/internal/ThreadExecutorMap.java:74
+#11 0x0000000000840da4 in io.netty.util.concurrent.FastThreadLocalRunnable::run(void) () at io/netty/util/concurrent/FastThreadLocalRunnable.java:30
+#12 0x0000000000b7dd04 in java.lang.Thread::run(void) () at java/lang/Thread.java:829
+#13 0x0000000000547dcc in com.oracle.svm.core.thread.JavaThreads::threadStartRoutine(org.graalvm.nativeimage.ObjectHandle *) () at com/oracle/svm/core/thread/JavaThreads.java:597
+#14 0x00000000004e15b1 in com.oracle.svm.core.posix.thread.PosixJavaThreads::pthreadStartRoutine(com.oracle.svm.core.thread.JavaThreads$ThreadStartData *) () at com/oracle/svm/core/posix/thread/PosixJavaThreads.java:194
+#15 0x0000000000480984 in com.oracle.svm.core.code.IsolateEnterStub::PosixJavaThreads_pthreadStartRoutine_e1f4a8c0039f8337338252cd8734f63a79b5e3df(com.oracle.svm.core.thread.JavaThreads$ThreadStartData *) () at com/oracle/svm/core/posix/thread/PosixJavaThreads.java:182
+#16 0x00007ffff7be0b1a in start_thread (arg=&lt;optimized out&gt;) at pthread_create.c:443
+#17 0x00007ffff7c65650 in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:81
+
+Thread 21 (Thread 0x7fffc97fa640 (LWP 1028871) "tloop-thread-14"):
+#0  0x00007ffff7c64c2e in epoll_wait (epfd=53, events=0x2cd0970, maxevents=1024, timeout=-1) at ../sysdeps/unix/sysv/linux/epoll_wait.c:30
+#1  0x000000000166e01c in Java_sun_nio_ch_EPoll_wait ()
+#2  0x00000000011bfece in sun.nio.ch.EPoll::wait(int, long, int, int) () at com/oracle/svm/core/stack/JavaFrameAnchors.java:42
+#3  0x00000000011c08d2 in sun.nio.ch.EPollSelectorImpl::doSelect(java.util.function.Consumer *, long) () at sun/nio/ch/EPollSelectorImpl.java:120
+#4  0x00000000011d8977 in sun.nio.ch.SelectorImpl::lockAndDoSelect(java.util.function.Consumer *, long) () at sun/nio/ch/SelectorImpl.java:124
+#5  0x0000000000705720 in sun.nio.ch.SelectorImpl::select () at sun/nio/ch/SelectorImpl.java:141
+#6  io.netty.channel.nio.SelectedSelectionKeySetSelector::select(void) () at io/netty/channel/nio/SelectedSelectionKeySetSelector.java:68
+#7  0x0000000000703c2e in io.netty.channel.nio.NioEventLoop::select(long) () at io/netty/channel/nio/NioEventLoop.java:813
+#8  0x0000000000701a5f in io.netty.channel.nio.NioEventLoop::run(void) () at io/netty/channel/nio/NioEventLoop.java:460
+#9  0x00000000008496df in io.netty.util.concurrent.SingleThreadEventExecutor$4::run(void) () at io/netty/util/concurrent/SingleThreadEventExecutor.java:986
+#10 0x0000000000860762 in io.netty.util.internal.ThreadExecutorMap$2::run(void) () at io/netty/util/internal/ThreadExecutorMap.java:74
+#11 0x0000000000840da4 in io.netty.util.concurrent.FastThreadLocalRunnable::run(void) () at io/netty/util/concurrent/FastThreadLocalRunnable.java:30
+#12 0x0000000000b7dd04 in java.lang.Thread::run(void) () at java/lang/Thread.java:829
+#13 0x0000000000547dcc in com.oracle.svm.core.thread.JavaThreads::threadStartRoutine(org.graalvm.nativeimage.ObjectHandle *) () at com/oracle/svm/core/thread/JavaThreads.java:597
+#14 0x00000000004e15b1 in com.oracle.svm.core.posix.thread.PosixJavaThreads::pthreadStartRoutine(com.oracle.svm.core.thread.JavaThreads$ThreadStartData *) () at com/oracle/svm/core/posix/thread/PosixJavaThreads.java:194
+#15 0x0000000000480984 in com.oracle.svm.core.code.IsolateEnterStub::PosixJavaThreads_pthreadStartRoutine_e1f4a8c0039f8337338252cd8734f63a79b5e3df(com.oracle.svm.core.thread.JavaThreads$ThreadStartData *) () at com/oracle/svm/core/posix/thread/PosixJavaThreads.java:182
+#16 0x00007ffff7be0b1a in start_thread (arg=&lt;optimized out&gt;) at pthread_create.c:443
+#17 0x00007ffff7c65650 in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:81
+
+Thread 20 (Thread 0x7fffc9ffb640 (LWP 1028870) "tloop-thread-13"):
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ただし、バックトレースを取得できるにもかかわらず、<code>list</code> コマンドを使用してソースコードをある点で引き続き一覧表示できないことに注意してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">(gdb) list
+164    in com/oracle/svm/core/UnmanagedMemoryUtil.java</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これは、<code>gdb</code> がソースファイルの場所を認識していないことが原因です。実行可能ファイルは、ターゲットディレクトリーの外で実行しています。これを修正するには、ターゲットディレクトリーから <code>gdb</code> を再実行するか、<code>directory target/debugging-native-1.0.0-SNAPSHOT-native-image-source-jar/sources</code> を実行します。以下に例を示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">(gdb) directory target/debugging-native-1.0.0-SNAPSHOT-native-image-source-jar/sources
+Source directories searched: /data/target/debugging-native-1.0.0-SNAPSHOT-native-image-source-jar/sources:$cdir:$cwd
+(gdb) list
+164        	UnsignedWord offset = size;
+165        	while (offset.aboveOrEqual(32)) {
+166            	offset = offset.subtract(32);
+167            	Pointer src = from.add(offset);
+168            	Pointer dst = to.add(offset);
+169            	long l24 = src.readLong(24);
+170            	long l16 = src.readLong(16);
+171            	long l8 = src.readLong(8);
+172            	long l0 = src.readLong(0);
+173            	dst.writeLong(24, l24);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We can now examine line <code>169</code> and get a first hint of what might be wrong
+(in this case we see that it fails at the first read from src which contains the address <code>0x0000</code>),
+or walk up the stack using <code>gdb</code>’s <code>up</code> command to see what part of our code led to this situation.
+For more information about using <code>gdb</code> to debug native executables, see the
+<a href="https://www.graalvm.org/jdk21/reference-manual/native-image/debugging-and-diagnostics/DebugInfo/">GraalVM Debug Info Feature</a> guide.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="native-faq"><a class="anchor" href="#native-faq"></a>よくある質問</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="why-is-the-process-of-generating-a-native-executable-slow"><a class="anchor" href="#why-is-the-process-of-generating-a-native-executable-slow"></a>ネイティブ実行可能ファイルを生成するプロセスが遅いのはなぜですか？</h3>
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルの生成は、複数のステップで構成されています。その中でも解析とコンパイルのステップは最もコストがかかるため、ネイティブ実行可能ファイルの生成にかかる時間の大半を占めます。</p>
+</div>
+<div class="paragraph">
+<p>解析フェーズでは、プログラムのメインメソッドから静的なPoint-to 解析を開始し、到達可能なものを見つけ出します。新しいクラスが発見されると、設定に応じてこのプロセス中にその一部が初期化されます。次のステップでは、ヒープがスナップショットされ、どのタイプが実行時に利用可能である必要があるかのチェックが行われます。初期化とヒープのスナップショットにより、新しい型が発見されることがありますが、その場合はこのプロセスが繰り返されます。このプロセスは、到達可能なプログラムがこれ以上成長しないという固定点に達したときに停止します。</p>
+</div>
+<div class="paragraph">
+<p>コンパイルのステップは非常に簡単で、到達可能なすべてのコードを単純にコンパイルします。</p>
+</div>
+<div class="paragraph">
+<p>解析とコンパイルの段階でかかる時間は、アプリケーションの大きさによって異なります。アプリケーションが大きければ大きいほど、コンパイルにかかる時間は長くなります。ただし、指数関数的な効果をもたらす機能もあります。例えば、リフレクションアクセスのために型やメソッドを登録する場合、解析はその型やメソッドの背後にあるものを簡単に見ることができないため、解析ステップを完了するためにはより多くの仕事をしなければなりません。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="native-faq-experimental-options"><a class="anchor" href="#native-faq-experimental-options"></a>I get a warning about using experimental options, what can I do?</h3>
+<div class="paragraph">
+<p>Starting with Mandrel 23.1 and GraalVM for JDK 21, the native executable generation process will warn about the use of experimental options with a message like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">Warning: The option '-H:ReflectionConfigurationResources=META-INF/native-image/io.micrometer/micrometer-core/reflect-config.json' is experimental and must be enabled via '-H:+UnlockExperimentalVMOptions' in the future.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the mentioned option is added by a third party library like in the example above, you should consider opening an issue in the library&#8217;s repository to ask for the option to be removed.
+If the option is added by your application, you should consider either removing it (if it&#8217;s not necessary) or wrapping it between <code>-H:+UnlockExperimentalVMOptions</code> and <code>-H:-UnlockExperimentalVMOptions</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="i-get-a-analysiserrorparsingerror-when-building-a-native-executable-due-to-an-unresolvedelementexception-what-can-i-do"><a class="anchor" href="#i-get-a-analysiserrorparsingerror-when-building-a-native-executable-due-to-an-unresolvedelementexception-what-can-i-do"></a>ネイティブの実行可能ファイルをビルドする際に、 <code>UnresolvedElementException</code> のために <code>AnalysisError\$ParsingError</code> が表示されるのですが、どうすればよいでしょうか？</h3>
+<div class="paragraph">
+<p>Quarkusでは、ネイティブの実行ファイルをビルドする際に、コードから参照されるすべてのクラスが、ビルド時か、実行時に初期化されるかに関係なく、クラスパスに存在することが必要です。こうすることで、実行時に潜在的な <code>NoClassDefFoundError</code> 例外の発生によるクラッシュすることがないようにします。これを達成するために、それはGraalVMの <code>--link-at-build-time</code> パラメータを利用します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">--link-at-build-time  require types to be fully defined at image build-time. If used
+                      without args, all classes in scope of the option are required to
+                      be fully defined.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>しかし、この場合、ビルド時に <code>UnresolvedElementException</code> が発生するため、 <code>AnalysisError\$ParsingError</code> が発生することがあります。これは、アプリケーションが <a href="https://maven.apache.org/guides/introduction/introduction-to-optional-and-excludes-dependencies.html#optional-dependencies">オプションの依存関係</a> からクラスを参照するために起こることが多いです。</p>
+</div>
+<div class="paragraph">
+<p>欠落している依存関係への参照を担当するソースコードにアクセスでき、それを変更できる場合は、次のいずれかを検討するべきです:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>実際に必要でない場合は、参照を削除してください。</p>
+</li>
+<li>
+<p>影響を受けるコードをサブモジュールに移動し、依存関係を非オプションにする（ベストプラクティスとして）。</p>
+</li>
+<li>
+<p>依存関係を非オプションにする。</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>問題の原因となる参照がサードパーティライブラリで作られており、それを変更することができない場合は、次のいずれかを検討する必要があります:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>クラス/メソッド置換を使用して、当該参照を削除する。</p>
+</li>
+<li>
+<p>オプションの依存関係を、プロジェクトの非オプションの依存関係として追加する。</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>オプション(1)は、アプリケーションのフットプリントを最小化するため、パフォーマンス的には最良の選択ですが、実装が容易でない場合があることに注意してください。さらに悪いことに、サードパーティライブラリの実装と密接に結合しているため、保守も容易ではありません。オプション(2)は、この問題を回避するための簡単な代替案ですが、結果として得られるネイティブ実行ファイルに、実行されたことのないコードが含まれる可能性があるという代償を伴います。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="i-get-an-outofmemoryerror-oome-building-native-executables-what-can-i-do"><a class="anchor" href="#i-get-an-outofmemoryerror-oome-building-native-executables-what-can-i-do"></a>ネイティブ実行可能ファイルをビルドする際に OutOfMemoryError (OOME) が発生しました。どうすればよいですか?</h3>
+<div class="paragraph">
+<p>Building native executables is not only time consuming, but it also takes a fair amount of memory.
+For example, building a sample native Quarkus Jakarta Persistence application such as the Hibernate ORM quickstart,
+may use 6GB to 8GB resident set size in memory.
+A big chunk of this memory is Java heap,
+but extra memory is required for other aspects of the JVM that runs the native building process.
+It is still possible to build such applications in environments that have total memory close to the limits,
+but to do that it is necessary to shrink the maximum heap size of the GraalVM native image process.
+To do that, set a maximum heap size using the <code>quarkus.native.native-image-xmx</code> property.
+For example, we can instruct GraalVM to use 5GB of maximum heap size by passing in
+<code>-Dquarkus.native.native-image-xmx=5g</code> in the command line.</p>
+</div>
+<div class="paragraph">
+<p>この方法でネイティブ実行可能ファイルをビルドすると、完了するまでに時間がかかるという副作用が生じる可能性があります。これは、ガベージコレクションが、ネイティブイメージの生成に必要な空き領域を確保するために、より多くの作業を行う必要があるためです。</p>
+</div>
+<div class="paragraph">
+<p>一般的なアプリケーションはクイックスタートよりも大きい可能性が高いため、メモリー要件も高くなる可能性があることに注意してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="why-is-runtime-performance-of-a-native-executable-inferior-compared-to-jvm-mode"><a class="anchor" href="#why-is-runtime-performance-of-a-native-executable-inferior-compared-to-jvm-mode"></a>JVMモードと比較して、ネイティブ実行可能ファイルのランタイムパフォーマンスが劣るのはなぜですか？</h3>
+<div class="paragraph">
+<p>多くの場合、JVM モードではなくネイティブコンパイルを選択すると、いくつかのトレードオフが発生します。そのため、アプリケーションによっては、ネイティブアプリケーションの実行時パフォーマンスが JVM モードに比べて遅くなることがありますが、絶対にそうであるとは限りません。</p>
+</div>
+<div class="paragraph">
+<p>JVMによるアプリケーションの実行には、実行中に蓄積されるプロファイル情報を利用したコードの実行時最適化が含まれます。これには、より多くのコードをインライン化したり、ホットコードをダイレクトパスに配置したり（つまり、より良い命令キャッシュのローカリティを確保する）、コールドパスにある多くのコードをカットしたりする機会が含まれます（JVMでは、多くのコードが何かが実行しようとするまでコンパイルされず、最適化解除や再コンパイルを引き起こすトラップに置き換えられます）。コールドパスを取り除くことで、コンパイルされる少量のホットコードの分岐の複雑さや組み合わせロジックが大幅に削減されるため、先行してコンパイルする場合よりも多くの最適化の機会が得られます。</p>
+</div>
+<div class="paragraph">
+<p>一方、ネイティブ実行可能ファイルのコンパイルでは、オフラインでコードをコンパイルする際に、すべての可能な実行経路に対応しなければなりません。なぜならば、ホットパスやコールドパスがわからないため、罠を仕掛けて、それに当たったら再コンパイルするというようなトリックが使えないからです。同じ理由で、ホットパスを隣接して配置することでコードキャッシュの衝突を最小限に抑えるようなサイコロを積むこともできません。ネイティブ実行可能ファイルの生成は、閉じた世界の仮説により、いくつかのコードを削除することができますが、それだけでは、プロファイリングや実行時最適化解除＆再コンパイルがJVM JITコンパイラに提供するすべての利点を補うことはできません。</p>
+</div>
+<div class="paragraph">
+<p>ただし、JVMの速度が向上する可能性があるため、その代償として、リソース（CPUとメモリの両方）の使用量と起動時間が増加することに注意してください。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>JITが作動してコードを完全に最適化するまでに時間がかかります。</p>
+</li>
+<li>
+<p>JIT コンパイラは、アプリケーションが利用できるリソースを消費します。</p>
+</li>
+<li>
+<p>JVMは、より良い最適化をサポートするために、より多くのメタデータやコンパイラ/プロファイラのデータを保持しなければなりません。</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>1)の理由は、コードはしばらくの間、インタプリタ実行する必要があり、場合によっては、以下を担保する全ての潜在的な最適化が実現される前に、何度もコンパイルする必要があるからです。</p>
+</div>
+<div class="olist loweralpha">
+<ol class="loweralpha">
+<li>
+<p>そのコードパスをコンパイルする価値があります。つまり、十分な回数実行されています。</p>
+</li>
+<li>
+<p>意味のある最適化を行うための十分なプロファイリングデータがあります。</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>1)の意味するところは、小規模で短命なアプリケーションには、ネイティブ実行可能ファイルの方が適しているということです。コンパイルされたコードは最適化されていませんが、すぐに利用できます。</p>
+</div>
+<div class="paragraph">
+<p>2)の理由は、JVMは基本的に実行時にアプリケーションと並行してコンパイラを実行しているからです。ネイティブ実行可能ファイルの場合、コンパイラは事前に実行されるため、アプリケーションと並行してコンパイラを実行する必要がありません。</p>
+</div>
+<div class="paragraph">
+<p>3)にはいくつかの理由があります。JVMは閉じた世界を想定していません。そのため、新しいクラスのロードにより、コンパイル時の楽観的な仮定を修正する必要がある場合には、コードを再コンパイルできなければなりません。例えば、あるインターフェイスの実装が1つだけの場合、そのコードに直接コールジャンプすることができます。しかし、2つ目の実装クラスがロードされた場合には、レシーバのインスタンスのタイプをテストして、そのクラスに属するコードにジャンプするようにコールサイトを修正する必要があります。このような最適化をサポートするには、ネイティブ実行可能ファイルよりもクラスベースの詳細を記録しておく必要があります。これには、完全なクラスとインターフェイスの階層、どのメソッドが他のメソッドをオーバーライドするかの詳細、すべてのメソッドのバイトコードなどが含まれます。ネイティブ実行可能ファイルでは、クラス構造やバイトコードの詳細のほとんどは実行時には無視できます。</p>
+</div>
+<div class="paragraph">
+<p>また、JVMはクラスベースや実行プロファイルの変更にも対応しなければならず、その結果、スレッドが以前のコールドパスを通ることになります。その時点で、JVMはコンパイルされたコードからインタープリタにジャンプし、以前のコールドパスを含む新しい実行プロファイルに対応するためにコードを再コンパイルしなければなりません。そのためには、コンパイルされたスタックフレームを1つまたは複数のインタープリタフレームに置き換えることができる実行時情報を保持する必要があります。また、実行されたもの、されなかったものを追跡するために、ランタイムの拡張可能なプロファイルカウンタを割り当て、更新する必要があります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="why-are-native-executables-big"><a class="anchor" href="#why-are-native-executables-big"></a>なぜネイティブ実行可能ファイルは大きいのですか？</h3>
+<div class="paragraph">
+<p>これには様々な理由があります。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>ネイティブ実行可能ファイルには、アプリケーションのコードだけでなく、ライブラリのコードやJDKのコードも含まれています。そのため、ネイティブ実行可能ファイルのサイズは、アプリケーションのサイズに加えて、使用するライブラリのサイズとJDKのサイズを加えたものと比較するのが、より公平な比較となります。特にJDKの部分は、HelloWorldのようなシンプルなアプリケーションでも無視できません。イメージの中で何が引き出されているかを把握するために、ネイティブ実行可能ファイルをビルドする際に <code>-H:+PrintUniverse</code> を使用することができます。</p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルには、実行時に実際には使われないかもしれないのに、必ず含まれている機能があります。そのような機能の例として、ガベージコレクションがあります。コンパイル時には、アプリケーションが実行時にガベージコレクションを実行する必要があるかどうかはわかりません。そのため、ガベージコレクションは、必要がないにもかかわらず、常にネイティブ実行可能ファイルに含まれ、サイズが大きくなります。ネイティブ実行可能ファイルの生成は、どのコードパスが到達可能かを特定するために、静的なコード解析に依存していますが、静的なコード解析は不正確な場合があり、実際に必要なコードよりも多くのコードがイメージに入ってしまうことがあります。</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>この話題については、 <a href="https://github.com/oracle/graal/issues/287">GraalVMアップストリーム課題</a>で興味深い議論が行われています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="what-version-of-mandrel-was-used-to-generate-a-binary"><a class="anchor" href="#what-version-of-mandrel-was-used-to-generate-a-binary"></a>バイナリの生成に使用したMandrelのバージョンは？</h3>
+<div class="paragraph">
+<p>どのバージョンのMandrelを使ってバイナリを生成したかは、バイナリを以下のように検査すればわかります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ strings target/debugging-native-1.0.0-SNAPSHOT-runner | grep GraalVM
+com.oracle.svm.core.VM=GraalVM 22.0.0.2-Final Java 11 Mandrel Distribution</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="how-do-i-enable-gc-logging-in-native-executables"><a class="anchor" href="#how-do-i-enable-gc-logging-in-native-executables"></a>ネイティブ実行可能ファイルでGCロギングを有効にするにはどうすればいいですか？</h3>
+<div class="paragraph">
+<p>詳細は <a href="#gc-logging">ネイティブメモリ管理GCロギングセクション</a> をご覧ください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="heap-dumps"><a class="anchor" href="#heap-dumps"></a>ネイティブ実行可能ファイルのヒープダンプを取得することはできますか？ 例えば、メモリ不足になった場合などです。</h3>
+<div class="paragraph">
+<p>GraalVM 22.2.0 からは、要求に応じてダンプをヒープすることが可能になります (例: <code>kill -SIGUSR1 &lt;pid&gt;</code> )。メモリー不足エラーの際のヒープダンプのダンプのサポートは、今後追加される予定です。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="can-i-build-and-run-this-examples-outside-a-container-in-linux"><a class="anchor" href="#can-i-build-and-run-this-examples-outside-a-container-in-linux"></a>このサンプルをコンテナーの外で Linux でビルドして実行することは可能ですか？</h3>
+<div class="paragraph">
+<p>Quarkusのネイティブ実行可能ファイルのデバッグは、Linux環境で行うのが最適です。一部のデバッグ手順を実行するために必要なパッケージをインストールする場合や、 <code>perf</code> でカーネルのイベントを収集できるようにする場合を除き、ルートアクセスは必要ありません。macOSやWindows環境でのデバッグは、コンテナ環境でも機能します（ <a href="#macwindows">FAQエントリ</a>を参照）。</p>
+</div>
+<div class="paragraph">
+<p>これらのパッケージは、異なるデバッグセクションを実行するために、Linux環境で必要となるものです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># dnf (rpm-based)
+sudo dnf install binutils gdb perf perl-open
+# Debian-based distributions:
+sudo apt install binutils gdb perf</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="generating-flame-graphs-is-slow-or-produces-errors-what-can-i-do"><a class="anchor" href="#generating-flame-graphs-is-slow-or-produces-errors-what-can-i-do"></a>フレームグラフの生成に時間がかかったり、エラーが発生したりするのですが、どうすればいいですか？</h3>
+<div class="paragraph">
+<p>Mandrelが作成したネイティブ実行可能ファイルをプロファイリングする方法は複数あります。すべての方法で、 <code>-H:-DeleteLocalSymbols</code> オプションを渡す必要があります。</p>
+</div>
+<div class="paragraph">
+<p>このリファレンス・ガイドで紹介する方法は、DWARFのデバッグ情報を含むバイナリを生成し、 <code>perf record</code> を通して実行し、 <code>perf script</code> とフレーム・グラフ・ツールを使用してフレーム・グラフを生成します。しかし、このバイナリで行われる <code>perf script</code> の後処理ステップは、時間がかかったり、DWARF のエラーが表示されたりすることがあります。</p>
+</div>
+<div class="paragraph">
+<p>フレームグラフを生成する別の方法として、ネイティブ実行可能ファイルを生成する際に、DWARFのデバッグ情報を生成する代わりに、 <code>-H:+PreserveFramePointer</code> を渡す方法があります。これは、フレームポインタに追加のレジスタを使用するようにバイナリに指示します。これにより、 <code>perf</code> は、実行時の動作をプロファイリングするためにスタックウォーキングを行うことができます。これらのフラグを使用してネイティブ実行可能ファイルを生成するには、以下のようにします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw package -DskipTests -Dnative
+    -Dquarkus.native.additional-build-args=-H:+PreserveFramePointer,-H:-DeleteLocalSymbols</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>実行時プロファイリング情報をネイティブ実行可能ファイルから取得するには、単純に次のようにします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">perf record -F 1009 -g -a ./target/debugging-native-1.0.0-SNAPSHOT-runner</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>実行時プロファイリング情報を生成する方法としては、フレームポインタを保持したバイナリを生成するよりも、デバッグ情報を使用することを推奨します。これは、ネイティブ実行可能ファイルのビルドプロセスにデバッグ情報を追加しても、実行時のパフォーマンスには何の影響もないのに対し、フレームポインタの保持は影響があるためです。</p>
+</div>
+<div class="paragraph">
+<p>DWARFのデバッグ情報は、別のファイルに生成され、デフォルトのデプロイメントでは省略することもでき、プロファイリングやデバッグの目的で必要なときだけ転送して使用することができます。さらに、デバッグ情報があることで、 <code>perf</code> は関連するソースコード行も表示することができ、ネイティブ実行可能ファイル自体を肥大化させることはありません。そのためには、 <code>perf report</code> にソースコード行を表示するパラメータを追加して呼び出すだけです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">perf report --stdio -F+srcline
+...
+83.69%     0.00%  GreetingResource.java:20 ...
+...
+83.69%     0.00%  AbstractStringBuilder.java:1025 ...
+...
+83.69%     0.00%  ArraycopySnippets.java:95 ...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>フレームポインターを保持することによる性能上のペナルティーは、スタックウォーキングのために余分なレジスタを使用することによるもので、特に <code>aarch64</code> と比較して <code>x86_64</code> では使用できるレジスターの数が少なくなります。この余分なレジスターを使用すると、他の作業に使用できるレジスターの数が減るため、性能上のペナルティーが発生します。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="i-think-ive-found-a-bug-in-native-image-how-can-i-debug-it-with-the-ide"><a class="anchor" href="#i-think-ive-found-a-bug-in-native-image-how-can-i-debug-it-with-the-ide"></a>native-imageのバグを見つけたようなのですが、IDEでどのようにデバッグすればいいのでしょうか？</h3>
+<div class="paragraph">
+<p>コンテナ内のプロセスをリモートデバッグすることは可能ですが、Mandrelをローカルにインストールしてシェルプロセスのパスに追加することで、native-imageをステップバイステップでデバッグする方が簡単かもしれません。</p>
+</div>
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルの生成は、2つのJavaプロセスが順次実行された結果です。最初のプロセスは非常に短く、主な仕事は2番目のプロセスのために物事を準備することです。2つ目のプロセスは、ほとんどの作業を行うものです。一方のプロセスをデバッグするための手順は、若干異なります。</p>
+</div>
+<div class="paragraph">
+<p>まず、最もデバッグしたいと思われる2番目のプロセスのデバッグ方法について説明します。2番目のプロセスのスタートポイントは、 <code>com.oracle.svm.hosted.NativeImageGeneratorRunner</code> クラスです。このプロセスをデバッグするには、ビルド時の引数として <code>--debug-attach=*:8000</code> を追加するだけです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw package -DskipTests -Dnative \
+    -Dquarkus.native.additional-build-args=--debug-attach=*:8000</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>1番目のプロセスのスタートポイントとなるのは、 <code>com.oracle.svm.driver.NativeImages</code> クラスです。GraalVM CEのディストリビューションでは、この最初のプロセスはバイナリなので、従来のようにJava IDEを使ってデバッグすることはできません。しかし、Mandrelのディストリビューション（またはローカルにビルドされたGraalVM CEインスタンス）では、これを通常のJavaプロセスとして保持しているため、 <code>--vm.agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:8000</code> を追加のビルド引数として追加することで、このプロセスをリモートデバッグすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ ./mvnw package -DskipTests -Dnative \
+    -Dquarkus.native.additional-build-args=--vm.agentlib:jdwp=transport=dt_socket\\,server=y\\,suspend=y\\,address=*:8000</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="can-i-use-jfrjmc-to-debug-or-profile-native-binaries"><a class="anchor" href="#can-i-use-jfrjmc-to-debug-or-profile-native-binaries"></a>JFR/JMCを使って、ネイティブバイナリのデバッグやプロファイリングはできますか？</h3>
+<div class="paragraph">
+<p><a href="https://docs.oracle.com/javacomponents/jmc-5-4/jfr-runtime-guide/about.htm#JFRUH170">Java Flight Recorder（JFR</a> ）と <a href="https://www.oracle.com/java/technologies/jdk-mission-control.html">JDK Mission Control（JMC</a> ）は、GraalVM CE 21.2.0以降、ネイティブ・バイナリのプロファイリングに使用することができます。
+しかしながら、GraalVMにおけるJFRはHotSpotと比較して限定されています。
+カスタム・イベントAPIは完全にサポートされていますが、一部のVMレベルの機能は利用できません。
+より多くのイベントと JFR 機能は、後のリリースで追加され続ける予定です。
+以下の表は、バージョンごとのネイティブ・イメージの JFR サポートと制限の概要です。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 41.6666%;">
+<col style="width: 41.6668%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">GraalVMバージョン</th>
+<th class="tableblock halign-left valign-top">サポート対象</th>
+<th class="tableblock halign-left valign-top">制約事項</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GraalVM CE 21.3およびMandrel 21.3</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>Minimal VM Level events</p>
+</li>
+<li>
+<p>Custom events API</p>
+</li>
+<li>
+<p>Start recordings upon executabe run or JFR Recording API</p>
+</li>
+</ul>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>No old object sampling</p>
+</li>
+<li>
+<p>No stacktrace tracing</p>
+</li>
+<li>
+<p>No event streaming</p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GraalVM CE 22.3およびMandrel 22.3</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>Everything from GraalVM CE 21.3</p>
+</li>
+<li>
+<p>Additional monitor and thread events</p>
+</li>
+</ul>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>No old object sampling</p>
+</li>
+<li>
+<p>No stacktrace tracing</p>
+</li>
+<li>
+<p>No event streaming</p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GraalVM CE for JDK 17/20 and Mandrel 23.0</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>Everything from GraalVM CE 22.3</p>
+</li>
+<li>
+<p>Additional monitor, thread, container, and allocation events</p>
+</li>
+<li>
+<p>Stacktraces</p>
+</li>
+<li>
+<p>Sampling based method profiling</p>
+</li>
+<li>
+<p>Event streaming</p>
+</li>
+</ul>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>No old object sampling</p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GraalVM CE for JDK 23 and Mandrel 24.1</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>Everything from GraalVM CE for JDK 17/20 and Mandrel 23.0</p>
+</li>
+<li>
+<p>Additional events</p>
+</li>
+<li>
+<p>Always on allocation profiling (event throttling)</p>
+</li>
+<li>
+<p>Partial support for old object sampling (no tracking paths to GC roots)</p>
+</li>
+<li>
+<p>Support for <code>-XX:FlightRecorderOptions</code></p>
+</li>
+</ul>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>Old object sampling is missing path to GC root support</p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>To add JFR support to your Quarkus executable, add the application property: <code>-Dquarkus.native.monitoring=jfr</code>.
+E.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw package -DskipTests -Dnative -Dquarkus.native.container-build=true \
+    -Dquarkus.native.builder-image=quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21 \
+    -Dquarkus.native.monitoring=jfr</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>イメージのコンパイルが完了したら、ランタイムフラグ <code>-XX:+FlightRecorder</code> と <code>-XX:StartFlightRecording</code> を使ってJFRを有効にし、起動します。例えば、以下のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./target/debugging-native-1.0.0-SNAPSHOT-runner \
+    -XX:+FlightRecorder \
+    -XX:StartFlightRecording="filename=recording.jfr"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For more information about using JFR, see the <a href="https://www.graalvm.org/jdk21/reference-manual/native-image/debugging-and-diagnostics/JFR/">GraalVM JDK Flight Recorder (JFR) with Native Image</a> guide.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="how-can-we-troubleshoot-performance-problems-only-reproducible-in-production"><a class="anchor" href="#how-can-we-troubleshoot-performance-problems-only-reproducible-in-production"></a>本番環境でのみ再現可能なパフォーマンスの問題をどのようにトラブルシューティングできますか?</h3>
+<div class="paragraph">
+<p>この状況では、JVM モードに切り替えることが最初に試す最善の方法です。JVM モードに切り替えた後もパフォーマンスの問題が続く場合は、より確立された成熟したツールを使用して根本原因を突き止めることができます。パフォーマンスの問題がネイティブモードのみに限定されている場合、<code>perf</code> を使用できない可能性があるため、この状況で情報を収集するには JFR が唯一の方法です。ネイティブの JFR サポートが拡大するにつれて、パフォーマンスの問題の根本原因を本番環境で直接検出する機能が向上します。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="what-information-helps-most-debug-issues-that-happen-either-at-build-time-or-run-time"><a class="anchor" href="#what-information-helps-most-debug-issues-that-happen-either-at-build-time-or-run-time"></a>ビルド時または実行時に発生するほとんどの問題のデバッグに役立つ情報は何ですか?</h3>
+<div class="paragraph">
+<p>ビルド時にクラスパス、クラスの初期化、または禁止された API エラーを修正するには、<a href="#native-reports">build time reports</a> を使用して、閉ざされた世界を理解するのが最善です。さまざまなクラスとメソッド間の関係とともに、世界全体像を把握することで、ほぼすべての問題を発見して修正することができます。</p>
+</div>
+<div class="paragraph">
+<p>ランタイムのネイティブ特有のエラーを修正するには、ネイティブの実行可能ファイルの <a href="#debug-info">debug info builds</a> を用意しておくと、<code>gdb</code> を素早くフックして問題をデバッグすることができます。デバッグ情報ビルドにローカルシンボルも追加すると、正確な <a href="#profiling">profiling information</a> が得られます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="build-stalled-for-minutes-barely-using-any-cpu"><a class="anchor" href="#build-stalled-for-minutes-barely-using-any-cpu"></a>ビルドが数分間停止し、CPU をほとんど使用していない</h3>
+<div class="paragraph">
+<p>ビルドが停止し、次のような状態で終了する場合もあるかもしれません:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">Image generator watchdog detected no activity.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>考えられる説明の 1 つは、エントロピーの欠如です。 例えば、エントロピーに制約のある VM で、Bouncycastle のビルド時のようにそのようなソースが必要な場合。</p>
+</div>
+<div class="paragraph">
+<p>Linuxシステムでは、利用可能なエントロピーは次のようにして確認することができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ cat /proc/sys/kernel/random/entropy_avail</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>量が百単位でない場合、問題になる可能性があります。回避策として考えられるのは、テストでは許容される妥協をし、次のように設定することです:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">export JAVA_OPTS=-Djava.security.egd=/dev/urandom</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>適切な解決策は、システムで利用可能なエントロピーを増やすことです。それはOSベンダーや仮想化ソリューションごとに固有な方法を必要とします。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="work-around-missing-cpu-features"><a class="anchor" href="#work-around-missing-cpu-features"></a>不足しているCPU機能を回避</h3>
+<div class="paragraph">
+<p>最近のマシンでビルドし、古いマシンでネイティブ実行可能ファイルを実行すると、アプリケーションの起動時に次のようなエラーが表示されることがあります：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">The current machine does not support all of the following CPU features that are required by the image: [CX8, CMOV, FXSR, MMX, SSE, SSE2, SSE3, SSSE3, SSE4_1, SSE4_2, POPCNT, LZCNT, AVX, AVX2, BMI1, BMI2, FMA].
+Please rebuild the executable with an appropriate setting of the -march option.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このエラー・メッセージは、ネイティブ・コンパイルが、アプリケーションを実行しているCPUがサポートしていない、より高度な命令セットを使用したことを意味します。
+この問題を回避するには、 <code>application.properties</code> に以下の行を追加して下さい:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.native.march=compatibility</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>その後、ネイティブ実行可能ファイルをリビルドします。
+この設定により、ネイティブ・コンパイルは古い命令セットを使用するようになり、互換性の可能性が高まります。</p>
+</div>
+<div class="paragraph">
+<p>ターゲット・アーキテクチャを明示的に定義するには、 <code>native-image -march=list</code> を実行してサポートされている構成を取得し、 <code>-march</code> をそのうちの1つ、たとえば <code>quarkus.native.additional-build-args=-march=x86-64-v4</code> を設定します。AMD64ホストをターゲットにしている場合は、ほとんどの場合、 <code>-march=x86-64-v2</code> で動作します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>march</code> パラメーターは GraalVM 23+ でのみ利用可能です。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#native-memory-management">ネイティブメモリ管理</a>
+<ul class="sectlevel2">
+<li><a href="#garbage-collectors">ガベージコレクター</a></li>
+<li><a href="#memory-management-options">メモリ管理オプション</a></li>
+<li><a href="#gc-logging">GCロギング</a></li>
+<li><a href="#rss">Resident Set Size (RSS)</a></li>
+</ul>
+</li>
+<li><a href="#native-image-agent-integration">Native Image Tracing Agent Integration</a>
+<ul class="sectlevel2">
+<li><a href="#integration-testing-with-the-tracing-agent">Integration Testing with the Tracing Agent</a></li>
+<li><a href="#informative-by-default">Informative By Default</a></li>
+<li><a href="#debugging-the-tracing-agent-integration">Debugging the Tracing Agent Integration</a></li>
+</ul>
+</li>
+<li><a href="#inspecting-and-debugging">ネイティブ実行可能ファイルの検査とデバッグ</a>
+<ul class="sectlevel2">
+<li><a href="#requirements-and-assumptions">要件と前提条件</a></li>
+<li><a href="#bootstrapping-the-project">プロジェクトのブートストラップ</a></li>
+<li><a href="#configure-quarkus-properties">Quarkus のプロパティーを設定する</a></li>
+<li><a href="#first-debugging-steps">最初のデバッグ手順</a></li>
+<li><a href="#inspecting-native-executables">ネイティブ実行可能ファイルの検査</a></li>
+<li><a href="#native-reports">ネイティブレポート</a></li>
+<li><a href="#build-time-vs-run-time-initialization">ビルド時と実行時の初期化</a></li>
+<li><a href="#profiling">実行時動作のプロファイリング</a></li>
+<li><a href="#debug-info">ネイティブ・クラッシュのデバッグ</a></li>
+</ul>
+</li>
+<li><a href="#native-faq">よくある質問</a>
+<ul class="sectlevel2">
+<li><a href="#why-is-the-process-of-generating-a-native-executable-slow">ネイティブ実行可能ファイルを生成するプロセスが遅いのはなぜですか？</a></li>
+<li><a href="#native-faq-experimental-options">I get a warning about using experimental options, what can I do?</a></li>
+<li><a href="#i-get-a-analysiserrorparsingerror-when-building-a-native-executable-due-to-an-unresolvedelementexception-what-can-i-do">ネイティブの実行可能ファイルをビルドする際に、 <code>UnresolvedElementException</code> のために <code>AnalysisError\$ParsingError</code> が表示されるのですが、どうすればよいでしょうか？</a></li>
+<li><a href="#i-get-an-outofmemoryerror-oome-building-native-executables-what-can-i-do">ネイティブ実行可能ファイルをビルドする際に OutOfMemoryError (OOME) が発生しました。どうすればよいですか?</a></li>
+<li><a href="#why-is-runtime-performance-of-a-native-executable-inferior-compared-to-jvm-mode">JVMモードと比較して、ネイティブ実行可能ファイルのランタイムパフォーマンスが劣るのはなぜですか？</a></li>
+<li><a href="#why-are-native-executables-big">なぜネイティブ実行可能ファイルは大きいのですか？</a></li>
+<li><a href="#what-version-of-mandrel-was-used-to-generate-a-binary">バイナリの生成に使用したMandrelのバージョンは？</a></li>
+<li><a href="#how-do-i-enable-gc-logging-in-native-executables">ネイティブ実行可能ファイルでGCロギングを有効にするにはどうすればいいですか？</a></li>
+<li><a href="#heap-dumps">ネイティブ実行可能ファイルのヒープダンプを取得することはできますか？ 例えば、メモリ不足になった場合などです。</a></li>
+<li><a href="#can-i-build-and-run-this-examples-outside-a-container-in-linux">このサンプルをコンテナーの外で Linux でビルドして実行することは可能ですか？</a></li>
+<li><a href="#generating-flame-graphs-is-slow-or-produces-errors-what-can-i-do">フレームグラフの生成に時間がかかったり、エラーが発生したりするのですが、どうすればいいですか？</a></li>
+<li><a href="#i-think-ive-found-a-bug-in-native-image-how-can-i-debug-it-with-the-ide">native-imageのバグを見つけたようなのですが、IDEでどのようにデバッグすればいいのでしょうか？</a></li>
+<li><a href="#can-i-use-jfrjmc-to-debug-or-profile-native-binaries">JFR/JMCを使って、ネイティブバイナリのデバッグやプロファイリングはできますか？</a></li>
+<li><a href="#how-can-we-troubleshoot-performance-problems-only-reproducible-in-production">本番環境でのみ再現可能なパフォーマンスの問題をどのようにトラブルシューティングできますか?</a></li>
+<li><a href="#what-information-helps-most-debug-issues-that-happen-either-at-build-time-or-run-time">ビルド時または実行時に発生するほとんどの問題のデバッグに役立つ情報は何ですか?</a></li>
+<li><a href="#build-stalled-for-minutes-barely-using-any-cpu">ビルドが数分間停止し、CPU をほとんど使用していない</a></li>
+<li><a href="#work-around-missing-cpu-features">不足しているCPU機能を回避</a></li>
+</ul>
+</li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="tutorial"><a href="/guides/building-native-image">ネイティブ実行可能ファイルのビルド</a></li>
+      
+        
+        <li class="guide"><a href="/guides/upx">UPXでネイティブ実行可能ファイルを圧縮</a></li>
+      
+        
+        <li class="guide"><a href="/guides/writing-native-applications-tips">ネイティブ・アプリケーションを作成するためのヒント</a></li>
+      
+        
+        <li class="guide"><a href="/guides/native-and-ssl">ネイティブイメージでのSSLの利用</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

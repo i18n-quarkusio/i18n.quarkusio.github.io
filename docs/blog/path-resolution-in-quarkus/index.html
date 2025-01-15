@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Quarkusでのパス解決 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/blog/path-resolution-in-quarkus/" />
+  <meta property="og:title" content="Quarkusでのパス解決" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/blog/path-resolution-in-quarkus/">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="post">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/blog/path-resolution-in-quarkus/">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="active">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/blog/path-resolution-in-quarkus/" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/blog/path-resolution-in-quarkus/">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/blog/path-resolution-in-quarkus/">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/blog/path-resolution-in-quarkus/">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/blog/path-resolution-in-quarkus/">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    <div class="full-width-breadcrumb-bg align-self">
+  <div class="width-12-12">
+      <p class="returnlink"><a href="/blog">Blog</a> <i class="fas fa-chevron-right"></i> Quarkusでのパス解決</p>
+  </div>
+</div>
+
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+    <div class="grid-wrapper">
+      <div class="width-12-12">
+        <div class="post-date">
+          March 04, 2021 
+          
+            <span class="tags"><a href="/blog/tag/web">#web</a><a href="/blog/tag/metrics">#metrics</a></span>
+          
+        </div>
+        <h1 class="post-title">Quarkusでのパス解決</h1>
+        <div class="grid-wrapper">
+          <div class="width-8-12 width-12-12-m byline-wrapper">
+            
+            
+              <img class="headshot" src="https://www.gravatar.com/avatar/de8863aca81addec74f0452f611c7864">
+            
+            <p class="byline">By <a href="/author/ebullient">Erin Schnabel</a></p>
+          </div>
+          <div class="width-12-12">
+              <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>ここ数週間、私たちは通常になく揺れ動いていました。パスの解決はこっそりと複雑になることがあり、物事を良くしようとしているうちに、私たちは誤って悪化させてしまったのです!今はすべて修正しましたが、いくつかの変更点があることに気づくかもしれません。うまくいけば、この記事でその変更が何であるか、その意味、そしてあなたが望むようにすべてを元の状態に戻すために何ができるか明確になるでしょう。</p>
+</div>
+<div class="paragraph">
+<p><strong>TL;DR:</strong> <code>1.11.5.Final</code> と <code>1.12.1.Final</code> の時点では、設定における先頭のスラッシュは重要です。つまり、 <code>/endpoint</code> を使用した場合、そのエンドポイントは絶対ルートから提供されます。もし、包含するバケットからの相対的なものにしたいのであれば、先頭のスラッシュを省略してください。例えば、 <code>quarkus.http.non-application-root-path</code> はデフォルトでは <code>q</code> になり、 <code>quarkus.http.root-path</code> の下に入れ子になり、元の動作と一致します。アプリケーション以外のエンドポイントを絶対ルートから (設定されている場合は http ルートの兄弟として) 提供するために、例えば <code>/q</code> のような絶対パスを使うことができます。アプリケーション以外のエンドポイントの動作を完全に削除するには、 <code>quarkus.http.non-application-root-path</code> を <code>quarkus.http.root-path</code> と同じ値に設定します。これを行う最も簡単な方法は、変数を使用することです: <code>quarkus.http.non-application-root-path=${quarkus.http.root-path}</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-long-story"><a class="anchor" href="#the-long-story"></a>長文での説明</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>昔々、Quarkusでは、ヘルスチェックやメトリクスなどのエンドポイントを追加で定義していました。これらは、アプリケーションが定義したエンドポイントと一緒に <code>quarkus.http.root-path</code> から提供されていました。デフォルトでは <code>quarkus.http.root-path</code> は <code>/</code> であり、事実上見えないようになっているため、これは必ずしも明らかではありません。</p>
+</div>
+<div class="paragraph">
+<p>そして、 <a href="https://groups.google.com/g/quarkus-dev/c/FMnmlDIcGRY">アプリケーションエンドポイント</a>との衝突を避け、セキュリティやアクセスポリシーの処理を容易にするために、アプリケーション以外のエンドポイントをどのようにグループ化するかを考え始めました。さらに何人かのユーザからは、これらの非アプリケーションエンドポイントを <a href="https://github.com/quarkusio/quarkus/issues/13602">完全に別のポートから提供できないか</a>という意見もありました (まだ実現していません)。</p>
+</div>
+<div class="paragraph">
+<p>最初のステップは、これらのエクステンションで定義されたエンドポイントをすべて一緒にグループ化することでした。これが、 <a href="https://github.com/quarkusio/quarkus/pull/13601">非アプリケーションエンドポイントパス</a>の始まりでした。この新しいパスのデフォルトの場所は <code>/q</code> で、他のエンドポイントと同様に HTTP ルートパスの下に入れ子になっていました。この効果は、例えば <code>/health</code> を <code>/q/health</code> に移動させることでした。</p>
+</div>
+<div class="paragraph">
+<p>私たちは、メトリクスやヘルスなどのエンドポイントの一部を移動することは、すでに展開されているアプリケーションや人間の記憶にとって問題があることを知っていました。移行を容易にするために、これらのエンドポイントの一部にリダイレクトを追加し、 <code>/metrics</code> にアクセスした場合は <code>/q/metrics</code> にリダイレクトされるようにしました。</p>
+</div>
+<div class="paragraph">
+<p>アプリケーション以外のエンドポイントのサポートは <code>1.11.0.Final</code> で出荷されました。</p>
+</div>
+<div class="paragraph">
+<p>そして、事態は <a href="https://github.com/quarkusio/quarkus/issues/15030">悪化</a>  <a href="https://github.com/quarkusio/quarkus/pull/14179">し</a>始めました。クラウドホスティングプロバイダの中には、例えば、ヘルスの定義として <code>200</code> のみを受け入れるものがあり、リダイレクト ( <code>301</code>) は意図した効果を発揮しませんでした。また、アプリケーション以外のエンドポイントをオフにして以前の動作に戻す方法についても混乱があり、特定のエンドポイントをこのアプリケーション以外のエンドポイントコレクションから移動させる方法についても疑問が残りました。</p>
+</div>
+<div class="paragraph">
+<p>余談ですが、どのようにしてこのような状況になったかというと、ライブラリの挙動の違いによるものではありません。Vert.x は、例えばルートを作成する際に、常に先頭のスラッシュで始まるセグメントを求めますが、JAX-RS は <code>@Path</code> のアノテーションでは先頭のスラッシュを事実上無視します。Vert.x に慣れている人は常に先頭のスラッシュを追加し、JAX-RS を使用している人は何をしても魔法のように動作します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusでは、実装の詳細が偶然にも露わになりました。エクステンションによって定義されたアプリケーション以外のエンドポイントは、Vert.xのルートをベースにしています。デフォルトのパス設定値はスラッシュで始まり、迅速なルート作成を可能にし、単純な追加動作を可能にします。Quarkusの初期の頃は、これが悪い考えであることを示唆するようなものは何もなく、JAX-RSの経験がある開発者は、JAX-RSが処理するので、どちらにしても警告を受けることはありませんでした。</p>
+</div>
+<div class="paragraph">
+<p>しかし、人々が期待していた通りにパスが解決されず、その状況を解決するために必要な設定の変更が直感的ではなかったり、別の問題を引き起こしたりする状況に陥りました。そこで私たちは、異なる設定値を組み合わせたときに何が起こるかを並べて見ることができるように、すべての可能な設定の組み合わせをスプレッドシートに入れてみました。結果はそれほど素晴らしいものではありませんでした。しかし、この演習により、アプリケーションと非アプリケーションのエンドポイントが必要な動作をするようにするために何を変更する必要があるかを評価するために、一歩下がって全体像を見ることができました。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusでパスを設定するために使用される設定属性のセットは変更されませんが、設定された値がどのように解釈されるかは異なります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>エンドポイントのパス設定のデフォルト値が相対値になりました。</strong> <code>/q</code> は <code>q</code> に、 <code>/metrics</code> は <code>metrics</code> になりました。これは、設定変更なしで、これらのエンドポイントが含まれているルートに対して相対的に解決されることを意味します。これは、JAX-RSが仕様ごとに行うことであり、ほとんどのユーザーが直感的に期待していることです。
+</p>
+</li>
+<li>
+<p><strong>明示的に設定された値の先頭のスラッシュは重要です。</strong> エンドポイントを特定の場所に移動させたいと考えている人がいることは承知しており、その意図を表現する最も一貫した方法は、エンドポイントに使用させたい URI を正確に指定できるようにすることです。 <code>/metrics</code> を指定すると、それがメトリクス・エンドポイントを見つける場所になります。
+</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>1.11.5.Final</code> と <code>1.12.1.Final</code> でこれらのアップデートが利用可能になり、埃は全て解消するはずです。</p>
+</div>
+<div class="paragraph">
+<p>アプリケーション以外のエンドポイントのための便利なリダイレクトはまだ存在しますが、 <code>quarkus.http.redirect-to-non-application-root-path</code> を <code>false</code> に設定することで無効にすることができます。これは全く変わっていません。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="resolution-of-configured-paths"><a class="anchor" href="#resolution-of-configured-paths"></a>設定されたパスの解決</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>新しいルールを使用してパスがどのように解決されるか、いくつかの例を見てみましょう。まず、以下の前提条件から始めましょう。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p> <code>@ApplicationPath("/hello")</code> という定義のあるHello World アプリケーションがあるとします。</p>
+</li>
+<li>
+<p>アプリケーションは、 <code>@Path("world")</code> と <code>@Path("/aliens")</code> のある2つのエンドポイントを指定します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>私たちが最も気にしている設定属性は:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus.http.root-path</code> - HTTP ルートパス。すべてのウェブコンテンツはこのルートパスからの相対パスで提供されます。</p>
+</li>
+<li>
+<p><code>quarkus.http.non-application-root-path</code> - アプリケーション以外のエンドポイントのルートパス。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>また、設定可能なアプリケーション以外のエンドポイントにも注目しています:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus.micrometer.export.prometheus.path</code> - Micrometerメトリクスのエンドポイントの場所。</p>
+</li>
+<li>
+<p><code>quarkus.smallrye-health.root-path</code> - すべてを網羅したヘルスエンドポイントの場所。</p>
+</li>
+<li>
+<p><code>quarkus.smallrye-health.liveness-path</code> - liveness エンドポイントの場所。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>レバーを引き始めると何が起こるかを見てみましょう。以下の例では、config の句読点に注意を払ってください。句読点が、そのように動作する鍵となるからです。</p>
+</div>
+<div class="sect2">
+<h3 id="defaults"><a class="anchor" href="#defaults"></a>デフォルト</h3>
+<div class="paragraph">
+<p>デフォルトの設定値は以下の通りです。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus.http.root-path=/</code></p>
+</li>
+<li>
+<p><code>quarkus.http.non-application-root-path=q</code></p>
+</li>
+<li>
+<p><code>quarkus.micrometer.export.prometheus.path=metrics</code></p>
+</li>
+<li>
+<p><code>quarkus.smallrye-health.root-path=health</code></p>
+</li>
+<li>
+<p><code>quarkus.smallrye-health.liveness-path=liveness</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>（宣言されたアプリケーションエンドポイントと組み合わされた）この設定は、Quarkusアプリケーションが開発モードで実行されている場合、次のような有効なURLになります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://localhost:8080/hello" class="bare">http://localhost:8080/hello</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/hello/world" class="bare">http://localhost:8080/hello/world</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/hello/aliens" class="bare">http://localhost:8080/hello/aliens</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/q/metrics" class="bare">http://localhost:8080/q/metrics</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/q/health" class="bare">http://localhost:8080/q/health</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/q/health/liveness" class="bare">http://localhost:8080/q/health/liveness</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>この例では <code>quarkus.http.root-path</code> が隠れていることに注意してください。値が <code>/</code> だからです。</p>
+</div>
+<div class="paragraph">
+<p>この場合、 <code>quarkus.http.non-application-root-path</code> と <code>quarkus.http.root-path</code> は同じではないので、利便性の為のリダイレクトがあります。この設定では、 <code>/metrics</code> は <code>/q/metrics</code> にリダイレクトされます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="change-the-http-root-path"><a class="anchor" href="#change-the-http-root-path"></a>Http ルートパスの変更</h3>
+<div class="paragraph">
+<p>HTTP のルートパスを <code>/root</code> に変更して、リソース解決への影響が見えるようにしてみましょう。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus.http.root-path=/root</code></p>
+</li>
+<li>
+<p><code>quarkus.http.non-application-root-path=q</code></p>
+</li>
+<li>
+<p><code>quarkus.micrometer.export.prometheus.path=metrics</code></p>
+</li>
+<li>
+<p><code>quarkus.smallrye-health.root-path=health</code></p>
+</li>
+<li>
+<p><code>quarkus.smallrye-health.liveness-path=liveness</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>その結果、以下のような開発モードのURLになります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://localhost:8080/root/hello" class="bare">http://localhost:8080/root/hello</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/root/hello/world" class="bare">http://localhost:8080/root/hello/world</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/root/hello/aliens" class="bare">http://localhost:8080/root/hello/aliens</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/root/q/metrics" class="bare">http://localhost:8080/root/q/metrics</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/root/q/health" class="bare">http://localhost:8080/root/q/health</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/root/q/health/liveness" class="bare">http://localhost:8080/root/q/health/liveness</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>この場合も、 <code>quarkus.http.non-application-root-path</code> と <code>quarkus.http.root-path</code>.は同じではないので、便利なリダイレクトがあります。この設定では、 <code>/root/metrics</code> は <code>/root/q/metrics</code> にリダイレクトされます。これは、アプリケーション以外のエンドポイントが暗黙のうちに HTTP ルートパスから相対化されていた以前の動作と一致しています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="move-the-non-application-root-path-q"><a class="anchor" href="#move-the-non-application-root-path-q"></a>アプリケーション以外のルートパスを移動 (/q)</h3>
+<div class="paragraph">
+<p>今までできなかったことをやってみましょう。絶対パス <code>/q</code> を指定して、アプリケーション以外のエンドポイントをHTTPルートパスの外側に移動させます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus.http.root-path=/root</code></p>
+</li>
+<li>
+<p><code>quarkus.http.non-application-root-path=/q</code></p>
+</li>
+<li>
+<p><code>quarkus.micrometer.export.prometheus.path=metrics</code></p>
+</li>
+<li>
+<p><code>quarkus.smallrye-health.root-path=health</code></p>
+</li>
+<li>
+<p><code>quarkus.smallrye-health.liveness-path=liveness</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>その結果、以下のような開発モードのURLになります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://localhost:8080/root/hello" class="bare">http://localhost:8080/root/hello</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/root/hello/world" class="bare">http://localhost:8080/root/hello/world</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/root/hello/aliens" class="bare">http://localhost:8080/root/hello/aliens</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/q/metrics" class="bare">http://localhost:8080/q/metrics</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/q/health" class="bare">http://localhost:8080/q/health</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/q/health/liveness" class="bare">http://localhost:8080/q/health/liveness</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>この場合も、 <code>quarkus.http.non-application-root-path</code> と <code>quarkus.http.root-path</code> が同一ではない為、利便性の為のリダイレクトが存在します。リダイレクトされた URL はまだ HTTP ルートに対する相対的なものなので、 <code>/root/metrics</code> は <code>/q/metrics</code> にリダイレクトされます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="move-individual-non-application-endpoints-metrics-and-liveness"><a class="anchor" href="#move-individual-non-application-endpoints-metrics-and-liveness"></a>アプリケーション以外のエンドポイントを個別に移動 (/metrics と /liveness)</h3>
+<div class="paragraph">
+<p>これは、以前は不可能だったもう一つの設定です。設定可能なアプリケーション以外のエンドポイントを、指定された絶対パスに個別に移動させることができます。特にこの例では <code>/metrics</code> と <code>/liveness</code> に移動させることが出来ます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus.http.root-path=/root</code></p>
+</li>
+<li>
+<p><code>quarkus.http.non-application-root-path=/q</code></p>
+</li>
+<li>
+<p><code>quarkus.micrometer.export.prometheus.path=/metrics</code></p>
+</li>
+<li>
+<p><code>quarkus.smallrye-health.root-path=health</code></p>
+</li>
+<li>
+<p><code>quarkus.smallrye-health.liveness-path=/liveness</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>その結果、以下のような開発モードのURLになります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://localhost:8080/root/hello" class="bare">http://localhost:8080/root/hello</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/root/hello/world" class="bare">http://localhost:8080/root/hello/world</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/root/hello/aliens" class="bare">http://localhost:8080/root/hello/aliens</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/metrics" class="bare">http://localhost:8080/metrics</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/q/health" class="bare">http://localhost:8080/q/health</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/liveness" class="bare">http://localhost:8080/liveness</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>quarkus.http.non-application-root-path</code> は <code>quarkus.http.root-path</code> と同じではないので、この場合も利便性の為のリダイレクトがあります。しかし、これらのリダイレクトは、非アプリケーションエンドポイントのルートによって制御される非アプリケーションエンドポイントにのみ適用されます。私たちは、基本的にそのルートからメトリクスとlivenessのエンドポイントを削除しているので、リダイレクトされることはありません。この設定では、 <code>/root/health</code> をリクエストすると <code>/q/health</code> にリダイレクトされます。 <code>/root/health/liveness</code> や <code>/root/metrics</code> にはリダイレクトされません。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="remove-the-non-application-endpoint-root"><a class="anchor" href="#remove-the-non-application-endpoint-root"></a>非アプリケーションエンドポイントのルートの削除</h3>
+<div class="paragraph">
+<p>何人かの方から、このアプリケーション以外のエンドポイントルートのものを完全にオフにするにはどうすればよいかという質問を受けました。あなたの意図を明確に表現するのがベストです。非アプリケーションエンドポイントを無効にするには、HTTPルートパスと同じにしてください。要するに、ランタイムに「HTTPルートからすべての非アプリケーションエンドポイントを提供する」ように指示していることになります。この例では、値が同じであることを保証するために変数を使用しています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus.http.root-path=/root</code></p>
+</li>
+<li>
+<p><code>quarkus.http.non-application-root-path=${quarkus.http.root-path}</code></p>
+</li>
+<li>
+<p><code>quarkus.micrometer.export.prometheus.path=metrics</code></p>
+</li>
+<li>
+<p><code>quarkus.smallrye-health.root-path=health</code></p>
+</li>
+<li>
+<p><code>quarkus.smallrye-health.liveness-path=liveness</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>その結果、以下のような開発モードのURLになります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://localhost:8080/root/hello" class="bare">http://localhost:8080/root/hello</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/root/hello/world" class="bare">http://localhost:8080/root/hello/world</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/root/hello/aliens" class="bare">http://localhost:8080/root/hello/aliens</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/root/metrics" class="bare">http://localhost:8080/root/metrics</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/root/health" class="bare">http://localhost:8080/root/health</a></p>
+</li>
+<li>
+<p><a href="http://localhost:8080/root/health/liveness" class="bare">http://localhost:8080/root/health/liveness</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>このシナリオでは、アプリケーション以外のエンドポイントの動作が完全に無効化されているため、利便性のためのリダイレクトはありません。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="knock-on-effects"><a class="anchor" href="#knock-on-effects"></a>ノックオン効果</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ほとんどの部分では、これが透明であることを願っています。途中で非常に一貫性のないパス処理を発見し、これらの値の多く（あるいはほとんど）がカスタマイズされることはないと考えさせられました。</p>
+</div>
+<div class="paragraph">
+<p>HTTP ルートパスをカスタマイズしている場合は、挙動の変化に気づく可能性が高いでしょう。その場合は、上記の新しいルールと例が、設定を微調整してすべてを思い通りに動作させる方法を理解するのに役立つことを願っています。</p>
+</div>
+<div class="paragraph">
+<p>エクステンション開発者は最も大きな変更点を目にすることになるでしょう。 <a href="https://quarkus.io/guides/writing-extensions#extension-defined-endpoints">エクステンション開発ガイド</a>が更新され、アプリケーション以外のエンドポイントを作成するために使用されるビルド項目の変更が記述されています。しかし、一般的なルールとしては、自分でエンドポイントパスを構築することは避け、 <code>NonApplicationRootPathBuildItem</code> と <code>HttpRootPathBuildItem</code> に頼って構築してもらうようにしましょう。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="parting-thoughts"><a class="anchor" href="#parting-thoughts"></a>おわりに</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>すべての人を幸せにすることは不可能であることはわかっていますが、少なくとも、より予測可能で一貫性のある結果につながる設定のパターンを達成することができたことを願っています。また、この問題を解決した際に観察された挙動の変化については、（再度）お詫び申し上げます。</p>
+</div>
+</div>
+</div>
+              
+          </div>
+          <div class="width-12-12"><div class="share-page">
+  <a class="share-linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=https://quarkus.io/blog/path-resolution-in-quarkus/&title=Quarkusでのパス解決" rel="nofollow" target="_blank" title="Share on LinkedIn">
+    <i class="fa-brands fa-linkedin fa-xl"></i>
+  </a>
+  <a class="share-x" href="https://x.com/intent/tweet?text=Quarkusでのパス解決&url=https://quarkus.io/blog/path-resolution-in-quarkus/&via=quarkusio&related=quarkusio" rel="nofollow" target="_blank" title="Share on X">
+    <i class="fa-brands fa-square-x-twitter fa-xl"></i>
+  </a>
+  <a class="share-facebook" href="https://facebook.com/sharer.php?u=https://quarkus.io/blog/path-resolution-in-quarkus/" rel="nofollow" target="_blank" title="Share on Facebook">
+    <i class="fa-brands fa-square-facebook fa-xl"></i>
+  </a>
+  <a class="share-reddit" href="http://www.reddit.com/submit?url=https://quarkus.io/blog/path-resolution-in-quarkus/" onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;" title="Share on Reddit" >
+    <i class="fa-brands fa-square-reddit fa-xl"></i>
+  </a>
+  <a class="share-email" href="mailto:?subject=Quarkusでのパス解決&amp;body=Quarkusでのパス解決 https://quarkus.io/blog/path-resolution-in-quarkus/" title="Share via Email" >
+    <i class="fa-solid fa-envelope fa-xl"></i>
+  </a>
+</div>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+  <script src="https://giscus.app/client.js"
+        data-repo="quarkusio/quarkus"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkxMzk5MTQ5MzI="
+        data-category="Quarkus Blog/Website"
+        data-category-id="DIC_kwDOCFbutM4CAFFV"
+        data-mapping="og:title"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+  </script>
+  </div>
+</div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

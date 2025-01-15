@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>開発モードと本番アプリケーションの差異 - 3.8 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.8/guides/dev-mode-differences" />
+  <meta property="og:title" content="開発モードと本番アプリケーションの差異 - 3.8" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/dev-mode-differences">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.8/guides/dev-mode-differences">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.8/guides/dev-mode-differences" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.8/guides/dev-mode-differences">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.8/guides/dev-mode-differences">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.8/guides/dev-mode-differences">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.8/guides/dev-mode-differences">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.8/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" selected>3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">開発モードと本番アプリケーションの差異 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このドキュメントでは、Quarkus の開発モードが本番アプリケーションとどのように異なるかを説明します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="intro"><a class="anchor" href="#intro"></a>イントロ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus には開発モード (詳細は <a href="maven-tooling.html#dev-mode">こちら</a>と <a href="gradle-tooling#dev-mode">こちら</a>) があり、開発に大いに役立ちます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="architectural-differences"><a class="anchor" href="#architectural-differences"></a>アーキテクチャの差異</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>機能セットはさておき、開発モードで実行される Quarkus アプリケーションは、プロダクションアプリケーション (すなわち、 <code>java -jar …​</code> を使用して実行されるもの) とはアーキテクチャ的に異なります。</p>
+</div>
+<div class="paragraph">
+<p>開発モードでは、Quarkus は ClassLoader 階層 (詳細は <a href="class-loading-reference.html">こちら</a>) を使用し、アプリケーションの再ビルドや再起動を必要とせずにユーザーコードのライブリロードを可能にしています。</p>
+</div>
+<div class="paragraph">
+<p>本番アプリケーションでは、前述のクラスローディングのインフラは全く存在しません。目的に応じて構築された単一の ClassLoader があり、(ほぼ) すべてのクラスと依存関係をロードします。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dev-mode-features"><a class="anchor" href="#dev-mode-features"></a>開発モードの機能</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>開発者満足を提供するという信条のもと、Quarkus は開発モードを有効にすると多くの機能を提供します。最も重要な機能は以下の通りです。</p>
+</div>
+<div class="sect2">
+<h3 id="live-reload"><a class="anchor" href="#live-reload"></a>ライブ・リロード</h3>
+<div class="paragraph">
+<p>この非常に重要な機能は、紹介するまでもなく、 <a href="#architectural-differences">アーキテクチャの違い</a> のセクションですでに述べたとおりです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="dev-ui"><a class="anchor" href="#dev-ui"></a>Dev UI</h3>
+<div class="paragraph">
+<p>Quarkusは、ブラウザから <code>/q/dev-ui</code> でアクセスできる非常に便利な <a href="dev-ui">UI</a> を提供しています。このUIにより、開発者はアプリケーションの状態を確認できるだけでなく、その状態を変更できるさまざまな操作にアクセスできます（存在するエクステンションに依存）。そのような操作の例としては、以下のようなものがあります:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>設定値の変更</p>
+</li>
+<li>
+<p>データベース移行スクリプトの実行</p>
+</li>
+<li>
+<p>キャッシュの消去</p>
+</li>
+<li>
+<p>スケジュールされたオペレーションの実行</p>
+</li>
+<li>
+<p>コンテナのビルド</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Quarkus 3.xでは、新しいDev UIが実装されました。
+全ての機能が利用できる訳ではありません。
+以前のバージョンのDev UIには、 <a href="http://localhost:8080/q/dev-ui/" class="bare">http://localhost:8080/q/dev-ui/</a> で引き続きアクセスすることが可能です。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="error-pages"><a class="anchor" href="#error-pages"></a>エラーページ</h3>
+<div class="paragraph">
+<p>開発エラーの診断を非常に簡単にするために、Quarkus は開発モードでの実行時に様々な詳細なエラーページを提供しています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="database-import-scripts"><a class="anchor" href="#database-import-scripts"></a>データベースインポートスクリプト</h3>
+<div class="paragraph">
+<p><code>quarkus-hibernate-orm</code> エクステンションは、Quarkus が開発モードで動作しているときに、 <code>import.sql</code> スクリプトを <code>src/main/resources</code> で実行します。詳細は <a href="hibernate-orm.html#dev-mode">こちら</a> をご覧ください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="dev-services"><a class="anchor" href="#dev-services"></a>Dev Services</h3>
+<div class="paragraph">
+<p>開発モードでテストまたは実行する場合、Quarkus はゼロコンフィグのデータベースをすぐに提供することができますが、これはDev Servicesと呼ばれる機能です。詳細については、<a href="datasource.html#dev-services">こちら</a> をご覧ください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="swagger-ui"><a class="anchor" href="#swagger-ui"></a>Swagger UI</h3>
+<div class="paragraph">
+<p><code>quarkus-smallrye-openapi</code> エクステンションは、Quarkus が開発モードで動作しているときに、Swagger UI を公開します。追加情報は <a href="openapi-swaggerui.html#dev-mode">こちら</a> をご覧ください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="graphql-ui"><a class="anchor" href="#graphql-ui"></a>GraphQL UI</h3>
+<div class="paragraph">
+<p><code>quarkus-smallrye-graphql</code> エクステンションは、Quarkus が開発モードで動作しているときに GraphiQL UI を公開します。詳細は <a href="smallrye-graphql.html#ui">こちら</a> をご覧ください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="health-ui"><a class="anchor" href="#health-ui"></a>Health UI</h3>
+<div class="paragraph">
+<p><code>quarkus-smallrye-health</code> エクステンションは、Quarkus が開発モードで動作しているときに Health UI を公開します。<a href="smallrye-health.html#ui">こちら</a> のセクションでは、追加情報を提供します。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="mock-mailer"><a class="anchor" href="#mock-mailer"></a>Mock mailer</h3>
+<div class="paragraph">
+<p><code>quarkus-mailer</code> エクステンションは、Quarkus が開発モードで動作しているときに、インメモリのモックメールサーバを有効にします。詳しくは <a href="mailer-reference.html#testing">こちら</a> をご覧ください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="grpc"><a class="anchor" href="#grpc"></a>gRPC</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>gRPC Reflection Service は、開発モードではデフォルトで有効になっています。これにより、<code>grpcurl</code> のようなツールを使用することができます。本番モードでは、リフレクションサービスは無効になっています。<code>quarkus.grpc-server.enable-reflection-service=true</code> を使って明示的に有効にすることができます。</p>
+</li>
+<li>
+<p>開発モードでは、<code>quarkus.grpc.server.instances</code> は効果がありません。</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="others"><a class="anchor" href="#others"></a>その他</h3>
+<div class="paragraph">
+<p>(アプリケーションに追加されたエクステンションに応じて) 他の設定プロパティがあるかもしれませんが、開発モードでは影響がありません。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="performance-implications"><a class="anchor" href="#performance-implications"></a>パフォーマンスへの影響</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>開発モードでは、アプリケーションの実行時フットプリントを最小化することは主な目的ではありません (ただし、Quarkus は高速に起動し、メモリをほとんど消費しません)。主な目的は、開発者満足を実現することです。そのため、ライブリロードが実行されるたびに、より多くのクラスがロードされ、ビルド時の操作も行われます。</p>
+</div>
+<div class="paragraph">
+<p>対照的に、プロダクションアプリケーションでは、Quarkusの主な目的は、最小のメモリを消費し、最小の時間で起動することです。したがって、本番アプリケーションを実行する際には、ビルド時の操作は（定義上）実行されず、ビルド時に必要なさまざまなインフラストラクチャクラスは、実行時にはまったく存在しません。さらに、 <a href="maven-tooling.html#fast-jar">fast-jar</a>パッケージタイプに付属する目的に応じて構築されたClassLoaderにより、クラスの検索が可能な限り高速に行われると同時に、メモリ内のjarの量も最小限に抑えられます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="security-implications"><a class="anchor" href="#security-implications"></a>セキュリティへの影響</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>dev-modeアプリケーションを本番環境で実行してはいけない最も重要な理由は、開発モードでは (Dev-UI を介して) 機密性のある情報を読み取ることができる一方で、(本番環境のアプリケーションでは利用できないはずのエンドポイントを公開したり、Dev-UI を介して) 破壊的な操作にアクセスすることができるからです。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="native-executable"><a class="anchor" href="#native-executable"></a>ネイティブ実行可能ファイル</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルを作成する場合 (詳しくは <a href="building-native-image.html">こちら</a>)、<strong>常に</strong> 本番アプリケーションからビルドされます。</p>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#intro">イントロ</a></li>
+<li><a href="#architectural-differences">アーキテクチャの差異</a></li>
+<li><a href="#dev-mode-features">開発モードの機能</a>
+<ul class="sectlevel2">
+<li><a href="#live-reload">ライブ・リロード</a></li>
+<li><a href="#dev-ui">Dev UI</a></li>
+<li><a href="#error-pages">エラーページ</a></li>
+<li><a href="#database-import-scripts">データベースインポートスクリプト</a></li>
+<li><a href="#dev-services">Dev Services</a></li>
+<li><a href="#swagger-ui">Swagger UI</a></li>
+<li><a href="#graphql-ui">GraphQL UI</a></li>
+<li><a href="#health-ui">Health UI</a></li>
+<li><a href="#mock-mailer">Mock mailer</a></li>
+<li><a href="#grpc">gRPC</a></li>
+<li><a href="#others">その他</a></li>
+</ul>
+</li>
+<li><a href="#performance-implications">パフォーマンスへの影響</a></li>
+<li><a href="#security-implications">セキュリティへの影響</a></li>
+<li><a href="#native-executable">ネイティブ実行可能ファイル</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="reference"><a href="/version/3.8/guides/class-loading-reference">クラスローディングリファレンス</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/continuous-testing">継続的テスト</a></li>
+      
+        
+        <li class="howto"><a href="/version/3.8/guides/doc-contribute-docs-howto">Quarkusドキュメントの寄稿方法</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.8/guides/doc-create-tutorial">チュートリアルの作成</a></li>
+      
+        
+        <li class="howto"><a href="/version/3.8/guides/security-openid-connect-dev-services">OpenID Connect (OIDC)のDev ServicesとDev UI</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/amqp-dev-services">Dev Services for AMQP</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/apicurio-registry-dev-services">Dev Services for Apicurio Registry</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/databases-dev-services">Dev Services for Databases</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/elasticsearch-dev-services">Dev Services for Elasticsearch</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/infinispan-dev-services">Infinispanの開発サービス</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/kafka-dev-services">Dev Services for Kafka</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/kubernetes-dev-services">Dev Services for Kubernetes</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/pulsar-dev-services">Dev Services for Pulsar</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/rabbitmq-dev-services">Dev Services for RabbitMQ</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/redis-dev-services">Dev Services for Redis</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/dev-services">Dev Servicesの概要</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.8/guides/duplicated-context">コンテキストの重複、コンテキストローカル、非同期処理と伝播</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/kafka-dev-ui">Kafka Dev UI</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/performance-measure">パフォーマンスの測定</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/platform">プラットフォーム</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

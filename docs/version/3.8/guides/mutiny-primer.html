@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Mutinyによる非同期入門 - 3.8 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.8/guides/mutiny-primer" />
+  <meta property="og:title" content="Mutinyによる非同期入門 - 3.8" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/mutiny-primer">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.8/guides/mutiny-primer">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.8/guides/mutiny-primer" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.8/guides/mutiny-primer">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.8/guides/mutiny-primer">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.8/guides/mutiny-primer">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.8/guides/mutiny-primer">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.8/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" selected>3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">Mutinyによる非同期入門 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://smallrye.io/smallrye-mutiny">Mutiny</a>は、直感的なリアクティブプログラミングライブラリです。Mutinyは、Quarkusでリアクティブアプリケーションを書くための主要なモデルです。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="an-event-driven-reactive-programming-api"><a class="anchor" href="#an-event-driven-reactive-programming-api"></a>イベントドリブンなリアクティブプログラミングAPI</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Mutinyは、他のリアクティブ・プログラミング・ライブラリとは大きく異なります。プログラムを設計するために異なるアプローチをとります。Mutinyでは、すべてがイベントドリブンです：イベントを受け取り、それに反応します。このイベント駆動型の側面は、分散システムの非同期性を受け入れ、継続性を表現するエレガントで正確な方法を提供します。</p>
+</div>
+<div class="paragraph">
+<p>Mutinyには、2つ型を提供します。両方ともイベントドリブンであり、遅延評価されます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Uni</code> は、単一のイベント（アイテムまたは失敗）を発します。Unisは、0または1の結果を返す非同期アクションを表現するのに便利です。例えば、メッセージ・ブローカーのキューにメッセージを送信した結果などがその例です。</p>
+</li>
+<li>
+<p><code>Multi</code> は複数のイベント（n個のアイテム、1つの失敗または1つの完了）を放出します。Multisはアイテムのストリームを表現することができ、無限に広がる可能性があります。例えば、メッセージ・ブローカのキューからメッセージを受信するのが良い例です。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>この2つのタイプは、あらゆるタイプのインタラクションを表現することができます。これらはイベントソースです。ユーザーはこれらを監視し（ <em>サブスクリプション</em> ）、アイテムの出力、失敗、またはバインドされたMultiの場合は完了イベントが発行されると通知を受け取ります。あなた（サブスクライバー）がイベントを受け取ると、それを処理することができます（例えば、変換したり、フィルタリングしたり）。Mutinyでは、 _onX().action()_のようなコードを書くことになりますが、これは「アイテムXの場合actionを実施」と読み替えられます。</p>
+</div>
+<div class="paragraph">
+<p>Mutinyとそのコンセプトについてもっと知りたい方は、 <a href="https://smallrye.io/smallrye-mutiny/latest/reference/why-is-asynchronous-important">Mutinyのリファレンスドキュメント</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="mutiny-in-quarkus"><a class="anchor" href="#mutiny-in-quarkus"></a>QuarkusでのMutiny</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Mutinyは、Quarkusのリアクティブな機能を扱う際の主要なAPIです。これは、ほとんどのエクステンションがMutinyをサポートしていることを意味しています。それは、UniやMultiを返すAPIを公開する（リアクティブデータソースやレストクライアントなど）か、メソッドがUniやMultiを返すときに理解する（RESTEasy ReactiveやReactive Messagingなど）かのどちらかです。</p>
+</div>
+<div class="paragraph">
+<p>これらの統合により、MutinyはQuarkusで開発されたすべてのリアクティブアプリケーションのための主要で凝集性のあるモデルとなっています。さらに、Mutinyのアーキテクチャでは、きめ細かなデッドコードの排除が可能で、ネイティブにコンパイルした場合（QuarkusのネイティブモードやGraalVMのネイティブイメージコンパイラなど）、メモリ使用量が改善されます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="why-another-reactive-programming-api"><a class="anchor" href="#why-another-reactive-programming-api"></a>なぜ別のリアクティブプログラミングAPIなのか？</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>熟練したリアクティブ開発者は、既存のリアクティブプログラミングAPIがあるにもかかわらず、Quarkusがまた新たなリアクティブプログラミングAPIを導入したことを不思議に思うかもしれません。しかし、Mutinyはまったく異なる角度からアプローチしています。</p>
+</div>
+<div class="paragraph">
+<p><strong>イベントドリブン</strong> - Mutinyはイベントを設計の中核に据えています。Mutinyでは、イベントを観測し、それに反応し、エレガントで読みやすい処理パイプラインを作成します。関数型プログラミングの博士号は必要ありません。</p>
+</div>
+<div class="paragraph">
+<p><strong>Navigable</strong> - インテリジェントなコード補完機能があっても、何百ものメソッドを持つクラスは混乱します。Mutinyは、必要な演算子に向かってあなたを導く、ナビゲーブルで明示的なAPIを提供します。</p>
+</div>
+<div class="paragraph">
+<p><strong>ノンブロッキングI/O</strong> - Mutinyは、ノンブロッキングI/O（ <a href="quarkus-reactive-architecture.html">Quarkus</a>の動力源）を備えたアプリケーションの非同期性を制御するための完璧なコンパニオンです。宣言的にオペレーションを構成し、データを変換し、進行を強制し、障害から回復するなどの機能があります。</p>
+</div>
+<div class="paragraph">
+<p><strong>非同期の世界のために作られた</strong> - Mutinyは、イベントドリブンなマイクロサービス、メッセージベースのアプリケーション、ネットワークユーティリティ、データストリーム処理、そしてもちろんリアクティブなアプリケーションなど、あらゆる非同期アプリケーションで使用することができます。</p>
+</div>
+<div class="paragraph">
+<p><strong>Reactive Streamsとコンバータ内蔵</strong> - Mutinyは <a href="https://www.reactive-streams.org/">Reactive Streams</a>の仕様に基づいているため、他のリアクティブプログラミングライブラリと統合することができます。さらに、他のポピュラーなライブラリと対話するためのコンバータも提供しています。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="mutiny-and-the-io-threads"><a class="anchor" href="#mutiny-and-the-io-threads"></a>Mutiny とI/Oスレッド</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusは <a href="quarkus-reactive-architecture.html#engine">リアクティブエンジン</a>を搭載しており、リアクティブアプリケーションを開発する際には、数少ないI/Oスレッドの1つでコードが実行されます。覚えておいてほしいのは、これらのスレッドを絶対にブロックしてはいけないということで、ブロックしてしまうとモデルが崩壊してしまいます。つまり、ブロッキングI/Oは使えないのです。代わりに、I/O操作をスケジュールして、継続を渡す必要があります。</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="./images/reactive-thread.png" alt="Reactive Execution Model and I/O Threads" width="50%">
+</div>
+</div>
+<div class="paragraph">
+<p>Mutinyのイベントドリブンパラダイムは、これに合わせて作られています。I/O操作が正常に完了すると、それを表現するUniはアイテムイベントをエミットします。それが失敗すると、それは失敗イベントをエミットします。継続は、イベントドリブンなAPIを使ってシンプルかつ自然に表現されます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="mutiny-through-examples"><a class="anchor" href="#mutiny-through-examples"></a>事例で見るMutiny</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>多くのQuarkusエクステンションがMutiny APIを公開しています。このセクションではMongoDBエクステンションを使用してMutinyの使用方法を説明します。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://en.wikipedia.org/wiki/Periodic_table">周期表</a>の元素を表す簡単な構造を想像してみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class Element {
+
+   public String name;
+   public String symbol;
+   public int position;
+
+   public Element(String name, String symbol, int position) {
+       this.name = name;
+       this.symbol = symbol;
+       this.position = position;
+   }
+
+   public Element() {
+        // Use by JSON mappers
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この構造体には、元素の名前、シンボル、位置が入っています。元素を取得して Mongo コレクションに格納するには、次のようなコードを使います。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+public class ElementService {
+
+   final ReactiveMongoCollection&lt;Element&gt; collection;
+
+   @Inject
+   ElementService(ReactiveMongoClient client) {
+       collection = client.getDatabase("quarkus")
+               .getCollection("elements", Element.class);
+   }
+
+   public void add(Element element) {
+       Uni&lt;InsertOneResult&gt; insertion = collection.insertOne(element);
+       insertion
+           .onItem().transform(r -&gt; r.getInsertedId().asString())
+           .subscribe().with(
+               result -&gt; System.out.println("inserted " + result),
+               failure -&gt; System.out.println("D'oh" + failure));
+   }
+
+   public void getAll() {
+       collection.find()
+           .subscribe().with(
+              element -&gt; System.out.println("Element: " + element),
+             failure -&gt; System.out.println("D'oh! " + failure),
+             () -&gt; System.out.println("No more elements")
+       );
+   }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>まず、Mongo のクライアントをインジェクションします。リアクティブ版 ( <code>io.quarkus.mongodb.reactive.ReactiveMongoClient</code>) を使っていることに注意しましょう。initialize メソッドでは、要素を挿入するためのコレクションを取得して保存します。</p>
+</div>
+<div class="paragraph">
+<p><code>add</code> メソッドは、コレクションに要素を挿入します。このメソッドはパラメータとして要素を受け取り、コレクションのリアクティブAPIを使用します。データベースとのやりとりにはI/Oが伴います。リアクティブな原則では、インタラクションが完了するのを待つ間のブロッキングを禁じています。代わりに、操作をスケジューリングし、継続を渡します。 <code>insertOne</code> メソッドはUniを返す、つまり非同期の操作です。これがスケジュールされたI/Oです。 <code>.onItem()</code> <code>.onItem()</code> では、観測されたUniがアイテムを放出したときに何が起こるべきかを設定することができます。この例では、スケジュールされたI/Oが完了したときです。この例では、挿入されたドキュメントIDを抽出しています。最後のステップはサブスクリプションです。これがなければ何も起こりません。購読することで、操作が開始されます。サブスクリプション・メソッドは、成功時には <code>id</code> の値を、挿入が失敗したときには失敗を返すというハンドラーを定義することもできます。</p>
+</div>
+<div class="paragraph">
+<p>次に、2つ目のメソッドを見てみましょう。これは、格納されているすべての要素を取得します。この場合、複数のアイテム（格納されている要素ごとに1つ）を返しますので、 <code>Multi</code> を使用しています。挿入については、保存されている要素の取得にはI/Oが必要です。 <code>find</code> が私たちの操作です。Uniに関しては、オペレーションをトリガーするためにサブスクライブする必要があります。サブスクライバーは、アイテムイベント、失敗イベント、またはすべての要素を受信したときの完了イベントを受け取ります。</p>
+</div>
+<div class="paragraph">
+<p>UniやMultiへのサブスクリプションは必須であり、それがなければ操作は実行されません。Quarkusでは、いくつかのエクステンションがサブスクリプションを処理してくれます。たとえば、RESTEasy Reactiveでは、HTTPメソッドでUniやMultiを返すことができ、RESTEasy Reactiveが購読を処理します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="mutiny-patterns"><a class="anchor" href="#mutiny-patterns"></a>Mutinyパターン</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>前節の例は、あえて単純化したものでした。ここでは、いくつかの共通するパターンを見てみましょう。</p>
+</div>
+<div class="sect2">
+<h3 id="observing-events"><a class="anchor" href="#observing-events"></a>イベントの観察</h3>
+<div class="paragraph">
+<p>次を利用して様々な種類のイベントを観察することができます:</p>
+</div>
+<div class="paragraph">
+<p><code>on{event}().invoke(ev &#8594; System.out.println(ev));</code></p>
+</div>
+<div class="paragraph">
+<p>例えば、アイテム使用の場合、次を使用して下さい: <code>onItem().invoke(item → …​);</code></p>
+</div>
+<div class="paragraph">
+<p>失敗の場合は、次を使用してください: <code>onFailure().invoke(failure → …​)</code></p>
+</div>
+<div class="paragraph">
+<p><code>invoke</code> メソッドは同期型です。時には、非同期のアクションを実行する必要があります。このような場合は <code>call</code> を使用して、 <code>onItem().call(item → someAsyncAction(item))</code> のようにします。なお、 <code>call</code> はアイテムを変更するのではなく、非同期アクションを呼び出すだけで、このアクションが完了すると、元のアイテムを下流に放出します。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="transforming-item"><a class="anchor" href="#transforming-item"></a>アイテムのトランスフォーム</h3>
+<div class="paragraph">
+<p>最初の計測パターンは、受け取ったアイテムイベントを変換することで構成されています。前節で見たように、挿入が成功したことを示したり、データベースに格納されている要素を示したりします。</p>
+</div>
+<div class="paragraph">
+<p>アイテムの変換には <code>onItem().transform(item &#8594; …​.)</code> を使用します。</p>
+</div>
+<div class="paragraph">
+<p>変換の詳細については、 <a href="https://smallrye.io/smallrye-mutiny/latest/tutorials/transforming-items/">Mutinyのドキュメント</a> を参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="sequential-composition"><a class="anchor" href="#sequential-composition"></a>シーケンシャル合成</h3>
+<div class="paragraph">
+<p>シーケンシャル合成では、依存性のある非同期操作を連鎖させることができます。これは <code>onItem().transformToUni(item → …​)</code> を使って実現しています。 <code>transform</code> とは異なり、 <code>transformToUni</code> に渡される関数は Uni を返します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Uni&lt;String&gt; uni1 = …
+uni1
+.onItem().transformToUni(item -&gt; anotherAsynchronousAction(item));</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>非同期変換の詳細については、 <a href="https://smallrye.io/smallrye-mutiny/latest/tutorials/transforming-items-asynchronously/">Mutinyのドキュメント</a> を参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="failure-handling"><a class="anchor" href="#failure-handling"></a>エラーハンドリング</h3>
+<div class="paragraph">
+<p>これまではアイテムのイベントだけを処理してきましたが、失敗の処理は必須です。 <code>onFailure()</code> を使って失敗を処理することができます。</p>
+</div>
+<div class="paragraph">
+<p>例えば、 <code>onFailure().recoverWithItem(fallback)</code> を使ったフォールバックアイテムでリカバリーできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Uni&lt;String&gt; uni1 = …
+uni1
+.onFailure().recoverWithItem(“my fallback value”);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>以下のようにして操作をリトライすることもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Uni&lt;String&gt; uni1 = …
+uni1
+.onFailure().retry().atMost(5);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>失敗のリカバリーについての詳細は、 <a href="https://smallrye.io/smallrye-mutiny/latest/tutorials/handling-failures/">失敗の処理のドキュメント</a> および <a href="https://smallrye.io/smallrye-mutiny/latest/tutorials/retrying/">リトライのドキュメント</a> を参照してください。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="events-and-actions"><a class="anchor" href="#events-and-actions"></a>イベント、アクション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>以下の表は、UniとMultiで受信できるイベントの一覧です。それぞれのイベントは、独自のグループ（onX）に関連付けられています。2つ目の表は、イベントを受けてできる古典的なアクションの一覧です。グループによってはより多くの可能性があることに注意してください。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"></th>
+<th class="tableblock halign-left valign-top">上流からのイベント</th>
+<th class="tableblock halign-left valign-top">下流からのイベント</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Uni</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subscription (1), Item (0..1), failure (0..1)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cancellation</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multi</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subscription (1), Item (0..n), failure (0..1), completion (0..1)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cancellation, Request</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>イベントの全リストは、 <a href="https://smallrye.io/smallrye-mutiny/latest/tutorials/observing-events/">イベントのドキュメント</a>で確認してください。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">アクション</th>
+<th class="tableblock halign-left valign-top">API</th>
+<th class="tableblock halign-left valign-top">コメント</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">transform</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>onItem().transform(Function&lt;I, O&gt; function);</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">同期関数を使って、イベントを別のイベントに変換します。
+ダウンストリームは、関数の結果（変換に失敗した場合は失敗）を受け取ります。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">transformToUni</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>onItem().transformToUni(Function&lt;I, Uni&lt;O&gt;&gt; function);</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">非同期関数を使って、イベントを別のイベントに変換する。下流側は、生成されたUniが発するアイテム（変換に失敗した場合は失敗）を受け取ります。生成されたUniが失敗を発した場合、その失敗は下流に渡されます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">invoke</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>onItem().invoke(Consumer&lt;I&gt; consumer)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">同期型コンシューマーを呼び出します。これは特に副作用のあるアクションを実行するのに便利です。ダウンストリームは元のイベントを受け取りますが、コンシューマが例外を投げた場合は失敗となります。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">call</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>onItem().call(Function&lt;I, Uni&lt;?&gt;&gt;)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">非同期関数を呼び出します。これは、非同期の副作用のあるアクションを実行する際に特に便利です。ダウンストリームは、元のイベントを受け取りますが、コンシューマーが例外を投げた場合や生成されたUniが失敗を発した場合は失敗となります。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">fail</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>onItem().failWith(Function&lt;I, Throwable&gt;)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">イベントを受信したときに失敗を出力します。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">complete (Multi のみ)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>onItem().complete()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">イベントを受信すると完了イベントを発行します。</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="other-patterns"><a class="anchor" href="#other-patterns"></a>その他のパターン</h3>
+<div class="paragraph">
+<p>Mutinyには他にもたくさんの機能があります。Mutinyの <a href="https://smallrye.io/smallrye-mutiny">ドキュメント</a>では、イベントの全リストとその処理方法など、さらに多くの例を見ることができます。</p>
+</div>
+<div class="paragraph">
+<p>よくある質問として、以下のようなガイドがあります。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>マージ vs 連結 - <a href="https://smallrye.io/smallrye-mutiny/latest/guides/merging-and-concatenating-streams/" class="bare">https://smallrye.io/smallrye-mutiny/latest/guides/merging-and-concatenating-streams/</a></p>
+</li>
+<li>
+<p>排出スレッドの制御 - <a href="https://smallrye.io/smallrye-mutiny/latest/guides/emit-on-vs-run-subscription-on/" class="bare">https://smallrye.io/smallrye-mutiny/latest/guides/emit-on-vs-run-subscription-on/</a></p>
+</li>
+<li>
+<p>明示的ブロッキング - <a href="https://smallrye.io/smallrye-mutiny/latest/guides/imperative-to-reactive/" class="bare">https://smallrye.io/smallrye-mutiny/latest/guides/imperative-to-reactive/</a></p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="shortcuts"><a class="anchor" href="#shortcuts"></a>ショートカット</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Uniを使うとき、 <code>onItem()</code> を書かなければならないのは面倒なことです。幸いなことに、Mutinyにはコードをより簡潔にするための一連のショートカットが用意されています。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">ショートカット</th>
+<th class="tableblock halign-left valign-top">等価表現</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.map(x &#8594; y)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.onItem().transform(x &#8594; y)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.flatMap(x &#8594; uni2)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.onItem().transformToUni(x &#8594; uni2)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.chain(x &#8594; uni2)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.onItem().transformToUni(x &#8594; uni2)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.invoke(x &#8594; System.out.println(x))</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.onItem().invoke(x &#8594; System.out.println(x))</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.call(x &#8594; uni2)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.onItem().call(x &#8594; uni2)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.eventually(() &#8594; System.out.println("eventually"))</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.onItemOrFailure().invoke((ignoredItem, ignoredException) &#8594; System.out.println("eventually"))</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.eventually(() &#8594; uni2)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.onItemOrFailure().call((ignoredItem, ignoredException) &#8594; uni2)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.replaceWith(x)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.onItem().transform(ignored &#8594; x)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.replaceWith(uni2)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.onItem().transformToUni(ignored &#8594; uni2)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.replaceIfNullWith(x)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uni.onItem().ifNull().continueWith(x)</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="reactive-streams"><a class="anchor" href="#reactive-streams"></a>Reactive Streams</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Mutinyは <a href="https://www.reactive-streams.org/">Reactive Streams</a>を使用しています。 <code>Multi</code> は <code>Publisher</code> を実装し、back-pressureプロトコルを実施しています。エミッションは、下流のサブスクライバから発せられるリクエストによって制約されます。したがって、サブスクライバーに過負荷をかけることはありません。なお、場合によっては、このプロトコルに従えないこともあります（Multiが時間や測定センサーなどの制御できないイベントを放出するため）。この場合、Mutinyは、 <code>onOverflow()</code> を使ってオーバーフローを制御する方法を提供します。</p>
+</div>
+<div class="paragraph">
+<p><code>Uni</code> は、Reactive Streams <code>Publisher</code> を実装していません。 <code>Uni</code> は1つのイベントしか発することができないので、 <code>Uni</code> をサブスクライブすることで、結果を使用する意思を表明することができ、リクエストプロトコルのセレモニーは必要ありません。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="mutiny-and-vert-x"><a class="anchor" href="#mutiny-and-vert-x"></a>MutinyとVert.x</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Vert.xは、リアクティブなアプリケーションやシステムを構築するためのツールキットです。Vert.xは、リアクティブな原則（ノンブロッキングおよび非同期）に従ったライブラリの巨大なエコシステムを提供します。Vert.xは、リアクティブ機能を提供するため、Quarkusの重要な部分となっています。</p>
+</div>
+<div class="paragraph">
+<p>さらに、Vert.x API全体をQuarkusで使用することができます。まとまりのある体験を提供するために、Vert.x APIはMutinyのバリアントを使用して、つまりUniとMultiを返すこともできます。</p>
+</div>
+<div class="paragraph">
+<p>このAPIの詳細については、 <a href="https://quarkus.io/blog/mutiny-vertx/" class="bare">https://quarkus.io/blog/mutiny-vertx/</a>  を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="mutiny-integration-in-quarkus"><a class="anchor" href="#mutiny-integration-in-quarkus"></a>QuarkusにおけるMutiny インテグレーション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>QuarkusにおけるMutinyのインテグレーションは、単なるライブラリにとどまりません。Mutinyは、QuarkusとMutinyを密接に統合するためのフックを公開しています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>I/O スレッドで実行している場合は <code>await</code> や <code>toIterable</code> を呼び出すと失敗し、I/O スレッドのブロックを防ぎます。</p>
+</li>
+<li>
+<p><code>log()</code> オペレーターは、Quarkus のロガーを使用しています。</p>
+</li>
+<li>
+<p>Mutinyのデフォルトのスレッドプールは、Quarkusのワーカースレッドプールです。</p>
+</li>
+<li>
+<p>Mutiny UniおよびMultiを使用する場合、Context伝搬はデフォルトで有効です。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>インフラ統合の詳細については、 <a href="https://smallrye.io/smallrye-mutiny/latest/guides/framework-integration/" class="bare">https://smallrye.io/smallrye-mutiny/latest/guides/framework-integration/</a> を参照してください。</p>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#an-event-driven-reactive-programming-api">イベントドリブンなリアクティブプログラミングAPI</a></li>
+<li><a href="#mutiny-in-quarkus">QuarkusでのMutiny</a></li>
+<li><a href="#why-another-reactive-programming-api">なぜ別のリアクティブプログラミングAPIなのか？</a></li>
+<li><a href="#mutiny-and-the-io-threads">Mutiny とI/Oスレッド</a></li>
+<li><a href="#mutiny-through-examples">事例で見るMutiny</a></li>
+<li><a href="#mutiny-patterns">Mutinyパターン</a>
+<ul class="sectlevel2">
+<li><a href="#observing-events">イベントの観察</a></li>
+<li><a href="#transforming-item">アイテムのトランスフォーム</a></li>
+<li><a href="#sequential-composition">シーケンシャル合成</a></li>
+<li><a href="#failure-handling">エラーハンドリング</a></li>
+</ul>
+</li>
+<li><a href="#events-and-actions">イベント、アクション</a>
+<ul class="sectlevel2">
+<li><a href="#other-patterns">その他のパターン</a></li>
+</ul>
+</li>
+<li><a href="#shortcuts">ショートカット</a></li>
+<li><a href="#reactive-streams">Reactive Streams</a></li>
+<li><a href="#mutiny-and-vert-x">MutinyとVert.x</a></li>
+<li><a href="#mutiny-integration-in-quarkus">QuarkusにおけるMutiny インテグレーション</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="reference"><a href="/version/3.8/guides/datasource">Quarkusでデータソースを設定</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.8/guides/getting-started-reactive">リアクティブ入門</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/quarkus-reactive-architecture">Quarkus リアクティブアーキテクチャ</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/reactive-sql-clients">リアクティブ SQL クライアント</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

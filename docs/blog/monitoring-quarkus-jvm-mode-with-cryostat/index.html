@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>CryostatでQuarkusのJVMモードを監視 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/blog/monitoring-quarkus-jvm-mode-with-cryostat/" />
+  <meta property="og:title" content="CryostatでQuarkusのJVMモードを監視" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/blog/monitoring-quarkus-jvm-mode-with-cryostat/">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="post">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/blog/monitoring-quarkus-jvm-mode-with-cryostat/">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="active">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/blog/monitoring-quarkus-jvm-mode-with-cryostat/" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/blog/monitoring-quarkus-jvm-mode-with-cryostat/">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/blog/monitoring-quarkus-jvm-mode-with-cryostat/">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/blog/monitoring-quarkus-jvm-mode-with-cryostat/">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/blog/monitoring-quarkus-jvm-mode-with-cryostat/">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    <div class="full-width-breadcrumb-bg align-self">
+  <div class="width-12-12">
+      <p class="returnlink"><a href="/blog">Blog</a> <i class="fas fa-chevron-right"></i> CryostatでQuarkusのJVMモードを監視</p>
+  </div>
+</div>
+
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+    <div class="grid-wrapper">
+      <div class="width-12-12">
+        <div class="post-date">
+          April 27, 2022 
+          
+            <span class="tags"><a href="/blog/tag/monitoring">#monitoring</a><a href="/blog/tag/metrics">#metrics</a><a href="/blog/tag/profiling">#profiling</a><a href="/blog/tag/cryostat">#cryostat</a><a href="/blog/tag/jfr">#jfr</a><a href="/blog/tag/kubernetes">#kubernetes</a><a href="/blog/tag/openshift">#openshift</a><a href="/blog/tag/containers">#containers</a></span>
+          
+        </div>
+        <h1 class="post-title">CryostatでQuarkusのJVMモードを監視</h1>
+        <div class="grid-wrapper">
+          <div class="width-8-12 width-12-12-m byline-wrapper">
+            
+            
+              <img class="headshot" src="https://www.gravatar.com/avatar/0039ddbe30680575cc454d1e717de3e3">
+            
+            <p class="byline">By <a href="/author/aazores">Andrew Azores</a></p>
+          </div>
+          <div class="width-12-12">
+              <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://developers.redhat.com/blog/2021/01/25/introduction-to-containerjfr-jdk-flight-recorder-for-containers" target="_blank" rel="noopener">Cryostat</a>は、HotSpot JVM 上で動作する Java アプリケーションに既に存在する <a href="https://developers.redhat.com/blog/2020/08/25/get-started-with-jdk-flight-recorder-in-openjdk-8u" target="_blank" rel="noopener">JDK Flight Recorder</a>(JFR) フレームワークを活用したプロファイリングおよび監視ツールです。Cryostatは、クラスタ内の収集ハブを提供し、クラスタ外からJDK Flight Recorderデータに簡単かつ安全にアクセスすることができます。Cryostatは、主にOpenShiftへのデプロイをターゲットとするクラウドネイティブアプリケーションです。したがって、このガイドでは、わかりやすくするために、QuarkusアプリケーションもOpenShiftにデプロイしているものと仮定します。</p>
+</div>
+<div class="paragraph">
+<p>この記事では、CryostatがQuarkusと通信し、JDK Flight Recorderの収集、保存、および分析ツールを提供できるように、Quarkusアプリケーションを設定する方法について説明します。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/posts/monitoring-quarkus-jvm-mode-with-cryostat/cryostat-recording-report.png" alt="Automated Analysis Report in the Cryostat web-client UI">
+</div>
+<div class="title">Figure 1. クライオスタット自動分析レポート</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/posts/monitoring-quarkus-jvm-mode-with-cryostat/cryostat-grafana-dashboard.png" alt="Grafana dashboard displaying metrics from Cryostat">
+</div>
+<div class="title">Figure 2. Cryostat Grafana Dashboard</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="caveats-for-cryostat-with-quarkus"><a class="anchor" href="#caveats-for-cryostat-with-quarkus"></a>Quarkusを使用したCryostatの注意点</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusは、標準のJVMモード（ビルドにより.JARファイルを生成し、ランタイムにJVMでロードして実行）またはネイティブモード（ビルドにより、直接実行するネイティブバイナリを生成）でビルドできることは有名な話です。CryostatはJDK Flight Recorder（JFR）に依存していますが、これはQuarkusのネイティブモードでは部分的にしかサポートされておらず、JDK Management Extensions（JMX）は執筆時点ではネイティブモードではサポートされていません。つまり、残念ながら、JVMモードのQuarkusアプリケーションしかCryostatで使用するように設定することができません。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started-with-cryostat"><a class="anchor" href="#getting-started-with-cryostat"></a>Cryostat入門</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>OpenShiftでCryostatを始めるには、OperatorHubからインストールするだけで、素早く簡単にできます。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/posts/monitoring-quarkus-jvm-mode-with-cryostat/cryostat-operatorhub.png" alt="Cryostat Operator in the OpenShift OperatorHub">
+</div>
+<div class="title">Figure 3. Cryostatインストール</div>
+</div>
+<div class="paragraph">
+<p>次に、Cryostat CR リソースインスタンスを作成し、Operator に Cryostat インスタンスをデプロイすることを知らせます。この段階で、いくつかの設定オプションを選択することもできますが、ここではデフォルトを前提とします。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/posts/monitoring-quarkus-jvm-mode-with-cryostat/cryostat-operator-resource.png" alt="A created Cryostat CR in the OpenShift Console">
+</div>
+<div class="title">Figure 4. Cryostat作成</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cryostat-communication"><a class="anchor" href="#cryostat-communication"></a>Cryostat通信</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>CryostatはJMXを使用して、HotSpot JVM上で動作するアプリケーション（JavaおよびScalaアプリケーションを含むが、これに限定されない）と対話します。JMXは、ツールがアプリケーションに接続してアクションを実行したり、さまざまな基礎となるトランスポートプロトコルを介してデータを取得したりできるようにする標準のJavaテクノロジーです。QuarkusアプリケーションをJVMモードで構築してデプロイする場合、JMXサポートはすでに組み込まれており、すぐに使用できます。アプリケーションでJMXを有効にするには、2つの方法があります。</p>
+</div>
+<div class="sect2">
+<h3 id="method-1-enable-it-at-runtime"><a class="anchor" href="#method-1-enable-it-at-runtime"></a>方法1：実行時に有効化</h3>
+<div class="paragraph">
+<p>JMXは、JVMのシステムプロパティを設定することで有効にすることができます。</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>-Dcom.sun.management.jmxremote
+-Dcom.sun.management.jmxremote.port=${RJMX_PORT}
+-Dcom.sun.management.jmxremote.rmi.port=${RJMX_PORT}
+-Djava.rmi.server.hostname=127.0.0.1
+-Dcom.sun.management.jmxremote.authenticate=false
+-Dcom.sun.management.jmxremote.ssl=false
+-Dcom.sun.management.jmxremote.local.only=false</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ここで、 <code>${RJMX_PORT}</code> は、RMIを介したリモートJMXネットワーク接続のために選択したポート番号に置き換えられています。この例では、JMX認証とJMX SSLを無効にしています。実際には、セキュリティ上の理由からこれらは両方とも有効にすべきですが、これらの特定のオプションを構成することは、このガイドの範囲外です。詳細については、 <a href="https://docs.oracle.com/javadb/10.10.1.2/adminguide/radminjmxenablepwdssl.html" target="_blank" rel="noopener">このドキュメントを</a>参照してください。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusでは、機能豊富なアプリケーション起動スクリプトを使用しており、環境変数を設定するだけで、実行時にJVMシステムプロパティを追加することができます。</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>JAVA_OPTS_APPEND="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=${RJMX_PORT} -Dcom.sun.management.jmxremote.rmi.port=${RJMX_PORT} -Djava.rmi.server.hostname=127.0.0.1 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>OpenShiftまたはKubernetesでQuarkusアプリケーションを実行している場合、この環境変数を、アプリケーション <code>Container</code> の <code>Spec</code> 内の <code>Deployment</code> もしくは <code>DeploymentConfig</code> で <code>Spec</code> にネストして設定してみてください 。この方法でJMXを有効にすると、Quarkusアプリケーションを再構築する必要はなく、再デプロイするだけです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="method-2-enable-it-at-build-time"><a class="anchor" href="#method-2-enable-it-at-build-time"></a>方法2：ビルド時に有効化</h3>
+<div class="paragraph">
+<p>コンテナ化されたQuarkusアプリケーションに、以前と同じJVMシステムプロパティを追加するには、 <code>src/main/docker/</code> の下にある <code>Dockerfile.jvm</code> を編集します。 <code>Dockerfile.jvm</code> 以下は、基本的なQuarkusプロジェクトのサンプルです。JVMプロパティを追加し、ポート番号を公開するために追加された <code>ENV JAVA_OPTS_APPEND</code> の行に注目してください。</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>FROM registry.access.redhat.com/ubi8/openjdk-11:1.11
+
+ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
+
+
+# We make four distinct layers so if there are application changes the library layers can be re-used
+COPY --chown=185 target/quarkus-app/lib/ /deployments/lib/
+COPY --chown=185 target/quarkus-app/*.jar /deployments/
+COPY --chown=185 target/quarkus-app/app/ /deployments/app/
+COPY --chown=185 target/quarkus-app/quarkus/ /deployments/quarkus/
+
+EXPOSE 8080 ${RJMX_PORT}
+USER 185
+ENV JAVA_OPTS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
+ENV JAVA_OPTS_APPEND="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=${RJMX_PORT} -Dcom.sun.management.jmxremote.rmi.port=${RJMX_PORT} -Djava.rmi.server.hostname=127.0.0.1 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false"
+ENV JAVA_APP_JAR="/deployments/quarkus-run.jar"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>繰り返しますが、このファイルでは、すべての行の <code>${RJMX_PORT}</code> をポート番号に置き換えてください。</p>
+</div>
+<div class="paragraph">
+<p>この方法は、ビルド時にリモートのJMXポート番号を知っている必要があり、アプリケーションを再構築して再デプロイする必要があるため、柔軟性に欠けます。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cryostat-discovery"><a class="anchor" href="#cryostat-discovery"></a>Cryostatディスカバリー</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>QuarkusアプリケーションでJMXを有効にし、再デプロイしたので、Cryostatと通信する準備ができました。しかし、これが実現する前に、Cryostatはアプリケーションをどこでどのように見つけるかを知る必要があります。これを達成するために、自動検出とカスタムターゲットの2つの方法があります。自動検出は好ましい方法であり、デフォルトで有効になっています。カスタムターゲットは、自動検出の基準を満たさないが、ネットワーク上で到達可能であることが知られている展開されたアプリケーションターゲットのギャップを埋めるために使用することができます。</p>
+</div>
+<div class="sect2">
+<h3 id="automatic-discovery"><a class="anchor" href="#automatic-discovery"></a>オートディスカバリー</h3>
+<div class="paragraph">
+<p>Cryostat はターゲットアプリケーションを自動的に検出し、検出されたリモート JMX サービス URL を使用して接続することができます。自動検出はデプロイメントプラットフォームに依存します。執筆時点では、OpenShift/Kubernetes にデプロイされた場合、Cryostat は <code>Endpoints</code> オブジェクトを検出するために OpenShift/Kubernetes API を使用します。OpenShift/Kubernetes APIサーバがない場合、CryostatはJava Discovery Protocol (JDP)を使用するようにフォールバックします。いずれの場合も、自動的に検出されたターゲットは、カスタムターゲットにマージされます。OpenShift/Kubernetes <code>Endpoints</code> ディスカバリーが使用される場合、ターゲットアプリケーションは、クラスタ内部のJMXトラフィック用のポートを公開する関連する <code>Service</code> オブジェクトを持つ必要があります。このポートは、Cryostat が意図したターゲットアプリケーションとしてピックアップするために、ポート番号 9091 を使用するか、 <code>jfr-jmx</code> という名前を持っている必要があります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="custom-targets"><a class="anchor" href="#custom-targets"></a>カスタムターゲット</h3>
+<div class="paragraph">
+<p>これは、Cryostat クライアント（エンドユーザまたは他の自動化ツール）が、単一のターゲットアプリケーションインスタンスを見つける方法と場所を Cryostat に指示するための方法です。カスタムターゲット定義は、その中核にある、ネットワークに到達可能なリモート接続JMX URLと人間が読めるエイリアスのみです。これらは、ターゲット選択のドロップダウンで <code>+</code> (プラス)アイコンをクリックするか、お好みのHTTPクライアントを使用して、Cryostatウェブクライアントで作成できます。</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>curl \
+  -X POST \
+  -F alias=myapp \
+  -F connectUrl=service:jmx:rmi:///jndi/rmi://myapp.my-openshift-cluster.example.com:1234/jmxrmi \
+  https://cryostat.my-openshift-cluster.example.com/api/v2/targets</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>targetId</code> カスタムターゲット定義が追加されると、 <code>connectUrl</code> URLパラメータとして、Cryostat HTTP APIで期待される任意の場所で使用することができます。</p>
+</div>
+<div class="paragraph">
+<p>Cryostatの詳細については、以下のリンクをご覧ください。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://developers.redhat.com/blog/2021/01/25/introduction-to-containerjfr-jdk-flight-recorder-for-containers" target="_blank" rel="noopener">Red Hat DevelopersブログでのCryostatの紹介</a></p>
+</li>
+<li>
+<p><a href="https://developers.redhat.com/articles/2021/10/26/configuring-java-applications-use-cryostat" target="_blank" rel="noopener">Red Hat DevelopersブログのCryostatを使用するためのJavaアプリケーションのセットアップガイド</a></p>
+</li>
+<li>
+<p><a href="https://developers.redhat.com/articles/2021/11/02/java-monitoring-custom-targets-cryostat" target="_blank" rel="noopener">Red Hat DevelopersブログのCryostatカスタムターゲットの使用に関するガイド</a></p>
+</li>
+<li>
+<p><a href="https://cryostat.io/" target="_blank" rel="noopener">Cryostat&#8217;s upstream ウェブサイト</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+              
+          </div>
+          <div class="width-12-12"><div class="share-page">
+  <a class="share-linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=https://quarkus.io/blog/monitoring-quarkus-jvm-mode-with-cryostat/&title=CryostatでQuarkusのJVMモードを監視" rel="nofollow" target="_blank" title="Share on LinkedIn">
+    <i class="fa-brands fa-linkedin fa-xl"></i>
+  </a>
+  <a class="share-x" href="https://x.com/intent/tweet?text=CryostatでQuarkusのJVMモードを監視&url=https://quarkus.io/blog/monitoring-quarkus-jvm-mode-with-cryostat/&via=quarkusio&related=quarkusio" rel="nofollow" target="_blank" title="Share on X">
+    <i class="fa-brands fa-square-x-twitter fa-xl"></i>
+  </a>
+  <a class="share-facebook" href="https://facebook.com/sharer.php?u=https://quarkus.io/blog/monitoring-quarkus-jvm-mode-with-cryostat/" rel="nofollow" target="_blank" title="Share on Facebook">
+    <i class="fa-brands fa-square-facebook fa-xl"></i>
+  </a>
+  <a class="share-reddit" href="http://www.reddit.com/submit?url=https://quarkus.io/blog/monitoring-quarkus-jvm-mode-with-cryostat/" onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;" title="Share on Reddit" >
+    <i class="fa-brands fa-square-reddit fa-xl"></i>
+  </a>
+  <a class="share-email" href="mailto:?subject=CryostatでQuarkusのJVMモードを監視&amp;body=CryostatでQuarkusのJVMモードを監視 https://quarkus.io/blog/monitoring-quarkus-jvm-mode-with-cryostat/" title="Share via Email" >
+    <i class="fa-solid fa-envelope fa-xl"></i>
+  </a>
+</div>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+  <script src="https://giscus.app/client.js"
+        data-repo="quarkusio/quarkus"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkxMzk5MTQ5MzI="
+        data-category="Quarkus Blog/Website"
+        data-category-id="DIC_kwDOCFbutM4CAFFV"
+        data-mapping="og:title"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+  </script>
+  </div>
+</div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

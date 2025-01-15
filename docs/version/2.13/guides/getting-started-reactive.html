@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>リアクティブ入門 - 2.13 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/2.13/guides/getting-started-reactive" />
+  <meta property="og:title" content="リアクティブ入門 - 2.13" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/getting-started-reactive">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/2.13/guides/getting-started-reactive">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/2.13/guides/getting-started-reactive" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/2.13/guides/getting-started-reactive">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/2.13/guides/getting-started-reactive">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/2.13/guides/getting-started-reactive">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/2.13/guides/getting-started-reactive">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/2.13/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" selected>2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">リアクティブ入門 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><em>リアクティブ</em> とは、堅牢で効率的、かつコンカレントなアプリケーションやシステムを構築するための一連の原則です。これらの原則により、従来のアプローチよりも多くの負荷を処理しながら、リソース（CPUやメモリ）をより効率的に使用し、また障害にも適切に対応することができます。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusは <em>Reactive</em> フレームワークです。当初から、 _Reactive_はQuarkusのアーキテクチャに欠かせない要素でした。多くのReactive機能が含まれており、幅広いエコシステムを提供しています。</p>
+</div>
+<div class="paragraph">
+<p>このガイドは、 <em>リアクティブ</em> とは何か、Quarkusでどのようにリアクティブアーキテクチャを実現するかについての詳細な記事ではありません。これらのトピックについて詳しく知りたい場合は、Quarkusのリアクティブエコシステムの概要を説明した <a href="quarkus-reactive-architecture">リアクティブアーキテクチャガイド</a> を参照してください。</p>
+</div>
+<div class="paragraph">
+<p>このガイドでは、Quarkusのリアクティブな機能をご紹介します。簡単なCRUDアプリケーションを実装する予定です。ただし、 <a href="hibernate-orm-panache">Hibernate with Panacheガイド</a> とは異なり、Quarkusのリアクティブ機能を使用します。</p>
+</div>
+<div class="paragraph">
+<p>このガイドでは、次の情報を提供します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>RESTEasy Reactiveを使ったリアクティブCRUDアプリケーションのブートストラップ</p>
+</li>
+<li>
+<p>Hibernate Reactive with Panacheによるリアクティブなデータベースとの連携</p>
+</li>
+<li>
+<p>RESTEasy Reactiveを使用して、リアクティブの原則を実行しながらHTTP APIを実装</p>
+</li>
+<li>
+<p>アプリケーションのパッケージ化と実行</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>約15分</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 11+ がインストールされ、 <code>JAVA_HOME</code>  が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.8.6</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルをビルドしたい場合、MandrelまたはGraalVM（あるいはネイティブなコンテナビルドを使用する場合はDocker）をインストールし、 <a href="building-native-image.html#configuring-graalvm">適切に設定</a>していること</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Mavenが期待するJavaバージョンを使用していることを確認します。複数のJDKがインストールされている場合、Mavenが期待されるものを使用していることを確認してください。 <code>mvn --version.</code> を実行することで、Mavenが使用するJDKを確認することができます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="imperative-vs-reactive-a-question-of-threads"><a class="anchor" href="#imperative-vs-reactive-a-question-of-threads"></a>命令型かリアクティブ型か: スレッドの問題だ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>前述したように、このガイドでは、リアクティブなCRUDアプリケーションを実装します。しかし、伝統的なモデルや命令型のモデルと比べて、どのような違いや利点があるのか疑問に思うかもしれません。</p>
+</div>
+<div class="paragraph">
+<p>この対比をよりよく理解するためには、リアクティブ型と命令型の実行モデルの違いを説明する必要があります。 <em>リアクティブ</em> は単なる実行モデルの違いではなく、このガイドを理解するためにはその区別が必要であることを理解しておく必要があります。</p>
+</div>
+<div class="paragraph">
+<p>伝統的な命令型のアプローチでは、フレームワークはリクエストを処理するスレッドを割り当てます。つまり、リクエストの処理全体がこのワーカースレッド上で実行されるのです。このモデルは、スケールがあまりよくありません。実際、複数の同時リクエストを処理するためには、複数のスレッドが必要となり、アプリケーションの同時実行性はスレッドの数によって制限されます。さらに、これらのスレッドは、コードがリモートサービスとやり取りするとすぐにブロックされます。そのため、より多くのスレッドが必要となり、各スレッドはOSのスレッドにマッピングされているため、メモリやCPUのコストがかかり、リソースの非効率的な使用につながります。</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="./images/blocking-threads.png" alt="Imperative Execution Model and Worker Threads" width="50%">
+</div>
+</div>
+<div class="paragraph">
+<p>一方、リアクティブモデルは、ノンブロッキングI/Oおよび、異なる実行モデルに依存しています。ノンブロッキングI/Oは、同時I/Oを効率的に処理する方法です。I/Oスレッドと呼ばれる最小限のスレッドで、多くの同時I/Oを処理することができます。このようなモデルでは、リクエスト処理をワーカースレッドに委ねるのではなく、I/Oスレッドを直接使用します。リクエストを処理するためにワーカースレッドを作成する必要がないため、メモリとCPUを節約できます。リクエストを処理するためにワーカスレッドを作成する必要がないため、メモリやCPUを節約できます。また、スレッド数の制約がなくなるため、同時実行性も向上します。最後に、スレッドの切り替え回数が減ることで、応答時間も改善されます。</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="./images/reactive-thread.png" alt="Reactive Execution Model and I/O Threads" width="50%">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="from-sequential-to-continuation-style"><a class="anchor" href="#from-sequential-to-continuation-style"></a>シーケンシャルから継続タイルへ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>つまり、リアクティブな実行モデルでは、I/Oスレッドを使ってリクエストを処理します。しかし、それだけではありません。I/Oスレッドは、複数の同時リクエストを処理することができます。どうやって？これが、リアクティブとインペラティブの最も重要な違いの一つであるトリックです。</p>
+</div>
+<div class="paragraph">
+<p>リクエストの処理に、HTTP APIやデータベースなどのリモートサービスとのやりとりが必要な場合、レスポンスを待つ間に実行をブロックすることはありません。代わりに、I/O操作をスケジューリングし、リクエスト処理の残りのコードである継続を添付します。この継続は、コールバック（I/Oの結果とともに呼び出される関数）として渡すこともできますし、リアクティブプログラミングやコルーティンなどのより高度な構成を使用することもできます。継続をどのように表現するかに関わらず、重要な点はI/Oスレッドの解放であり、その結果、このスレッドを使って別のリクエストを処理することができるという事実です。スケジュールされたI/Oが完了すると、I/Oスレッドは継続を実行し、保留中のリクエストの処理は継続されます。</p>
+</div>
+<div class="paragraph">
+<p>そのため、I/Oが実行をブロックするような命令型モデルとは異なり、リアクティブ型ではI/Oスレッドを解放し、I/Oが完了した時点で継続を呼び出す継続型のデザインに切り替わります。その結果、I/Oスレッドは複数の同時リクエストを処理できるようになり、アプリケーション全体の同時性が向上します。</p>
+</div>
+<div class="paragraph">
+<p>しかし、これには問題があります。継続パッシングのコードを書くための方法が必要なのです。これにはいろいろな方法があります。Quarkusでは、以下を提案しています:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Mutiny - 直感的でイベント駆動型のリアクティブ・プログラミング・ライブラリ</p>
+</li>
+<li>
+<p>Kotlin co-routines - 非同期のコードを逐次的に記述する方法</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>このガイドでは、Mutinyを使用します。Mutinyについて詳しく知りたい方は、 <a href="mutiny-primer.html">Mutinyのドキュメント</a>をご覧ください。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+JDKに近々導入されるProject Loomは、仮想スレッドベースのモデルを提案しています。Quarkusのアーキテクチャは、Loomがグローバルに利用可能になり次第、サポートする準備ができています。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="bootstrapping-the-reactive-fruits-application"><a class="anchor" href="#bootstrapping-the-reactive-fruits-application"></a>リアクティブフルーツアプリケーションの起動</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>これを念頭に置いて、Quarkusを使用してCRUDアプリケーションを開発する方法を見てみましょう。このアプリケーションは、I / Oスレッドを使用してHTTPリクエストを処理し、データベースとやり取りし、結果を処理し、HTTP応答を記述します。言い換えれば、リアクティブCRUDアプリケーションです。</p>
+</div>
+<div class="paragraph">
+<p>ステップバイステップの手順に従うことをお勧めしますが、最終的なソリューションは <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/main/hibernate-reactive-panache-quickstart" class="bare">https://github.com/quarkusio/quarkus-quickstarts/tree/main/hibernate-reactive-panache-quickstart</a>  で見つけることができます。</p>
+</div>
+<div class="paragraph">
+<p>まず、 <a href="https://code.quarkus.io">code.quarkus.io</a>にアクセスし、以下のエクステンションを選択します:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>RESTEasy Reactive Jackson</p>
+</li>
+<li>
+<p>Hibernate Reactive with Panache</p>
+</li>
+<li>
+<p>リアクティブなPostgreSQLクライアント</p>
+</li>
+</ol>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="./images/reactive-guide-code.png" alt="Extensions to select in https://code.quarkus.io" width="90%">
+</div>
+</div>
+<div class="paragraph">
+<p>最後のエクステンションは、PostgreSQL用のリアクティブデータベースドライバです。Hibernate Reactiveはこのドライバを使用して、呼び出し元のスレッドをブロックすることなくデータベースと対話します。</p>
+</div>
+<div class="paragraph">
+<p>選択したら、"Generate your application "をクリックし、zipファイルをダウンロードして解凍し、お好みのIDEでコードを開きます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="reactive-panache-entity"><a class="anchor" href="#reactive-panache-entity"></a>Reactive Panache Entity</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>では、 <code>Fruit</code> から始めましょう。以下の内容で <code>src/main/java/org/acme/hibernate/orm/panache/Fruit.java</code> ファイルを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.hibernate.orm.panache;
+
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+
+import io.quarkus.hibernate.reactive.panache.PanacheEntity;  <i class="conum" data-value="1"></i><b>(1)</b>
+
+@Entity
+@Cacheable
+public class Fruit extends PanacheEntity {
+
+	 @Column(length = 40, unique = true)
+	 public String name;
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>PanacheEntity</code> のリアクティブ版をインポートしてください。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>このクラスは <code>Fruits</code> を表します。1つのフィールド( <code>name</code>)を持つ単純なエンティティです。なお、このクラスは <code>PanacheEntity</code> のリアクティブ版である <code>io.quarkus.hibernate.reactive.panache.PanacheEntity</code> を使用しています。つまり、舞台裏では、Hibernate は上述の実行モデルを使用しています。スレッドをブロックすることなく、データベースと対話します。さらに、このリアクティブな <code>PanacheEntity</code> は、リアクティブな API を提案しています。このAPIを使用してRESTエンドポイントを実装します。</p>
+</div>
+<div class="paragraph">
+<p>その前に、 <code>src/main/resource/application.properties</code> ファイルを開き、次を追加してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.datasource.db-kind=postgresql
+quarkus.hibernate-orm.database.generation=drop-and-create</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>データベースにPostgreSQLを使用し、データベーススキーマの生成を処理するようにアプリケーションに指示します。</p>
+</div>
+<div class="paragraph">
+<p>同じディレクトリに、 <code>import.sql</code> ファイルを作成します。このファイルにはいくつかのフルーツが挿入されており、開発モードで空のデータベースから始めないようになっています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">INSERT INTO fruit(id, name) VALUES (nextval('hibernate_sequence'), 'Cherry');
+INSERT INTO fruit(id, name) VALUES (nextval('hibernate_sequence'), 'Apple');
+INSERT INTO fruit(id, name) VALUES (nextval('hibernate_sequence'), 'Banana');</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ターミナルで、次のようにしてアプリケーションを開発モードで起動します： <code>./mvnw quarkus:dev</code>. Quarkusは自動的にデータベースインスタンスを起動し、アプリケーションの設定を行います。あとは、HTTPエンドポイントを実装するだけです。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="reactive-resource"><a class="anchor" href="#reactive-resource"></a>リアクティブリソース</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>データベースとのやりとりはノンブロッキングで非同期なので、HTTPリソースを実装するために非同期の構造を使用する必要があります。Quarkusは、中心となるリアクティブプログラミングモデルとしてMutinyを使用しています。そのため、HTTPエンドポイントからMutinyタイプ（ <code>Uni</code> と <code>Multi</code> ）を返すことをサポートしています。また、Fruit Panacheのエンティティはこれらの型を使ったメソッドを公開していますので、私たちは <em>糊</em> を実装するだけで済みます。</p>
+</div>
+<div class="paragraph">
+<p><code>src/main/java/org/acme/hibernate/orm/panache/FruitResource.java</code> ファイルを以下の内容で作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.hibernate.orm.panache;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.ws.rs.Path;
+
+@Path("/fruits")
+@ApplicationScoped
+public class FruitResource {
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>まずは、 <code>getAll</code> のメソッドから見てみましょう。 <code>getAll</code> メソッドは、データベースに保存されているすべてのフルーツを返します。 <code>FruitResource</code> の中に、以下のコードを追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@GET
+public Uni&lt;List&lt;Fruit&gt;&gt; get() {
+    return Fruit.listAll(Sort.by("name"));
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><a href="http://localhost:8080/fruits" class="bare">http://localhost:8080/fruits</a> を開いて、このメソッドを呼び出します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">[{"id":2,"name":"Apple"},{"id":3,"name":"Banana"},{"id":1,"name":"Cherry"},{"id":4,"name":"peach"}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>期待通りのJSON配列が得られます。RESTEasy Reactiveでは、特に指示がない限り、リストを自動的にJSON配列にマッピングします。</p>
+</div>
+<div class="paragraph">
+<p>戻り値の型を見てください。これは <code>List&lt;Fruit&gt;</code> の <code>Uni</code> を返します。 <code>Uni</code> は非同期型です。これはfutureのようなものです。これは後で値（アイテム）を得るためのプレースホルダーです。アイテムを受け取ったら（Mutinyではアイテムを _emit_すると言っています）、何らかの動作を付けることができます。Uniを取得し、そのUniがアイテムをemitしたら、残りの処理を実行する、という継続を表現しています。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+リアクティブな開発者は、なぜフルーツのストリームを直接返すことができないのかと思うかもしれません。それは、データベースを扱うときにはよくない考えになりがちです。リレーショナル・データベースはストリーミングをうまく扱えません。これは、このユースケースのために設計されていないプロトコルの問題です。そのため、データベースから行をストリーミングするには、すべての行が消費されるまで、コネクション（場合によってはトランザクション）を開いておく必要があります。コンシューマーが遅い場合、データベースの黄金律である「コネクションを長く保持しない」を破ってしまいます。実際、コネクションの数はかなり少なく、コンシューマーがコネクションを長時間保持することは、アプリケーションの並行性を劇的に低下させます。ですから、可能な限り <code>Uni&lt;List&lt;T&gt;&gt;</code> を使用し、コンテンツをロードしてください。結果のセットが大きい場合は、ページネーションを実装してください。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>getSingle</code> でAPIを継続してみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@GET
+@Path("/{id}")
+public Uni&lt;Fruit&gt; getSingle(Long id) {
+    return Fruit.findById(id);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この場合、 <code>Fruit.findById</code> を使ってフルーツを取得します。これは、データベースが行を取得したときに完了する <code>Uni</code> を返します。</p>
+</div>
+<div class="paragraph">
+<p><code>create</code> メソッドでは、新しいフルーツをデータベースに追加することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@POST
+public Uni&lt;Response&gt; create(Fruit fruit) {
+    return Panache.&lt;Fruit&gt;withTransaction(fruit::persist)
+            .onItem().transform(inserted -&gt; Response.created(URI.create("/fruits/" + inserted.id)).build());
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>コードはもう少し複雑になっています。データベースへの書き込みには、トランザクションが必要です。そこで、 <code>Panache.withTransaction</code> を使って（非同期に）トランザクションを取得し、トランザクションを受け取ったら <code>persist</code> メソッドを呼び出します。 <code>persist</code> メソッドも <code>Uni</code> を返しています。この <code>Uni</code> は、データベースにフルーツを挿入した結果を出力します。挿入が完了すると（これが私たちの継続です）、 <code>201 CREATED</code> レスポンスを作成します。RESTEasy Reactiveは自動的にリクエスト・ボディをJSONとして読み込み、 <code>Fruit</code> インスタンスを作成します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>.onItem().transform(…​)</code> は <code>.map(…​)</code> に置き換えることができます。 <code>map</code> はショートカットです。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>マシンに <a href="https://curl.se/">curl</a>があれば、エンドポイントを使って試すことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">&gt; curl --header "Content-Type: application/json" \
+  --request POST \
+  --data '{"name":"peach"}' \
+  http://localhost:8080/fruits</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>同じ考え方で、他のCRUDメソッドも実装できます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-and-running"><a class="anchor" href="#testing-and-running"></a>テストと実行</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>リアクティブなアプリケーションのテストは、非リアクティブなアプリケーションのテストと同様に、 HTTP エンドポイントを使用して、HTTP レスポンスを検証します。アプリケーションがリアクティブであることによる差異はありません。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/quarkusio/quarkus-quickstarts/blob/main/hibernate-reactive-panache-quickstart/src/test/java/org/acme/hibernate/orm/panache/FruitsEndpointTest.java">FruitsEndpointTest.java</a>では、Fruitアプリケーションのテストがどのように実装出来るかを見ることができます。</p>
+</div>
+<div class="paragraph">
+<p>アプリケーションのパッケージ化と実行も同様に差異はありません。</p>
+</div>
+<div class="paragraph">
+<p>以下のコマンドは通常通り使用できます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>また、ネイティブ実行可能ファイルのビルドも同様です。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build --native</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install -Dnative</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build -Dquarkus.package.type=native</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>また、アプリケーションをコンテナにパッケージすることもできます。</p>
+</div>
+<div class="paragraph">
+<p>アプリケーションを実行するには、データベースを起動し、アプリケーションに設定を提供することを忘れないでください。</p>
+</div>
+<div class="paragraph">
+<p>例えば、Dockerを使ってデータベースを動かすことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker run -it --rm=true \
+    --name postgres-quarkus -e POSTGRES_USER=quarkus \
+    -e POSTGRES_PASSWORD=quarkus -e POSTGRES_DB=fruits \
+    -p 5432:5432 postgres:14.1</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、アプリケーションを起動します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">java \
+   -Dquarkus.datasource.reactive.url=postgresql://localhost/fruits \
+   -Dquarkus.datasource.username=quarkus \
+   -Dquarkus.datasource.password=quarkus \
+   -jar target/quarkus-app/quarkus-run.jar</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>あるいは、アプリケーションをネイティブ実行可能ファイルとしてパッケージ化する場合は、次を使用します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./target/getting-started-with-reactive-runner \
+  -Dquarkus.datasource.reactive.url=postgresql://localhost/fruits \
+  -Dquarkus.datasource.username=quarkus \
+  -Dquarkus.datasource.password=quarkus</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>アプリケーションに渡されるパラメータは、データソースガイドに記載されています。アプリケーションを設定する方法は他にもあります。 <a href="config-reference#configuration-sources">設定ガイド</a>を参照して、利用可能なオプションの概要を確認してください（env変数、.envファイルなど）。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="going-further"><a class="anchor" href="#going-further"></a>さらに詳しく</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、Quarkusが提供するいくつかのリアクティブ機能を簡単に紹介しました。Quarkusはリアクティブフレームワークであるため、多くのリアクティブ機能を提供しています。</p>
+</div>
+<div class="paragraph">
+<p>このトピックを続けたい方は以下をチェック下さい:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="quarkus-reactive-architecture.html">Quarkusリアクティブアーキテクチャ</a></p>
+</li>
+<li>
+<p><a href="mutiny-primer">Mutiny -直感的なリアクティブプログラミングライブラリ</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#imperative-vs-reactive-a-question-of-threads">命令型かリアクティブ型か: スレッドの問題だ</a></li>
+<li><a href="#from-sequential-to-continuation-style">シーケンシャルから継続タイルへ</a></li>
+<li><a href="#bootstrapping-the-reactive-fruits-application">リアクティブフルーツアプリケーションの起動</a></li>
+<li><a href="#reactive-panache-entity">Reactive Panache Entity</a></li>
+<li><a href="#reactive-resource">リアクティブリソース</a></li>
+<li><a href="#testing-and-running">テストと実行</a></li>
+<li><a href="#going-further">さらに詳しく</a></li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Quarkusドキュメントの寄稿方法 - 3.15 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.15/guides/doc-contribute-docs-howto" />
+  <meta property="og:title" content="Quarkusドキュメントの寄稿方法 - 3.15" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/doc-contribute-docs-howto">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.15/guides/doc-contribute-docs-howto">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.15/guides/doc-contribute-docs-howto" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.15/guides/doc-contribute-docs-howto">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.15/guides/doc-contribute-docs-howto">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.15/guides/doc-contribute-docs-howto">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.15/guides/doc-contribute-docs-howto">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.15/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" selected>3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">Quarkusドキュメントの寄稿方法 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>QuarkusのWebサイトポータルでコンテンツが正常にレンダリングされるように、推奨されるコンテンツタイプ、ステップ、ワークフロー、スタイルガイダンスを使用して、ドキュメントに貢献します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusのドキュメントには、 <a href="https://asciidoc.org/">AsciiDoc</a> のマークアップが使用されています。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>You have an editor or IDE that provides syntax highlighting and previews for AsciiDoc, either natively or with a plugin.</p>
+</li>
+<li>
+<p>You have reviewed the following Quarkus contributor resources:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>The <a href="https://github.com/quarkusio/quarkus/blob/main/CONTRIBUTING.md#documentation">Documentation</a> section of the Quarkus "Contributing" guide.</p>
+</li>
+<li>
+<p>The <a href="doc-reference">Quarkus style and content guidelines</a> for the required syntax, preferred style, and other conventions.</p>
+</li>
+<li>
+<p>The <a href="doc-concept">Quarkus documentation content types</a>.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>You have the <a href="https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/">AsciiDoc syntax reference</a> nearby.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="locate-the-source-files-for-quarkus-docs"><a class="anchor" href="#locate-the-source-files-for-quarkus-docs"></a>Quarkus docsのソースファイルの場所を確認する</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>AsciiDoc files are in the <code>src/main/asciidoc</code> directory within the <code>docs</code> module of the <a href="https://github.com/quarkusio/quarkus/tree/main/docs">Quarkus GitHub repository</a>.</p>
+</li>
+<li>
+<p>The Quarkus doc templates are located in the <code>src/main/asciidoc/_templates</code> directory within the <code>docs</code> module of the <a href="https://github.com/quarkusio/quarkus/tree/main/docs">Quarkus GitHub repository</a>.</p>
+</li>
+<li>
+<p>設定ドキュメントは、Javaソースファイル内のJavaDocコメントから生成されます。</p>
+</li>
+<li>
+<p>JavaやYAMLなどのソースファイルをAsciiDocのファイルから <a href="doc-reference.html#reference-source-code">参照</a> することも可能です。</p>
+</li>
+<li>
+<p><a href="https://quarkus.io/guides/">Quarkusのドキュメント</a> メニューページは、doc indexページとも呼ばれ、 <a href="https://github.com/quarkusio/quarkusio.github.io">quarkusio.github.io</a> リポジトリにソースがあります。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="create-quarkus-content-in-asciidoc"><a class="anchor" href="#create-quarkus-content-in-asciidoc"></a>QuarkusのコンテンツをAsciiDocで作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://quarkus.io/guides/">Quarkusドキュメントホームページ</a> にコンテンツが正しく表示されるようにするには、次のステップを使用します：</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>投稿するコンテンツに最適な <a href="doc-concept">Diataxis</a> のコンテンツタイプを決めましょう。</p>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+To help you decide, see the content type descriptions in <a href="doc-reference#titles-and-headings">Titles and headings</a> on the "About Quarkus documentation" page.
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p><code>src/main/asciidoc/_templates</code> ディレクトリに移動し、選択したコンテンツタイプに対応するテンプレートのコピーを作成します。必ず、以下のようにしてください:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Use the filename syntax of`&lt;category&gt;-&lt;titlekeyword&gt;-&lt;titlekeyword&gt;.adoc`. For example, <code>security-basic-authentication.adoc</code>.</p>
+</li>
+<li>
+<p>Include the diataxis type (concept, howto, reference, tutorial) in the file name if it makes sense to do so.
+For example, <code>telemetry-micrometer.adoc</code> is a reference, and <code>telemetry-micrometer-tutorial.adoc</code> is a tutorial.</p>
+</li>
+<li>
+<p><code>quarkus</code> リポジトリの <code>docs/src/main/asciidoc</code> フォルダに保存してください。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Set the minimum required header information to ensure that the content renders correctly in the website portal and on the documentation home page, as outlined in the following example:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">[id="security-basic-authentication"] <i class="conum" data-value="1"></i><b>(1)</b>
+= Secure a Quarkus application with basic authentication <i class="conum" data-value="2"></i><b>(2)</b>
+include::_attributes.adoc[] <i class="conum" data-value="3"></i><b>(3)</b>
+:diataxis-type: howto <i class="conum" data-value="4"></i><b>(4)</b>
+:categories: security,web <i class="conum" data-value="5"></i><b>(5)</b>
+<i class="conum" data-value="6"></i><b>(6)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Set the <code>id</code> value to be the same as the file name but without the extension.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>For information about how to create a good title for each content type, see <a href="doc-reference#titles-and-headings">Titles and headings</a> on the "Quarkus style and content guidelines" page.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The <code>_attributes.adoc</code> include is required to ensure that attributes get resolved and the table of contents is generated.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Specify the diataxis type: <code>concept</code>, <code>howto</code>, <code>reference</code>, or <code>tutorial</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Set at least one category to ensure that the content is findable on the <a href="https://quarkus.io/guides/">Quarkus documentation home page</a>. For a list of Quarkus categories, see <a href="doc-reference#document-attributes-and-variables">Document attributes and variables</a> on the "Quarkus style and content guidelines" page.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Insert a blank line after all document attributes and before the abstract.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Ensure there are no blank lines between the document id and title, the attribute include (<code>include::_attributes.adoc[]</code>) and the declaration of other document attributes(<code>:attribute:</code>).</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Add an abstract that describes the purpose of the guide.</p>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><a href="https://quarkus.io/guides/">Quarkusガイド</a> のホームページに自動的に表示されるため、要約の最初の文は、コンテンツの価値と何らかの利益を27単語以内で説明する必要があります。また、要約の前後で改行する必要があります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>For more information about the minimum header requirements, see <a href="doc-reference#document-structure">Document structure</a> on the "Quarkus style and content guidelines" page.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="add-prerequisites"><a class="anchor" href="#add-prerequisites"></a>Add a prerequisites section</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For how-to and tutorial topics, include a prerequisites section just after the abstract.
+Declaring prerequisites clarifies the starting place for both how-to and tutorial content.
+Include them even though they might seem obvious to knowledgeable users.</p>
+</div>
+<div class="listingblock">
+<div class="title">An example prerequisite with callout explanations</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">.Prerequisites <i class="conum" data-value="1"></i><b>(1)</b>
+
+:prerequisites-time: 30 minutes <i class="conum" data-value="2"></i><b>(2)</b>
+include::{includes}/prerequisites.adoc[] <i class="conum" data-value="3"></i><b>(3)</b>
+* &lt;an additional prerequisite&gt; <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Section heading for the prerequisites</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Optional: An attribute that modifies the prerequisites</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>An include statement for the <code>prerequisites.adoc</code> file</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Optional: An additional prerequisite not covered by the attributes</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<div class="title">The default prerequisites</div>
+<p>By default, <code>include::./_includes/prerequisites.adoc[]</code> inserts the following asciidoc:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">To complete this guide, you need:
+
+* Roughly 15 minutes
+* An IDE
+* JDK 17+ installed with `JAVA_HOME` configured appropriately
+* Apache Maven {maven-version}
+* Optionally the xref:cli-tooling.adoc[Quarkus CLI] if you want to use it
+* Optionally Mandrel or GraalVM installed and xref:building-native-image.adoc#configuring-graalvm[configured appropriately] if you want to build a native executable (or Docker if you use a native container build)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<div class="title">Using attributes to modify the prerequisites</div>
+<p>Optionally, you can add, remove, or modify the default prerequisites by inserting the following attributes on the line before the <code>include::./_includes/prerequisites.adoc[]</code> macro.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>{prerequisites-time}: &lt;number of minutes&gt;</code> overrides the default value of 15 minutes. For example, <code>{prerequisites-time}: 30</code> adds <code>* Roughly 30 minutes</code>.</p>
+</li>
+<li>
+<p><code>{prerequisites-no-maven}</code> removes <code>* Apache Maven &lt;maven version&gt;</code>.</p>
+</li>
+<li>
+<p><code>{prerequisites-docker}</code> adds <code>* A working container runtime (Docker or <a href="podman">Podman</a>)</code>.</p>
+</li>
+<li>
+<p><code>{prerequisites-docker-compose}</code> adds <code>Docker and Docker Compose or <a href="podman">Podman</a>, and Docker Compose</code>.</p>
+</li>
+<li>
+<p><code>{prerequisites-no-cli}</code> removes <code>* Optionally the <a href="cli-tooling">Quarkus CLI</a> if you want to use it</code>.</p>
+</li>
+<li>
+<p><code>{prerequisites-no-graalvm}</code> or <code>{prerequisites-graalvm-mandatory}</code> remove <code>* Optionally Mandrel or GraalVM installed and <a href="building-native-image#configuring-graalvm">configured appropriately</a> if you want to build a native executable (or Docker if you use a native container build)</code>.</p>
+</li>
+<li>
+<p><code>{prerequisites-graalvm-mandatory}</code> adds <code>* Mandrel or GraalVM installed and <a href="building-native-image#configuring-graalvm">configured appropriately</a></code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For more information about these attributes, inspect the content of the <code>docs/src/main/asciidoc/_includes/prerequisites.adoc</code> file.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="retire-and-redirect-an-existing-quarkus-asciidoc-source-file"><a class="anchor" href="#retire-and-redirect-an-existing-quarkus-asciidoc-source-file"></a>既存のQuarkus AsciiDocソースファイルの削除とリダイレクト</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>コンテンツの進化に伴い、既存のQuarkusコンテンツを1つまたは複数のコンテンツタイプに再編成し、既存のAsciiDocソースファイルを破棄したい場合があります。</p>
+</div>
+<div class="paragraph">
+<p>If you are retiring or renaming a published Quarkus AsciiDoc source file, ensure that the restructure does not break existing bookmarks and links to the original content.
+Configure a URL redirect in the <a href="https://github.com/quarkusio/quarkusio.github.io/">Quarkus.io Website</a> GitHub repository by using the following steps:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Switch to the <a href="https://github.com/quarkusio/quarkusio.github.io/tree/develop/_redirects/guides"><code>quarkusio/quarkusio.github.io</code></a> repository, and open the <code>_redirects/guides</code> folder.</p>
+</li>
+<li>
+<p>破棄したい元のAsciiDocのソースファイル名と一致するファイル名のリダイレクトファイルをMarkdown形式で作成します。</p>
+</li>
+<li>
+<p>Markdownリダイレクトファイルに、以下の内容を追加します:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-markdown hljs" data-lang="markdown">---
+permalink: /guides/&lt;original_asciidoc_filename&gt;/index.html <i class="conum" data-value="1"></i><b>(1)</b>
+newUrl: /guides/&lt;new_asciidoc_filename&gt; <i class="conum" data-value="2"></i><b>(2)</b>
+---</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>何処に</p>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The name of the original AsciiDoc source file that you are retiring, without the <code>.adoc</code> file extension.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The name of the AsciiDoc source file that you want to redirect to, without the <code>.adoc</code> file extension.</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. 例</caption>
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">元のAsciiDocソースファイル名</th>
+<th class="tableblock halign-left valign-top">リダイレクト先となるファイル名</th>
+<th class="tableblock halign-left valign-top">Redirection file</th>
+<th class="tableblock halign-left valign-top">プルリクエストの例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>security-getting-started</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>security-overview-concept</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/quarkusio/quarkusio.github.io/blob/develop/_redirects/guides/security-getting-started.md"><code>security-getting-started.md</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/quarkusio/quarkusio.github.io/pull/1579">PR #1579</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="anchors-howto"><a class="anchor" href="#anchors-howto"></a>Use anchors to cross-reference in-file and cross-file content</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>An anchor, also called an ID, can be defined almost anywhere in the document, including on a section title, discrete heading, paragraph, image, delimited block, inline phrase, etc.</p>
+</div>
+<div class="paragraph">
+<p>The callout functions for these anchors vary based on whether you call a local ID or the ID from another file, but the anchored ID creation remains the same.</p>
+</div>
+<div class="sect2">
+<h3 id="create-an-anchored-id"><a class="anchor" href="#create-an-anchored-id"></a>Create an anchored ID</h3>
+<div class="paragraph">
+<p>To create an ID for a new file or a section to which you want to refer, insert the anchor ID as follows:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Use lower-case characters.</p>
+</li>
+<li>
+<p>Separate each word with a dash character.</p>
+</li>
+<li>
+<p>Enclose the ID in double square brackets.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<div class="title">Anchored ID creation example</div>
+<p>In this section, we will use an anchor created above the level-2 heading for demonstration purposes.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">[[title-heading]]
+== Title heading</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="call-an-anchored-id-in-the-same-file"><a class="anchor" href="#call-an-anchored-id-in-the-same-file"></a>Call an anchored ID in the same file</h3>
+<div class="paragraph">
+<p>同じファイルに作成されたアンカーを呼び出すには、 <code>&lt;&lt;&gt;&gt;</code> xrefマクロにアンカーIDを挿入してください。</p>
+</div>
+<div class="listingblock">
+<div class="title">Inter-document anchored ID call example</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">&lt;&lt;title-heading&gt;&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This macro creates an URL with a name automatically sourced from the anchored heading, section, or table.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<code><a href="#Title heading">[Title heading]</a></code> のように、逐語的な見出しやセクションの説明に <code>&lt;&lt;&gt;&gt;</code> 形式を使用しないでください。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>When you want to specify a non-default caption for your URL, specify the anchored ID and desired name separated by <code>,</code> without white space.</p>
+</div>
+<div class="listingblock">
+<div class="title">Anchor with a custom URL caption example</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">&lt;&lt;title-heading,Title heading description that fits the context of your content&gt;&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="call-an-anchored-id-from-a-different-file"><a class="anchor" href="#call-an-anchored-id-from-a-different-file"></a>Call an anchored ID from a different file</h3>
+<div class="paragraph">
+<p>To call an anchor created in a different file, insert the anchor to an <code>xref</code> macro and specify the full name of the hosting file and the desired anchored ID.</p>
+</div>
+<div class="listingblock">
+<div class="title">Cross-document anchored ID call example</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">xref:&lt;other-file-name&gt;.adoc#title-heading[Title heading]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Breaking this example apart, we are using the <code>xref</code> macro to refer to another file (<code>xref:&lt;name-of-the-file&gt;.adoc[Human-readable label]</code>) and inserting the anchor ID for the target section (<code>#title-heading</code>) just after the file name.</p>
+</div>
+<div class="paragraph">
+<p>For more guidelines on writing cross-references, including the recommended path attributes, see <a href="doc-reference#cross-references">Cross-references</a>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="preview-and-build-quarkus-documentation"><a class="anchor" href="#preview-and-build-quarkus-documentation"></a>Quarkusドキュメントのプレビューとビルド</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Pull Request を送信する前に、以下のビルド方法のいずれかを使用して、AsciiDoc ソースの HTML 出力をプレビューしてください：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ちょっとしたドキュメントの変更であれば、IDEが提供するAsciiDocのシンタックスハイライトとプレビューを利用することができます。</p>
+</li>
+<li>
+<p>生成された設定ドキュメントの大幅な変更や更新は、 <code>docs</code> モジュールをローカルでビルドし、以下のセクションで説明するように Vale linter を実行してください。</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="build-the-docs-module-locally"><a class="anchor" href="#build-the-docs-module-locally"></a><code>docs</code> モジュールをローカルでビルド</h3>
+<div class="paragraph">
+<p>以下は、Quarkusリポジトリにあるすべてのモジュール（テストモジュールを除く）をビルドし、`999-SNAPSHOT`バージョンでローカルmavenリポジトリにインストールします：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">./mvnw -DquicklyDocs</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>-DquicklyDocs</code> の実行は以下を生成します：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>target/asciidoc/generated/config/</code> ディレクトリに自動生成の設定プロパティを記述したAsciiDoc（ <code>adoc</code> ファイル）</p>
+</li>
+<li>
+<p><code>docs/target/generated-docs/</code> ディレクトリにAsciiDoc出力（ <code>html</code> ファイル）。</p>
+</li>
+<li>
+<p>全ドキュメント個別のメタデータを含むYAML ( `docs/target/indexByFile.yaml `) とドキュメントタイプ別にグループ化したメタデータを含むYAML ( `target/indexByType.yaml `)。</p>
+</li>
+<li>
+<p>ファイル別にメタデータのエラーをリストアップするYAMLファイル( `docs/target/errorsByFile.yaml `)と、エラーの種類別にメタデータのエラーをリストアップするYAMLファイル( `docs/target/errorsByType.yaml `)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>変更をPRで提出し、レビューを受ける前に、結果の出力をレビューし、問題があれば修正を行ってください。</p>
+</div>
+<div class="paragraph">
+<p>変更を加えると、特に <code>docs</code> モジュールを再構築して、生成された HTML を更新できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">./mvnw -f docs clean install</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>エクステンションの設定を更新する場合:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>エクステンションのJavadocを改訂する</p>
+</li>
+<li>
+<p><code>target/asciidoc/generated/config/</code> にコンテンツを生成するためにエクステンションをビルドする</p>
+</li>
+<li>
+<p><code>docs</code> モジュールをビルドして、レンダリング結果を確認する。</p>
+</li>
+</ol>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="lint-documentation-changes-with-vale"><a class="anchor" href="#lint-documentation-changes-with-vale"></a>Valeによるドキュメント変更の性的解析</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>我々は <a href="https://vale.sh">Vale</a> を使用して、英語版ドキュメントの文法、スタイル、単語の使用状況をチェックしています。独自のValeスタイルルールセットを作成し、コンテンツがQuarkusの推奨スタイルガイドラインに沿うようにしました。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="ulist">
+<ul>
+<li>
+<p>ValeのQuarkusの設定は、 <code>docs/.vale.ini</code> にあります。</p>
+</li>
+<li>
+<p>Quarkusのスタイルルールは、 <code>docs/.vale/styles</code> ディレクトリにあるYAMLフォーマットです。</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="containerized-vale"><a class="anchor" href="#containerized-vale"></a>コンテナ化されたVale</h3>
+<div class="paragraph">
+<p>この方法では、動作するコンテナランタイム（Dockerまたは <a href="podman.html">Podman</a> ）が必要です。</p>
+</div>
+<div class="paragraph">
+<p><code>docs</code> モジュールには、JUnit 5 テストがあり、コンテナ内で Vale リンターを実行します（ <a href="https://www.testcontainers.org/">Testcontainers</a> を使用）。QuarkusドキュメントのメタデータとValeスタイルルールの両方が検証されます。</p>
+</div>
+<div class="paragraph">
+<p>以下のいずれかの方法でテストを実行します：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">./mvnw -f docs test -Dvale -DvaleLevel=suggestion <i class="conum" data-value="1"></i><b>(1)</b>
+./mvnw -f docs test -Dvale=git -DvaleLevel=warning <i class="conum" data-value="2"></i><b>(2)</b>
+./mvnw -f docs test -Dvale='doc-.*' -DvaleLevel=error <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>docs</code> モジュールの <code>src/main/asciidoc</code> ディレクトリにあるすべての <code>*.adoc</code> ファイルに対して Vale linter を実行します。結果には提案、警告、エラーが含まれます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>docs</code> モジュール内の変更された <code>*.adoc</code> ファイル ( <code>git status</code> )に対して Vale linter を実行します。結果には警告とエラーが含まれます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>正規表現（Java Pattern構文）に一致する <code>*.adoc</code> ファイルに対して、Vale linterを実行します。結果にはエラーが含まれます。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="use-the-vale-cli"><a class="anchor" href="#use-the-vale-cli"></a>Vale CLIの使用</h3>
+<div class="paragraph">
+<p><a href="https://vale.sh/docs/vale-cli/installation/">Vale CLI</a> をインストールした場合、設定ファイルとスキャンするファイルのディレクトリまたはリストを指定する必要があります：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell"># Run from the Quarkus project root
+vale --config=docs/.vale.ini --minAlertLevel=warning docs/src/main/asciidoc
+
+# Run from within the docs directory
+vale --minAlertLevel=warning src/main/asciidoc</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>詳しくは、 <a href="https://vale.sh/manual/">Vale CLI Manual</a> をご覧ください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="vale-ide-plugins"><a class="anchor" href="#vale-ide-plugins"></a>Vale IDE プラグイン</h3>
+<div class="paragraph">
+<p><a href="https://vale.sh/docs/integrations/guide/">Vale IDEとの連携</a> には、Vale CLIがインストールされていることが必要です。</p>
+</div>
+<div class="paragraph">
+<p>Each IDE integration has its own configuration requirements. The Visual Studio Code IDE extension, for example, requires a definition of the Vale CLI path:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">"vale.valeCLI.path": "/path/to/vale"</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-pull-requests-for-doc-updates"><a class="anchor" href="#creating-pull-requests-for-doc-updates"></a>ドキュメント更新のためのプルリクエストの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus リポジトリーの <code>main</code> ブランチに対して、 <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork">プルリクエストの作成</a> を行い、自身の <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks">リポジトリーのフォーク</a> から Quarkus のコアドキュメントに変更案を提出します。</p>
+</div>
+<div class="paragraph">
+<p>Reviews for code and documentation have different (but overlapping) participants.
+To simplify collaborative review, either isolate changes to docs in separate PRs or ensure that a PR has a single focused purpose. For example:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>エクステンションの設定オプションを追加し、変更を説明するために関連資料 (ハウツー、リファレンス) を更新する単一の PR を作成します。</p>
+</li>
+<li>
+<p>Create a single PR for related changes to a group of documents; some examples:
+Correcting the usage of a term, correcting a recurring error, or moving common content into a shared file.</p>
+</li>
+<li>
+<p>広範囲なコード変更とドキュメント変更がある場合、ドキュメント変更のために別のPRを作成し、Issueの説明にその関係性を含めてください。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>GitHub automatically adds the <code>area/documentation</code> label to pull requests that contain changes to documentation files.</p>
+</div>
+<div class="paragraph">
+<p>For more information about managing pull requests, see <a href="https://github.com/quarkusio/quarkus/blob/main/COMMITTERS.adoc">Information for Quarkus Committers</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="automatic-style-checking-on-the-pr-diff"><a class="anchor" href="#automatic-style-checking-on-the-pr-diff"></a>PR diffの自動スタイルチェック</h3>
+<div class="paragraph">
+<p>PRが作成または更新されると、Valeのリンタージョブが自動的に実行されます。コンテンツの更新がQuarkusコミュニティの主要なスタイルや用語の好みと一致しない場合、diffタブの更新行にValeの推奨事項の注釈が付きます。コンテンツが承認されるように、リンターのエラー、警告、および提案を修正してください。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusのドキュメントスタイルガイドラインに関するご意見をお待ちしております。</p>
+</div>
+<div class="paragraph">
+<p>Valeの結果に同意できない場合は、黄色のPRラベル <code>needs-vale-rule-tweak</code> を付けてください。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="previewing-doc-changes-on-the-quarkus-website"><a class="anchor" href="#previewing-doc-changes-on-the-quarkus-website"></a>QuarkusのWebサイトでdocの変更点をプレビューする</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>After your PR is merged to <code>main</code> and the branch is synchronized with the <a href="https://github.com/quarkusio/quarkusio.github.io/tree/develop/_generated-doc">Quarkus.io</a> website repository, you can preview the resulting build output on the <a href="https://quarkus.io/version/main/guides/">Main branch (SNAPSHOT)</a> documentation page of the Quarkus site.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>quarkus</code> リポジトリの <code>main</code> ブランチは、毎日グリニッジ標準時の午前1時に同期されるため、次のサイト更新が行われるまで、 <a href="https://quarkus.io/version/main/guides/">Main ブランチ（SNAPSHOT</a> ）での変更をプレビューすることはできません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#locate-the-source-files-for-quarkus-docs">Quarkus docsのソースファイルの場所を確認する</a></li>
+<li><a href="#create-quarkus-content-in-asciidoc">QuarkusのコンテンツをAsciiDocで作成</a></li>
+<li><a href="#add-prerequisites">Add a prerequisites section</a></li>
+<li><a href="#retire-and-redirect-an-existing-quarkus-asciidoc-source-file">既存のQuarkus AsciiDocソースファイルの削除とリダイレクト</a></li>
+<li><a href="#anchors-howto">Use anchors to cross-reference in-file and cross-file content</a>
+<ul class="sectlevel2">
+<li><a href="#create-an-anchored-id">Create an anchored ID</a></li>
+<li><a href="#call-an-anchored-id-in-the-same-file">Call an anchored ID in the same file</a></li>
+<li><a href="#call-an-anchored-id-from-a-different-file">Call an anchored ID from a different file</a></li>
+</ul>
+</li>
+<li><a href="#preview-and-build-quarkus-documentation">Quarkusドキュメントのプレビューとビルド</a>
+<ul class="sectlevel2">
+<li><a href="#build-the-docs-module-locally"><code>docs</code> モジュールをローカルでビルド</a></li>
+</ul>
+</li>
+<li><a href="#lint-documentation-changes-with-vale">Valeによるドキュメント変更の性的解析</a>
+<ul class="sectlevel2">
+<li><a href="#containerized-vale">コンテナ化されたVale</a></li>
+<li><a href="#use-the-vale-cli">Vale CLIの使用</a></li>
+<li><a href="#vale-ide-plugins">Vale IDE プラグイン</a></li>
+</ul>
+</li>
+<li><a href="#creating-pull-requests-for-doc-updates">ドキュメント更新のためのプルリクエストの作成</a>
+<ul class="sectlevel2">
+<li><a href="#automatic-style-checking-on-the-pr-diff">PR diffの自動スタイルチェック</a></li>
+</ul>
+</li>
+<li><a href="#previewing-doc-changes-on-the-quarkus-website">QuarkusのWebサイトでdocの変更点をプレビューする</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="tutorial"><a href="/version/3.15/guides/doc-create-tutorial">チュートリアルの作成</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.15/guides/doc-concept">Quarkusドキュメントのコンテンツタイプ</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/doc-reference">Quarkusスタイル・コンテンツガイドライン</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/class-loading-reference">クラスローディングリファレンス</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.15/guides/duplicated-context">コンテキストの重複、コンテキストローカル、非同期処理と伝播</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/dev-mode-differences">開発モードと本番アプリケーションの差異</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/performance-measure">パフォーマンスの測定</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/platform">Platform</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/extension-registry-user">Quarkus Extension Registry</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/quarkus-reactive-architecture">Quarkus リアクティブアーキテクチャ</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

@@ -1,0 +1,2237 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>OpenID Connect (OIDC)のマルチテナンシーの使用 - main - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/main/guides/security-openid-connect-multitenancy" />
+  <meta property="og:title" content="OpenID Connect (OIDC)のマルチテナンシーの使用 - main" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/security-openid-connect-multitenancy">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/main/guides/security-openid-connect-multitenancy">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/main/guides/security-openid-connect-multitenancy" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/main/guides/security-openid-connect-multitenancy">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/main/guides/security-openid-connect-multitenancy">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/main/guides/security-openid-connect-multitenancy">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/main/guides/security-openid-connect-multitenancy">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/main/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" selected>Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <a class="editlink" href="https://github.com/quarkusio/quarkus/edit/main/docs/src/main/asciidoc/security-openid-connect-multitenancy.adoc">このページを編集</a>
+      
+      <h1 class="text-caps">OpenID Connect (OIDC)のマルチテナンシーの使用 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、OpenID Connect (OIDC) アプリケーションがマルチテナントをサポートして、単一のアプリケーションから複数のテナントにサービスを提供する方法を説明します。
+これらのテナントは、同じ OIDC プロバイダー内の異なるレルムまたはセキュリティードメイン、あるいは異なる OIDC プロバイダーである場合もあります。</p>
+</div>
+<div class="paragraph">
+<p>SaaS 環境など、同じアプリケーションから複数の顧客にサービスを提供する場合、各顧客は個別のテナントとして機能します。
+アプリケーションに対してマルチテナンシーサポートを有効にすると、Keycloak や Google などの異なる OIDC プロバイダーに対して認証する場合でも、テナントごとに異なる認証ポリシーをサポートできます。</p>
+</div>
+<div class="paragraph">
+<p>Bearer Token Authorization を使用してテナントを認可するには、<a href="security-oidc-bearer-token-authentication">OpenID Connect (OIDC) ベアラートークン認証</a> ガイドを参照してください。</p>
+</div>
+<div class="paragraph">
+<p>OIDC 認可コードフローを使用してテナントを認証および認可するには、<a href="security-oidc-code-flow-authentication">Web アプリケーションを保護するための OpenID Connect 認可コードフローメカニズム</a> ガイドを参照してください。</p>
+</div>
+<div class="paragraph">
+<p>また、<a href="security-oidc-configuration-properties-reference">OpenID Connect (OIDC) 設定プロパティー</a> のリファレンスガイドも参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>約15分</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 17+がインストールされ、 <code>JAVA_HOME</code> が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.9.9</p>
+</li>
+<li>
+<p>動作するコンテナランタイム(Docker, <a href="podman">Podman</a>)</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルをビルドしたい場合、MandrelまたはGraalVM（あるいはネイティブなコンテナビルドを使用する場合はDocker）をインストールし、 <a href="building-native-image.html#configuring-graalvm">適切に設定</a>していること</p>
+</li>
+<li>
+<p><a href="https://stedolan.github.io/jq/">jq tool</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="architecture"><a class="anchor" href="#architecture"></a>アーキテクチャ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>この例では、次の 2 つのリソースメソッドをサポートする非常にシンプルなアプリケーションをビルドします。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>/{tenant}</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>このリソースは、認証されたユーザーと現在のテナントについて、OIDC プロバイダーによって発行された ID トークンから取得した情報を返します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>/{tenant}/bearer</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>このリソースは、認証されたユーザーと現在のテナントについて、OIDC プロバイダーによって発行された Access Token から取得した情報を返します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution"><a class="anchor" href="#solution"></a>ソリューション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>完全に理解するために、次の手順に従ってアプリケーションをビルドすることを推奨します。</p>
+</div>
+<div class="paragraph">
+<p>あるいは、完成した例から始める場合は、Git リポジトリーをクローン (<code>git clone -b development <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code>) するか、https://github.com/quarkusio/quarkus-quickstarts/archive/development.zip[アーカイブ] をダウンロードします。</p>
+</div>
+<div class="paragraph">
+<p>ソリューションは、<code>security-openid-connect-multi-tenancy-quickstart</code> <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/development/security-openid-connect-multi-tenancy-quickstart">ディレクトリー</a>にあります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-maven-project"><a class="anchor" href="#creating-the-maven-project"></a>Mavenプロジェクトの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、新しいプロジェクトが必要です。以下のコマンドで新規プロジェクトを作成します。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:security-openid-connect-multi-tenancy-quickstart \
+    --extension='oidc,rest-jackson' \
+    --no-code
+cd security-openid-connect-multi-tenancy-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus:quarkus-maven-plugin:999-SNAPSHOT:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=security-openid-connect-multi-tenancy-quickstart \
+    -Dextensions='oidc,rest-jackson' \
+    -DnoCode
+cd security-openid-connect-multi-tenancy-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Windowsユーザーの場合:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>cmdを使用する場合、（バックスラッシュ <code>\</code> を使用せず、すべてを同じ行に書かないでください）。</p>
+</li>
+<li>
+<p>Powershellを使用する場合は、 <code>-D</code> パラメータを二重引用符で囲んでください。例: <code>"-DprojectArtifactId=security-openid-connect-multi-tenancy-quickstart"</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Quarkus プロジェクトがすでに設定されている場合は、プロジェクトベースディレクトリーで次のコマンドを実行して、<code>oidc</code> エクステンションをプロジェクトに追加します。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus extension add oidc</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:add-extension -Dextensions='oidc'</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew addExtension --extensions='oidc'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、 <code>pom.xml</code> ファイルに以下が追加されます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-oidc&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-oidc")</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application"><a class="anchor" href="#writing-the-application"></a>アプリケーションの記述</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、<code>/{tenant}</code> エンドポイントを実装することから始めます。
+以下のソースコードからわかるように、これは単なる通常の Jakarta REST リソースです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.quickstart.oidc;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+
+import org.eclipse.microprofile.jwt.JsonWebToken;
+
+import io.quarkus.oidc.IdToken;
+
+@Path("/{tenant}")
+public class HomeResource {
+    /**
+     * Injection point for the ID Token issued by the OIDC provider.
+     */
+    @Inject
+    @IdToken
+    JsonWebToken idToken;
+
+    /**
+     * Injection point for the Access Token issued by the OIDC provider.
+     */
+    @Inject
+    JsonWebToken accessToken;
+
+    /**
+     * Returns the ID Token info.
+     * This endpoint exists only for demonstration purposes.
+     * Do not expose this token in a real application.
+     *
+     * @return ID Token info
+     */
+    @GET
+    @Produces("text/html")
+    public String getIdTokenInfo() {
+        StringBuilder response = new StringBuilder().append("&lt;html&gt;")
+                .append("&lt;body&gt;");
+
+        response.append("&lt;h2&gt;Welcome, ").append(this.idToken.getClaim("email").toString()).append("&lt;/h2&gt;\n");
+        response.append("&lt;h3&gt;You are accessing the application within tenant &lt;b&gt;").append(idToken.getIssuer()).append(" boundaries&lt;/b&gt;&lt;/h3&gt;");
+
+        return response.append("&lt;/body&gt;").append("&lt;/html&gt;").toString();
+    }
+
+    /**
+     * Returns the Access Token info.
+     * This endpoint exists only for demonstration purposes.
+     * Do not expose this token in a real application.
+     *
+     * @return Access Token info
+     */
+    @GET
+    @Produces("text/html")
+    @Path("bearer")
+    public String getAccessTokenInfo() {
+        StringBuilder response = new StringBuilder().append("&lt;html&gt;")
+                .append("&lt;body&gt;");
+
+        response.append("&lt;h2&gt;Welcome, ").append(this.accessToken.getClaim("email").toString()).append("&lt;/h2&gt;\n");
+        response.append("&lt;h3&gt;You are accessing the application within tenant &lt;b&gt;").append(accessToken.getIssuer()).append(" boundaries&lt;/b&gt;&lt;/h3&gt;");
+
+        return response.append("&lt;/body&gt;").append("&lt;/html&gt;").toString();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>受信リクエストからテナントを解決し、<code>application.properties</code> 内の特定の <code>quarkus-oidc</code> テナント設定にマップするには、テナント設定を動的に解決できる <code>io.quarkus.oidc.TenantConfigResolver</code> インターフェイスの実装を作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.quickstart.oidc;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+import org.eclipse.microprofile.config.ConfigProvider;
+
+import io.quarkus.oidc.OidcRequestContext;
+import io.quarkus.oidc.OidcTenantConfig;
+import io.quarkus.oidc.OidcTenantConfig.ApplicationType;
+import io.quarkus.oidc.TenantConfigResolver;
+import io.quarkus.oidc.runtime.OidcUtils;
+import io.smallrye.mutiny.Uni;
+import io.vertx.ext.web.RoutingContext;
+
+@ApplicationScoped
+public class CustomTenantResolver implements TenantConfigResolver {
+
+    @Override
+    public Uni&lt;OidcTenantConfig&gt; resolve(RoutingContext context, OidcRequestContext&lt;OidcTenantConfig&gt; requestContext) {
+        String path = context.request().path();
+
+        if (path.startsWith("/tenant-a")) {
+           String keycloakUrl = ConfigProvider.getConfig().getValue("keycloak.url", String.class);
+
+            OidcTenantConfig config = OidcTenantConfig
+                    .authServerUrl(keycloakUrl + "/realms/tenant-a")
+                    .tenantId("tenant-a")
+                    .clientId("multi-tenant-client")
+                    .credentials("secret")
+                    .applicationType(ApplicationType.HYBRID)
+                    .build();
+            return Uni.createFrom().item(config);
+        } else {
+            // resolve to default tenant config
+            return Uni.createFrom().nullItem();
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>前述の実装では、テナントはリクエストパスから解決されます。
+テナントを推測できない場合は、デフォルトのテナント設定を使用する必要があることを示すために <code>null</code> が返されます。</p>
+</div>
+<div class="paragraph">
+<p><code>tenant-a</code> アプリケーションタイプは <code>hybrid</code> です。提供されている場合、HTTP ベアラートークンを受け入れることができます。
+それ以外の場合は、認証が必要なときに認可コードフローを開始します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-the-application"><a class="anchor" href="#configuring-the-application"></a>アプリケーションの設定</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># Default tenant configuration
+%prod.quarkus.oidc.auth-server-url=http://localhost:8180/realms/quarkus
+quarkus.oidc.client-id=multi-tenant-client
+quarkus.oidc.credentials.secret=secret
+quarkus.oidc.application-type=web-app
+
+# Tenant A configuration is created dynamically in CustomTenantConfigResolver
+
+# HTTP security configuration
+quarkus.http.auth.permission.authenticated.paths=/*
+quarkus.http.auth.permission.authenticated.policy=authenticated</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>最初の設定は、リクエストからテナントを推測できない場合に使用するデフォルトのテナント設定です。
+%prod` プロファイル接頭辞は、Dev Services For Keycloak を使用したマルチテナントアプリケーションのテストをサポートするために、<code>quarkus.oidc.auth-server-url</code> とともに使用される点に注意してください。
+この設定では、Keycloak インスタンスを使用してユーザーを認証します。</p>
+</div>
+<div class="paragraph">
+<p><code>TenantConfigResolver</code> によって提供される 2 番目の設定は、受信リクエストが <code>tenant-a</code> テナントにマップされるときに使用されます。</p>
+</div>
+<div class="paragraph">
+<p>両方の設定は、異なる <code>realms</code> を使用しながら、同じ Keycloak サーバーインスタンスにマップされます。</p>
+</div>
+<div class="paragraph">
+<p>または、<code>application.properties</code> で直接テナント <code>tenant-a</code> を設定することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># Default tenant configuration
+%prod.quarkus.oidc.auth-server-url=http://localhost:8180/realms/quarkus
+quarkus.oidc.client-id=multi-tenant-client
+quarkus.oidc.credentials.secret=secret
+quarkus.oidc.application-type=web-app
+
+# Tenant A configuration
+quarkus.oidc.tenant-a.auth-server-url=http://localhost:8180/realms/tenant-a
+quarkus.oidc.tenant-a.client-id=multi-tenant-client
+quarkus.oidc.tenant-a.credentials.secret=secret
+quarkus.oidc.tenant-a.application-type=web-app
+
+# HTTP security configuration
+quarkus.http.auth.permission.authenticated.paths=/*
+quarkus.http.auth.permission.authenticated.policy=authenticated</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>その場合は、カスタム <code>TenantConfigResolver</code> も使用して解決します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.quickstart.oidc;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+import io.quarkus.oidc.TenantResolver;
+import io.vertx.ext.web.RoutingContext;
+
+@ApplicationScoped
+public class CustomTenantResolver implements TenantResolver {
+
+    @Override
+    public String resolve(RoutingContext context) {
+        String path = context.request().path();
+        String[] parts = path.split("/");
+
+        if (parts.length == 0) {
+            //Resolve to default tenant configuration
+            return null;
+        }
+
+        return parts[1];
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>設定ファイルで複数のテナントを定義できます。
+<code>TenantResolver</code> 実装からテナントを解決するときにそれらを正しくマップするには、それぞれに一意のエイリアスがあることを確認します。</p>
+</div>
+<div class="paragraph">
+<p>ただし、<code>application.properties</code> でテナントを設定し、<code>TenantResolver</code> を使用してこれらを解決する静的テナント解決を使用することは、Dev Services for Keycloak を使用したエンドポイントのテストには機能しません。これは、リクエストが個々のテナントにどのようにマッピングされるかがわからず、テナント固有の <code>quarkus.oidc.&lt;tenant-id&gt;.auth-server-url</code> の値を動的に提供できないためです。したがって、<code>application.properties</code> 内のテナント固有の URL に <code>%prod</code> 接頭辞を付けると、テストモードと開発モードの両方で機能しません。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>現在のテナントが OIDC の <code>web-app</code> アプリケーションを表す場合、カスタムテナントリゾルバーがすべてのリクエストに対して呼び出されるまでに、現在の <code>io.vertx.ext.web.RoutingContext</code> には <code>tenant-id</code> 属性が含まれ、テナント固有の状態またはセッション Cookie のいずれかがすでに存在する場合に、コード認証フローとすでに認証されたリクエストを完了します。
+したがって、複数の OIDC プロバイダーを使用する場合、<code>RoutingContext</code> に <code>tenant-id</code> 属性が設定されていない場合にのみ、パス固有のチェックを行ってテナント ID を解決する必要があります。以下はその例です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.quickstart.oidc;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+import io.quarkus.oidc.TenantResolver;
+import io.vertx.ext.web.RoutingContext;
+
+@ApplicationScoped
+public class CustomTenantResolver implements TenantResolver {
+
+    @Override
+    public String resolve(RoutingContext context) {
+        String tenantId = context.get("tenant-id");
+        if (tenantId != null) {
+            return tenantId;
+        } else {
+            // Initial login request
+            String path = context.request().path();
+            String[] parts = path.split("/");
+
+            if (parts.length == 0) {
+                //Resolve to default tenant configuration
+                return null;
+            }
+            return parts[1];
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これは、カスタム <code>TenantResolver</code> が登録されていない場合に、Quarkus OIDC が静的カスタムテナントを解決する方法です。</p>
+</div>
+<div class="paragraph">
+<p>同様の手法を <code>TenantConfigResolver</code> でも使用できます。コンテキストで提供される <code>tenant-id</code> は、以前のリクエストですでに準備されている <code>OidcTenantConfig</code> を返すことができます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you also use Hibernate ORM multitenancy or MongoDB with Panache multitenancy and both tenant ids are the same,
+you can get the tenant id from the <code>RoutingContext</code> attribute with <code>tenant-id</code>. You can find more information here:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="hibernate-orm#multitenancy">Hibernate ORM multitenancy</a></p>
+</li>
+<li>
+<p><a href="mongodb-panache#multitenancy">MongoDB with Panache multitenancy</a></p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="starting-and-configuring-the-keycloak-server"><a class="anchor" href="#starting-and-configuring-the-keycloak-server"></a>Keycloak サーバーの起動と設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Keycloak サーバーを起動するには、Docker を使用して次のコマンドを実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker run --name keycloak -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin -p 8180:8080 quay.io/keycloak/keycloak:{keycloak.version} start-dev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where <code>keycloak.version</code> is set to <code>26.0.7</code> or higher.</p>
+</div>
+<div class="paragraph">
+<p><a href="http://localhost:8180">localhost:8180</a> で Keycloak サーバーにアクセスします。</p>
+</div>
+<div class="paragraph">
+<p>Keycloak 管理コンソールにアクセスするには、<code>admin</code> ユーザーとしてログインします。
+ユーザー名とパスワードは両方とも <code>admin</code> です。</p>
+</div>
+<div class="paragraph">
+<p>次に、2 つのテナントのレルムをインポートします。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/quarkusio/quarkus-quickstarts/tree/development/security-openid-connect-multi-tenancy-quickstart/config/default-tenant-realm.json">default-tenant-realm.json</a> をインポートして、デフォルトのレルムを作成します。</p>
+</li>
+<li>
+<p><a href="https://github.com/quarkusio/quarkus-quickstarts/tree/development/security-openid-connect-multi-tenancy-quickstart/config/tenant-a-realm.json">tenant-a-realm.json</a> をインポートし、テナント <code>tenant-a</code> のレルムを作成します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>詳細は、https://www.keycloak.org/docs/latest/server_admin/index.html#_create-realm[新規レルムの作成] 方法に関する Keycloak ドキュメントを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-and-using-the-application"><a class="anchor" href="#running-and-using-the-application"></a>アプリケーションの実行と使用</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="running-in-developer-mode"><a class="anchor" href="#running-in-developer-mode"></a>開発者モードで実行</h3>
+<div class="paragraph">
+<p>マイクロサービスをdevモードで実行する場合、次を実行して下さい:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="running-in-jvm-mode"><a class="anchor" href="#running-in-jvm-mode"></a>JVM モードでの実行</h3>
+<div class="paragraph">
+<p>開発モードでアプリケーションを試した後、標準の Java アプリケーションとして実行できます。</p>
+</div>
+<div class="paragraph">
+<p>まず、コンパイルします:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、以下のように実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">java -jar target/quarkus-app/quarkus-run.jar</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="running-in-native-mode"><a class="anchor" href="#running-in-native-mode"></a>ネイティブモードでの実行</h3>
+<div class="paragraph">
+<p>この同じデモはネイティブコードにコンパイルできます。変更は必要ありません。</p>
+</div>
+<div class="paragraph">
+<p>これは、生成されたバイナリーにランタイムテクノロジーが含まれ、
+最小限のリソースで実行するように最適化されているため、
+実稼働環境に JVM をインストールする必要がなくなることを意味します。</p>
+</div>
+<div class="paragraph">
+<p>コンパイルには少し時間がかかるため、この手順はデフォルトでオフになっています。
+ネイティブビルドを有効にして再度ビルドしてみましょう。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build --native</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install -Dnative</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build -Dquarkus.native.enabled=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>しばらくすると、このバイナリーを直接実行できるようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./target/security-openid-connect-multi-tenancy-quickstart-runner</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="test-the-application"><a class="anchor" href="#test-the-application"></a>アプリケーションのテスト</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="use-dev-services-for-keycloak"><a class="anchor" href="#use-dev-services-for-keycloak"></a>Dev Services for Keycloakの使用</h3>
+<div class="paragraph">
+<p>Keycloak に対するインテグレーションテストには、<a href="security-openid-connect-dev-services">Dev Services for Keycloak</a> が推奨されます。
+Dev Services for Keycloak は、テストコンテナーを起動して初期化します。設定されたレルムをインポートし、<code>CustomTenantResolver</code> のベース Keycloak URL を設定して、レルム固有の URL を計算します。</p>
+</div>
+<div class="paragraph">
+<p>まず、次の依存関係を追加します。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-test-keycloak-server&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.rest-assured&lt;/groupId&gt;
+    &lt;artifactId&gt;rest-assured&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.htmlunit&lt;/groupId&gt;
+    &lt;artifactId&gt;htmlunit&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">testImplementation("io.quarkus:quarkus-test-keycloak-server")
+testImplementation("io.rest-assured:rest-assured")
+testImplementation("org.htmlunit:htmlunit")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>quarkus-test-keycloak-server</code> は、レルム固有のアクセストークンを取得するためのユーティリティクラス <code>io.quarkus.test.keycloak.client.KeycloakTestClient</code> を提供します。これは、ベアラアクセストークンを想定する <code>/{tenant}/bearer</code> エンドポイントのテストに <code>RestAssured</code> と共に使用できます。
+<code>HtmlUnit</code> は、<code>/{tenant}</code> エンドポイントと認可コードフローをテストします。</p>
+</div>
+<div class="paragraph">
+<p>次に、必要なレルムを設定します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># Default tenant configuration
+%prod.quarkus.oidc.auth-server-url=http://localhost:8180/realms/quarkus
+quarkus.oidc.client-id=multi-tenant-client
+quarkus.oidc.application-type=web-app
+
+# Tenant A configuration is created dynamically in CustomTenantConfigResolver
+
+# HTTP security configuration
+quarkus.http.auth.permission.authenticated.paths=/*
+quarkus.http.auth.permission.authenticated.policy=authenticated
+
+quarkus.keycloak.devservices.realm-path=default-tenant-realm.json,tenant-a-realm.json</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>最後に、JVM モードで実行されるテストを記述します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.quickstart.oidc;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.IOException;
+
+import org.htmlunit.SilentCssErrorHandler;
+import org.htmlunit.WebClient;
+import org.htmlunit.html.HtmlForm;
+import org.htmlunit.html.HtmlPage;
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.keycloak.client.KeycloakTestClient;
+import io.restassured.RestAssured;
+
+@QuarkusTest
+public class CodeFlowTest {
+
+    KeycloakTestClient keycloakClient = new KeycloakTestClient();
+
+    @Test
+    public void testLogInDefaultTenant() throws IOException {
+        try (final WebClient webClient = createWebClient()) {
+            HtmlPage page = webClient.getPage("http://localhost:8081/default");
+
+            assertEquals("Sign in to quarkus", page.getTitleText());
+
+            HtmlForm loginForm = page.getForms().get(0);
+
+            loginForm.getInputByName("username").setValueAttribute("alice");
+            loginForm.getInputByName("password").setValueAttribute("alice");
+
+            page = loginForm.getButtonByName("login").click();
+
+            assertTrue(page.asNormalizedText().contains("tenant"));
+        }
+    }
+
+    @Test
+    public void testLogInTenantAWebApp() throws IOException {
+        try (final WebClient webClient = createWebClient()) {
+            HtmlPage page = webClient.getPage("http://localhost:8081/tenant-a");
+
+            assertEquals("Sign in to tenant-a", page.getTitleText());
+
+            HtmlForm loginForm = page.getForms().get(0);
+
+            loginForm.getInputByName("username").setValueAttribute("alice");
+            loginForm.getInputByName("password").setValueAttribute("alice");
+
+            page = loginForm.getButtonByName("login").click();
+
+            assertTrue(page.asNormalizedText().contains("alice@tenant-a.org"));
+        }
+    }
+
+    @Test
+    public void testLogInTenantABearerToken() throws IOException {
+        RestAssured.given().auth().oauth2(getAccessToken()).when()
+            .get("/tenant-a/bearer").then().body(containsString("alice@tenant-a.org"));
+    }
+
+    private String getAccessToken() {
+        return keycloakClient.getRealmAccessToken("tenant-a", "alice", "alice", "multi-tenant-client", "secret");
+    }
+
+    private WebClient createWebClient() {
+        WebClient webClient = new WebClient();
+        webClient.setCssErrorHandler(new SilentCssErrorHandler());
+        return webClient;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ネイティブモードの場合: </p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.quickstart.oidc;
+
+import io.quarkus.test.junit.QuarkusIntegrationTest;
+
+@QuarkusIntegrationTest
+public class CodeFlowIT extends CodeFlowTest {
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>初期化および設定方法の詳細は、<a href="security-openid-connect-dev-services">Dev Services for Keycloak</a> を参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="use-the-browser"><a class="anchor" href="#use-the-browser"></a>ブラウザーの使用</h3>
+<div class="paragraph">
+<p>アプリケーションの動作確認は、ブラウザを起動して以下のURLにアクセスしてください:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://localhost:8080/default">http://localhost:8080/default</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>すべてが期待どおりに動作する場合、認証のために Keycloak サーバーにリダイレクトされます。
+要求されたパスは、設定ファイルでマッピングされていない <code>default</code> テナントを定義していることに注意してください。
+この場合、デフォルトの設定が使用されます。</p>
+</div>
+<div class="paragraph">
+<p>アプリケーションを認証するには、Keycloak ログインページで次の認証情報を入力します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ユーザー名: <code>alice</code></p>
+</li>
+<li>
+<p>パスわ=ド: <code>alice</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Login</strong> ボタンをクリックすると、アプリケーションにリダイレクトされます。</p>
+</div>
+<div class="paragraph">
+<p>次の URL でアプリケーションにアクセスを試みます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://localhost:8080/tenant-a">http://localhost:8080/tenant-a</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Keycloak ログインページに再度リダイレクトされます。
+ただし、今回は別のレルムを使用して認証します。</p>
+</div>
+<div class="paragraph">
+<p>どちらの場合も、ユーザーが正常に認証されると、ランディングページにユーザーの名前とメールアドレスが表示されます。
+<code>alice</code> は両方のテナントに存在しますが、アプリケーションはそれらを別々のレルム内の別個のユーザーとして扱います。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="tenant-resolution"><a class="anchor" href="#tenant-resolution"></a>テナントの解決</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="tenant-resolution-order"><a class="anchor" href="#tenant-resolution-order"></a>テナント解決の順序</h3>
+<div class="paragraph">
+<p>OIDC テナントは、以下の順序で解決されます。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>プロアクティブ認証が無効になっている場合は、最初に <code>io.quarkus.oidc.Tenant</code> アノテーションがチェックされます。</p>
+</li>
+<li>
+<p>カスタム <code>TenantConfigResolver</code> を使用した動的なテナント解決。</p>
+</li>
+<li>
+<p>静的テナント解決は、カスタム <code>TenantResolver</code>、設定されたテナントパス、およびテナント ID として最後のリクエストパスセグメントをデフォルト設定するオプションのいずれかを使用します。</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Finally, the default OIDC tenant is selected if a tenant id has not been resolved after the preceding steps.</p>
+</div>
+<div class="paragraph">
+<p>詳細は、以下のセクションを参照してください。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#annotations-tenant-resolver">アノテーションで解決する</a></p>
+</li>
+<li>
+<p><a href="#tenant-config-resolver">動的なテナント設定の解決</a></p>
+</li>
+<li>
+<p><a href="#static-tenant-resolution">静的テナント設定の解決</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>さらに、OIDC `web-app`アプリケーションの場合、状態とセッションの Cookie は、認可コードフローが開始された時点で上記のオプションのいずれかで解決されたテナントに関するヒントも提供します。詳細は、<a href="#tenant-resolution-for-web-app">OIDC web-app アプリケーションのテナント解決</a> セクションを参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="annotations-tenant-resolver"><a class="anchor" href="#annotations-tenant-resolver"></a>アノテーションで解決する</h3>
+<div class="paragraph">
+<p><code>io.quarkus.oidc.TenantResolver</code> を使用する代わりに、<code>io.quarkus.oidc.Tenant</code> アノテーションを使用してテナント識別子を解決できます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>これを機能させるには、プロアクティブ HTTP 認証を無効にする必要があります (<code>quarkus.http.auth.proactive=false</code>)。
+詳細は、<a href="security-proactive-authentication">プロアクティブ認証</a> ガイドを参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>アプリケーションが 2 つの OIDC テナント (<code>hr</code> テナントとデフォルトテナント) をサポートしていると仮定すると、<code>@Tenant("hr")</code> を持つすべてのリソースメソッドとクラスは、<code>quarkus.oidc.hr.auth-server-url</code> によって設定された OIDC プロバイダーを使用して認証されます。
+対照的に、他のすべてのクラスとメソッドは、引き続きデフォルトの OIDC プロバイダーを使用して認証されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+import io.quarkus.oidc.Tenant;
+import io.quarkus.security.Authenticated;
+
+@Authenticated
+@Path("/api/hello")
+public class HelloResource {
+
+    @Tenant("hr") <i class="conum" data-value="1"></i><b>(1)</b>
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String sayHello() {
+        return "Hello!";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>io.quarkus.oidc.Tenant</code> アノテーションは、リソースクラスまたはリソースメソッドのいずれかに配置する必要があります。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>In the example above, authentication of the <code>sayHello</code> endpoint is enforced with the <code>@Authenticated</code> annotation.</p>
+</div>
+<div class="paragraph">
+<p>Alternatively, if you use an the <a href="security-authorize-web-endpoints-reference#authorization-using-configuration">HTTP Security policy</a>
+to secure the endpoint, then, for the <code>@Tenant</code> annotation be effective, you must delay this policy&#8217;s permission check as shown in the following example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.auth.permission.authenticated.paths=/api/hello
+quarkus.http.auth.permission.authenticated.methods=GET
+quarkus.http.auth.permission.authenticated.policy=authenticated
+quarkus.http.auth.permission.authenticated.applies-to=JAXRS <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@Tenant</code> アノテーションを使用してテナントを選択した後、Quarkus に HTTP 権限チェックを実行するように指示します。</td>
+</tr>
+</table>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="tenant-config-resolver"><a class="anchor" href="#tenant-config-resolver"></a>動的なテナント設定の解決</h3>
+<div class="paragraph">
+<p>サポートしたいさまざまなテナントに対して、より動的な設定が必要で、設定ファイルに複数のエントリーを入れたくない場合は、 <code>io.quarkus.oidc.TenantConfigResolver</code> が利用出来ます。</p>
+</div>
+<div class="paragraph">
+<p>このインターフェイスを使用すると、実行時にテナント設定を動的に作成することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.it.keycloak;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import java.util.function.Supplier;
+
+import io.smallrye.mutiny.Uni;
+import io.quarkus.oidc.OidcRequestContext;
+import io.quarkus.oidc.OidcTenantConfig;
+import io.quarkus.oidc.TenantConfigResolver;
+import io.vertx.ext.web.RoutingContext;
+
+@ApplicationScoped
+public class CustomTenantConfigResolver implements TenantConfigResolver {
+
+    @Override
+    public Uni&lt;OidcTenantConfig&gt; resolve(RoutingContext context, OidcRequestContext&lt;OidcTenantConfig&gt; requestContext) {
+        String path = context.request().path();
+        String[] parts = path.split("/");
+
+        if (parts.length == 0) {
+            //Resolve to default tenant configuration
+            return null;
+        }
+
+        if ("tenant-c".equals(parts[1])) {
+            // Do 'return requestContext.runBlocking(createTenantConfig());'
+            // if a blocking call is required to create a tenant config,
+            return Uni.createFrom().item(createTenantConfig());
+        }
+
+        //Resolve to default tenant configuration
+        return null;
+    }
+
+    private Supplier&lt;OidcTenantConfig&gt; createTenantConfig() {
+        final OidcTenantConfig config = OidcTenantConfig
+                .authServerUrl("http://localhost:8180/realms/tenant-c")
+                .tenantId("tenant-c")
+                .clientId("multi-tenant-client")
+                .credentials("my-secret")
+                .build();
+
+        // Any other setting supported by the quarkus-oidc extension
+
+        return () -&gt; config;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このメソッドから返される <code>OidcTenantConfig</code> は、<code>application.properties</code> から <code>oidc</code> namespace 設定を解析するために使用されるものと同じです。
+<code>quarkus-oidc</code> エクステンションでサポートされている任意の設定を使用してデータを入力できます。</p>
+</div>
+<div class="paragraph">
+<p>動的テナントリゾルバーが <code>null</code> を返す場合、次に <a href="#static-tenant-resolution">静的テナント設定の解決</a> が試行されます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="static-tenant-resolution"><a class="anchor" href="#static-tenant-resolution"></a>静的テナント設定の解決</h3>
+<div class="paragraph">
+<p><code>application.properties</code> ファイルで複数のテナント設定を行う場合は、テナント識別子の解決方法を指定するだけで済みます。
+テナント識別子の解決を設定するには、次のいずれかのオプションを使用します。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#tenant-resolver"><code>TenantResolver</code> で解決する</a></p>
+</li>
+<li>
+<p><a href="#configure-tenant-paths">テナントパスの設定</a></p>
+</li>
+<li>
+<p><a href="#default-tenant-resolver">最後のリクエストパスセグメントをテナント ID として使用する</a></p>
+</li>
+<li>
+<p><a href="#issuer-based-tenant-resolver">トークン issuer のクレームでテナントを解決する</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>これらのテナント解決オプションは、テナント ID が解決されるまで、リストされている順序で試行されます。
+テナント ID が未解決のまま (<code>null</code>) の場合、デフォルト (名前なし) のテナント設定が選択されます。</p>
+</div>
+<div class="sect3">
+<h4 id="tenant-resolver"><a class="anchor" href="#tenant-resolver"></a><code>TenantResolver</code> で解決する</h4>
+<div class="paragraph">
+<p>次の <code>application.properties</code> の例は、<code>TenantResolver</code> メソッドを使用して、<code>a</code> および <code>b</code> という名前の 2 つのテナントのテナント ID を解決する方法を示しています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># Tenant 'a' configuration
+quarkus.oidc.a.auth-server-url=http://localhost:8180/realms/quarkus-a
+quarkus.oidc.a.client-id=client-a
+quarkus.oidc.a.credentials.secret=client-a-secret
+
+# Tenant 'b' configuration
+quarkus.oidc.b.auth-server-url=http://localhost:8180/realms/quarkus-b
+quarkus.oidc.b.client-id=client-b
+quarkus.oidc.b.credentials.secret=client-b-secret</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can return the tenant id of either <code>a</code> or <code>b</code> from <code>io.quarkus.oidc.TenantResolver</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.oidc.TenantResolver;
+import io.vertx.ext.web.RoutingContext;
+
+public class CustomTenantResolver implements TenantResolver {
+
+    @Override
+    public String resolve(RoutingContext context) {
+        String path = context.request().path();
+        if (path.endsWith("a")) {
+            return "a";
+        } else if (path.endsWith("b")) {
+            return "b";
+        } else {
+            // default tenant
+            return null;
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この例では、最後のリクエストパスセグメントの値はテナント ID ですが、必要に応じて、より複雑なテナント ID 解決ロジックを実装できます。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="configure-tenant-paths"><a class="anchor" href="#configure-tenant-paths"></a>テナントパスの設定</h4>
+<div class="paragraph">
+<p><code>io.quarkus.oidc.TenantResolver</code> を使用する代わりに、<code>quarkus.oidc.tenant-paths</code> 設定プロパティーを使用してテナント識別子を解決することができます。
+前の例で使用した <code>HelloResource</code> リソースの <code>sayHello</code> エンドポイントに <code>hr</code> テナントを選択する方法は次のとおりです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.hr.tenant-paths=/api/hello <i class="conum" data-value="1"></i><b>(1)</b>
+quarkus.oidc.a.tenant-paths=/api/* <i class="conum" data-value="2"></i><b>(2)</b>
+quarkus.oidc.b.tenant-paths=/*/hello <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>前の例の <code>quarkus.http.auth.permission.authenticated.paths=/api/hello</code> 設定プロパティーと同じパス一致ルールが適用されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>パスの末尾に置かれたワイルドカードは、任意の数のパスセグメントを表します。ただし、パスは <code>/api/hello</code> よりも具体的ではないため、<code>sayHello</code> エンドポイントを保護するために <code>hr</code> テナントが使用されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>/*/hello</code> のワイルドカードは、1 つのパスセグメントのみを表します。ただし、ワイルドカードは <code>api</code> ほど具体的ではないため、<code>hr</code> テナントが使用されます。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+パス一致メカニズムは、<a href="security-authorize-web-endpoints-reference#authorization-using-configuration">設定を使用した認可</a> とまったく同じように動作します。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="default-tenant-resolver"><a class="anchor" href="#default-tenant-resolver"></a>最後のリクエストパスセグメントをテナント ID として使用する</h4>
+<div class="paragraph">
+<p>テナント識別子のデフォルトの解決は規則に基づいており、認証要求には要求パスの最後のセグメントにテナント識別子が含まれている必要があります。</p>
+</div>
+<div class="paragraph">
+<p>次の <code>application.properties</code> の例は、<code>google</code> と <code>github</code> という名前の 2 つのテナントを設定する方法を示しています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># Tenant 'google' configuration
+quarkus.oidc.google.provider=google
+quarkus.oidc.google.client-id=${google-client-id}
+quarkus.oidc.google.credentials.secret=${google-client-secret}
+quarkus.oidc.google.authentication.redirect-path=/signed-in
+
+# Tenant 'github' configuration
+quarkus.oidc.github.provider=github
+quarkus.oidc.github.client-id=${github-client-id}
+quarkus.oidc.github.credentials.secret=${github-client-secret}
+quarkus.oidc.github.authentication.redirect-path=/signed-in</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>提供された例では、両方のテナントが OIDC <code>web-app</code> アプリケーションを設定して、認可コードフローを使用してユーザーを認証し、認証後にセッション Cookie を生成することを要求します。
+Google または GitHub が現在のユーザーを認証すると、ユーザーは、JAX-RS エンドポイント上のセキュアなリソースパスなど、認証されたユーザーの <code>/signed-in</code> 領域に戻されます。</p>
+</div>
+<div class="paragraph">
+<p>最後に、デフォルトのテナント解決を完了するには、次の設定プロパティーを設定します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.auth.permission.login.paths=/google,/github
+quarkus.http.auth.permission.login.policy=authenticated</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>エンドポイントが <code><a href="http://localhost:8080" class="bare">http://localhost:8080</a></code> で実行されている場合は、特定の <code>/google</code> または <code>/github</code> JAX-RS リソースパスを追加せずに、ユーザーが <code><a href="http://localhost:8080/google" class="bare">http://localhost:8080/google</a></code> または <code><a href="http://localhost:8080/github" class="bare">http://localhost:8080/github</a></code> のいずれかにログインするための UI オプションを提供することもできます。
+認証が完了すると、テナント識別子もセッション Cookie 名に記録されます。
+したがって、認証されたユーザーは、セキュアな URL に <code>google</code> または <code>github</code> パス値を含める必要なく、セキュアなアプリケーション領域にアクセスできます。</p>
+</div>
+<div class="paragraph">
+<p>デフォルトの解決は、ベアラートークン認証にも機能します。
+ただし、テナント識別子は常に最後のパスセグメント値として設定する必要があるため、あまり実用的ではない可能性があります。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="issuer-based-tenant-resolver"><a class="anchor" href="#issuer-based-tenant-resolver"></a>トークン issuer のクレームでテナントを解決する</h4>
+<div class="paragraph">
+<p>ベアラートークン認証をサポートする OIDC テナントは、アクセストークンの issuer を使用して解決できます。
+issuer ベースの解決が機能するには、次の条件を満たす必要があります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>アクセストークンが JWT 形式で、issuer (<code>iss</code>) トークン要求を含んでいる必要があります。</p>
+</li>
+<li>
+<p>アプリケーションタイプが <code>service</code> または <code>hybrid</code> である OIDC テナントのみが考慮されます。これらのテナントでは、トークン issuer が検出または設定されている必要があります。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>issuer ベースの解決は、<code>quarkus.oidc.resolve-tenants-with-issuer</code> プロパティーで有効になります。例: </p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.resolve-tenants-with-issuer=true <i class="conum" data-value="1"></i><b>(1)</b>
+
+quarkus.oidc.tenant-a.auth-server-url=${tenant-a-oidc-provider} <i class="conum" data-value="2"></i><b>(2)</b>
+quarkus.oidc.tenant-a.client-id=${tenant-a-client-id}
+quarkus.oidc.tenant-a.credentials.secret=${tenant-a-client-secret}
+
+quarkus.oidc.tenant-b.auth-server-url=${tenant-b-oidc-provider} <i class="conum" data-value="3"></i><b>(3)</b>
+quarkus.oidc.tenant-b.discover-enabled=false
+quarkus.oidc.tenant-b.token.issuer=${tenant-b-oidc-provider}/issuer
+quarkus.oidc.tenant-b.jwks-path=/jwks
+quarkus.oidc.tenant-b.token-path=/tokens
+quarkus.oidc.tenant-b.client-id=${tenant-b-client-id}
+quarkus.oidc.tenant-b.credentials.secret=${tenant-b-client-secret}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>テナント <code>tenant-a</code> と <code>tenant-b</code> は、JWT アクセストークンの issuer <code>iss</code> クレーム値を使用して解決されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>テナント <code>tenant-a</code> は、OIDC プロバイダーの既知の設定エンドポイントから <code>issuer</code> を検出します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>テナント <code>tenant-b</code> は、OIDC プロバイダーが検出をサポートしていないため、<code>issuer</code> を設定します。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="tenant-resolution-for-web-app"><a class="anchor" href="#tenant-resolution-for-web-app"></a>OIDC web-app アプリケーションのテナント解決</h3>
+<div class="paragraph">
+<p>OIDC <code>web-app</code> アプリケーションのテナント解決は、OIDC テナント固有の設定が次の各手順の実行方法に影響する場合、認可コードフロー中に少なくとも 3 回実行する必要があります。</p>
+</div>
+<div class="paragraph">
+<div class="title">手順 1: 認証されていないユーザーがエンドポイントにアクセスし、OIDC プロバイダーにリダイレクトされます。</div>
+<p>認証されていないユーザーがセキュアなパスにアクセスすると、ユーザーは認証のために OIDC プロバイダーにリダイレクトされ、テナント設定を使用してリダイレクト URI が構築されます。</p>
+</div>
+<div class="paragraph">
+<p><a href="#static-tenant-resolution">静的テナント設定の解決</a> と <a href="#tenant-config-resolver">動的なテナント設定の解決</a> セクションに記載されているすべての静的および動的テナント解決オプションを使用して、テナントを解決できます。</p>
+</div>
+<div class="paragraph">
+<div class="title">手順 2: ユーザーはエンドポイントにリダイレクトされます。</div>
+<p>プロバイダー認証後、ユーザーは Quarkus エンドポイントにリダイレクトされ、テナント設定を使用して認可コードフローが完了します。</p>
+</div>
+<div class="paragraph">
+<p>静的および動的テナント解決オプションはすべて、<a href="#static-tenant-resolution">静的テナント設定の解決</a> に記載されています。また、<a href="#tenant-config-resolver">動的なテナント設定の解決</a> セクションを使用して、テナントを解決できます。テナント解決が始まる前に、認可コードフローの <code>state cookie</code> を使用して、すでに解決されたテナント設定 ID を RoutingContext の <code>tenant-id</code> 属性として設定します。カスタムの動的 <code>TenantConfigResolver</code> テナントリゾルバーと静的 <code>TenantResolver</code> テナントリゾルバーの両方でこれを確認できます。</p>
+</div>
+<div class="paragraph">
+<div class="title">Step 3: Authenticated user accesses the secured path using the session cookie</div>
+<p>The tenant configuration determines how the session cookie is verified and refreshed. Before the tenant resolution begins, the authorization code flow <code>session cookie</code> is used to set the already resolved tenant configuration id as a RoutingContext <code>tenant-id</code> attribute: both custom dynamic <code>TenantConfigResolver</code> and static <code>TenantResolver</code> tenant resolvers can check it.</p>
+</div>
+<div class="paragraph">
+<p>たとえば、カスタム <code>TenantConfigResolver</code> が、すでに解決されているテナント設定の作成を回避する方法は以下に示すとおりです。この作成を回避しない場合は、データベースやその他のリモートソースからの読み取りをブロックする必要がある可能性があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.it.keycloak;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import io.quarkus.oidc.OidcRequestContext;
+import io.quarkus.oidc.OidcTenantConfig;
+import io.quarkus.oidc.OidcTenantConfig.ApplicationType;
+import io.quarkus.oidc.TenantConfigResolver;
+import io.quarkus.oidc.runtime.OidcUtils;
+import io.smallrye.mutiny.Uni;
+import io.vertx.ext.web.RoutingContext;
+
+@ApplicationScoped
+public class CustomTenantConfigResolver implements TenantConfigResolver {
+
+    @Override
+    public Uni&lt;OidcTenantConfig&gt; resolve(RoutingContext context, OidcRequestContext&lt;OidcTenantConfig&gt; requestContext) {
+        String resolvedTenantId = context.get(OidcUtils.TENANT_ID_ATTRIBUTE);
+        if (resolvedTenantId != null) { <i class="conum" data-value="1"></i><b>(1)</b>
+            return null;
+        }
+
+        String path = context.request().path(); <i class="conum" data-value="2"></i><b>(2)</b>
+        if (path.endsWith("tenant-a")) {
+            return Uni.createFrom().item(createTenantConfig("tenant-a", "client-a", "secret-a"));
+        } else if (path.endsWith("tenant-b")) {
+            return Uni.createFrom().item(createTenantConfig("tenant-b", "client-b", "secret-b"));
+        }
+
+        // Default tenant id
+        return null;
+    }
+
+    private OidcTenantConfig createTenantConfig(String tenantId, String clientId, String secret) {
+        final OidcTenantConfig config = OidcTenantConfig
+                .authServerUrl("http://localhost:8180/realms/"  + tenantId)
+                .tenantId(tenantId)
+                .clientId(clientId)
+                .credentials(secret)
+                .applicationType(ApplicationType.WEB_APP)
+                .build();
+        return config;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>以前に解決されている場合は、すでに解決されたテナント設定を Quarkus が使用するようにします。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>テナント設定を作成するためのリクエストパスを確認します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>デフォルトの設定は次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.auth-server-url=http://localhost:8180/realms/default
+quarkus.oidc.client-id=client-default
+quarkus.oidc.credentials.secret=secret-default
+quarkus.oidc.application-type=web-app</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The preceding example assumes that the <code>tenant-a</code>, <code>tenant-b</code> and default tenants are all used to protect the same endpoint paths. In other words, after the user has authenticated with the <code>tenant-a</code> configuration, this user will not be able to choose to authenticate with the <code>tenant-b</code> or default configuration before this user logs out and has a session cookie cleared or expired.</p>
+</div>
+<div class="paragraph">
+<p>The situation where multiple OIDC <code>web-app</code> tenants protect the tenant-specific paths is less typical and also requires an extra care.
+When multiple OIDC <code>web-app</code> tenants such as <code>tenant-a</code>, <code>tenant-b</code> and default tenants are used to control access to the tenant specific paths, the users authenticated with one OIDC provider must not be able to access the paths requiring an authentication with another provider, otherwise the results can be unpredictable, most likely causing unexpected authentication failures.
+For example, if the <code>tenant-a</code> authentication requires a Keycloak authentication and the <code>tenant-b</code> authentication requires an Auth0 authentication, then, if the <code>tenant-a</code> authenticated user attempts to access a path secured by the <code>tenant-b</code> configuration, then the session cookie will not be verified, since the Auth0 public verification keys can not be used to verify the tokens signed by Keycloak.
+An easy, recommended way to avoid multiple <code>web-app</code> tenants conflicting with each other is to set the tenant specific session path as shown in the following example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.it.keycloak;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import io.quarkus.oidc.OidcRequestContext;
+import io.quarkus.oidc.OidcTenantConfig;
+import io.quarkus.oidc.OidcTenantConfig.ApplicationType;
+import io.quarkus.oidc.TenantConfigResolver;
+import io.quarkus.oidc.runtime.OidcUtils;
+import io.smallrye.mutiny.Uni;
+import io.vertx.ext.web.RoutingContext;
+
+@ApplicationScoped
+public class CustomTenantConfigResolver implements TenantConfigResolver {
+
+    @Override
+    public Uni&lt;OidcTenantConfig&gt; resolve(RoutingContext context, OidcRequestContext&lt;OidcTenantConfig&gt; requestContext) {
+        String resolvedTenantId = context.get(OidcUtils.TENANT_ID_ATTRIBUTE);
+        if (resolvedTenantId != null) { <i class="conum" data-value="1"></i><b>(1)</b>
+            return null;
+        }
+
+        String path = context.request().path(); <i class="conum" data-value="2"></i><b>(2)</b>
+        if (path.endsWith("tenant-a")) {
+            return Uni.createFrom().item(createTenantConfig("tenant-a", "/tenant-a", "client-a", "secret-a"));
+        } else if (path.endsWith("tenant-b")) {
+            return Uni.createFrom().item(createTenantConfig("tenant-b", "/tenant-b", "client-b", "secret-b"));
+        }
+
+        // Default tenant id
+        return null;
+    }
+
+    private OidcTenantConfig createTenantConfig(String tenantId, String cookiePath, String clientId, String secret) {
+        final OidcTenantConfig config = OidcTenantConfig
+                .authServerUrl("http://localhost:8180/realms/" + tenantId)
+                .tenantId(tenantId)
+                .clientId(clientId)
+                .credentials(secret)
+                .applicationType(ApplicationType.WEB_APP)
+                .authentication().cookiePath(cookiePath).end()  <i class="conum" data-value="3"></i><b>(3)</b>
+                .build();
+        return config;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>以前に解決されている場合は、すでに解決されたテナント設定を Quarkus が使用するようにします。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>テナント設定を作成するためのリクエストパスを確認します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>テナント固有の Cookie パスを設定し、セッション Cookie がそれを作成したテナントにのみ表示されるようにします。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>デフォルトのテナント設定は、次のように調整する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.auth-server-url=http://localhost:8180/realms/default
+quarkus.oidc.client-id=client-default
+quarkus.oidc.credentials.secret=secret-default
+quarkus.oidc.authentication.cookie-path=/default
+quarkus.oidc.application-type=web-app</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>複数の OIDC <code>web-app</code> テナントがテナント固有のパスを保護するときに同じセッション Cookie パスを持つことは推奨されず、避ける必要があります。
+これは、カスタムリゾルバーがさらに注意する必要があるためです。例:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.it.keycloak;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import io.quarkus.oidc.OidcRequestContext;
+import io.quarkus.oidc.OidcTenantConfig;
+import io.quarkus.oidc.OidcTenantConfig.ApplicationType;
+import io.quarkus.oidc.TenantConfigResolver;
+import io.quarkus.oidc.runtime.OidcUtils;
+import io.smallrye.mutiny.Uni;
+import io.vertx.ext.web.RoutingContext;
+
+@ApplicationScoped
+public class CustomTenantConfigResolver implements TenantConfigResolver {
+
+    @Override
+    public Uni&lt;OidcTenantConfig&gt; resolve(RoutingContext context, OidcRequestContext&lt;OidcTenantConfig&gt; requestContext) {
+
+        String path = context.request().path(); <i class="conum" data-value="1"></i><b>(1)</b>
+        if (path.endsWith("tenant-a")) {
+            String resolvedTenantId = context.get(OidcUtils.TENANT_ID_ATTRIBUTE);
+	    if (resolvedTenantId != null) {
+	        if ("tenant-a".equals(resolvedTenantId)) { <i class="conum" data-value="2"></i><b>(2)</b>
+	            return null;
+	        } else {
+	           // Require a "tenant-a" authentication
+                   context.remove(OidcUtils.TENANT_ID_ATTRIBUTE); <i class="conum" data-value="3"></i><b>(3)</b>
+	        }
+            }
+            return Uni.createFrom().item(createTenantConfig("tenant-a", "client-a", "secret-a"));
+        } else if (path.endsWith("tenant-b")) {
+            String resolvedTenantId = context.get(OidcUtils.TENANT_ID_ATTRIBUTE);
+	    if (resolvedTenantId != null) {
+	        if ("tenant-b".equals(resolvedTenantId)) { <i class="conum" data-value="2"></i><b>(2)</b>
+	            return null;
+	        } else {
+	            // Require a "tenant-b" authentication
+                   context.remove(OidcUtils.TENANT_ID_ATTRIBUTE); <i class="conum" data-value="3"></i><b>(3)</b>
+	        }
+            }
+            return Uni.createFrom().item(createTenantConfig("tenant-b", "client-b", "secret-b"));
+        }
+
+        // Set default tenant id
+        context.put(OidcUtils.TENANT_ID_ATTRIBUTE, OidcUtils.DEFAULT_TENANT_ID); <i class="conum" data-value="4"></i><b>(4)</b>
+        return null;
+    }
+
+    private OidcTenantConfig createTenantConfig(String tenantId, String clientId, String secret) {
+        final OidcTenantConfig config = OidcTenantConfig
+            .authServerUrl("http://localhost:8180/realms/"  + tenantId)
+            .tenantId(tenantId)
+            .clientId(clientId)
+            .credentials(secret)
+            .applicationType(ApplicationType.WEB_APP)
+            .build();
+        return config;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>テナント設定を作成するためのリクエストパスを確認します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>現在のパスに対してすでに解決されたテナントが予想される場合は、Quarkus がすでに解決されたテナント設定を使用するようにします。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>すでに解決されたテナント設定が現在のパスに対して予想されていない場合は、<code>tenant-id</code> 属性を削除します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>他のすべてのパスにはデフォルトのテナントを使用します。これは、<code>tenant-id</code> 属性を削除するのと同じです。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="disable-tenant"><a class="anchor" href="#disable-tenant"></a>テナント設定を無効にする</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>現在のリクエストからテナントを推測できず、デフォルトのテナント設定へのフォールバックが必要な場合、カスタム <code>TenantResolver</code> および <code>TenantConfigResolver</code> 実装は、<code>null</code> を返すことがあります。</p>
+</div>
+<div class="paragraph">
+<p>カスタムリゾルバーが常にテナントを解決することを期待する場合は、デフォルトのテナント解決を設定する必要はありません。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>デフォルトのテナント設定をオフにするには、<code>quarkus.oidc.tenant-enabled=false</code> を設定します。</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>quarkus.oidc.auth-server-url</code> が設定されていない場合、デフォルトのテナント設定は自動的に無効になりますが、カスタムテナント設定が使用可能であるか、<code>TenantConfigResolver</code> が登録されています。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>テナント固有の設定も無効にできる点に注意してください (例: <code>quarkus.oidc.tenant-a.tenant-enabled=false</code>)。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="programmatic-startup"><a class="anchor" href="#programmatic-startup"></a>Programmatic OIDC start-up for multiple tenants</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Static OIDC tenants can be created programmatically like in the example below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.it.oidc;
+
+import io.quarkus.oidc.Oidc;
+import io.quarkus.oidc.OidcTenantConfig;
+import jakarta.enterprise.event.Observes;
+
+public class OidcStartup {
+
+    void observe(@Observes Oidc oidc) { <i class="conum" data-value="1"></i><b>(1)</b>
+        oidc.create(OidcTenantConfig.authServerUrl("http://localhost:8180/realms/tenant-one").tenantId("tenant-one").build()); <i class="conum" data-value="2"></i><b>(2)</b>
+        oidc.create(OidcTenantConfig.authServerUrl("http://localhost:8180/realms/tenant-two").tenantId("tenant-two").build()); <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Observe OIDC event.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Create OIDC tenant 'tenant-one'.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Create OIDC tenant 'tenant-two'.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The code above is a programmatic equivalent to the following configuration in the <code>application.properties</code> file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.tenant-one.auth-server-url=http://localhost:8180/realms/tenant-one
+quarkus.oidc.tenant-two.auth-server-url=http://localhost:8180/realms/tenant-two</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="references"><a class="anchor" href="#references"></a>リファレンス</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="security-oidc-configuration-properties-reference">OIDC設定プロパティ</a></p>
+</li>
+<li>
+<p><a href="https://www.keycloak.org/documentation.html">Keycloak Documentation</a></p>
+</li>
+<li>
+<p><a href="https://openid.net/connect/">OpenID Connect</a></p>
+</li>
+<li>
+<p><a href="https://tools.ietf.org/html/rfc7519">JSON Web Token</a></p>
+</li>
+<li>
+<p><a href="https://developers.google.com/identity/protocols/OpenIDConnect">Google OpenID Connect</a></p>
+</li>
+<li>
+<p><a href="security-overview">Quarkus Securityの概要</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#architecture">アーキテクチャ</a></li>
+<li><a href="#solution">ソリューション</a></li>
+<li><a href="#creating-the-maven-project">Mavenプロジェクトの作成</a></li>
+<li><a href="#writing-the-application">アプリケーションの記述</a></li>
+<li><a href="#configuring-the-application">アプリケーションの設定</a></li>
+<li><a href="#starting-and-configuring-the-keycloak-server">Keycloak サーバーの起動と設定</a></li>
+<li><a href="#running-and-using-the-application">アプリケーションの実行と使用</a>
+<ul class="sectlevel2">
+<li><a href="#running-in-developer-mode">開発者モードで実行</a></li>
+<li><a href="#running-in-jvm-mode">JVM モードでの実行</a></li>
+<li><a href="#running-in-native-mode">ネイティブモードでの実行</a></li>
+</ul>
+</li>
+<li><a href="#test-the-application">アプリケーションのテスト</a>
+<ul class="sectlevel2">
+<li><a href="#use-dev-services-for-keycloak">Dev Services for Keycloakの使用</a></li>
+<li><a href="#use-the-browser">ブラウザーの使用</a></li>
+</ul>
+</li>
+<li><a href="#tenant-resolution">テナントの解決</a>
+<ul class="sectlevel2">
+<li><a href="#tenant-resolution-order">テナント解決の順序</a></li>
+<li><a href="#annotations-tenant-resolver">アノテーションで解決する</a></li>
+<li><a href="#tenant-config-resolver">動的なテナント設定の解決</a></li>
+<li><a href="#static-tenant-resolution">静的テナント設定の解決</a></li>
+<li><a href="#tenant-resolution-for-web-app">OIDC web-app アプリケーションのテナント解決</a></li>
+</ul>
+</li>
+<li><a href="#disable-tenant">テナント設定を無効にする</a></li>
+<li><a href="#programmatic-startup">Programmatic OIDC start-up for multiple tenants</a></li>
+<li><a href="#references">リファレンス</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same extensions</h3>
+      <ul class="related-content">
+      
+        
+        <li class="concepts"><a href="/version/main/guides/security-openid-connect-providers">よく知られたOpenID Connect プロバイダーの設定</a></li>
+      
+        
+        <li class="howto"><a href="/version/main/guides/security-openid-connect-dev-services">OpenID Connect (OIDC)のDev ServicesとDev UI</a></li>
+      
+        
+        <li class="concepts"><a href="/version/main/guides/security-oidc-bearer-token-authentication">OpenID Connect (OIDC) ベアラートークン認証</a></li>
+      
+        
+        <li class="reference"><a href="/version/main/guides/security-oidc-configuration-properties-reference">OpenID Connect (OIDC) 設定プロパティ</a></li>
+      
+        
+        <li class="concepts"><a href="/version/main/guides/security-oidc-code-flow-authentication">Web アプリケーションを保護するための OpenID Connect 認可コードフローメカニズム</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/main/guides/security-oidc-bearer-token-authentication-tutorial">OpenID Connect（OIDC）ベアラートークン認証によるサービスアプリケーションの保護</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/main/guides/security-oidc-code-flow-authentication-tutorial">Quarkus - 認可コードフローのOpenID Connectを使用してWebアプリケーションを保護</a></li>
+      
+        
+        <li class="howto"><a href="/version/main/guides/security-keycloak-authorization">OpenID Connect (OIDC)とKeycloakを使用した認可の一元化</a></li>
+      </ul>
+    </div>
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="concepts"><a href="/version/main/guides/security-openid-connect-providers">よく知られたOpenID Connect プロバイダーの設定</a></li>
+      
+        
+        <li class="howto"><a href="/version/main/guides/security-openid-connect-dev-services">OpenID Connect (OIDC)のDev ServicesとDev UI</a></li>
+      
+        
+        <li class="reference"><a href="/version/main/guides/security-openid-connect-client-reference">OpenID Connect (OIDC) と OAuth2 クライアントおよびフィルター</a></li>
+      
+        
+        <li class="reference"><a href="/version/main/guides/security-openid-connect-client-registration">OpenID Connect (OIDC) and OAuth2 dynamic client registration</a></li>
+      
+        
+        <li class="concepts"><a href="/version/main/guides/security-oidc-bearer-token-authentication">OpenID Connect (OIDC) ベアラートークン認証</a></li>
+      
+        
+        <li class="reference"><a href="/version/main/guides/security-oidc-configuration-properties-reference">OpenID Connect (OIDC) 設定プロパティ</a></li>
+      
+        
+        <li class="concepts"><a href="/version/main/guides/security-oidc-code-flow-authentication">Web アプリケーションを保護するための OpenID Connect 認可コードフローメカニズム</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/main/guides/security-openid-connect-client">OpenID Connectクライアントとトークン伝搬クイックスタート</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/main/guides/security-oidc-bearer-token-authentication-tutorial">OpenID Connect（OIDC）ベアラートークン認証によるサービスアプリケーションの保護</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/main/guides/security-oidc-code-flow-authentication-tutorial">Quarkus - 認可コードフローのOpenID Connectを使用してWebアプリケーションを保護</a></li>
+      
+        
+        <li class="howto"><a href="/version/main/guides/security-keycloak-authorization">OpenID Connect (OIDC)とKeycloakを使用した認可の一元化</a></li>
+      
+        
+        <li class="concepts"><a href="/version/main/guides/security-authentication-mechanisms">Quarkusの認証メカニズム</a></li>
+      
+        
+        <li class="reference"><a href="/version/main/guides/security-authorize-web-endpoints-reference">ウェブエンドポイントの認可</a></li>
+      
+        
+        <li class="concepts"><a href="/version/main/guides/security-basic-authentication">Basic認証</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/security-jwt-build">Build, sign, and encrypt JSON Web Tokens</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/security-csrf-prevention">クロスサイトリクエストフォージェリー対策</a></li>
+      
+        
+        <li class="howto"><a href="/version/main/guides/security-basic-authentication-howto">ベーシック認証の有効化</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/main/guides/security-getting-started-tutorial">Basic認証とJakarta Persistenceを使ったセキュリティ入門</a></li>
+      
+        
+        <li class="concepts"><a href="/version/main/guides/security-identity-providers">アイデンティティ・プロバイダー</a></li>
+      
+        
+        <li class="concepts"><a href="/version/main/guides/security-proactive-authentication">プロアクティブ認証</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

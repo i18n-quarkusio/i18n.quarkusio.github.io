@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Quarkus REST、Undertow、またはReactive Routesを使用したAWS Lambda - 3.15 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.15/guides/aws-lambda-http" />
+  <meta property="og:title" content="Quarkus REST、Undertow、またはReactive Routesを使用したAWS Lambda - 3.15" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/aws-lambda-http">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.15/guides/aws-lambda-http">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.15/guides/aws-lambda-http" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.15/guides/aws-lambda-http">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.15/guides/aws-lambda-http">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.15/guides/aws-lambda-http">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.15/guides/aws-lambda-http">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.15/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" selected>3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">Quarkus REST、Undertow、またはReactive Routesを使用したAWS Lambda </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>With Quarkus you can deploy your favorite Java HTTP frameworks as AWS Lambda&#8217;s using either the <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html">AWS Gateway HTTP API</a>
+or <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-rest-api.html">AWS Gateway REST API</a>.  This means that you can deploy your microservices written with Quarkus REST (our Jakarta REST implementation),
+Undertow (servlet), Reactive Routes, <a href="funqy-http">Funqy HTTP</a> or any other Quarkus HTTP framework as an AWS Lambda.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+You should only use single HTTP framework together with AWS Lambda extension to avoid unexpected conflicts and errors.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Lambda を純粋な Java jar としてデプロイすることもできますし、プロジェクトをネイティブイメージにコンパイルしてデプロイすることで、より少ないメモリーフットプリントと起動時間を実現することもできます。また、統合により、 <a href="https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html">AmazonのSAM framework</a> で使用できるSAMデプロイメントファイルも生成されます。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusでは、ゲートウェイAPIごとに異なるエクステンションを用意しています。HTTP Gateway APIは、 <code>quarkus-amazon-lambda-http</code> のエクステンションで実装されています。REST Gateway APIは、 <code>quarkus-amazon-lambda-rest</code> のエクステンションで実装されています。どのGateway製品を使用すべきか迷っている場合は、Amazonが決断を助ける為に <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html">素晴らしいガイド</a>を提供しています。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus AWS Lambda HTTP/REST エクステンションは、大概の Quarkus エクステンションと同様、ライブコーディングをサポートしています。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>この技術は、previewと考えられています。</p>
+</div>
+<div class="paragraph">
+<p><em>preview</em> では、下位互換性やエコシステムでの存在は保証されていません。具体的な改善には設定や API の変更が必要になるかもしれませんが、 <em>stable</em> になるための計画は現在進行中です。フィードバックは <a href="https://groups.google.com/d/forum/quarkus-dev">メーリングリスト</a> や <a href="https://github.com/quarkusio/quarkus/issues">GitHub の課題管理</a> で受け付けています。</p>
+</div>
+<div class="paragraph">
+<p>とりうるステータスの完全なリストについては、 <a href="https://quarkus.io/faq/#extension-status">FAQの項目</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ざっと 30 minutes</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 17+がインストールされ、 <code>JAVA_HOME</code> が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.9.8</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルをビルドしたい場合、MandrelまたはGraalVM（あるいはネイティブなコンテナビルドを使用する場合はDocker）をインストールし、 <a href="building-native-image.html#configuring-graalvm">適切に設定</a>していること</p>
+</li>
+<li>
+<p><a href="https://aws.amazon.com">An Amazon AWS account</a></p>
+</li>
+<li>
+<p><a href="https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html">AWS SAM CLI</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started"><a class="anchor" href="#getting-started"></a>はじめに</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This guide walks you through generating an example Java project via a Maven archetype.  Later on, it walks through the structure
+of the project so you can adapt any existing projects you have to use AWS Lambda.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="installing-aws-bits"><a class="anchor" href="#installing-aws-bits"></a>AWS ビットのインストール</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>AWSのすべてのツールをインストールすることは、おそらくこのガイドでは最も難しいことです。AWS CLIをインストールするためのすべての手順に従っていることを確認してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-maven-deployment-project"><a class="anchor" href="#creating-the-maven-deployment-project"></a>デプロイ用のMavenプロジェクトを作成する</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Maven Archetype を使用して Quarkus AWS Lambda Maven プロジェクトを作成します。</p>
+</div>
+<div class="paragraph">
+<p>AWS Gateway HTTP APIを使用する場合は、このスクリプトでプロジェクトを生成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn archetype:generate \
+       -DarchetypeGroupId=io.quarkus \
+       -DarchetypeArtifactId=quarkus-amazon-lambda-http-archetype \
+       -DarchetypeVersion=3.15.2</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>AWS Gateway REST APIを使用する場合は、このスクリプトでプロジェクトを生成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn archetype:generate \
+       -DarchetypeGroupId=io.quarkus \
+       -DarchetypeArtifactId=quarkus-amazon-lambda-rest-archetype \
+       -DarchetypeVersion=3.15.2</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="build-and-deploy"><a class="anchor" href="#build-and-deploy"></a>ビルドとデプロイ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>プロジェクトのビルド</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これでコードがコンパイルされ、生成されたプロジェクト内に含まれるユニットテストが実行されます。ユニットテストは他のJavaプロジェクトと同じで、Amazonで実行する必要はありません。Quarkus dev モードもこのエクステンションで利用できます。</p>
+</div>
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルをビルドする場合は、GraalVM が正しくインストールされていることを確認し、ビルドに <code>native</code> プロパティーを追加してください。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build --native</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install -Dnative</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Linux 以外のシステムでビルドしている場合は、Amazon Lambda が Linux バイナリーを必要とするため、Docker ビルドを使用するように Quarkus に指示するプロパティーも渡す必要があります。これを行うには、ビルドコマンドに <code>-Dquarkus.native.container-build=true</code> を渡します。ただし、これには Docker をローカルにインストールする必要があります。
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build --native --no-tests -Dquarkus.native.container-build=true
+# The --no-tests flag is required only on Windows and macOS.</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install -Dnative -DskipTests -Dquarkus.native.container-build=true</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="extra-build-generated-files"><a class="anchor" href="#extra-build-generated-files"></a>ビルド時に追加生成されるファイル</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ビルドを実行すると、Quarkus lambda エクステンションで生成されるいくつかの追加ファイルがあります。これらのファイルはビルドディレクトリーにあります: Maven なら <code>target/</code>、Gradle なら <code>build/</code> です。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>function.zip</code> - Lambda デプロイファイル</p>
+</li>
+<li>
+<p><code>sam.jvm.yaml</code> - SAM CLI デプロイメントスクリプト</p>
+</li>
+<li>
+<p><code>sam.native.yaml</code> - ネイティブ用の SAM CLI デプロイメントスクリプト</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="live-coding-and-simulating-aws-lambda-environment-locally"><a class="anchor" href="#live-coding-and-simulating-aws-lambda-environment-locally"></a>AWS Lambda 環境のローカルでのライブコーディングとシミュレーション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>開発モードおよびテストモードでは、Quarkus は模擬 AWS Lambda イベントサーバーを起動し、対応する API Gateway イベントタイプに HTTP リクエストを変換し、処理のために基盤となる Quarkus HTTP Lambda 環境に送信します。これにより、Docker や SAM CLI などのツールを必要とせずに、AWS Lambda 環境を可能な限りローカルでシミュレートします。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus Dev Mode を使用する場合は、REST エンドポイントをテストする場合と同じように、<code><a href="http://localhost:8080" class="bare">http://localhost:8080</a></code> で HTTP リクエストを呼び出すだけです。このリクエストは Mock Event Server にヒットし、Quarkus Lambda Poll ループによって消費される API Gateway json メッセージに変換されます。</p>
+</div>
+<div class="paragraph">
+<p>テストのために、Quarkus はポート 8081 で別の Mock Event サーバーを起動します。Rest Assured のデフォルトポートは Quarkus によって自動的に 8081 に設定されるため、これを設定する必要はありません。</p>
+</div>
+<div class="paragraph">
+<p>テストでより複雑な API Gateway イベントをシミュレートする場合は、生の API Gateway json イベントを使用して <code><a href="http://localhost:8080/_lambda_" class="bare">http://localhost:8080/_lambda_</a></code> (テストモードではポート 8081) に対して手動で HTTP POST を実行します。これらのイベントは、処理のために Quarkus Lambda ポーリングループに直接配置されます。その例を次に示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.equalTo;
+
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
+
+import io.quarkus.test.junit.QuarkusTest;
+
+@QuarkusTest
+public class AmazonLambdaSimpleTestCase {
+    @Test
+    public void testJaxrsCognitoJWTSecurityContext() throws Exception {
+        APIGatewayV2HTTPEvent request = request("/security/username");
+        request.getRequestContext().setAuthorizer(new APIGatewayV2HTTPEvent.RequestContext.Authorizer());
+        request.getRequestContext().getAuthorizer().setJwt(new APIGatewayV2HTTPEvent.RequestContext.Authorizer.JWT());
+        request.getRequestContext().getAuthorizer().getJwt().setClaims(new HashMap&lt;&gt;());
+        request.getRequestContext().getAuthorizer().getJwt().getClaims().put("cognito:username", "Bill");
+
+        given()
+                .contentType("application/json")
+                .accept("application/json")
+                .body(request)
+                .when()
+                .post("/_lambda_")
+                .then()
+                .statusCode(200)
+                .body("body", equalTo("Bill"));
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上記の例は、HTTP リクエストを含む Cognito プリンシパルを HTTP Lambda に送信することをシミュレートしています。</p>
+</div>
+<div class="paragraph">
+<p>AWS HTTP API の生のイベントをハンドコードする場合、AWS Lambda ライブラリーのリクエストイベントタイプは <code>com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent</code> で、レスポンスイベントタイプは <code>com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse</code> です。これは、<code>quarkus-amazon-lambda-http</code> エクステンションおよび AWS HTTP API に対応します。</p>
+</div>
+<div class="paragraph">
+<p>AWS REST API の生のイベントをハンドコードする場合、Quarkus には独自の実装 (<code>io.quarkus.amazon.lambda.http.model.AwsProxyRequest</code> および <code>io.quarkus.amazon.lambda.http.model.AwsProxyResponse</code>) があります。これは、<code>quarkus-amazon-lambda-rest</code> エクステンションおよび AWS REST API に対応します。</p>
+</div>
+<div class="paragraph">
+<p>モックイベントサーバは <code>@QuarkusIntegrationTest</code> のテストでも起動されるので、ネイティブバイナリでも動作します。このように、SAM CLI のローカルテストと同様の機能を、Docker のオーバーヘッドなしに提供します。</p>
+</div>
+<div class="paragraph">
+<p>最後に、ポート 8080 またはポート 8081 がコンピューターで使用できない場合は、application.properties を使用して開発モードとテストモードのポートを変更できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">quarkus.lambda.mock-event-server.dev-port=8082
+quarkus.lambda.mock-event-server.test-port=8083</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ポート値がゼロの場合、ポートはランダムに割り当てられます。</p>
+</div>
+<div class="paragraph">
+<p>モック・イベント・サーバーをオフにする方法:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">quarkus.lambda.mock-event-server.enabled=false</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="simulate-aws-lambda-deployment-with-sam-cli"><a class="anchor" href="#simulate-aws-lambda-deployment-with-sam-cli"></a>Simulate AWS Lambda Deployment with SAM CLI</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>AWS SAM CLI を使用すると、ラップトップ上で Lambda をシミュレートした環境でローカルに実行することができます。このためには Docker をインストールする必要があります。Maven プロジェクトをビルドした後、以下のコマンドを実行してください</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">sam local start-api --template target/sam.jvm.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これで Amazon の Lambda のデプロイ環境を模した Docker コンテナーが起動します。環境が起動したら、ブラウザで以下を開くとサンプルの Lambda を実行できます。</p>
+</div>
+<div class="paragraph">
+<p><a href="http://127.0.0.1:3000/hello" class="bare">http://127.0.0.1:3000/hello</a></p>
+</div>
+<div class="paragraph">
+<p>コンソールには、ラムダからの起動メッセージが表示されます。この特定のデプロイメントでは、JVM を起動し、純粋な Java として Lambda をロードします。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="deploy-to-aws"><a class="anchor" href="#deploy-to-aws"></a>AWS にデプロイする</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">sam deploy -t target/sam.jvm.yaml -g</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>すべての質問に答えると、 Lambda がデプロイされ、API Gatewayへの必要なフックが設定されます。すべてが正常にデプロイされると、マイクロサービスのルート URL がコンソールに出力されます。このような感じです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Key                 LambdaHttpApi
+Description         URL for application
+Value               https://234asdf234as.execute-api.us-east-1.amazonaws.com/</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Value</code> 属性は Lambda のルート URL です。これをブラウザにコピーして、最後に <code>hello</code> を追加します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+バイナリー型のレスポンスは自動的にbase64でエンコードされます。これは、生のバイトを返す <code>quarkus:dev</code> を使用した動作とは異なります。Amazon の API には、base64 エンコーディングを必要とする追加の制限があります。一般的に、クライアントコードは自動的にこのエンコーディングを処理しますが、特定のカスタムな状況では、手動でエンコーディングを管理する必要があるかもしれないことを認識しておく必要があります。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="deploying-a-native-executable"><a class="anchor" href="#deploying-a-native-executable"></a>ネイティブ実行可能ファイルのデプロイ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルをデプロイするには、GraalVM を使用してビルドする必要があります。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build --native --no-tests -Dquarkus.native.container-build=true
+# The --no-tests flag is required only on Windows and macOS.</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install -Dnative -DskipTests -Dquarkus.native.container-build=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>その後、ローカルで sam local を使って実行可能ファイルをテストすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">sam local start-api --template target/sam.native.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>AWS Lambda へのデプロイ</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">sam deploy -t target/sam.native.yaml -g</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="examine-the-pom"><a class="anchor" href="#examine-the-pom"></a>POM を検証する</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>POM には <code>quarkus-amazon-lambda-http</code> エクステンション(AWS Gateway HTTP APIでデプロイしている場合) か <code>quarkus-amazon-lambda-rest</code> エクステンション( AWS Gateway REST APIでデプロイしている場合)が依存関係として含まれている以外に特別なことは何もありません。これらのエクステンションは Lambda のデプロイに必要なものをすべて自動的に生成します。</p>
+</div>
+<div class="paragraph">
+<p>Also, at least in the generated Maven archetype <code>pom.xml</code>, the <code>quarkus-rest</code>, <code>quarkus-reactive-routes</code>, and <code>quarkus-undertow</code>
+dependencies are all optional.  Pick which HTTP framework(s) you want to use (Jakarta REST, Reactive Routes, and/or Servlet) and
+remove the other dependencies to shrink your deployment.</p>
+</div>
+<div class="sect2">
+<h3 id="examine-sam-yaml"><a class="anchor" href="#examine-sam-yaml"></a>sam.yaml を調べる</h3>
+<div class="paragraph">
+<p><code>sam.yaml</code> の構文はこのドキュメントの範囲を超えています。しかし、カスタムの <code>sam.yaml</code> デプロイメントファイルを作成しようとしている場合、幾つかの強調しなければならないことがあります。</p>
+</div>
+<div class="paragraph">
+<p>最初に注意することは、純粋なJavaラムダデプロイメントには特定のハンドラークラスが必要であるということです。 Lambdaハンドラー名は変更しないでください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">     Properties:
+        Handler: io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest
+        Runtime: java17</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このハンドラは、lambdaランタイムと使用しているQuarkus HTTPフレームワーク（Jakarta REST、Servletなど）の間のブリッジとなります。</p>
+</div>
+<div class="paragraph">
+<p>ネイティブを利用する場合は、ネイティブのGraalVMデプロイメント用に設定する必要のある環境変数があります。 <code>sam.native.yaml</code> を見ると、次のことがわかります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">        Environment:
+          Variables:
+            DISABLE_SIGNAL_HANDLERS: true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This environment variable resolves some incompatibilities between Quarkus and the AWS Lambda Custom Runtime environment.</p>
+</div>
+<div class="paragraph">
+<p>最後に、AWS Gateway RESTAPIへのデプロイに固有のことが一つあります。そのAPIは、設定でどのメディアタイプがバイナリーであるかを明示的に指定しない限り、HTTPレスポンスボディはテキストであることを想定しています。より簡単にするために、QuarkusエクステンションはすべてのHTTP応答メッセージのバイナリー(ベース64)エンコーディングを強制します。 <code>sam.yaml</code> ファイルでは、すべてのメディアタイプがバイナリーであると仮定するようにAPI Gatewayを設定する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">  Globals:
+    Api:
+      EndpointConfiguration: REGIONAL
+      BinaryMediaTypes:
+        - "*/*"</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="injectable-aws-context-variables"><a class="anchor" href="#injectable-aws-context-variables"></a>注入可能なAWSコンテキスト変数</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you are using Quarkus REST and Jakarta REST, you can inject various AWS Context variables into your Jakarta REST resource classes
+using the Jakarta REST <code>@Context</code> annotation or anywhere else with the CDI <code>@Inject</code> annotation.</p>
+</div>
+<div class="paragraph">
+<p>AWS HTTP APIでは、AWS変数 <code>com.amazonaws.services.lambda.runtime.Context</code> および <code>com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent</code> を注入することができます。以下はその例です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.ws.rs.core.Context;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
+
+
+@Path("/myresource")
+public class MyResource {
+    @GET
+    public String ctx(@Context com.amazonaws.services.lambda.runtime.Context ctx) { }
+
+    @GET
+    public String event(@Context APIGatewayV2HTTPEvent event) { }
+
+    @GET
+    public String requestContext(@Context APIGatewayV2HTTPEvent.RequestContext req) { }
+
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>AWS REST APIでは、AWS変数 <code>com.amazonaws.services.lambda.runtime.Context</code> と <code>io.quarkus.amazon.lambda.http.model.AwsProxyRequestContext</code> を注入することができます。以下はその例です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.ws.rs.core.Context;
+import io.quarkus.amazon.lambda.http.model.AwsProxyRequestContext;
+import io.quarkus.amazon.lambda.http.model.AwsProxyRequest;
+
+
+@Path("/myresource")
+public class MyResource {
+    @GET
+    public String ctx(@Context com.amazonaws.services.lambda.runtime.Context ctx) { }
+
+    @GET
+    public String reqContext(@Context AwsProxyRequestContext req) { }
+
+    @GET
+    public String req(@Context AwsProxyRequest req) { }
+
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="tracing-with-aws-xray-and-graalvm"><a class="anchor" href="#tracing-with-aws-xray-and-graalvm"></a>AWS XRay と GraalVM を使用したトレース</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ネイティブイメージをビルドしていて、Lambda で <a href="https://aws.amazon.com/xray">AWS X-Ray Tracing</a> を使いたい場合は、 <code>quarkus-amazon-lambda-xray</code> を依存関係として pom に含める必要があります。AWS X-Ray ライブラリは GraalVM との完全な互換性がないため、これを動作させるためにいくつかの統合作業をしなければなりませんでした。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="security-integration"><a class="anchor" href="#security-integration"></a>セキュリティー統合</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>API GatewayでHTTPリクエストを呼び出すと、GatewayはそのHTTPリクエストをJSONイベントドキュメントに変換し、Quarkus Lambdaに転送されます。Quarkus LambdaはこのJSONを解析し、QuarkusがサポートするあらゆるHTTPフレームワーク（Jakarta REST、サーブレット、Reactive Routes）で使用できるHTTPリクエストの内部表現に変換します。</p>
+</div>
+<div class="paragraph">
+<p>API Gateway supports many ways to securely invoke on your HTTP endpoints that are backed by Lambda and Quarkus.
+If you enable it, Quarkus will automatically parse relevant parts of the <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html">event json document</a>
+and look for security based metadata and register a <code>java.security.Principal</code> internally that can be looked up in Jakarta REST
+by injecting a <code>jakarta.ws.rs.core.SecurityContext</code>, via <code>HttpServletRequest.getUserPrincipal()</code> in servlet, and <code>RouteContext.user()</code> in Reactive Routes.
+If you want more security information, the <code>Principal</code> object can be typecast to
+a class that will give you more information.</p>
+</div>
+<div class="paragraph">
+<p>このセキュリティー機能を有効にするには、これを <code>application.properties</code> ファイルに追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>quarkus.lambda-http.enable-security=true</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>マッピング方法は次のとおりです。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. HTTP <code>quarkus-amazon-lambda-http</code></caption>
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">認証タイプ</th>
+<th class="tableblock halign-left valign-top">プリンシパルクラス</th>
+<th class="tableblock halign-left valign-top">プリンシパル名の Json パス</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cognito JWT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.quarkus.amazon.lambda.http.CognitoPrincipal</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>requestContext.authorizer.jwt.claims.cognito:username</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IAM</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.quarkus.amazon.lambda.http.IAMPrincipal</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>requestContext.authorizer.iam.userId</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">カスタム Lambda</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.quarkus.amazon.lambda.http.CustomPrincipal</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>requestContext.authorizer.lambda.principalId</code></p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 2. REST <code>quarkus-amazon-lambda-rest</code></caption>
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">認証タイプ</th>
+<th class="tableblock halign-left valign-top">プリンシパルクラス</th>
+<th class="tableblock halign-left valign-top">プリンシパル名の Json パス</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cognito</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.quarkus.amazon.lambda.http.CognitoPrincipal</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>requestContext.authorizer.claims.cognito:username</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IAM</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.quarkus.amazon.lambda.http.IAMPrincipal</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>requestContext.identity.user</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">カスタム Lambda</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.quarkus.amazon.lambda.http.CustomPrincipal</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>requestContext.authorizer.principalId</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><code>cognito:groups</code> が存在する場合、Quarkus はこれらのグループを抽出して Quarkus のロールにマッピングし、 <code>@RolesAllowed</code> のようなアノテーションを使用して認証に使用することができます。 <code>cognito:groups</code> をQuarkusのロールにマッピングしたくない場合は、設定で明示的に無効にする必要があります:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>quarkus.lambda-http.map-cognito-to-roles=false</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>また、ロールを抽出するために、別のCognitoクレームを指定することもできます：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>quarkus.lambda-http.cognito-role-claim=cognito:roles</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>デフォルトでは、ロールが括弧で囲んだスペース区切りのリスト（例： <code>[ user admin ]</code> ）に入っていることを想定しています。クレーム文字列から個々のロールを検索するために使用する正規表現を指定することも可能です:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>quarkus.lambda-http.cognito-claim-matcher=[^\[\] \t]+</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="custom-security-integration"><a class="anchor" href="#custom-security-integration"></a>カスタムセキュリティーの統合</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>AWSセキュリティのデフォルトサポートは、プリンシパル名をQuarkusセキュリティAPIにマッピングするだけで、クレームやロール、パーミッションのマッピングは何も行いません。 <code>io.quarkus.amazon.lambda.http.LambdaIdentityProvider</code> インターフェースの実装を使用して、ラムダHTTPイベントのセキュリティメタデータがQuarkus Security APIにマッピングされる方法を完全に制御することができます。このインターフェースを実装することで、プリンシパルのロールマッピングを定義したり、IAMやCognito、カスタムLambdaセキュリティ統合によって提供される追加属性を公開したりすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="title">HTTP <code>quarkus-amazon-lambda-http</code></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.amazon.lambda.http;
+
+/**
+ * Helper interface that removes some boilerplate for creating
+ * an IdentityProvider that processes APIGatewayV2HTTPEvent
+ */
+public interface LambdaIdentityProvider extends IdentityProvider&lt;LambdaAuthenticationRequest&gt; {
+    @Override
+    default public Class&lt;LambdaAuthenticationRequest&gt; getRequestType() {
+        return LambdaAuthenticationRequest.class;
+    }
+
+    @Override
+    default Uni&lt;SecurityIdentity&gt; authenticate(LambdaAuthenticationRequest request, AuthenticationRequestContext context) {
+        APIGatewayV2HTTPEvent event = request.getEvent();
+        SecurityIdentity identity = authenticate(event);
+        if (identity == null) {
+            return Uni.createFrom().optional(Optional.empty());
+        }
+        return Uni.createFrom().item(identity);
+    }
+
+    /**
+     * You must override this method unless you directly override
+     * IdentityProvider.authenticate
+     *
+     * @param event
+     * @return
+     */
+    default SecurityIdentity authenticate(APIGatewayV2HTTPEvent event) {
+        throw new IllegalStateException("You must override this method or IdentityProvider.authenticate");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>HTTP の場合、オーバーライドする重要なメソッドは <code>LambdaIdentityProvider.authenticate(APIGatewayV2HTTPEvent event)</code> です。ここで、<code>APIGatewayV2HTTPEvent</code> からセキュリティーデータをマッピングする方法に基づいて SecurityIdentity を割り当てます。</p>
+</div>
+<div class="listingblock">
+<div class="title">REST <code>quarkus-amazon-lambda-rest</code></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.amazon.lambda.http;
+
+import java.util.Optional;
+
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
+
+import io.quarkus.amazon.lambda.http.model.AwsProxyRequest;
+import io.quarkus.security.identity.AuthenticationRequestContext;
+import io.quarkus.security.identity.IdentityProvider;
+import io.quarkus.security.identity.SecurityIdentity;
+import io.smallrye.mutiny.Uni;
+
+/**
+ * Helper interface that removes some boilerplate for creating
+ * an IdentityProvider that processes APIGatewayV2HTTPEvent
+ */
+public interface LambdaIdentityProvider extends IdentityProvider&lt;LambdaAuthenticationRequest&gt; {
+...
+
+    /**
+     * You must override this method unless you directly override
+     * IdentityProvider.authenticate
+     *
+     * @param event
+     * @return
+     */
+    default SecurityIdentity authenticate(AwsProxyRequest event) {
+        throw new IllegalStateException("You must override this method or IdentityProvider.authenticate");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>REST の場合、オーバーライドする重要なメソッドは <code>LambdaIdentityProvider.authenticate(AwsProxyRequest event)</code> です。ここで、<code>AwsProxyRequest</code> からセキュリティーデータをマップする方法に基づいて SecurityIdentity を割り当てます。</p>
+</div>
+<div class="paragraph">
+<p>実装するプロバイダーは CDI Bean である必要があります。次に例を示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import java.security.Principal;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
+
+import io.quarkus.amazon.lambda.http.LambdaIdentityProvider;
+import io.quarkus.security.identity.SecurityIdentity;
+import io.quarkus.security.runtime.QuarkusPrincipal;
+import io.quarkus.security.runtime.QuarkusSecurityIdentity;
+
+@ApplicationScoped
+public class CustomSecurityProvider implements LambdaIdentityProvider {
+    @Override
+    public SecurityIdentity authenticate(APIGatewayV2HTTPEvent event) {
+        if (event.getHeaders() == null || !event.getHeaders().containsKey("x-user"))
+            return null;
+        Principal principal = new QuarkusPrincipal(event.getHeaders().get("x-user"));
+        QuarkusSecurityIdentity.Builder builder = QuarkusSecurityIdentity.builder();
+        builder.setPrincipal(principal);
+        return builder.build();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次も同じ例ですが、AWS Gateway REST API を使用しています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import java.security.Principal;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+import io.quarkus.amazon.lambda.http.model.AwsProxyRequest;
+
+import io.quarkus.amazon.lambda.http.LambdaIdentityProvider;
+import io.quarkus.security.identity.SecurityIdentity;
+import io.quarkus.security.runtime.QuarkusPrincipal;
+import io.quarkus.security.runtime.QuarkusSecurityIdentity;
+
+@ApplicationScoped
+public class CustomSecurityProvider implements LambdaIdentityProvider {
+    @Override
+    public SecurityIdentity authenticate(AwsProxyRequest event) {
+        if (event.getMultiValueHeaders() == null || !event.getMultiValueHeaders().containsKey("x-user"))
+            return null;
+        Principal principal = new QuarkusPrincipal(event.getMultiValueHeaders().getFirst("x-user"));
+        QuarkusSecurityIdentity.Builder builder = QuarkusSecurityIdentity.builder();
+        builder.setPrincipal(principal);
+        return builder.build();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Quarkus は、この実装を自動的に検出し、前述のデフォルトの実装の代わりに使用する必要があります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="simple-sam-local-principal"><a class="anchor" href="#simple-sam-local-principal"></a>単純な SAM ローカルプリンシパル</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>sam local</code> を使用してアプリケーションをテストしている場合は、<code>QUARKUS_AWS_LAMBDA_FORCE_USER_NAME</code> 環境変数を設定することで、アプリケーションの実行時に使用するプリンシパル名をハードコーディングできます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="snapstart"><a class="anchor" href="#snapstart"></a>SnapStart</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>アプリケーションをLambda SnapStartに最適化するには、 <a href="aws-lambda-snapstart">SnapStart構成ドキュメント</a> を参照してください。</p>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#getting-started">はじめに</a></li>
+<li><a href="#installing-aws-bits">AWS ビットのインストール</a></li>
+<li><a href="#creating-the-maven-deployment-project">デプロイ用のMavenプロジェクトを作成する</a></li>
+<li><a href="#build-and-deploy">ビルドとデプロイ</a></li>
+<li><a href="#extra-build-generated-files">ビルド時に追加生成されるファイル</a></li>
+<li><a href="#live-coding-and-simulating-aws-lambda-environment-locally">AWS Lambda 環境のローカルでのライブコーディングとシミュレーション</a></li>
+<li><a href="#simulate-aws-lambda-deployment-with-sam-cli">Simulate AWS Lambda Deployment with SAM CLI</a></li>
+<li><a href="#deploy-to-aws">AWS にデプロイする</a></li>
+<li><a href="#deploying-a-native-executable">ネイティブ実行可能ファイルのデプロイ</a></li>
+<li><a href="#examine-the-pom">POM を検証する</a>
+<ul class="sectlevel2">
+<li><a href="#examine-sam-yaml">sam.yaml を調べる</a></li>
+</ul>
+</li>
+<li><a href="#injectable-aws-context-variables">注入可能なAWSコンテキスト変数</a></li>
+<li><a href="#tracing-with-aws-xray-and-graalvm">AWS XRay と GraalVM を使用したトレース</a></li>
+<li><a href="#security-integration">セキュリティー統合</a></li>
+<li><a href="#custom-security-integration">カスタムセキュリティーの統合</a></li>
+<li><a href="#simple-sam-local-principal">単純な SAM ローカルプリンシパル</a></li>
+<li><a href="#snapstart">SnapStart</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same extensions</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/aws-lambda">AWS Lambda</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/funqy-aws-lambda-http">Funqy HTTPバインディングとAWS Lambda</a></li>
+      </ul>
+    </div>
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/aws-lambda">AWS Lambda</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/aws-lambda-snapstart">AWS Lambda SnapStartの設定</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/funqy-aws-lambda">Funqy AWS Lambdaバインディング</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/funqy-aws-lambda-http">Funqy HTTPバインディングとAWS Lambda</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/azure-functions">Azure Functions</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/azure-functions-http">Quarkus REST、Undertow、またはReactive Routesを使用したAzure Functions</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/funqy">Funqy</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/funqy-gcp-functions">Funqy Google Cloud Functions</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/funqy-http">Funqy HTTPバインディング (スタンドアロン)</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/funqy-azure-functions-http">Azure Functions と Funqy HTTP バインディング</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/funqy-gcp-functions-http">Google Cloud Functionsを使用した Funqy HTTP バインディング</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/funqy-knative-events">Funqy Knative Events バインディング</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/gcp-functions">Google Cloud Functions (サーバーレス)</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/gcp-functions-http">Quarkus REST、Undertow、またはReactive Routesを使用したGoogle Cloud Functions（サーバーレス）</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/appcds">AppCDS</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/container-image">コンテナーイメージ</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/deploying-to-openshift">OpenShiftへのデプロイ</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/deploying-to-google-cloud">Google Cloud Platform (GCP)へのデプロイ</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/deploying-to-heroku">Herokuへのデプロイ</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/deploying-to-azure-cloud">Microsoft Azure Cloudへのデプロイ</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

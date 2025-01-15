@@ -1,0 +1,1681 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Quarkus コマンドラインインターフェイス (CLI) を使用した Quarkus アプリの構築 - 3.8 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.8/guides/cli-tooling" />
+  <meta property="og:title" content="Quarkus コマンドラインインターフェイス (CLI) を使用した Quarkus アプリの構築 - 3.8" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/cli-tooling">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.8/guides/cli-tooling">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.8/guides/cli-tooling" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.8/guides/cli-tooling">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.8/guides/cli-tooling">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.8/guides/cli-tooling">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.8/guides/cli-tooling">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.8/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" selected>3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">Quarkus コマンドラインインターフェイス (CLI) を使用した Quarkus アプリの構築 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>quarkus</code> コマンドを使用すると、プロジェクトの作成、エクステンションの管理、基盤となるプロジェクトビルドツールを使用したビルドと開発の必須タスクを行うことができます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="installing-the-cli"><a class="anchor" href="#installing-the-cli"></a>CLI のインストール</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus CLI は、以下のようないくつかの開発者向けのパッケージマネージャーで利用できます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://sdkman.io">SDKMAN!</a></p>
+</li>
+<li>
+<p><a href="https://brew.sh">Homebrew</a></p>
+</li>
+<li>
+<p><a href="https://community.chocolatey.org/packages/quarkus">Chocolatey</a></p>
+</li>
+<li>
+<p><a href="https://scoop.sh">Scoop</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>これらのツールのいずれかをすでに使用している (または使用したい) 場合、これは Quarkus CLI をインストールして最新の状態に保つ最も簡単な方法です。</p>
+</div>
+<div class="paragraph">
+<p>これらのパッケージマネージャーに加えて、Quarkus CLI は <a href="https://www.jbang.dev">JBang</a> からもインストールできます。最も実用的な方法を選択してください。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>JBang - Linux、macOS、および Windows 向け</p>
+</li>
+<li>
+<p>SDKMAN! - Linux および macOS 向け</p>
+</li>
+<li>
+<p>Homebrew - Linux および macOS 向け</p>
+</li>
+<li>
+<p>Chocolatey - Windows 向け</p>
+</li>
+<li>
+<p>Scoop - Windows 向け</p>
+</li>
+</ul>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-jbang">
+<div class="content">
+<div class="title">JBang</div>
+<div class="paragraph">
+<p>Quarkus CLI は、 <a href="https://jbang.dev">JBang</a> を使用してインストール可能な jar として利用できます。</p>
+</div>
+<div class="paragraph">
+<p>JBang は、既存の Java を使用するか、必要に応じて Java をインストールします。</p>
+</div>
+<div class="paragraph">
+<p>Linux、macOS、および Windows (WSL または Cygwin や MinGW などの bash 互換シェルを使用) の場合</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -Ls https://sh.jbang.dev | bash -s - trust add https://repo1.maven.org/maven2/io/quarkus/quarkus-cli/
+curl -Ls https://sh.jbang.dev | bash -s - app install --fresh --force quarkus@quarkusio</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Powershell を使用する Windows の場合:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-powershell hljs" data-lang="powershell">iex "&amp; { $(iwr https://ps.jbang.dev) } trust add https://repo1.maven.org/maven2/io/quarkus/quarkus-cli/"
+iex "&amp; { $(iwr https://ps.jbang.dev) } app install --fresh --force quarkus@quarkusio"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>JBang がすでにインストールされている場合は、直接使用できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># This can also be used to update to the latest version
+jbang app install --fresh --force quarkus@quarkusio</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>特定のバージョンを使用したい場合は、直接バージョンを指定することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Create an alias in order to use a specific version
+jbang app install --name qs3.5.0 https://repo1.maven.org/maven2/io/quarkus/quarkus-cli/3.5.0/quarkus-cli-3.5.0-runner.jar</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Quarkus をローカルでビルドしている場合は、そのバージョンを使用できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Use the latest (or locally built) snapshot (with qss as an alias)
+jbang app install --force --name qss ~/.m2/repository/io/quarkus/quarkus-cli/999-SNAPSHOT/quarkus-cli-999-SNAPSHOT-runner.jar</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>インストールされると、<code>quarkus</code> は <code>$PATH</code> にあり、<code>quarkus --version</code> を実行すると、インストールされているバージョンが出力されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus --version
+3.8.6</code></pre>
+</div>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="title">最近の JBang バージョンを使用する</div>
+<div class="paragraph">
+<p><code>app</code> が読み取れないというエラーが発生した場合は、v0.56.0 より古いバージョンの JBang がインストールされている可能性があります。削除するか、最新バージョンにアップグレードしてください。</p>
+</div>
+<div class="paragraph">
+<p>JBang を初めてインストールする場合は、新しいセッションを開始して <code>PATH</code> を更新してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-sdkman">
+<div class="content">
+<div class="title">SDKMAN!</div>
+<div class="paragraph">
+<p><a href="https://sdkman.io/">SDKMAN!</a> を使用して、開発環境を管理できます。ほとんどの Unix ベースのシステムで複数のソフトウェア開発キットの並列バージョンを管理できるため、複数の JDK バージョンを便利に使う場合に非常に良い代替手段となります。</p>
+</div>
+<div class="paragraph">
+<p>SDKMAN! を使用すると、Quarkus CLI などの一般的な Java ツールをインストールすることもできます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Quarkus CLI をインストールする前に、 <a href="https://sdkman.io/jdks">JDK</a> がインストールされていることを確認してください。</p>
+</div>
+<div class="paragraph">
+<p>使用可能な Java のバージョンを一覧表示するには、<code>sdk list java</code> を使用します。続いて、<code>sdk install java x.y.z-open</code> (または、必要に応じて別のベンダーの JDK) を使用して、必要なバージョンの OpenJDK をインストールできます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>SDKMAN! を使用して Quarkus CLI をインストールするには、次のコマンドを実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">sdk install quarkus</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Quarkus CLI の最新バージョンがインストールされます。</p>
+</div>
+<div class="paragraph">
+<p>インストールされると、<code>quarkus</code> は <code>$PATH</code> にあり、<code>quarkus --version</code> を実行すると、インストールされているバージョンが出力されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus --version
+3.8.6</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>SDKMAN! は、新しいバージョンが利用可能になると通知するので、更新は簡単です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">sdk upgrade quarkus</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-homebrew">
+<div class="content">
+<div class="title">Homebrew</div>
+<div class="paragraph">
+<p><a href="https://brew.sh">Homebrew</a> は、macOS (および Linux) 向けのパッケージマネージャーです。</p>
+</div>
+<div class="paragraph">
+<p>Homebrew を使用して、Quarkus CLI をインストール (および更新) できます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Quarkus CLI をインストールする前に、JDK がインストールされていることを確認してください。お好みの JDK バージョンを使用できるようにするため、明示的な依存関係は追加していません。</p>
+</div>
+<div class="paragraph">
+<p>最新のJavaバージョンの場合、 <code>brew install openjdk</code> 、Java 17用の場合、 <code>brew install openjdk@17</code> 、Java 21用の場合、 <code>brew install openjdk@21</code> でJDKをインストールすることが出来ます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Homebrew を使用して Quarkus CLI をインストールするには、次のコマンドを実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">brew install quarkusio/tap/quarkus</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Quarkus CLI の最新バージョンがインストールされます。このコマンドを使用して、Quarkus CLI を更新することもできます。</p>
+</div>
+<div class="paragraph">
+<p>インストールされると、<code>quarkus</code> は <code>$PATH</code> にあり、<code>quarkus --version</code> を実行すると、インストールされているバージョンが出力されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus --version
+3.8.6</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>以下の方法で、Quarkus CLI をアップグレードできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">brew update <i class="conum" data-value="1"></i><b>(1)</b>
+brew upgrade quarkus <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>すべてのパッケージ定義と Homebrew 自体を更新します</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>QuarkusCLI を最新バージョンにアップグレードします</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-chocolatey">
+<div class="content">
+<div class="title">Chocolatey</div>
+<div class="paragraph">
+<p><a href="https://chocolatey.org">Chocolatey</a> は、Windows 向けのパッケージマネージャーです。</p>
+</div>
+<div class="paragraph">
+<p>Chocolatey を使用して、Quarkus CLI をインストール (および更新) できます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Quarkus CLI をインストールする前に、JDK がインストールされていることを確認してください。</p>
+</div>
+<div class="paragraph">
+<p>Java 17の場合、 <code>choco install temurin17</code> あるいはJava 21の場合、 <code>choco install temurin21</code> でJDKをインストールできます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Chocolatey を使用して Quarkus CLI をインストールするには、次のコマンドを実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">choco install quarkus</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Quarkus CLI の最新バージョンがインストールされます。</p>
+</div>
+<div class="paragraph">
+<p>インストールされると、<code>quarkus</code> は <code>$PATH</code> にあり、<code>quarkus --version</code> を実行すると、インストールされているバージョンが出力されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus --version
+3.8.6</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>以下の方法で、Quarkus CLI をアップグレードできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">choco upgrade quarkus</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-scoop">
+<div class="content">
+<div class="title">Scoop</div>
+<div class="paragraph">
+<p><a href="https://scoop.sh">Scoop</a> は、Windows 向けのパッケージマネージャーです。Scoop を使用して、Quarkus CLI をインストール (および更新) できます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Quarkus CLIをインストールする前に、JDKがインストールされていることを確認してください。
+Java 17の場合、 <code>scoop install openjdk17</code> あるいはJava 21の場合、 <code>scoop install openjdk21</code> でJDKをインストールできます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Scoop を使用して QuarkusCLI をインストールするには、次のコマンドを実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">scoop install quarkus-cli</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Quarkus CLI の最新バージョンがインストールされます。インストールされると、<code>quarkus</code> は$PATH` にあり、<code>quarkus --version</code> を実行すると、インストールされているバージョンが出力されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus --version
+3.8.6</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>以下の方法で、Quarkus CLI をアップグレードできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">scoop update quarkus-cli</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-the-cli"><a class="anchor" href="#using-the-cli"></a>CLI の使用</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>--help</code> を使用して、使用可能なすべてのコマンドと共にヘルプ情報を表示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus --help
+Usage: quarkus [-ehv] [--refresh] [--verbose] [--config=CONFIG]
+               [-D=&lt;String=String&gt;]... [COMMAND]
+Options:
+      --refresh         Refresh the local Quarkus extension registry cache
+      --config=CONFIG   Configuration file
+  -h, --help            Display this help message.
+  -v, --version         Print CLI version information and exit.
+  -e, --errors          Display error messages.
+      --verbose         Verbose mode.
+  -D=&lt;String=String&gt;    Java properties
+
+Commands:
+  create                  Create a new project.
+    app                   Create a Quarkus application project.
+    cli                   Create a Quarkus command-line project.
+    extension             Create a Quarkus extension project
+  build                   Build the current project.
+  dev                     Run the current project in dev (live coding) mode.
+  test                    Run the current project in continuous testing mode.
+  extension, ext          Configure extensions of an existing project.
+    list, ls              List platforms and extensions.
+    categories, cat       List extension categories.
+    add                   Add extension(s) to this project.
+    remove, rm            Remove extension(s) from this project.
+  image                   Build or push project container image.
+    build                 Build a container image.
+      docker              Build a container image using Docker.
+      buildpack           Build a container image using Buildpack.
+      jib                 Build a container image using Jib.
+      openshift           Build a container image using Openshift.
+    push                  Push a container image.
+  deploy                  Deploy application.
+    kubernetes            Perform the deploy action on kubernetes.
+    openshift             Perform the deploy action on openshift.
+    knative               Perform the deploy action on knative.
+    kind                  Perform the deploy action on minikube.
+    minikube              Perform the deploy action on minikube.
+  registry                Configure Quarkus registry client
+    list                  List enabled Quarkus registries
+    add                   Add a Quarkus extension registry
+    remove                Remove a Quarkus extension registry
+  info                    Display project information and verify versions
+                            health (platform and extensions).
+  update, up, upgrade     Suggest recommended project updates with the
+                            possibility to apply them.
+  version                 Display CLI version information.
+  plugin, plug            Configure plugins of the Quarkus CLI.
+    list, ls              List CLI plugins.
+    add                   Add plugin(s) to the Quarkus CLI.
+    remove                Remove plugin(s) to the Quarkus CLI.
+    sync                  Sync (discover / purge) CLI Plugins.
+  completion              bash/zsh completion:  source &lt;(quarkus completion)</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>このドキュメントは便利なリファレンスですが、最も信頼のおける情報源はクライアントヘルプです。</p>
+</div>
+<div class="paragraph">
+<p>期待する出力が表示されない場合は、 <code>--help</code> を使用して、正しい引数を使用してコマンドを呼び出していることを確認してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="project-creation"><a class="anchor" href="#project-creation"></a>新規プロジェクトの作成</h3>
+<div class="paragraph">
+<p>新しいプロジェクトを作成するには、 <code>create</code> コマンドを使用します（ <code>app</code> サブコマンドは、指定しない場合は暗黙で適用されます）:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus create
+-----------
+
+applying codestarts...
+📚  java
+🔨  maven
+📦  quarkus
+📝  config-properties
+🔧  dockerfiles
+🔧  maven-wrapper
+🚀  resteasy-codestart
+
+-----------
+[SUCCESS] ✅ quarkus project has been successfully generated in:
+--&gt; /&lt;output-dir&gt;/code-with-quarkus</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、現在の作業ディレクトリに、デフォルトの <code>groupId</code> 、 <code>artifactId</code> 、 <code>version</code> の値（ <code>groupId='org.acme'</code> 、 <code>artifactId='code-with-quarkus'</code> 、 <code>version='1.0.0-SNAPSHOT'</code> ）を使用して、 <code>code-with-quarkus</code> というフォルダが作成されます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+上記の絵文字は、正確に一致しない場合があります。絵文字の見え方は、使用するフォントや端末・環境によって異なる場合があります。例えば、IntelliJ IDEAでは、ターミナルでの絵文字の動作やレンダリングに関して、いくつかの長期にわたる問題が残されています。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>コマンドラインから直接、 <code>groupId</code> 、 <code>artifactId</code> 、 <code>version</code> を <code>group:artifactId:version</code> の構文を使用して指定することができます。セグメントを選択的に省略して、デフォルト値を使用することができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell"># Create a project with groupId=org.acme, artifactId=bar, and version=1.0.0-SNAPSHOT
+quarkus create app bar
+
+# Create a project with groupId=com.foo, artifactId=bar, and version=1.0.0-SNAPSHOT
+quarkus create app com.foo:bar
+
+# Create a project with groupId=com.foo, artifactId=bar, and version=1.0
+quarkus create app com.foo:bar:1.0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>出力には、プロジェクトが作成されていることが表示されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">-----------
+
+applying codestarts...
+📚  java
+🔨  maven
+📦  quarkus
+📝  config-properties
+🔧  dockerfiles
+🔧  maven-wrapper
+🚀  resteasy-codestart
+
+-----------
+[SUCCESS] ✅ quarkus project has been successfully generated in:
+--&gt; /&lt;output-dir&gt;/bar
+-----------</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Use the <code>--help</code> option to display the options for creating projects:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus create app --help
+quarkus create cli --help</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="specifying-quarkus-version"><a class="anchor" href="#specifying-quarkus-version"></a>Quarkus バージョンの指定</h3>
+<div class="paragraph">
+<p>Both <code>quarkus create</code> and <code>quarkus extension list</code> allow you to explicitly specify a version of Quarkus in one of two ways:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>特定のプラットフォーム・リリースBOMを指定</p>
+<div class="paragraph">
+<p>A <a href="platform#quarkus-platform-bom">Quarkus Platform release BOM</a> is identified by <code>groupId:artifactId:version</code> (GAV) coordinates. When specifying a platform release BOM, you may use empty segments to fall back to default values (shown with <code>quarkus create app --help</code>). If you specify only one segment (no <code>:</code>), it is assumed to be a version.</p>
+</div>
+<div class="paragraph">
+<p><code>io.quarkus.platform</code> is the default <code>groupId</code>. Specifying <code>-P :quarkus-bom:</code> is equivalent to <code>-P io.quarkus.platform:quarkus-bom:3.8.6</code>. Note that you need to specify the <code>groupId</code> to work with a snapshot, e.g. <code>-P io.quarkus::999-SNAPSHOT</code> is equivalent to <code>-P io.quarkus:quarkus-bom:999-SNAPSHOT</code>.</p>
+</div>
+<div class="paragraph">
+<p>Default values are subject to change. Use the <code>--dry-run</code> option to see the computed value.</p>
+</div>
+</li>
+<li>
+<p>プラットフォーム・ストリームの指定</p>
+<div class="paragraph">
+<p>プラットフォーム・ストリームは、リモート・レジストリに対して動作します。各レジストリは1つ以上のプラットフォーム・ストリームを定義し、各ストリームは、そのストリームを使用するプロジェクトの設定方法を定義する1つ以上のプラットフォーム・リリースBOMファイルを定義します。</p>
+</div>
+<div class="paragraph">
+<p>ストリームは、 <code>platformKey:streamId</code> 構文を使用して識別されます。特定のストリームを指定するには <code>-S platformKey:streamId</code> を使用します。ストリームを指定する際、空のセグメントはストリームリソースの解決ルールに 基づき、 <em>発見された</em> デフォルトに置き換えられます。</p>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="working-with-extensions"><a class="anchor" href="#working-with-extensions"></a>エクステンションの使用</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus ext --help</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="listing-extensions"><a class="anchor" href="#listing-extensions"></a>エクステンションの一覧表示</h4>
+<div class="paragraph">
+<p>The Quarkus CLI can be used to list Quarkus extensions.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus ext ls</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>結果のフォーマットは、4つのオプションのいずれかで制御できます：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>--name</code>    Display the name (artifactId) only</p>
+</li>
+<li>
+<p><code>--concise</code> 名前（artifactId）と説明を表示します</p>
+</li>
+<li>
+<p><code>--full</code>    Display concise format and version/status-related columns.</p>
+</li>
+<li>
+<p><code>--origins</code> conciseフォーマットと共に、エクステンションのQuarkusプラットフォームリリースオリジンを表示します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>quarkus ext ls</code> の動作はコンテキストによって異なります。</p>
+</div>
+<div class="sect4">
+<h5 id="listing-extensions-for-a-quarkus-release"><a class="anchor" href="#listing-extensions-for-a-quarkus-release"></a>Quarkusリリースのエクステンションのリストアップ</h5>
+<div class="paragraph">
+<p>If you invoke the Quarkus CLI from outside of a project, Quarkus will list all the extensions available for the Quarkus release used by the CLI itself.</p>
+</div>
+<div class="paragraph">
+<p>You can also list extensions for a specific release of Quarkus using <code>-P</code> or <code>-S</code>, as described in <a href="#specifying-quarkus-version">Quarkus バージョンの指定</a>.</p>
+</div>
+<div class="paragraph">
+<p>This mode uses the <code>--origins</code> format by default.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="listing-extensions-for-a-quarkus-project"><a class="anchor" href="#listing-extensions-for-a-quarkus-project"></a>Quarkusプロジェクトのエクステンションのリストアップ</h5>
+<div class="paragraph">
+<p>When working with a Quarkus project, the CLI will list the extensions the current project has installed, using the <code>--name</code> format by default.</p>
+</div>
+<div class="paragraph">
+<p>Use the <code>--installable</code> or <code>-i</code> option to list extensions that can be installed from the Quarkus platform the project is using.</p>
+</div>
+<div class="paragraph">
+<p>You can narrow or filter the list using search (<code>--search</code> or <code>-s</code>).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus ext list --concise -i -s jdbc
+JDBC Driver - DB2                                  quarkus-jdbc-db2
+JDBC Driver - PostgreSQL                           quarkus-jdbc-postgresql
+JDBC Driver - H2                                   quarkus-jdbc-h2
+JDBC Driver - MariaDB                              quarkus-jdbc-mariadb
+JDBC Driver - Microsoft SQL Server                 quarkus-jdbc-mssql
+JDBC Driver - MySQL                                quarkus-jdbc-mysql
+JDBC Driver - Oracle                               quarkus-jdbc-oracle
+JDBC Driver - Derby                                quarkus-jdbc-derby
+Elytron Security JDBC                              quarkus-elytron-security-jdbc
+Agroal - Database connection pool                  quarkus-agroal</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="adding-extensions"><a class="anchor" href="#adding-extensions"></a>エクステンションの追加</h4>
+<div class="paragraph">
+<p>The Quarkus CLI can add one or more extensions to your project with the <code>add</code>
+subcommand:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus ext add kubernetes health
+[SUCCESS] ✅ Extension io.quarkus:quarkus-kubernetes has been installed
+[SUCCESS] ✅ Extension io.quarkus:quarkus-smallrye-health has been installed</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can install all extensions which match a glob pattern:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus ext add smallrye-*</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="removing-extensions"><a class="anchor" href="#removing-extensions"></a>エクステンションの削除</h4>
+<div class="paragraph">
+<p>The Quarkus CLI can remove one or more extensions from your project with the <code>remove</code>/<code>rm</code>
+subcommand:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus ext rm kubernetes
+[SUCCESS] ✅ Extension io.quarkus:quarkus-kubernetes has been uninstalled</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="build-your-project"><a class="anchor" href="#build-your-project"></a>プロジェクトのビルド</h3>
+<div class="paragraph">
+<p>To build your project using the Quarkus CLI (using the default configuration in this example),
+use the <code>build</code> command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus build
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ---------------------&lt; org.acme:code-with-quarkus &gt;---------------------
+[INFO] Building code-with-quarkus 1.0.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  8.331 s
+[INFO] Finished at: 2021-05-27T10:13:28-04:00
+[INFO] ------------------------------------------------------------------------</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+出力は、プロジェクトが使用しているビルドツール（Maven、Gradle、またはJBang）によって異なります。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Run <code>quarkus build --clean</code> to perform clean as part of the build.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="development-mode"><a class="anchor" href="#development-mode"></a>開発モード</h3>
+<div class="paragraph">
+<p>To start dev mode from the Quarkus CLI, use the <code>dev</code> command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus dev
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ---------------------&lt; org.acme:code-with-quarkus &gt;---------------------
+[INFO] Building code-with-quarkus 1.0.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+...
+Listening for transport dt_socket at address: 5005
+__  ____  __  _____   ___  __ ____  ______
+--/ __ \/ / / / _ | / _ \/ //_/ / / / __/
+-/ /_/ / /_/ / __ |/ , _/ ,&lt; / /_/ /\ \
+--\___\_\____/_/ |_/_/|_/_/|_|\____/___/
+2021-05-27 10:15:56,032 INFO  [io.quarkus] (Quarkus Main Thread) code-with-quarkus 1.0.0-SNAPSHOT on JVM (powered by Quarkus 999-SNAPSHOT) started in 1.387s. Listening on: http://localhost:8080
+2021-05-27 10:15:56,035 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
+2021-05-27 10:15:56,035 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, resteasy-reactive, smallrye-context-propagation]
+
+--
+Tests paused, press [r] to resume</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+出力は、プロジェクトが使用しているビルドツール（Maven、Gradle、またはJBang）によって異なります。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Run <code>quarkus dev --clean</code> to perform clean as part of the build.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="shell-autocomplete-and-aliases"><a class="anchor" href="#shell-autocomplete-and-aliases"></a>シェルのオートコンプリートとエイリアス</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Automatic command completion is available for Bash and Zsh:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell"># Setup autocompletion in the current shell
+source &lt;(quarkus completion)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you choose to use an alias for the <code>quarkus</code> command, adjust the command completion with the following commands:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell"># Add an alias for the quarkus command
+alias q=quarkus
+# Add q to list of commands included in quarkus autocompletion
+complete -F _complete_quarkus q</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="container-images"><a class="anchor" href="#container-images"></a>コンテナイメージ</h3>
+<div class="paragraph">
+<p>The Quarkus CLI allows building container images without tampering with your project configuration (adding / removing container image extensions).
+To build the image for your project:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus image build</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>image build</code> command can be used directly, or a subcommand can be selected. The available subcommands are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>docker</p>
+</li>
+<li>
+<p>buildpacks</p>
+</li>
+<li>
+<p>jib</p>
+</li>
+<li>
+<p>openshift</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>各サブコマンドは、Quarkusがサポートしているイメージビルドツールに対応しており、特定の設定オプションにアクセスできます。</p>
+</div>
+<div class="paragraph">
+<p>たとえば、 <a href="https://buildpacks.io/">Cloud Native Buildpack</a> をカスタムビルダーイメージで使用するには、次のようにします：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus image build buildpack --builder-image &lt;your builder image&gt;</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="pushing"><a class="anchor" href="#pushing"></a>プッシュ</h4>
+<div class="paragraph">
+<p>The <code>image push</code> command is similar to <code>image build</code>, and surfaces some basic options required to push images to a target container registry.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus image push --registry=&lt;image registry&gt; --registry-username=&lt;registry username&gt; --registry-password-stdin</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="extending-the-cli"><a class="anchor" href="#extending-the-cli"></a>CLIの拡張</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Quarkus CLI embeds a plugin system that can be used to dynamically add commands and subcommands to the CLI.</p>
+</div>
+<div class="sect2">
+<h3 id="what-is-a-plugin"><a class="anchor" href="#what-is-a-plugin"></a>プラグインとは</h3>
+<div class="paragraph">
+<p>A plugin can be any executable, jar or Java command that can be found locally or obtained remotely.</p>
+</div>
+<div class="paragraph">
+<p>Plugins are classified as follows:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Plugins executed via shell</p>
+</li>
+<li>
+<p><strong>executable</strong> (any executable prefixed with <code>quarkus-</code> found locally)</p>
+</li>
+<li>
+<p>Plugins executed via jbang</p>
+</li>
+<li>
+<p><strong>jar</strong> (any runnable jar found locally)</p>
+</li>
+<li>
+<p><strong>jbang alias</strong> (any jbang alias prefixed with <code>quarkus-</code> installed locally or through the quarkusio catalog)</p>
+</li>
+<li>
+<p><strong>maven</strong> (any maven coordinate in GACTV form pointing to a runnable jar)</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="how-to-obtain-plugins"><a class="anchor" href="#how-to-obtain-plugins"></a>プラグインの入手方法</h3>
+<div class="paragraph">
+<p>Plugins can be found via multiple sources that are described below.</p>
+</div>
+<div class="sect3">
+<h4 id="extensions"><a class="anchor" href="#extensions"></a>エクステンション</h4>
+<div class="paragraph">
+<p>A Quarkus extension may define a list of <code>cli-plugins</code> as part of its metadata.
+The list may contain GACTV string pointing to executable jars.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>At the moment, the CLI is able to obtain the list of available extensions,
+but is not very accurate on the exact version of the extension (it uses the version found in the extension catalog).</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="local-path-scanning"><a class="anchor" href="#local-path-scanning"></a>ローカルパススキャン</h4>
+<div class="paragraph">
+<p>Scan the path elements for executable files prefixed with <code>quarkus-</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="using-jbang-aliases"><a class="anchor" href="#using-jbang-aliases"></a>JBangのエイリアスの使用</h4>
+<div class="paragraph">
+<p>Scan the local or project jbang catalog for aliases prefixed with <code>quarkus-</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="using-the-jbang-quarkusio-catalog"><a class="anchor" href="#using-the-jbang-quarkusio-catalog"></a>JBangのquarkusioカタログの使用</h4>
+<div class="paragraph">
+<p>Scan the <code>quarkusio</code> catalog for aliases prefixed with <code>quarkus-</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+JBangバイナリを使用します。もし見つからない場合、自動的に <code>.jbang</code> にインストールされます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="explicitly-using-the-plugin-commands"><a class="anchor" href="#explicitly-using-the-plugin-commands"></a>プラグインコマンドの明示的な使用</h4>
+<div class="paragraph">
+<p>See <code>quarkus plugin add</code> below</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="managing-plugins"><a class="anchor" href="#managing-plugins"></a>プラグインの管理</h3>
+<div class="paragraph">
+<p>Plugins are managed using the following commands.</p>
+</div>
+<div class="sect3">
+<h4 id="listing-plugins"><a class="anchor" href="#listing-plugins"></a>プラグインをリストアップ</h4>
+<div class="paragraph">
+<p>The following command lists the installed plugins:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus plugin list
+No plugins installed!
+To include the installable plugins in the list, append --installable to the command.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>利用可能/インストール可能なプラグインを一覧表示します：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus plugin list --installable
+    Name    	 Type       	 Scope 	 Location                          	 Description
+    kill    	 jbang      	 user  	 quarkus-kill@quarkusio
+ *  fmt     	 jbang      	 user  	 quarkus-fmt@quarkusio
+    greeter 	 executable 	 user  	 /home/iocanel/bin/quarkus-greeter
+
+   Use the 'plugin add' subcommand and pass the location of any plugin listed above, or any remote location in the form of URL / GACTV pointing to a remote plugin.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The output of the <code>list</code> command may be filtered by <code>type</code> using <code>-t</code> or by name using <code>-s</code> flag and a search pattern.</p>
+</div>
+<div class="paragraph">
+<p>For instance, to list all the installable plugins starting with the letter <code>k</code>, use the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus plugin list --installable -s "k*"
+    Name    	 Type       	 Scope 	 Location                          	 Description
+    kill    	 jbang      	 user  	 quarkus-kill@quarkusio
+
+Use the 'plugin add' subcommand and pass the location of any plugin listed above, or any remote location in the form of URL / GACTV pointing to a remote plugin.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="adding-plugins"><a class="anchor" href="#adding-plugins"></a>プラグインの追加</h4>
+<div class="paragraph">
+<p>To add any of the installable plugins, use <code>quarkus plugin add &lt;name or location&gt;</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus plugin add kill
+Added plugin:
+    Name    	 Type       	 Scope 	 Location                          	 Description
+ *  kill    	 jbang      	 user  	 quarkus-kill@quarkusio</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The command above installed a plugin by <code>name</code> using the name as listed by <code>quarkus plugin list --installable</code>.</p>
+</div>
+<div class="paragraph">
+<p>The installed command can be now executed using <code>quarkus kill</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Users are not limited to the plugins discovered by <code>quarkus plug list --installable</code>.
+Users may install plugins as long as they provide the URL or the Maven coordinates pointing to an executable jar or Java file.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>You can install an executable jar as a plugin via Maven coordinates.</p>
+</div>
+<div class="paragraph">
+<p>For instance, let&#8217;s use <code>io.quarkiverse.authzed:quarkus-authzed-cli:runner:jar:0.2.0</code> which is a real executable jar that provides a CLI utility for the <code>quarkus-authzed</code> extension.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus plugin add io.quarkiverse.authzed:quarkus-authzed-cli:runner:jar:0.2.0 -d "Authzed CLI"
+Added plugin:
+    Name    	 Type  	 Location                                                    	 Description
+ *  authzed 	 maven 	 io.quarkiverse.authzed:quarkus-authzed-cli:runner:jar:0.2.0 	 Authzed CLI</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+It is also possible to set a description that will appear in the help output.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus --help
+
+Usage: quarkus [-ehv] [--refresh] [--verbose] [--config=CONFIG]
+               [-D=&lt;String=String&gt;]... [COMMAND]
+...
+Commands:
+...
+  plugin, plug            Configure plugins of the Quarkus CLI.
+    list, ls              List CLI plugins.
+    add                   Add plugin(s) to the Quarkus CLI.
+    remove                Remove plugin(s) to the Quarkus CLI.
+    sync                  Sync (discover / purge) CLI Plugins.
+  completion              bash/zsh completion:  source &lt;(quarkus completion)
+  authzed                 Authzed CLI
+...</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="where-are-the-plugins-added"><a class="anchor" href="#where-are-the-plugins-added"></a>プラグインはどこに追加されるのですか？</h4>
+<div class="paragraph">
+<p>Plugins are added in the plugin catalog that lives at: <code>&lt;user home&gt;/.quarkus/cli/plugins/quarkus-cli-catalog.json</code>.</p>
+</div>
+<div class="paragraph">
+<p>There is a second plugin catalog that is relative to the current project (if available): <code>&lt;project root&gt;/.quarkus/cli/plugins/quarkus-cli-catalog.json</code>.</p>
+</div>
+<div class="paragraph">
+<p>The effective catalog is the combination of both the <code>user</code> and <code>project</code> catalogs with the latter being able to override entries of the former (e.g. use a different version or location for a plugin).</p>
+</div>
+<div class="paragraph">
+<p>If the project catalog is available, it will always be preferred, unless explicitly specified with the <code>--user</code> flag.</p>
+</div>
+<div class="paragraph">
+<p>The column <code>scope</code> of the plugins table indicates where the plugin is/will be added.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="removing-plugins"><a class="anchor" href="#removing-plugins"></a>プラグインの削除</h4>
+<div class="paragraph">
+<p>Plugins are removed using <code>quarkus plugin remove &lt;plugin name&gt;</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">quarkus plugin remove kill
+Removed plugin:
+    Name 	 Type  	 Scope 	 Location               	 Description
+    kill 	 jbang 	 user  	 quarkus-kill@quarkusio</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="syncing-plugins"><a class="anchor" href="#syncing-plugins"></a>プラグインの同期</h4>
+<div class="paragraph">
+<p>To remove stale plugins or discover new plugins provided by extensions, the <code>quarkus plugin sync</code> command is available.
+With this command binaries and JBang aliases that are added to the catalog but are no longer available will be purged.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Remote plugins that are explicitly added by the user using URL/Maven coordinates are excluded from the removal.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The command is also executed implicitly through any of the CLI commands:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Weekly</p>
+</li>
+<li>
+<p>最後のカタログ更新以降にプロジェクトファイルが更新されている場合（モジュールに限定）。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#installing-the-cli">CLI のインストール</a></li>
+<li><a href="#using-the-cli">CLI の使用</a>
+<ul class="sectlevel2">
+<li><a href="#project-creation">新規プロジェクトの作成</a></li>
+<li><a href="#specifying-quarkus-version">Quarkus バージョンの指定</a></li>
+<li><a href="#working-with-extensions">エクステンションの使用</a></li>
+<li><a href="#build-your-project">プロジェクトのビルド</a></li>
+<li><a href="#development-mode">開発モード</a></li>
+</ul>
+</li>
+<li><a href="#shell-autocomplete-and-aliases">シェルのオートコンプリートとエイリアス</a>
+<ul class="sectlevel2">
+<li><a href="#container-images">コンテナイメージ</a></li>
+</ul>
+</li>
+<li><a href="#extending-the-cli">CLIの拡張</a>
+<ul class="sectlevel2">
+<li><a href="#what-is-a-plugin">プラグインとは</a></li>
+<li><a href="#how-to-obtain-plugins">プラグインの入手方法</a></li>
+<li><a href="#managing-plugins">プラグインの管理</a></li>
+</ul>
+</li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="reference"><a href="/version/3.8/guides/command-mode-reference">コマンドモードアプリケーション</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/picocli">Picocli を使ったコマンドモード</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/upx">UPXでネイティブ実行可能ファイルを圧縮</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/continuous-testing">継続的テスト</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/tests-with-coverage">テストカバレッジの測定</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/jreleaser">JReleaser によるパッケージングとリリース</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/gradle-tooling">QuarkusとGradle</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/maven-tooling">QuarkusとMaven</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/quarkus-maven-plugin">Quarkus Mavenプラグイン</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.8/guides/ide-tooling">お好みのIDEのQuarkus Tools</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/reaugmentation">Quarkusアプリケーションの再オーグメンテーション</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/getting-started-testing">アプリケーションのテスト</a></li>
+      
+        
+        <li class="howto"><a href="/version/3.8/guides/update-quarkus">プロジェクトをQuarkusの最新バージョンに更新</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.8/guides/tooling">ツールの使用</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/podman">Podman と Quarkus の併用</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

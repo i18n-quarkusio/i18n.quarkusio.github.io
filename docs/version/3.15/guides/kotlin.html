@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Kotlinの使用 - 3.15 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.15/guides/kotlin" />
+  <meta property="og:title" content="Kotlinの使用 - 3.15" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/kotlin">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.15/guides/kotlin">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.15/guides/kotlin" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.15/guides/kotlin">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.15/guides/kotlin">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.15/guides/kotlin">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.15/guides/kotlin">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.15/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" selected>3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">Kotlinの使用 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://kotlinlang.org/">Kotlin</a> は、JVMをターゲットにした(他の環境を含めても)非常に人気のあるプログラミング言語です。Kotlinはここ数年で人気が急上昇し、Javaを除いて最も人気のあるJVM言語となっています。</p>
+</div>
+<div class="paragraph">
+<p>このガイドで説明するように、QuarkusはKotlinを使用するためのファーストクラスのサポートを提供しています。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>約15分</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 17+がインストールされ、 <code>JAVA_HOME</code> が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.9.8</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルをビルドしたい場合、MandrelまたはGraalVM（あるいはネイティブなコンテナビルドを使用する場合はDocker）をインストールし、 <a href="building-native-image.html#configuring-graalvm">適切に設定</a>していること</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>注：Gradleプロジェクトのセットアップについては、以下を参照してください。また、詳細については、 <a href="gradle-tooling.html">Gradleセットアップページ</a>のガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-maven-project"><a class="anchor" href="#creating-the-maven-project"></a>Mavenプロジェクトの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、新しいKotlinプロジェクトが必要です。これは以下のコマンドで行うことができます。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:rest-kotlin-quickstart \
+    --extension='kotlin,rest-jackson'
+cd rest-kotlin-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:3.15.2:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=rest-kotlin-quickstart \
+    -Dextensions='kotlin,rest-jackson'
+cd rest-kotlin-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Windowsユーザーの場合:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>cmdを使用する場合、（バックスラッシュ <code>\</code> を使用せず、すべてを同じ行に書かないでください）。</p>
+</li>
+<li>
+<p>Powershellを使用する場合は、 <code>-D</code> パラメータを二重引用符で囲んでください。例: <code>"-DprojectArtifactId=rest-kotlin-quickstart"</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>kotlin</code> をエクステンションリストに追加すると、Maven プラグインは Kotlin で動作するように適切に設定されたプロジェクトを生成します。さらに、 <code>org.acme.ReactiveGreetingResource</code> クラスは Kotlin ソースコードとして実装されます (生成されるテストも同様)。エクステンションリストに <code>rest-jackson</code> を追加すると、Quarkus REST (旧 RESTEasy Reactive) および Jackson エクステンションがインポートされます。</p>
+</div>
+<div class="paragraph">
+<p><code>ReactiveGreetingResource</code> は次のようになります:</p>
+</div>
+<div class="listingblock">
+<div class="title">ReactiveGreetingResource.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">package org.acme
+
+import jakarta.ws.rs.GET
+import jakarta.ws.rs.Path
+import jakarta.ws.rs.Produces
+import jakarta.ws.rs.core.MediaType
+
+@Path("/hello")
+class ReactiveGreetingResource {
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    fun hello() = "Hello from Quarkus REST"
+}</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="update-code"><a class="anchor" href="#update-code"></a>コードの更新</h3>
+<div class="paragraph">
+<p>Kotlin のより実用的な使用例を示すために、 <code>Greeting</code> というシンプルな <a href="https://kotlinlang.org/docs/reference/data-classes.html">データクラス</a> を追加してみましょう:</p>
+</div>
+<div class="listingblock">
+<div class="title">Greeting.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">package org.acme.rest
+
+data class Greeting(val message: String = "")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>また、 <code>ReactiveGreetingResource</code> を次のように更新します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import jakarta.ws.rs.GET
+import jakarta.ws.rs.Path
+import jakarta.ws.rs.core.MediaType
+
+@Path("/hello")
+class ReactiveGreetingResource {
+
+    @GET
+    fun hello() = Greeting("hello")
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これらの変更により、 <code>/hello</code> エンドポイントは、単純な文字列ではなくJSONオブジェクトで応答するようになりました。</p>
+</div>
+<div class="paragraph">
+<p>テストをパスするためには、 <code>ReactiveGreetingResourceTest</code> を次のように更新します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import org.hamcrest.Matchers.equalTo
+
+@QuarkusTest
+class ReactiveGreetingResourceTest {
+
+    @Test
+    fun testHelloEndpoint() {
+        given()
+          .`when`().get("/hello")
+          .then()
+             .statusCode(200)
+             .body("message", equalTo("hello"))
+    }
+
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="kotlin-version"><a class="anchor" href="#kotlin-version"></a>Kotlin バージョン</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>QuarkusのKotlinエクステンションは、すでに <code>kotlin-stdlib-jdk8</code> や <code>kotlin-reflect</code> などの一部のKotlinベースライブラリへの依存を宣言しています。これらの依存関係のKotlinバージョンは、Quarkus BOMで宣言されており、現在のバージョンは2.0.10です。したがって、他のKotlinライブラリには、同じKotlinバージョンを使用することをお勧めします。他のベースKotlinライブラリに依存性を追加する場合（たとえば、 <code>kotlin-test-junit5</code> ）、Quarkus BOMに <a href="https://search.maven.org/artifact/org.jetbrains.kotlin/kotlin-bom">Kotlin BOM</a> が含まれているため、バージョンを指定する必要はありません。</p>
+</div>
+<div class="paragraph">
+<p>そうは言っても、使用する Kotlin コンパイラのバージョンを指定する必要があります。 繰り返しになりますが、Quarkus が Kotlin ライブラリに使用するのと同じバージョンを使用することをお勧めします。</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+通常、Quarkus アプリケーションで別の Kotlin バージョンを使用することはお勧めしません。 ただしそうする必要がある場合は、Quarkus BOM の <strong>前に</strong> Kotlin BOM をインポートする必要があります。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="important-maven-configuration-points"><a class="anchor" href="#important-maven-configuration-points"></a>重要なMavenの設定ポイント</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>生成された <code>pom.xml</code> には、Kotlin が選択されていない場合と比較して、以下の修正が含まれています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus-kotlin</code> アーティファクトが依存関係に追加されています。このアーティファクトはライブリロードモードでの Kotlin のサポートを提供します (これについては後ほど説明します)。</p>
+</li>
+<li>
+<p><code>kotlin-stdlib-jdk8</code> も依存関係として追加されています。</p>
+</li>
+<li>
+<p>Maven の <code>sourceDirectory</code> と <code>testSourceDirectory</code> ビルドプロパティーは、Kotlin ソースを指すように設定されています (それぞれ <code>src/main/kotlin</code> と <code>src/test/kotlin</code> )。</p>
+</li>
+<li>
+<p><code>kotlin-maven-plugin</code> は以下のように設定されています。</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;plugin&gt;
+    &lt;artifactId&gt;kotlin-maven-plugin&lt;/artifactId&gt;
+    &lt;groupId&gt;org.jetbrains.kotlin&lt;/groupId&gt;
+    &lt;version&gt;${kotlin.version}&lt;/version&gt;
+    &lt;executions&gt;
+        &lt;execution&gt;
+            &lt;id&gt;compile&lt;/id&gt;
+            &lt;goals&gt;
+                &lt;goal&gt;compile&lt;/goal&gt;
+            &lt;/goals&gt;
+        &lt;/execution&gt;
+        &lt;execution&gt;
+            &lt;id&gt;test-compile&lt;/id&gt;
+            &lt;goals&gt;
+                &lt;goal&gt;test-compile&lt;/goal&gt;
+            &lt;/goals&gt;
+        &lt;/execution&gt;
+    &lt;/executions&gt;
+    &lt;configuration&gt;
+        &lt;compilerPlugins&gt;
+            &lt;plugin&gt;all-open&lt;/plugin&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+        &lt;/compilerPlugins&gt;
+
+        &lt;pluginOptions&gt;
+            &lt;!-- Each annotation is placed on its own line --&gt;
+            &lt;option&gt;all-open:annotation=jakarta.ws.rs.Path&lt;/option&gt;
+        &lt;/pluginOptions&gt;
+    &lt;/configuration&gt;
+
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.jetbrains.kotlin&lt;/groupId&gt;
+            &lt;artifactId&gt;kotlin-maven-allopen&lt;/artifactId&gt;
+            &lt;version&gt;${kotlin.version}&lt;/version&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/plugin&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>all-open</code> アノテーションプラグインの有効化（以下の議論を参照）</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>注意すべき重要なこととして、 <a href="https://kotlinlang.org/docs/reference/compiler-plugins.html#all-open-compiler-plugin">all-open</a> Kotlinコンパイラーのプラグインを使用していることです。なぜこのプラグインが必要なのかを理解するためには、まず、Kotlin コンパイラから生成されるクラスはデフォルトで <code>final</code> でマークされていることに注目してください。</p>
+</div>
+<div class="paragraph">
+<p>しかし、 <code>final</code> クラスであることは、 <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/reflection/proxy.html">ダイナミックプロキシー</a> を作成する必要がある様々なフレームワークではうまく機能しません。</p>
+</div>
+<div class="paragraph">
+<p>そのため、 <code>all-open</code> Kotlinコンパイラ・プラグインでは、特定のアノテーションを持つクラスを <code>final</code> としてマーク *しない * ようにコンパイラを設定することができます。上記のスニペットでは、 <code>jakarta.ws.rs.Path</code> のアノテーションを持つクラスは <code>final</code> としないように指定しています。</p>
+</div>
+<div class="paragraph">
+<p>例えば、 <code>jakarta.enterprise.context.ApplicationScoped</code> でアノテーションされた Kotlin クラスがアプリケーションに含まれている場合、 <code>&lt;option&gt;all-open:annotation=jakarta.enterprise.context.ApplicationScoped&lt;/option&gt;</code> も追加する必要があります。JPAエンティティクラスのように、実行時に動的プロキシを作成する必要があるクラスも同様です。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusの将来のバージョンでは、この設定を変更する必要がないようにKotlinコンパイラプラグインを設定するようになる予定です。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="important-gradle-configuration-points"><a class="anchor" href="#important-gradle-configuration-points"></a>重要なGradle設定ポイント</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Mavenの設定と同様、Gradleを使用する場合、Kotlinを選択すると以下のような修正が必要になります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus-kotlin</code> アーティファクトが依存関係に追加されています。このアーティファクトはライブリロードモードでの Kotlin のサポートを提供します (これについては後ほど説明します)。</p>
+</li>
+<li>
+<p><code>kotlin-stdlib-jdk8</code> も依存関係として追加されています。</p>
+</li>
+<li>
+<p>Kotlin プラグインが有効になり、暗黙のうちに <code>sourceDirectory</code> と <code>testSourceDirectory</code> のビルドプロパティーが追加され、Kotlin ソース (それぞれ <code>src/main/kotlin</code> と <code>src/test/kotlin</code> ) を指すようになります。</p>
+</li>
+<li>
+<p>all-open Kotlinプラグインは、アノテーションがハイライトされているクラスを最終的なものとしてマークしないようにコンパイラに指示します (必要に応じてカスタマイズしてください)</p>
+</li>
+<li>
+<p>ネイティブイメージを使用する場合は、http (または https) プロトコルの使用を宣言しなければなりません。</p>
+</li>
+<li>
+<p>以下に設定例を示します。</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">plugins {
+    id 'java'
+    id 'io.quarkus'
+
+    id "org.jetbrains.kotlin.jvm" version "2.0.10" <i class="conum" data-value="1"></i><b>(1)</b>
+    id "org.jetbrains.kotlin.plugin.allopen" version "2.0.10" <i class="conum" data-value="1"></i><b>(1)</b>
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.10'
+
+   implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
+
+    implementation 'io.quarkus:quarkus-rest'
+    implementation 'io.quarkus:quarkus-rest-jackson'
+    implementation 'io.quarkus:quarkus-kotlin'
+
+    testImplementation 'io.quarkus:quarkus-junit5'
+    testImplementation 'io.rest-assured:rest-assured'
+}
+
+group = '...' // set your group
+version = '1.0.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+allOpen { <i class="conum" data-value="2"></i><b>(2)</b>
+    annotation("jakarta.ws.rs.Path")
+    annotation("jakarta.enterprise.context.ApplicationScoped")
+    annotation("jakarta.persistence.Entity")
+    annotation("io.quarkus.test.junit.QuarkusTest")
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_11
+    kotlinOptions.javaParameters = true
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_11
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Kotlinプラグインのバージョンを指定する必要があります。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>上記のMavenガイドにあるように、オールオープン構成が必要です。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>または、GradleのKotlin DSLを使用している場合:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">plugins {
+    kotlin("jvm") version "2.0.10" <i class="conum" data-value="1"></i><b>(1)</b>
+    kotlin("plugin.allopen") version "2.0.10"
+    id("io.quarkus")
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+val quarkusPlatformGroupId: String by project
+val quarkusPlatformArtifactId: String by project
+val quarkusPlatformVersion: String by project
+
+group = "..."
+version = "1.0.0-SNAPSHOT"
+
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation(kotlin("stdlib-jdk8"))
+
+    implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
+
+    implementation("io.quarkus:quarkus-kotlin")
+    implementation("io.quarkus:quarkus-rest")
+    implementation("io.quarkus:quarkus-rest-jackson")
+
+    testImplementation("io.quarkus:quarkus-junit5")
+    testImplementation("io.rest-assured:rest-assured")
+}
+
+group = '...' // set your group
+version = "1.0.0-SNAPSHOT"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+allOpen { <i class="conum" data-value="2"></i><b>(2)</b>
+    annotation("jakarta.ws.rs.Path")
+    annotation("jakarta.enterprise.context.ApplicationScoped")
+    annotation("jakarta.persistence.Entity")
+    annotation("io.quarkus.test.junit.QuarkusTest")
+}
+
+tasks.withType&lt;org.jetbrains.kotlin.gradle.tasks.KotlinCompile&gt; {
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
+    kotlinOptions.javaParameters = true
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Kotlinプラグインのバージョンを指定する必要があります。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>上記のMavenガイドにあるように、オールオープン構成が必要です。</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="overriding-the-quarkus-bom-kotlin-version-gradle"><a class="anchor" href="#overriding-the-quarkus-bom-kotlin-version-gradle"></a>Quarkus BOMのKotlin versionをオーバーライドする（Gradle）</h3>
+<div class="paragraph">
+<p>アプリケーションで Quarkus の BOM で指定されているものとは異なるバージョンを使用する場合 (たとえば、プレリリース機能を試すため、または互換性の理由から)、Gradle の依存関係で <code>strictly {}</code> バージョン修飾子を使用してこれを行うことができます 。 例:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">plugins {
+    id("io.quarkus")
+    kotlin("jvm") version "1.7.0-Beta"
+    kotlin("plugin.allopen") version "1.7.0-Beta"
+}
+
+configurations.all {
+    resolutionStrategy {
+        force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.0-Beta"
+        force "org.jetbrains.kotlin:kotlin-reflect:1.7.0-Beta"
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="live-reload"><a class="anchor" href="#live-reload"></a>ライブ・リロード</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusは、ソースコードに加えられた変更をライブでリロードする機能をサポートしています。このサポートはKotlinでも利用できます。つまり、開発者はKotlinのソースコードを更新して、変更が反映されたことをすぐに確認することができます。</p>
+</div>
+<div class="paragraph">
+<p>この機能の動作を確認するには、まず次のコマンドを実行します:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code><a href="http://localhost:8080/hello" class="bare">http://localhost:8080/hello</a></code> に対してHTTP GETリクエストを実行すると、 <code>message</code> フィールドに <code>hello</code> という値を持つJSONメッセージが表示されます。</p>
+</div>
+<div class="paragraph">
+<p>ここで、お好きなエディタやIDEを使って、 <code>ReactiveGreetingResource.kt</code> をアップデートし、 <code>hello</code> のメソッドを以下のように変更します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">fun hello() = Greeting("hi")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code><a href="http://localhost:8080/hello" class="bare">http://localhost:8080/hello</a></code> に対してHTTP GETリクエストを実行すると、 <code>message</code> フィールドに <code>hi</code> という値を持つJSONメッセージが表示されるはずです。</p>
+</div>
+<div class="paragraph">
+<p>注意点としては、お互いに依存関係にあるJavaとKotlinの両方のソースに変更を加えた場合、ライブリロード機能が利用できないということです。将来的にはこの制限を緩和したいと考えています。</p>
+</div>
+<div class="sect2">
+<h3 id="configuring-live-reload-compiler"><a class="anchor" href="#configuring-live-reload-compiler"></a>ライブリロードコンパイラーの設定</h3>
+<div class="paragraph">
+<p>開発モードで <code>kotlinc</code> によって使用されるコンパイラ フラグをカスタマイズする必要がある場合は、それらを quarkus プラグインで設定できます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;plugin&gt;
+  &lt;groupId&gt;${quarkus.platform.group-id}&lt;/groupId&gt;
+  &lt;artifactId&gt;quarkus-maven-plugin&lt;/artifactId&gt;
+  &lt;version&gt;${quarkus.platform.version}&lt;/version&gt;
+
+  &lt;configuration&gt;
+    &lt;source&gt;${maven.compiler.source}&lt;/source&gt;
+    &lt;target&gt;${maven.compiler.target}&lt;/target&gt;
+    &lt;compilerOptions&gt;
+      &lt;compiler&gt;
+        &lt;name&gt;kotlin&lt;/name&gt;
+        &lt;args&gt;
+          &lt;arg&gt;-Werror&lt;/arg&gt;
+        &lt;/args&gt;
+      &lt;/compiler&gt;
+    &lt;/compilerOptions&gt;
+  &lt;/configuration&gt;
+
+  ...
+&lt;/plugin&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-groovy">
+<div class="title">Gradle (Groovy DSL)</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">quarkusDev {
+    compilerOptions {
+        compiler("kotlin").args(['-Werror'])
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-kotlin">
+<div class="title">Gradle (Kotlin DSL)</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">tasks.quarkusDev {
+     compilerOptions {
+        compiler("kotlin").args(["-Werror"])
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="packaging-the-application"><a class="anchor" href="#packaging-the-application"></a>アプリケーションのパッケージング</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>いつものように、アプリケーションは以下の方法でパッケージ化されます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして次のコマンドで実行できます。 <code>java -jar target/quarkus-app/quarkus-run.jar</code>.</p>
+</div>
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルを次のようにビルドすることもできます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build --native</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install -Dnative</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build -Dquarkus.native.enabled=true</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="kotlin-jackson"><a class="anchor" href="#kotlin-jackson"></a>Kotlin と Jackson</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>com.fasterxml.jackson.module:jackson-module-kotlin</code> 依存関係と <code>quarkus-jackson</code> エクステンション（または <code>quarkus-resteasy-jackson</code> または <code>quarkus-rest-jackson</code> エクステンションのいずれか）がプロジェクトに追加されている場合、Quarkus は自動的に <code>KotlinModule</code> を <code>ObjectMapper</code> Bean に登録します（詳細は <a href="rest-json#jackson">この</a> ガイドを参照）。</p>
+</div>
+<div class="paragraph">
+<p>Kotlin のデータクラスを <code>native-image</code> で使用すると、Kotlin Jackson Module が登録されているにもかかわらず、 <code>JVM</code> バージョンでは発生しないシリアライズエラーが発生することがあります。これは、より複雑なJSON階層を持っている場合に特に見られる現象で、下位のノードで問題が発生するとシリアライズに失敗します。表示されるエラーメッセージはキャッチオールで、通常はルートオブジェクトの問題を表示しますが、必ずしもそうではない場合もあります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Cannot construct instance of `Address` (no Creators, like default construct, exist): cannot deserialize from Object value (no delegate- or property-based Creator)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>native-image</code> との完全な互換性を確保するためには、Jackson <code>@field:JsonProperty("fieldName")</code> アノテーションを適用し、以下の図のように nullable のデフォルトを設定することをお勧めします。Intellijのプラグイン（JSON to Kotlin Classなど）を使用して、サンプルのJSONに対するKotlinデータクラスの生成を自動化し、Jacksonアノテーションを有効にして、自動コード生成の一部としてnullableパラメータを選択することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import com.fasterxml.jackson.annotation.JsonProperty
+
+data class Response(
+	@field:JsonProperty("chart")
+	val chart: ChartData? = null
+)
+
+data class ChartData(
+	@field:JsonProperty("result")
+	val result: List&lt;ResultItem?&gt;? = null,
+
+	@field:JsonProperty("error")
+	val error: Any? = null
+)
+
+data class ResultItem(
+	@field:JsonProperty("meta")
+	val meta: Meta? = null,
+
+	@field:JsonProperty("indicators")
+	val indicators: IndicatorItems? = null,
+
+	@field:JsonProperty("timestamp")
+	val timestamp: List&lt;Int?&gt;? = null
+)
+
+...</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="kotlin-and-the-kubernetes-client"><a class="anchor" href="#kotlin-and-the-kubernetes-client"></a>KotlinとKubernetesクライアント</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>quarkus-kubernetes</code> エクステンションを使用して、Kotlin クラスを CustomResource 定義にバインドする場合（オペレーターを構築する場合など）、基盤となる Fabric8 Kubernetes Client が独自の静的な Jackson <code>ObjectMapper</code> を使用することに注意する必要があります。これは <code>KotlinModule</code> を使用して以下のように設定できます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.fabric8.kubernetes.client.utils.Serialization
+import com.fasterxml.jackson.module.kotlin.KotlinModule
+
+...
+val kotlinModule = KotlinModule.Builder().build()
+Serialization.jsonMapper().registerModule(kotlinModule)
+Serialization.yamlMapper().registerModule(kotlinModule)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><em>ネイティブイメージへのコンパイル時には慎重にテストし、問題が発生した場合はJava互換のJacksonバインディングにフォールバックしてください。</em></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="coroutines-support"><a class="anchor" href="#coroutines-support"></a>コルーチンのサポート</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="extensions"><a class="anchor" href="#extensions"></a>エクステンション</h3>
+<div class="paragraph">
+<p>以下のエクステンションは、Kotlinのコルーチンをサポートするために、メソッドシグネチャでKotlinの <code>suspend</code> キーワードを使用できるようにするものです。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">エクステンション</th>
+<th class="tableblock halign-left valign-top">Comments</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus-rest</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jakarta REST Resource Methodsへのサポートが提供されます</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus-rest-client</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RESTクライアントインタフェースメソッドへのサポートが提供されます</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus-messaging</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Reactiveメッセージングメソッドへのサポートが提供されます</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus-scheduler</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">スケジューラーメソッドへのサポートが提供されます</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus-smallrye-fault-tolerance</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">宣言型アノテーションベースAPIへのサポートが提供されます</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus-vertx</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Support is provided for <code>@ConsumeEvent</code> methods</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quarkus-websockets-next</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Support is provided for server-side and client-side endpoint methods</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="kotlin-coroutines-and-mutiny"><a class="anchor" href="#kotlin-coroutines-and-mutiny"></a>Kotlin coroutines と Mutiny</h3>
+<div class="paragraph">
+<p>Kotlinのコルーチンは、非同期でリアクティブな方法で実際に実行される命令型プログラミングモデルを提供します。MutinyとKotlinの相互運用を簡単にするために、モジュール <code>io.smallrye.reactive:mutiny-kotlin</code> が存在し、 <a href="https://smallrye.io/smallrye-mutiny/latest/guides/kotlin/">ここ</a> で解説されています。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cdi-inject-with-kotlin"><a class="anchor" href="#cdi-inject-with-kotlin"></a>Kotlinでの CDI @Inject</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Kotlinのリフレクションアノテーション処理はJavaとは異なります。CDIの@Injectを使用していると、以下のようなエラーが発生することがあります。"kotlin.UninitializedPropertyAccessException: lateinitプロパティーxxxが初期化されていません"</p>
+</div>
+<div class="paragraph">
+<p>以下の例では、アノテーションに @field を追加することで、Kotlin のリフレクションアノテーション定義に @Target がない場合に対応し、問題を簡単に解決できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import jakarta.inject.Inject
+import jakarta.enterprise.inject.Default
+import jakarta.enterprise.context.ApplicationScoped
+
+import jakarta.ws.rs.GET
+import jakarta.ws.rs.Path
+import jakarta.ws.rs.Produces
+import jakarta.ws.rs.core.MediaType
+
+
+
+@ApplicationScoped
+class GreetingService {
+
+    fun greeting(name: String): String {
+        return "hello $name"
+    }
+
+}
+
+@Path("/")
+class ReactiveGreetingResource {
+
+    @Inject
+    @field: Default <i class="conum" data-value="1"></i><b>(1)</b>
+    lateinit var service: GreetingService
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/hello/{name}")
+    fun greeting(name: String): String {
+        return service.greeting(name)
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Kotlinでは、アノテーション定義に@Targetがないため、@field: xxx修飾子が必要です。この例では @field: xxx を追加します。@Defaultが修飾子として使用され、デフォルトBeanの使用を明示的に指定します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>あるいは、Javaの例を変更せずに動作し、テスト性が高く、Kotlinのプログラミングスタイルに最も適しているコンストラクタ・インジェクションの使用をお勧めします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import jakarta.enterprise.context.ApplicationScoped
+
+import jakarta.ws.rs.GET
+import jakarta.ws.rs.Path
+import jakarta.ws.rs.Produces
+import jakarta.ws.rs.core.MediaType
+
+@ApplicationScoped
+class GreetingService {
+    fun greeting(name: String): String {
+        return "hello $name"
+    }
+}
+
+@Path("/")
+class ReactiveGreetingResource(
+    private val service: GreetingService
+) {
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/hello/{name}")
+    fun greeting(name: String): String {
+        return service.greeting(name)
+    }
+
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#creating-the-maven-project">Mavenプロジェクトの作成</a>
+<ul class="sectlevel2">
+<li><a href="#update-code">コードの更新</a></li>
+</ul>
+</li>
+<li><a href="#kotlin-version">Kotlin バージョン</a></li>
+<li><a href="#important-maven-configuration-points">重要なMavenの設定ポイント</a></li>
+<li><a href="#important-gradle-configuration-points">重要なGradle設定ポイント</a>
+<ul class="sectlevel2">
+<li><a href="#overriding-the-quarkus-bom-kotlin-version-gradle">Quarkus BOMのKotlin versionをオーバーライドする（Gradle）</a></li>
+</ul>
+</li>
+<li><a href="#live-reload">ライブ・リロード</a>
+<ul class="sectlevel2">
+<li><a href="#configuring-live-reload-compiler">ライブリロードコンパイラーの設定</a></li>
+</ul>
+</li>
+<li><a href="#packaging-the-application">アプリケーションのパッケージング</a></li>
+<li><a href="#kotlin-jackson">Kotlin と Jackson</a></li>
+<li><a href="#kotlin-and-the-kubernetes-client">KotlinとKubernetesクライアント</a></li>
+<li><a href="#coroutines-support">コルーチンのサポート</a>
+<ul class="sectlevel2">
+<li><a href="#extensions">エクステンション</a></li>
+<li><a href="#kotlin-coroutines-and-mutiny">Kotlin coroutines と Mutiny</a></li>
+</ul>
+</li>
+<li><a href="#cdi-inject-with-kotlin">Kotlinでの CDI @Inject</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/hibernate-orm-panache-kotlin">シンプルになったHibernate ORM with PanacheとKotlin</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/mongodb-panache">シンプルになったMongoDB with Panache</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/mongodb-panache-kotlin">シンプルになったMongoDB with PanacheとKotlin</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

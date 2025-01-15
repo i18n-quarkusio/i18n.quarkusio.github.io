@@ -1,0 +1,4646 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>独自のエクステンションを書く - 3.15 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.15/guides/writing-extensions" />
+  <meta property="og:title" content="独自のエクステンションを書く - 3.15" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/writing-extensions">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.15/guides/writing-extensions">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="active">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.15/guides/writing-extensions" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.15/guides/writing-extensions">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.15/guides/writing-extensions">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.15/guides/writing-extensions">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.15/guides/writing-extensions">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.15/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" selected>3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">独自のエクステンションを書く </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusのエクステンションは、コアサービスに開発者向けの新しい動作を追加するもので、ビルド時の拡張とランタイムコンテナという2つの異なる部分から構成されています。拡張部分は、アノテーションやXML記述子の読み込みなど、すべてのメタデータ処理を担当します。この拡張フェーズの出力は、関連するランタイムサービスを直接インスタンス化するためのバイトコードとして記録されます。</p>
+</div>
+<div class="paragraph">
+<p>これは、メタデータがビルド時に一度だけ処理されることを意味し、起動時間の節約と、処理に使用されるクラスなどがランタイムJVMにロードされない（あるいは存在しない）ため、メモリ使用量の節約の両方を実現しています。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+This is an in-depth documentation, see the <a href="building-my-first-extension">building my first extension</a> if you need an introduction,
+or the <a href="extension-faq">frequently asked questions</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="extension-philosophy"><a class="anchor" href="#extension-philosophy"></a>1. エクステンション哲学</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このセクションは作業中であり、エクステンションがどのように設計され、どのように書かれるべきかの哲学を記述します。</p>
+</div>
+<div class="sect2">
+<h3 id="why-an-extension-framework"><a class="anchor" href="#why-an-extension-framework"></a>1.1. なぜエクステンションフレームワークなのか</h3>
+<div class="paragraph">
+<p>Quarkusの使命は、使用するライブラリを含むアプリケーション全体を、従来のアプローチよりも大幅に少ないリソースしか使用しないアーティファクトに変換することです。これらを使用して、GraalVMを使用してネイティブアプリケーションを構築することができます。これを行うためには、アプリケーションの完全な「クローズドワールド」を分析し、理解する必要があります。完全で完璧なコンテキストがなければ、達成可能なものは最高でも部分的で限定的、一般的なサポートです。Quarkusのエクステンションアプローチを使用することで、Kubernetesやクラウドプラットフォームのようなメモリフットプリントに制約のある環境にJavaアプリケーションを合わせることができます。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusエクステンションフレームワークは、GraalVMを使用していない場合（HotSpotなど）でも、リソース利用率を大幅に改善します。エクステンションが実行するアクションをリストアップしてみましょう:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ビルド時のメタデータを収集し、コードを生成</p>
+<div class="ulist">
+<ul>
+<li>
+<p>この部分はGraalVMとは何の関係もありませんが、Quarkusがフレームワークを"ビルド時" に起動する方法です。</p>
+</li>
+<li>
+<p>エクステンションフレームワークは、必要に応じてメタデータの読み込み、クラスのスキャン、クラスの生成を容易にします。</p>
+</li>
+<li>
+<p>拡張作業のごく一部は生成されたクラスを介して実行時に実行され、作業の大部分はビルド時に行われます (デプロイメント時と呼ばれます)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>アプリケーションの近い世界観に基づいて、定見に基づいた賢明なデフォルトを強制（例えば、 <code>@Entity</code> のないアプリケーションは、Hibernate ORM を起動する必要はありません）</p>
+</li>
+<li>
+<p>エクステンションは Substrate VM のコード置換をホストし、ライブラリを GraalVM 上で実行できるようにします。</p>
+<div class="ulist">
+<ul>
+<li>
+<p>ほとんどの変更は、基礎となるライブラリがGraalVM上で動作するようにupstreamにプッシュされます。</p>
+</li>
+<li>
+<p>すべての変更をupstreamにプッシュできるわけではないので、エクステンションは Substrate VM 置換をホスト。これはコードパッチの一形態で、ライブラリが実行できるようになっています。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Substrate VMコード置換のホストにより、アプリケーションのニーズに基づいたデッドコードの排除を支援します。</p>
+<div class="ulist">
+<ul>
+<li>
+<p>これはアプリケーションに依存しており、ライブラリ自体で共有することはできません。</p>
+</li>
+<li>
+<p>たとえば、Quarkusは、特定の接続プールとキャッシュプロバイダだけが必要であることを知っているため、Hibernateコードを最適化します。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>メタデータをGraalVMに送信。例えば、リフレクションに必要なクラス</p>
+<div class="ulist">
+<ul>
+<li>
+<p>この情報はライブラリ(Hibernateなど)ごとに静的ではありませんが、フレームワークはセマンティックな知識を持っており、どのクラスがリフレクションを必要とするかを知っています(例えば@Entityクラスなど)。</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="favor-build-time-work-over-runtime-work"><a class="anchor" href="#favor-build-time-work-over-runtime-work"></a>1.2. ランタイムワークよりもビルドタイムワーク</h3>
+<div class="paragraph">
+<p>可能な限り、フレームワークに起動時（ランタイム）に作業をさせるのではなく、ビルド時（エクステンションのデプロイメント部分）に作業を行うことをお勧めします。そこでの作業が多いほど、そのエクステンションを使用しているQuarkusアプリケーションは小さくなり、ロードが速くなります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="how-to-expose-configuration"><a class="anchor" href="#how-to-expose-configuration"></a>1.3. 設定を公開する方法</h3>
+<div class="paragraph">
+<p>Quarkusは、最も一般的な使用法を簡略化しています。つまり、そのデフォルトは、統合されているライブラリとは異なる場合があります。</p>
+</div>
+<div class="paragraph">
+<p>シンプルな体験を最も簡単にするために、SmallRye Configを介して <code>application.properties</code> で設定を統一します。ライブラリ固有の設定ファイルは避けるか、少なくともオプションにしてください。例えば、Hibernate ORM用の <code>persistence.xml</code> はオプションです。</p>
+</div>
+<div class="paragraph">
+<p>エクステンションは、ライブラリの体験に焦点を当てるのではなく、Quarkusアプリケーションとして全体的に設定を見るべきです。例えば、データベースアクセスの定義が共有タスクであるように、 <code>quarkus.database.url</code> 等々がエクステンション間で共有されます（例えば <code>hibernate.</code> プロパティを使用される代わりに）。最も便利な設定オプションは、ライブラリの自然な名前空間ではなく、 <code>quarkus.[extension].</code> として公開されるべきです。あまり一般的ではないプロパティは、ライブラリの名前空間に置くことができます。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusが最適化できる閉じた世界の仮定を完全に有効にするには、ビルド時に設定された設定オプションと実行時にオーバーライド可能な設定オプションのどちらを採用するか検討するべきでしょう。もちろん、ホスト、ポート、パスワードなどのプロパティは、実行時にオーバーライド可能でなければなりません。しかし、キャッシングを有効にしたり、JDBCドライバを設定したりするような多くのプロパティは、アプリケーションの再構築を安全に要求することができます。</p>
+</div>
+<div class="sect3">
+<h4 id="static-init-config"><a class="anchor" href="#static-init-config"></a>1.3.1. スタティック初期化設定</h4>
+<div class="paragraph">
+<p>If the extension provides additional Config Sources and if these are required during Static Init, these must be registered with <code>StaticInitConfigBuilderBuildItem</code>. Configuration in Static Init does not scan for additional sources to avoid double initialization at application startup time.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="expose-your-components-via-cdi"><a class="anchor" href="#expose-your-components-via-cdi"></a>1.4. CDI でコンポーネントを公開する</h3>
+<div class="paragraph">
+<p>CDI がコンポーネントの構成に関して中心的なプログラミングモデルであるため、フレームワークやエクステンションはそのコンポーネントを、ユーザアプリケーションが容易に消費できるBeanとして公開しなければなりません。例えば、Hibernate ORM は <code>EntityManagerFactory</code> と <code>EntityManager</code> の Bean を公開し、コネクションプールは <code>DataSource</code> のBeanを公開します。エクステンションは、ビルド時にこれらのBean定義を登録しなければなりません。</p>
+</div>
+<div class="sect3">
+<h4 id="beans-backed-by-classes"><a class="anchor" href="#beans-backed-by-classes"></a>1.4.1. クラスに裏付けられたBean</h4>
+<div class="paragraph">
+<p>エクステンションは <a href="cdi-integration#additional_bean_build_item"><code>AdditionalBeanBuildItem</code></a> を生成して、元のアプリケーションの一部であるかのようにクラスからビーン定義を読み取るようにコンテナに指示することができます。</p>
+</div>
+<div class="listingblock">
+<div class="title">登録されている Bean クラス <code>AdditionalBeanBuildItem</code></div>
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@Singleton <i class="conum" data-value="1"></i><b>(1)</b>
+public class Echo {
+
+   public String echo(String val) {
+      return val;
+   }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>AdditionalBeanBuildItem</code> で登録された Bean がスコープを指定しない場合は <code>@Dependent</code> とする。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>他のすべての Bean は、このような Bean を注入することができます。</p>
+</div>
+<div class="listingblock">
+<div class="title"><code>AdditionalBeanBuildItem</code> によって構築された Bean をインジェクトするBean</div>
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@Path("/hello")
+public class ExampleResource {
+
+    @Inject
+    Echo echo;
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String hello(String foo) {
+        return echo.echo(foo);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>また、その逆に、 エクステンション Bean は、他のエクステンションによって提供されるアプリケーション Bean やアプリケーション Bean を注入することができます。</p>
+</div>
+<div class="listingblock">
+<div class="title">エクステンション Bean インジェクト例</div>
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@Singleton
+public class Echo {
+
+    @Inject
+    DataSource dataSource;  <i class="conum" data-value="1"></i><b>(1)</b>
+
+    @Inject
+    Instance&lt;List&lt;String&gt;&gt; listsOfStrings; <i class="conum" data-value="2"></i><b>(2)</b>
+
+    //...
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>他のエクステンションで提供されているBeanをインジェクトします。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>タイプ <code>List&lt;String&gt;</code> に一致するすべてのBeanを注入します。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="bean_init"><a class="anchor" href="#bean_init"></a>1.4.2. Bean 初期化</h4>
+<div class="paragraph">
+<p>コンポーネントによっては、拡張中に収集された情報に基づいて、追加の初期化が必要になる場合があります。最も簡単な解決策は、Bean のインスタンスを取得し、ビルドステップから直接メソッドを呼び出すことです。しかし、拡張フェーズ中にBeanインスタンスを取得することは <em>違反</em> です。理由は、CDIコンテナがまだ起動していないからです。CDIコンテナは <a href="#bootstrap-three-phases">Static initブートストラップフェーズ</a> の間に起動されています。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<code>BUILD_AND_RUN_TIME_FIXED</code> と <code>RUN_TIME</code> 設定ルートは、どのBeanにも注入することができます。 <code>RUN_TIME</code> 設定ルールは、ブートストラップの後にのみ注入すべきです。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>しかし、 <a href="#bytecode-recording">recorderメソッド</a> からBeanメソッドを呼び出すことは可能です。 <code>@Record(STATIC_INIT)</code> ビルドステップで Bean にアクセスする必要がある場合は、 <code>BeanContainerBuildItem</code> に依存するか、 <code>BeanContainerListenerBuildItem</code> でロジックをラップしなければなりません。理由は簡単で、CDIコンテナが完全に初期化されて起動していることを確認する必要があるからです。しかし、CDI コンテナは <code>@Record(RUNTIME_INIT)</code> ビルドステップで完全に初期化されて実行されていると思っておいた方が安全です。コンテナへの参照は、 <code>CDI.current()</code> またはQuarkus固有の <code>Arc.container()</code> .</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Beanの状態が可視性を保証していることを担保することを忘れないでください。たとえば、<code>volatile</code> キーワードです。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+この「遅延初期化」アプローチには、1つの重大な欠点があります。 <em>初期化されていない</em> Beanは、ブートストラップ中にインスタンス化された他のエクステンションやアプリケーションコンポーネントからアクセスされる可能性があります。 <a href="#synthetic_beans">synthetic_beans</a>] で、よりロバストな解決策を取り上げます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="default-beans"><a class="anchor" href="#default-beans"></a>1.4.3. デフォルトのBean</h4>
+<div class="paragraph">
+<p>このような Bean を作成しつつ、アプリケーションコードにカスタム実装で Bean の一部を簡単にオーバーライドする機能を与えるという非常に便利なパターンは、Quarkus が提供している <code>@DefaultBean</code> を使用することです。これは例を挙げて説明するのが一番です。</p>
+</div>
+<div class="paragraph">
+<p>ここでは、Quarkusエクステンションが <code>Tracer</code> Bean を提供する必要があると仮定して、アプリケーションコードがそれ自身の Bean に注入することを意味します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@Dependent
+public class TracerConfiguration {
+
+    @Produces
+    public Tracer tracer(Reporter reporter, Configuration configuration) {
+        return new Tracer(reporter, configuration);
+    }
+
+    @Produces
+    @DefaultBean
+    public Configuration configuration() {
+        // create a Configuration
+    }
+
+    @Produces
+    @DefaultBean
+    public Reporter reporter(){
+        // create a Reporter
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>例えば、アプリケーションコードが <code>Tracer</code> を使用したいが、カスタムの <code>Reporter</code> Bean を使用する必要がある場合、そのような要件は、次のようなものを使用して簡単に行うことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@Dependent
+public class CustomTracerConfiguration {
+
+    @Produces
+    public Reporter reporter(){
+        // create a custom Reporter
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="how-to-override-a-bean-defined-by-a-libraryquarkus-extension-that-doesnt-use-defaultbean"><a class="anchor" href="#how-to-override-a-bean-defined-by-a-libraryquarkus-extension-that-doesnt-use-defaultbean"></a>1.4.4. @DefaultBean を使用しない Library/Quarkus エクステンションによって定義された Bean をオーバーライドする方法</h4>
+<div class="paragraph">
+<p><code>@DefaultBean</code> が推奨されていますが、CDI <code>@Alternative</code> としてBeanをマークし、 <code>@Priority</code> アノテーションを含めることで、アプリケーションコードがエクステンションによって提供されるBeanをオーバーライドすることも可能です。簡単な例を示しましょう。架空の"quarkus-parser"エクステンションで作業をしていて、デフォルトのBeanの実装を持っているとします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@Dependent
+class Parser {
+
+  String[] parse(String expression) {
+    return expression.split("::");
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、私たちのエクステンションはこのパーサも消費します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+class ParserService {
+
+  @Inject
+  Parser parser;
+
+  //...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>さて、ユーザーや他のエクステンションが <code>Parser</code> のデフォルトの実装を上書きする必要がある場合、最も簡単な解決策は CDI <code>@Alternative</code> + <code>@Priority</code> を使用することです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@Alternative <i class="conum" data-value="1"></i><b>(1)</b>
+@Priority(1) <i class="conum" data-value="2"></i><b>(2)</b>
+@Singleton
+class MyParser extends Parser {
+
+  String[] parse(String expression) {
+    // my super impl...
+  }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>MyParser</code> は代替 Beanです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>代替 Beanを有効にします。優先度はデフォルトの Bean を上書きするために任意の数値を指定できますが、複数の代替 Bean がある場合は、最も高い優先度のものが優先されます。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+CDI の代替 Beanは、インジェクションと型安全解決の間のみ考慮されます。例えば、デフォルトの実装では、オブザーバー通知を受け取ることになります。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="synthetic_beans"><a class="anchor" href="#synthetic_beans"></a>1.4.5. 合成Bean</h4>
+<div class="paragraph">
+<p>合成 Beanを登録できると非常に便利なことがあります。合成 Beanのビーン属性は，javaクラス，メソッド，フィールドから派生したものではありません。その代わりに、属性はエクステンションによって指定されます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+CDIコンテナは合成Beanのインスタンス化を制御しないので、依存性注入や他のサービス(インターセプタなど)はサポートされていません。言い換えれば、合成 Bean のインスタンスに必要なすべてのサービスを提供するのはエクステンション次第ということです。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>There are several ways to register a <a href="cdi-integration#synthetic_beans">synthetic bean</a> in Quarkus.
+In this chapter, we will cover a use case that can be used to initialize extension beans in a safe manner (compared to <a href="#bean_init">Bean 初期化</a>).</p>
+</div>
+<div class="paragraph">
+<p><code>SyntheticBeanBuildItem</code> で合成 Bean を登録することができます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>そのインスタンスは、 <a href="#bytecode-recording">レコーダー</a> を介して簡単に生成することができます。</p>
+</li>
+<li>
+<p>実際のコンポーネントはコンテキスト Beanを直接注入することができるので"遅延初期化"を必要としないように、拡張中に収集されたすべての情報を保持する"コンテキスト" Beanを提供します。</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="title">レコーダーを通して生成されたインスタンス</div>
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@BuildStep
+@Record(STATIC_INIT)
+SyntheticBeanBuildItem syntheticBean(TestRecorder recorder) {
+   return SyntheticBeanBuildItem.configure(Foo.class).scope(Singleton.class)
+                .runtimeValue(recorder.createFoo("parameters are recorder in the bytecode")) <i class="conum" data-value="1"></i><b>(1)</b>
+                .done();
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>文字列の値はバイトコードに記録され、 <code>Foo</code> のインスタンス初期化に使用されます。</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">"コンテキスト"ホルダー</div>
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@BuildStep
+@Record(STATIC_INIT)
+SyntheticBeanBuildItem syntheticBean(TestRecorder recorder) {
+   return SyntheticBeanBuildItem.configure(TestContext.class).scope(Singleton.class)
+                .runtimeValue(recorder.createContext("parameters are recorder in the bytecode")) <i class="conum" data-value="1"></i><b>(1)</b>
+                .done();
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>「本物の」コンポーネントは、 <code>TestContext</code> を直接注入することができます。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="some-types-of-extensions"><a class="anchor" href="#some-types-of-extensions"></a>1.5. エクステンションのタイプ</h3>
+<div class="paragraph">
+<p>エクステンションの定型的なタイプは複数存在しますが、いくつか挙げてみましょう。</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">ベアライブラリの実行</dt>
+<dd>
+<p>これはあまり洗練されていないエクステンションです。これは、ライブラリがGraalVM上で動作するようにするためのパッチのセットで構成されています。可能であれば、これらのパッチはエクステンションの中ではなく、アップストリームで貢献してください。二番目に良いのは、ネイティブイメージのコンパイル時に適用されるパッチである Substrate VM 置換を書くことです。</p>
+</dd>
+<dt class="hdlist1">実行中のフレームワークを取得する</dt>
+<dd>
+<p>実行時のフレームワークは通常、設定を読み込み、クラスパスとクラスをスキャンしてメタデータ (アノテーションやゲッターなど) を探し、その上にメタモデルを構築し、サービスローダパターンを介してオプションを見つけ、実行呼び出し (リフレクション) やプロキシインターフェイスなどを準備します。これらの操作はビルド時に行われ、メタモデルは実行時に実行されるクラスを生成するレコーダ－ DSL　に渡され、フレームワークを起動します。</p>
+</dd>
+<dt class="hdlist1">CDI ポータブルエクステンションを動作させる</dt>
+<dd>
+<p>CDIポータブルエクステンションモデルは非常に柔軟性が高いです。Quarkusが推進するビルドタイムブートの恩恵を受けるには、あまりにも柔軟性が高すぎます。私たちが見てきたほとんどのエクステンションは、このような極端な柔軟性の機能を利用していません。CDIエクステンションをQuarkusに移植する方法は、ビルド時（エクステンションの言い方ではデプロイ時）に様々なBeanを定義するQuarkusエクステンションとして書き換えることです。</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="technical-aspect"><a class="anchor" href="#technical-aspect"></a>2. 技術的な側面</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="bootstrap-three-phases"><a class="anchor" href="#bootstrap-three-phases"></a>2.1. ブートストラップの 3 つのフェーズと Quarkus 哲学</h3>
+<div class="paragraph">
+<p>Quarkusアプリには、3つの異なるブートストラップフェーズがあります。</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">拡張</dt>
+<dd>
+<p>This is the first phase, and is done by the <a href="#build-step-processors">ビルドステッププロセッサー</a>. These processors have access to Jandex annotation
+information and can parse any descriptors and read annotations, but should not attempt to load any application classes. The output of these
+build steps is some recorded bytecode, using an extension of the ObjectWeb ASM project called Gizmo(ext/gizmo), that is used to actually bootstrap the application at runtime.
+Depending on the <code>io.quarkus.deployment.annotations.ExecutionTime</code> value of the <code>@io.quarkus.deployment.annotations.Record</code> annotation associated with the build step,
+the step may be run in a different JVM based on the following two modes.</p>
+</dd>
+<dt class="hdlist1">スタティック初期化</dt>
+<dd>
+<p><code>@Record(STATIC_INIT)</code> でバイトコードが記録されている場合は、mainクラスのスタティック初期化メソッドから実行されます。ネイティブビルドの場合、このコードはネイティブビルドプロセスの一部として通常のJVMで実行され、この段階で生成されたリテインドオブジェクトは、イメージマップされたファイルを介してネイティブ実行可能ファイルに直接シリアル化されます。つまり、この段階でフレームワークが起動できれば、そのフレームワークの起動状態がイメージに直接書き込まれるため、イメージの起動時にブートコードを実行する必要がありません。</p>
+<div class="paragraph">
+<p>この段階では、サブストレートVMがネイティブ実行可能ファイルに含まれるいくつかのオブジェクトを許可しないため、実行できる内容にいくつかの制限があります。例えば、この段階でポートのリッスンやスレッドの開始を試みてはいけません。また、スタティック初期化時に実行時設定を読み取ることも禁止されています。</p>
+</div>
+<div class="paragraph">
+<p>非ネイティブのピュアJVMモードでは、スタティック起動とランタイム起動に実質的な違いはありませんが、スタティック起動が常に最初に実行されることが異なります。このモードでは、記述子の解析とアノテーションのスキャンがビルド時に行われ、関連するクラスやフレームワークの依存関係がビルド出力jarから削除されるため、ネイティブモードと同様のビルドフェーズのエクステンションが利用できます。WildFlyのようなサーバーでは、XMLパーサーなどの展開関連クラスがアプリケーションの存続期間中、貴重なメモリを使用してぶら下がっています。Quarkusは、このようなことをなくし、実行時にロードされるクラスのみが実行時に実際に使用されるようにすることを目指しています。</p>
+</div>
+<div class="paragraph">
+<p>例として、QuarkusアプリケーションがXMLパーサーをロードする理由は、ユーザーがアプリケーションでXMLを使用している場合のみです。どの設定のXMLパースも、拡張フェーズで行う必要があります。</p>
+</div>
+</dd>
+<dt class="hdlist1">ランタイム初期化</dt>
+<dd>
+<p><code>@Record(RUNTIME_INIT)</code> でバイトコードが記録されている場合は、アプリケーションのメインメソッドから実行されます。このコードはネイティブ実行可能ファイルブートで実行されます。一般的に、このフェーズではできるだけ少ないコードを実行すべきであり、ポートを開く必要があるコードなどに限定すべきです。</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p><code>@Record(STATIC_INIT)</code> フェーズにできるだけ多くのものを押し込むことで、2つの異なる最適化が可能になります。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>ネイティブ実行可能ファイルとピュアJVMの両方のモードで、これによりビルド時に処理が行われたため、アプリを可能な限り高速に起動することができます。また、アプリケーションに必要なクラスやネイティブコードを最小限に抑え、純粋な実行時関連の動作を実現します。</p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルモードのもう一つの利点は、サブストレートが使われない機能をより簡単に排除できることです。機能がバイトコードで直接初期化される場合、Substrateはメソッドが一度も呼ばれていないことを検知し、そのメソッドを削除することができます。また、実行時に設定を読み込む場合、サブストレートは設定の内容を推論することができないため、必要な場合に備えてすべての機能を残しておく必要があります。</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="project-setup"><a class="anchor" href="#project-setup"></a>2.2. プロジェクトのセットアップ</h3>
+<div class="paragraph">
+<p>エクステンションプロジェクトは、2つのサブモジュールを持つマルチモジュールプロジェクトとして設定する必要があります。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>ビルド時の処理やバイトコードの記録を行うデプロイメント時サブモジュール</p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルまたはランタイムJVMでエクステンション動作を提供する実行時動作を含むランタイムサブモジュール</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Your runtime artifact should depend on <code>io.quarkus:quarkus-core</code>, and possibly the runtime artifacts of other Quarkus
+modules if you want to use functionality provided by them.</p>
+</div>
+<div class="paragraph">
+<p>Your deployment time module should depend on <code>io.quarkus:quarkus-core-deployment</code>, your runtime artifact,
+and the deployment artifacts of any other Quarkus extensions your own extension depends on. This is essential, otherwise any transitively
+pulled in extensions will not provide their full functionality.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The Maven and Gradle plugins will validate this for you and alert you to any deployment artifacts you might have forgotten to add.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>いかなる場合でも、実行時モジュールはデプロイメントアーティファクトに依存することはできません。これは、すべてのデプロイメント時のコードが実行時スコープに取り込まれることに繋がり、分割の目的を台無しにします。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="using-maven"><a class="anchor" href="#using-maven"></a>2.2.1. Maven の使用</h4>
+<div class="paragraph">
+<p><code>io.quarkus:quarkus-extension-maven-plugin</code> をインクルードして、 <code>maven-compiler-plugin</code> で <code>quarkus-extension-processor</code> アノテーションプロセッサを検出し、拡張アーティファクトに必要な <a href="extension-metadata">Quarkus エクステンションメタデータ</a>を収集・生成する必要がありますが、もし Quarkus 親 pom を使用していれば自動的に正しい構成を継承します。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+You may want to use the <code>create-extension</code> mojo of <code>io.quarkus.platform:quarkus-maven-plugin</code> to create these Maven modules - see the next section.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+規約として、デプロイメント時アーティファクトには <code>-deployment</code> というサフィックスを付け、実行時アーティファクトにはサフィックスを付けません（エンドユーザーが自分のプロジェクトに追加するものです）。
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-xml hljs" data-lang="xml">&lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+      &lt;artifactId&gt;quarkus-core&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;
+
+&lt;build&gt;
+    &lt;plugins&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+            &lt;artifactId&gt;quarkus-extension-maven-plugin&lt;/artifactId&gt;
+            &lt;!-- Executions configuration can be inherited from quarkus-build-parent --&gt;
+            &lt;executions&gt;
+                &lt;execution&gt;
+                    &lt;goals&gt;
+                        &lt;goal&gt;extension-descriptor&lt;/goal&gt;
+                    &lt;/goals&gt;
+                    &lt;configuration&gt;
+                         &lt;deployment&gt;${project.groupId}:${project.artifactId}-deployment:${project.version}&lt;/deployment&gt;
+                   &lt;/configuration&gt;
+               &lt;/execution&gt;
+           &lt;/executions&gt;
+        &lt;/plugin&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+            &lt;configuration&gt;
+                &lt;annotationProcessorPaths&gt;
+                    &lt;path&gt;
+                        &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+                        &lt;artifactId&gt;quarkus-extension-processor&lt;/artifactId&gt;
+                    &lt;/path&gt;
+                &lt;/annotationProcessorPaths&gt;
+            &lt;/configuration&gt;
+        &lt;/plugin&gt;
+    &lt;/plugins&gt;
+&lt;/build&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+上記の <code>maven-compiler-plugin</code> の設定には、バージョン 3.5+ が必要です。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>また、<code>quarkus-extension-processor</code> アノテーションプロセッサを検出するようデプロイメントモジュールの <code>maven-compiler-plugin</code> を設定する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-xml hljs" data-lang="xml">&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+        &lt;artifactId&gt;quarkus-core-deployment&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;
+
+&lt;build&gt;
+    &lt;plugins&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+            &lt;configuration&gt;
+                &lt;annotationProcessorPaths&gt;
+                    &lt;path&gt;
+                        &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+                        &lt;artifactId&gt;quarkus-extension-processor&lt;/artifactId&gt;
+                    &lt;/path&gt;
+                &lt;/annotationProcessorPaths&gt;
+            &lt;/configuration&gt;
+        &lt;/plugin&gt;
+    &lt;/plugins&gt;
+&lt;/build&gt;</code></pre>
+</div>
+</div>
+<div class="sect4">
+<h5 id="create-new-quarkus-core-extension-modules-using-maven"><a class="anchor" href="#create-new-quarkus-core-extension-modules-using-maven"></a>2.2.1.1. Maven を使用した新しい Quarkus Core 拡張モジュールの作成</h5>
+<div class="paragraph">
+<p>Quarkus は、 <code>create-extension</code> Maven Mojo を提供し、拡張プロジェクトを初期化します。</p>
+</div>
+<div class="paragraph">
+<p>オプションの自動検出が試行されます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus</code> (Quarkus Core) または <code>quarkus/extensions</code> ディレクトリからアクセスすると、'Quarkus Core' エクステンションのレイアウトとデフォルトが使用されます。</p>
+</li>
+<li>
+<p><code>-DgroupId=io.quarkiverse.[extensionId]</code> を使用すると、'Quarkiverse' エクステンションのレイアウトとデフォルトを使用します。</p>
+</li>
+<li>
+<p>それ以外の場合は 'Standalone' エクステンションのレイアウトとデフォルトを使用します。</p>
+</li>
+<li>
+<p>将来的には他のレイアウトタイプを導入する可能性があります。</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+You may not specify any parameter to use the interactive mode: <code>mvn io.quarkus.platform:quarkus-maven-plugin:3.15.2:create-extension -N</code>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>例として、 <code>my-ext</code> という新しいエクステンションをQuarkusのソースツリーに追加してみましょう:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">git clone https://github.com/quarkusio/quarkus.git
+cd quarkus
+mvn io.quarkus.platform:quarkus-maven-plugin:3.15.2:create-extension -N \
+    -DextensionId=my-ext \
+    -DextensionName="My Extension" \
+    -DextensionDescription="Do something useful."</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+デフォルトでは、 <code>groupId</code>, <code>version</code>, <code>quarkusVersion</code>, <code>namespaceId</code>, <code>namespaceName</code> は、他のQuarkusコアエクステンションと一致します。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+エクステンションの説明は、https://code.quarkus.io/、Quarkus CLI でエクステンションを一覧表示する際などに表示されるため、重要です。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>上記の一連のコマンドは、次のような動作をします。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>4つの新しいMavenモジュールを作成します。</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>extensions/my-ext</code> ディレクトリーにある <code>quarkus-my-ext-parent</code> を使用します。</p>
+</li>
+<li>
+<p><code>extensions/my-ext/runtime</code> ディレクトリーにある <code>quarkus-my-ext</code> を使用します。</p>
+</li>
+<li>
+<p><code>extensions/my-ext/deployment</code> ディレクトリに <code>quarkus-my-ext-deployment</code> ; 基本的な <code>MyExtProcessor</code> クラスはこのモジュールで生成されます。</p>
+</li>
+<li>
+<p><code>quarkus-my-ext-integration-test</code> in the <code>integration-tests/my-ext/deployment</code> directory; an empty Jakarta REST Resource class and two test classes (for JVM mode and native mode) are generated in this module.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>必要に応じて、これらの3つのモジュールをリンクします。</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus-my-ext-parent</code> が <code>quarkus-extensions-parent</code> の <code>&lt;modules&gt;</code> に追加されました。</p>
+</li>
+<li>
+<p>QuarkusのBOM（Bill of Materials） <code>bom/application/pom.xml</code> の <code>&lt;dependencyManagement&gt;</code> に <code>quarkus-my-ext</code> が追加されます。</p>
+</li>
+<li>
+<p>QuarkusのBOM（Bill of Materials） <code>bom/application/pom.xml</code> の <code>&lt;dependencyManagement&gt;</code> に <code>quarkus-my-ext-deployment</code> が追加されます。</p>
+</li>
+<li>
+<p>quarkus-my-ext-integration-test` は <code>quarkus-integration-tests-parent</code> の <code>&lt;modules&gt;</code> に追加されました。</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+また、ランタイムモジュール <code>src/main/resources/META-INF</code> フォルダ内に、エクステンションを記述した <a href="extension-metadata#quarkus-extension-yaml">quarkus-extension.yaml</a> テンプレートファイルを記述する必要があります。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>これは、 <code>quarkus-agroal</code> エクステンションの <code>quarkus-extension.yaml</code> です。手本として使用することができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">name: "Agroal - Database connection pool" <i class="conum" data-value="1"></i><b>(1)</b>
+metadata:
+  keywords: <i class="conum" data-value="2"></i><b>(2)</b>
+  - "agroal"
+  - "database-connection-pool"
+  - "datasource"
+  - "jdbc"
+  guide: "https://quarkus.io/guides/datasource" <i class="conum" data-value="3"></i><b>(3)</b>
+  categories: <i class="conum" data-value="4"></i><b>(4)</b>
+  - "data"
+  status: "stable" <i class="conum" data-value="5"></i><b>(5)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>ユーザーに表示される拡張子の名前</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>エクステンションカタログでエクステンションを検索するために使用できるキーワード</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>エクステンションのガイドまたはドキュメントへのリンク</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><a href="https://code.quarkus.io">code.quarkus.io</a> で表示されるべきカテゴリーを省略することができます。この場合、エクステンションは表示されますが、特定のカテゴリーには表示されません。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>エクステンションのメンテナーが評価する、<code>stable</code>、<code>preview</code>、<code>experimental</code> のいずれかの成熟度状態。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+mojoの <code>name</code> パラメータはオプションです。コマンドラインで指定しなかった場合、プラグインは <code>extensionId</code> からダッシュをスペースに置き換え、各トークンを大文字にすることで導出します。そのため、場合によっては明示的な <code>name</code> を省略することも考えられます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Mojoで使用できるすべてのオプションについては、 <a href="https://github.com/quarkusio/quarkus/blob/3.15.2/devtools/maven/src/main/java/io/quarkus/maven/CreateExtensionMojo.java">CreateExtensionMojoのJavaDoc</a>を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="using-gradle"><a class="anchor" href="#using-gradle"></a>2.2.2. Gradle の使用</h4>
+<div class="paragraph">
+<p>エクステンションプロジェクトの <code>runtime</code> モジュールに <code>io.quarkus.extension</code> プラグインを適用する必要があります。  このプラグインには <code>META-INF/quarkus-extension.properties</code> と <code>META-INF/quarkus-extension.yml</code> ファイルを生成する <code>extensionDescriptor</code> というタスクが含まれています。  また、このプラグインは <code>io.quarkus:quarkus-extension-processor</code> アノテーションプロセッサを <code>deployment</code> と <code>runtime</code> の両方のモジュールで有効にして、残りの <a href="extension-metadata">Quarkus extension metadata</a> を収集し生成するようにします。  デプロイメントモジュールの名前は、プラグイン内で <code>deploymentModule</code> プロパティを設定することによって設定することができます。このプロパティは、デフォルトで <code>deployment</code> に設定されています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">plugins {
+    id 'java'
+    id 'io.quarkus.extension'
+}
+
+quarkusExtension {
+    deploymentModule = 'deployment'
+}
+
+dependencies {
+    implementation platform('io.quarkus:quarkus-bom:3.15.2')
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="build-step-processors"><a class="anchor" href="#build-step-processors"></a>2.3. ビルドステッププロセッサー</h3>
+<div class="paragraph">
+<p>作業は、 <em>ビルドアイテム</em> を生成・消費する <em>ビルドステップ</em> によって拡張時に行われます。プロジェクトビルドのエクステンションに対応するデプロイメント・モジュール内のビルドステップは、自動的に接続され、最終的なビルドアーティファクトを生成するために実行されます。</p>
+</div>
+<div class="sect3">
+<h4 id="build-steps"><a class="anchor" href="#build-steps"></a>2.3.1. ビルドステップ</h4>
+<div class="paragraph">
+<p><em>ビルドステップ</em> は、 <code>@io.quarkus.deployment.annotations.BuildStep</code> アノテーションが付与された非静的なメソッドです。各ビルドステップは、前のステージで生成されたアイテムを <a href="#consuming-values">消費したり</a> 、後のステージで消費できるアイテムを <a href="#producing-values">生成したり</a>します。ビルドステップは通常、最終的に他のステップで消費されるビルドアイテムを生成するときにのみ実行されます。</p>
+</div>
+<div class="paragraph">
+<p>ビルドステップは通常、エクステンションのデプロイメントモジュール内のプレーンなクラスに配置されます。このクラスは、拡張プロセス中に自動的にインスタンス化され、 <a href="#injection">インジェクション</a>を利用します。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="build-items"><a class="anchor" href="#build-items"></a>2.3.2. ビルドアイテム</h4>
+<div class="paragraph">
+<p>ビルドアイテムは、abstractな <code>io.quarkus.builder.item.BuildItem</code> クラスのfinalな具象サブクラスです。それぞれのビルドアイテムは、あるステージから別のステージに渡す必要のある情報の単位を表します。ベースとなる <code>BuildItem</code> クラスは、それ自体を直接サブクラス化することはできません。むしろ、作成 <em>可能な</em> ビルドアイテムのサブクラスの種類（ <a href="#simple-build-items">シンプル</a>、 <a href="#multi-build-items">マルチ</a>、 <a href="#empty-build-items">空</a>）ごとに抽象サブクラスがあります。</p>
+</div>
+<div class="paragraph">
+<p>ビルドアイテムは、異なるエクステンションが相互に通信するための手段と考えてください。例えば、ビルドアイテムは以下のことができます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>データベース設定が存在することを明らかにする</p>
+</li>
+<li>
+<p>データベースの設定を利用する（例：コネクションプールエクステンション、ORMエクステンション）</p>
+</li>
+<li>
+<p>エクステンションに別のエクステンションの動作を要求する。たとえば、新しい CDI Bean を定義するエクステンションの代わりに、ArC エクステンションにその定義を要求します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>これは非常に柔軟なメカニズムです。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>BuildItem</code> インスタンスはイミュータブルでなければなりません。プロデューサー/コンシューマーモデルでは、ミューテーションを正しく順序付けることができないからです。これは強制されるものではありませんが、このルールに従わないと競合状態になる可能性があります。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+ビルドステップは、他のビルドステップが（推移的に）必要とするビルドアイテムを生成する場合にのみ、実行されます。ビルドステップがビルドアイテムを生成することを確認してください。そうでない場合は、ビルド検証用に <code>ValidationErrorBuildItem</code> を生成するか、生成されたアーティファクト用に <code>ArtifactResultBuildItem</code> を生成すべきです。
+</td>
+</tr>
+</table>
+</div>
+<div class="sect4">
+<h5 id="simple-build-items"><a class="anchor" href="#simple-build-items"></a>2.3.2.1. シンプルなビルドアイテム</h5>
+<div class="paragraph">
+<p>シンプルビルドアイテムは <code>io.quarkus.builder.item.SimpleBuildItem</code> を拡張したfinalクラスです。シンプルビルドアイテムは、特定のビルドにおいて、1つのステップでのみ作成できます。ビルド内の複数のステップが同じシンプルビルドアイテムを生成すると宣言した場合、エラーが発生します。シンプルビルドアイテムを利用するビルドステップは、常にそのアイテムを生成したビルドステップの <em>後に</em> 実行されます。</p>
+</div>
+<div class="listingblock">
+<div class="title">単一のビルドアイテムの例</div>
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">/**
+ * The build item which represents the Jandex index of the application,
+ * and would normally be used by many build steps to find usages
+ * of annotations.
+ */
+public final class ApplicationIndexBuildItem extends SimpleBuildItem {
+
+    private final Index index;
+
+    public ApplicationIndexBuildItem(Index index) {
+        this.index = index;
+    }
+
+    public Index getIndex() {
+        return index;
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="multi-build-items"><a class="anchor" href="#multi-build-items"></a>2.3.2.2. マルチビルドアイテム</h5>
+<div class="paragraph">
+<p>マルチビルドアイテムは、 <code>io.quarkus.builder.item.MultiBuildItem</code> を拡張したfinalクラスです。あるクラスのマルチビルドアイテムは、任意の数のステップで、任意の数生成できますが、マルチビルドアイテムを利用するステップは、それらを生成できるすべてのステップが実行された後のみ実行されます。</p>
+</div>
+<div class="listingblock">
+<div class="title">マルチビルドアイテムの例</div>
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">public final class ServiceWriterBuildItem extends MultiBuildItem {
+    private final String serviceName;
+    private final List&lt;String&gt; implementations;
+
+    public ServiceWriterBuildItem(String serviceName, String... implementations) {
+        this.serviceName = serviceName;
+        // Make sure it's immutable
+        this.implementations = Collections.unmodifiableList(
+            Arrays.asList(
+                implementations.clone()
+            )
+        );
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public List&lt;String&gt; getImplementations() {
+        return implementations;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">マルチビルドアイテムの使用例</div>
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">/**
+ * This build step produces a single multi build item that declares two
+ * providers of one configuration-related service.
+ */
+@BuildStep
+public ServiceWriterBuildItem registerOneService() {
+    return new ServiceWriterBuildItem(
+        Converter.class.getName(),
+        MyFirstConfigConverterImpl.class.getName(),
+        MySecondConfigConverterImpl.class.getName()
+    );
+}
+
+/**
+ * This build step produces several multi build items that declare multiple
+ * providers of multiple configuration-related services.
+ */
+@BuildStep
+public void registerSeveralServices(
+    BuildProducer&lt;ServiceWriterBuildItem&gt; providerProducer
+) {
+    providerProducer.produce(new ServiceWriterBuildItem(
+        Converter.class.getName(),
+        MyThirdConfigConverterImpl.class.getName(),
+        MyFourthConfigConverterImpl.class.getName()
+    ));
+    providerProducer.produce(new ServiceWriterBuildItem(
+        ConfigSource.class.getName(),
+        MyConfigSourceImpl.class.getName()
+    ));
+}
+
+/**
+ * This build step aggregates all the produced service providers
+ * and outputs them as resources.
+ */
+@BuildStep
+public void produceServiceFiles(
+    List&lt;ServiceWriterBuildItem&gt; items,
+    BuildProducer&lt;GeneratedResourceBuildItem&gt; resourceProducer
+) throws IOException {
+    // Aggregate all the providers
+
+    Map&lt;String, Set&lt;String&gt;&gt; map = new HashMap&lt;&gt;();
+    for (ServiceWriterBuildItem item : items) {
+        String serviceName = item.getName();
+        for (String implName : item.getImplementations()) {
+            map.computeIfAbsent(
+                serviceName,
+                (k, v) -&gt; new LinkedHashSet&lt;&gt;()
+            ).add(implName);
+        }
+    }
+
+    // Now produce the resource(s) for the SPI files
+    for (Map.Entry&lt;String, Set&lt;String&gt;&gt; entry : map.entrySet()) {
+        String serviceName = entry.getKey();
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            try (OutputStreamWriter w = new OutputStreamWriter(os, StandardCharsets.UTF_8)) {
+                for (String implName : entry.getValue()) {
+                    w.write(implName);
+                    w.write(System.lineSeparator());
+                }
+                w.flush();
+            }
+            resourceProducer.produce(
+                new GeneratedResourceBuildItem(
+                    "META-INF/services/" + serviceName,
+                    os.toByteArray()
+                )
+            );
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="empty-build-items"><a class="anchor" href="#empty-build-items"></a>2.3.2.3. 空のビルドアイテム</h5>
+<div class="paragraph">
+<p>空のビルドアイテムは、 <code>io.quarkus.builder.item.EmptyBuildItem</code> を拡張するfinalの（通常は空の）クラスです。空のビルドアイテムは、実際には何のデータも持たないビルドアイテムを表しており、空のクラスをインスタンス化することなく、そのようなアイテムを生成したり消費したりすることができます。空のクラスは、それ自体をインスタンス化することはできません。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+それらはインスタンス化できないため、いかなる方法でも注入することも、ビルドステップ (または <code>BuildProducer</code> を介して) によって返すこともできません。 空のビルド アイテムを生成するには、ビルド ステップに <code>@Produce(MyEmptyBuildItem.class)</code> でアノテーションを付け、それを <code>@Consume(MyEmptyBuildItem.class)</code> で消費する必要があります。
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">空のビルドアイテムの例</div>
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">public final class NativeImageBuildItem extends EmptyBuildItem {
+    // empty
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>空のビルドアイテムは、ステップ間の順序付けを可能にする「バリア」を表すことができます。また、一般的なビルドシステムが「疑似ターゲット」を使用するのと同じように、空のビルドアイテムを使用することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="title">空のビルドアイテムを「疑似ターゲット」スタイルで使用する例</div>
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">/**
+ * Contrived build step that produces the native image on disk.  The main augmentation
+ * step (which is run by Maven or Gradle) would be declared to consume this empty item,
+ * causing this step to be run.
+ */
+@BuildStep
+@Produce(NativeImageBuildItem.class)
+void produceNativeImage() {
+    // ...
+    // (produce the native image)
+    // ...
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">空のビルドアイテムを "バリア "スタイルで使用した例</div>
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">/**
+ * This would always run after {@link #produceNativeImage()} completes, producing
+ * an instance of {@code SomeOtherBuildItem}.
+ */
+@BuildStep
+@Consume(NativeImageBuildItem.class)
+SomeOtherBuildItem secondBuildStep() {
+    return new SomeOtherBuildItem("foobar");
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="validation-error-build-item"><a class="anchor" href="#validation-error-build-item"></a>2.3.2.4. バリデーションエラービルドアイテム</h5>
+<div class="paragraph">
+<p>これらは、ビルドを失敗させるバリデーションエラーを持つビルドアイテムを表します。これらのビルドアイテムは、CDIコンテナの初期化時に消費されます。</p>
+</div>
+<div class="listingblock">
+<div class="title">「疑似ターゲット」スタイルでバリデーションエラービルドアイテムを使用する例</div>
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@BuildStep
+void checkCompatibility(Capabilities capabilities, BuildProducer&lt;ValidationErrorBuildItem&gt; validationErrors) {
+    if (capabilities.isPresent(Capability.RESTEASY_REACTIVE)
+            &amp;&amp; capabilities.isPresent(Capability.RESTEASY)) {
+        validationErrors.produce(new ValidationErrorBuildItem(
+                new ConfigurationException("Cannot use both RESTEasy Classic and Reactive extensions at the same time")));
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="artifact-result-build-item"><a class="anchor" href="#artifact-result-build-item"></a>2.3.2.5. アーティファクトリゾルトビルドアイテム</h5>
+<div class="paragraph">
+<p>これらは、uberjar や thin jar など、ビルドによって生成された実行可能なアーティファクトを含むビルド アイテムを表します。 これらのビルドアイテムを使用して、何も生成せずに常にビルド ステップを実行することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="title">「疑似ターゲット」スタイルで常に実行されるビルドステップの例</div>
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@BuildStep
+@Produce(ArtifactResultBuildItem.class)
+void runBuildStepThatProducesNothing() {
+    // ...
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="injection"><a class="anchor" href="#injection"></a>2.3.3. 注入</h4>
+<div class="paragraph">
+<p>ビルドステップを含むクラスは、以下のタイプのインジェクションに対応しています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>コンストラクタパラメータ・インジェクション</p>
+</li>
+<li>
+<p>フィールド・インジェクション</p>
+</li>
+<li>
+<p>メソッドパラメータ・インジェクション（ビルドステップ・メソッドの場合のみ）</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>ビルド・ステップ・クラスは、ビルド・ステップを呼び出すたびにインスタンス化され、注入され、その後は破棄されます。ビルドステップ間では、たとえ同じクラスであっても、ビルドアイテムを介してのみ状態が伝達されるべきです。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+finalフィールドはインジェクションの対象にはなりませんが、必要に応じてコンストラクタのパラメータインジェクションで入力することができます。staticフィールドは、インジェクションの対象にはなりません。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>注入可能な値の種類は以下の通りです:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>前のビルドステップで生成された <a href="#build-items">ビルドアイテム</a></p>
+</li>
+<li>
+<p>後続のビルドステップのためにアイテムを生産する <a href="#producing-values">ビルドプロデューサー</a></p>
+</li>
+<li>
+<p><a href="#configuration">設定マッピング</a> 型</p>
+</li>
+<li>
+<p><a href="#bytecode-recording">バイトコード記録</a>用のテンプレートオブジェクト</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+ビルドステップのメソッドやそのクラスに注入されたオブジェクトは、そのメソッドの実行時以外に使用しては <em>いけません</em> 。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+インジェクションは、アノテーション・プロセッサを介してコンパイル時に解決され、生成されたコードは、プライベート・フィールドを注入したり、プライベート・メソッドを呼び出したりする権限を持ちません。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="producing-values"><a class="anchor" href="#producing-values"></a>2.3.4. 値の生成</h4>
+<div class="paragraph">
+<p>ビルドステップは、いくつかの可能な方法で後続のステップのために値を生成することができます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#simple-build-items">シンプルビルドアイテム</a>や <a href="#multi-build-items">マルチビルドアイテム</a>のインスタンスを返すことで</p>
+</li>
+<li>
+<p>マルチビルドアイテムクラスの <code>List</code> を返すことで</p>
+</li>
+<li>
+<p>単純または複数のビルドアイテムクラスの <code>BuildProducer</code> を挿入する</p>
+</li>
+<li>
+<p>メソッドに <code>@io.quarkus.deployment.annotations.Produce</code> というアノテーションを付けて、<a href="#empty-build-items">空のビルドアイテム</a> のクラス名を指定します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>単純な構築項目が構築ステップで宣言される場合、それはその構築ステップの間に生成されなければならず、さもなければエラーが発生します。ステップに注入されるビルドプロデューサーは、そのステップの外側で使用されては <em>なりません</em>。</p>
+</div>
+<div class="paragraph">
+<p><code>@BuildStep</code> メソッドは、別のコンシューマーまたは最終出力が必要とするものを生成する場合にのみ呼び出されることに注意してください。特定のアイテムのコンシューマーがいない場合は生成されません。必要なものは、最終的な生成物により異なります。たとえば開発者モードで実行している場合、最終出力では <code>ReflectiveClassBuildItem</code> などの GraalVM 固有のビルドアイテムが要求されないため、これらのアイテムのみを生成するメソッドは呼び出されません。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="consuming-values"><a class="anchor" href="#consuming-values"></a>2.3.5. 値の利用</h4>
+<div class="paragraph">
+<p>ビルドステップは、以下の方法で前のステップの値を利用することができます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#simple-build-items">シンプルビルドアイテム</a>を注入することで</p>
+</li>
+<li>
+<p>シンプルビルドアイテムクラスの <code>Optional</code> を注入することで</p>
+</li>
+<li>
+<p><a href="#multi-build-items">マルチビルドアイテムクラス</a>の <code>List</code> を注入することで</p>
+</li>
+<li>
+<p>メソッドに <code>@io.quarkus.deployment.annotations.Consume</code> というアノテーションを付けて、<a href="#empty-build-items">空のビルドアイテム</a> のクラス名を指定します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>通常、他のステップで生成されない単純なビルドアイテムを消費するために含まれるステップはエラーとなる。このように、ステップの実行時に、宣言された値がすべて存在し、かつ非 <code>null</code> であることが保証されます。</p>
+</div>
+<div class="paragraph">
+<p>ビルドを完了するために値が必要ない場合もありますが、値が存在する場合は、ビルドステップの動作を通知する場合があります。この場合、値はオプションで挿入できます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+マルチビルド値は常に <em>オプション</em> とみなされます。存在しない場合は、空のリストが挿入されます。
+</td>
+</tr>
+</table>
+</div>
+<div class="sect4">
+<h5 id="producing-weak-values"><a class="anchor" href="#producing-weak-values"></a>2.3.5.1. 弱い値の生成</h5>
+<div class="paragraph">
+<p>通常、ビルドステップは、他のビルドステップで使用されるビルドアイテムを生成する際に必ず含まれます。これにより、最終的なアーティファクトを生成するために必要なステップと、インストールされていないエクステンションに関連するステップ、または指定のアーティファクトタイプに関係のないビルドアイテムのみを生成するステップが含まれます。</p>
+</div>
+<div class="paragraph">
+<p>これが望ましくない動作である場合は、<code>@io.quarkus.deployment.annotations.Weak</code> アノテーションを使用できます。このアノテーションは、アノテーション付きの値の生成のみに基づいてビルドステップが自動的に含まれるべきではないことを示しています。</p>
+</div>
+<div class="listingblock">
+<div class="title">ビルドアイテムの弱い生成例</div>
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">/**
+ * This build step is only run if something consumes the ExecutorClassBuildItem.
+ */
+@BuildStep
+void createExecutor(
+        @Weak BuildProducer&lt;GeneratedClassBuildItem&gt; classConsumer,
+        BuildProducer&lt;ExecutorClassBuildItem&gt; executorClassConsumer
+) {
+        ClassWriter cw = new ClassWriter(Gizmo.ASM_API_VERSION);
+        String className = generateClassThatCreatesExecutor(cw); <i class="conum" data-value="1"></i><b>(1)</b>
+        classConsumer.produce(new GeneratedClassBuildItem(true, className, cw.toByteArray()));
+        executorClassConsumer.produce(new ExecutorClassBuildItem(className));
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>このメソッド (この例では提供されていません) は、ASM API を使用してクラスを生成します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>生成されたクラスやリソースなど、特定の種類のビルドアイテムは通常は常に消費されます。エクステンションは、生成されたクラスとともにビルドアイテムを生成して、そのビルドアイテムの使用を容易にする場合があります。このようなビルドステップでは、生成されたクラスビルドアイテムに <code>@Weak</code> アノテーションを使用しますが、通常は他のビルドアイテムを生成します。他のビルドアイテムが最終的に何かによって消費された場合、ステップが実行され、クラスが生成されます。他のビルドアイテムを消費するものがない場合、そのステップはビルドプロセスに含まれません。</p>
+</div>
+<div class="paragraph">
+<p>上記の例では、<code>GeneratedClassBuildItem</code> は、<code>ExecutorClassBuildItem</code> が他のビルドステップによって消費された場合にのみ生成されます。</p>
+</div>
+<div class="paragraph">
+<p><a href="#bytecode-recording">バイトコード記録</a> を使用する場合、暗黙的に生成されたクラスは <code>@io.quarkus.deployment.annotations.Record</code> アノテーションの <code>optional</code> 属性を使用して弱いと宣言できることに注意してください。</p>
+</div>
+<div class="listingblock">
+<div class="title">生成されたクラスが弱く生成されるバイトコードレコーダーの使用例</div>
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">/**
+ * This build step is only run if something consumes the ExecutorBuildItem.
+ */
+@BuildStep
+@Record(value = ExecutionTime.RUNTIME_INIT, optional = true) <i class="conum" data-value="1"></i><b>(1)</b>
+ExecutorBuildItem createExecutor( <i class="conum" data-value="2"></i><b>(2)</b>
+        ExecutorRecorder recorder,
+        ThreadPoolConfig threadPoolConfig
+) {
+
+    return new ExecutorBuildItem(
+        recorder.setupRunTime(
+            shutdownContextBuildItem,
+            threadPoolConfig,
+            launchModeBuildItem.getLaunchMode()
+        )
+    );
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>optional</code> 属性に注意してください。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>この例では、レコーダープロキシーを使用しています。詳細は、<a href="#bytecode-recording">バイトコード記録</a> のセクションを参照してください。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="application-archives"><a class="anchor" href="#application-archives"></a>2.3.6. アプリケーションアーカイブ</h4>
+<div class="paragraph">
+<p><code>@BuildStep</code> アノテーションは、クラスパス上のどのアーカイブが「アプリケーション・アーカイブ」とみなされ、したがってインデックスが作成されるかを決定するマーカーファイルを登録することもできます。これは <code>applicationArchiveMarkers</code> を介して行われます。たとえば、ArCエクステンションでは <code>META-INF/beans.xml</code> を登録していますが、これは <code>beans.xml</code> ファイルがあるクラスパス上のすべてのアーカイブがインデックスされることを意味します。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="using-threads-context-class-loader"><a class="anchor" href="#using-threads-context-class-loader"></a>2.3.7. スレッドコンテキストクラスローダーの使用</h4>
+<div class="paragraph">
+<p>ビルドステップは、トランスフォーマーセーフな方法でデプロイメントからユーザークラスをロードできる TCCL を使用して実行されます。このクラスローダーは、オーグメンテーションの存続期間中のみ存在し、その後破棄されます。クラスは、実行時に別のクラスローダーに再度ロードされます。これは、オーグメンテーション中にクラスをロードしても、開発/テストモードで実行している場合はクラスの変換が停止しないことを意味します。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="adding-external-jars-to-the-indexer-with-indexdependencybuilditem"><a class="anchor" href="#adding-external-jars-to-the-indexer-with-indexdependencybuilditem"></a>2.3.8. IndexDependencyBuildItem によるインデクサへの外部 JAR の追加</h4>
+<div class="paragraph">
+<p>スキャンされたクラスのインデックスには、外部クラスの依存関係が自動的に含まれることはありません。依存関係を追加するには、<code>groupId</code> と <code>artifactId</code> に対して <code>IndexDependencyBuildItem</code> オブジェクトを生成する <code>@BuildStep</code> を作成します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+インデクサーに追加する必要のあるすべてのアーティファクトを指定することが重要です。暗黙的にアーティファクトが推移的に追加されることはありません。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>Amazon Alexa</code> エクステンションは、Jackson JSON 変換で使用される依存関係ライブラリーを Alexa SDK から追加し、リフレクションクラスが <code>BUILD_TIME</code> で識別および含まれるようにします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">   @BuildStep
+    void addDependencies(BuildProducer&lt;IndexDependencyBuildItem&gt; indexDependency) {
+        indexDependency.produce(new IndexDependencyBuildItem("com.amazon.alexa", "ask-sdk"));
+        indexDependency.produce(new IndexDependencyBuildItem("com.amazon.alexa", "ask-sdk-runtime"));
+        indexDependency.produce(new IndexDependencyBuildItem("com.amazon.alexa", "ask-sdk-model"));
+        indexDependency.produce(new IndexDependencyBuildItem("com.amazon.alexa", "ask-sdk-lambda-support"));
+        indexDependency.produce(new IndexDependencyBuildItem("com.amazon.alexa", "ask-sdk-servlet-support"));
+        indexDependency.produce(new IndexDependencyBuildItem("com.amazon.alexa", "ask-sdk-dynamodb-persistence-adapter"));
+        indexDependency.produce(new IndexDependencyBuildItem("com.amazon.alexa", "ask-sdk-apache-client"));
+        indexDependency.produce(new IndexDependencyBuildItem("com.amazon.alexa", "ask-sdk-model-runtime"));
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>アーティファクトが <code>Jandex</code> インデクサーに追加されたので、インデックスを検索して、インターフェイスを実装するクラス、特定のクラスのサブクラス、またはターゲットアノテーションを持つクラスを特定できるようになりました。</p>
+</div>
+<div class="paragraph">
+<p>たとえば、<code>Jackson</code> エクステンションは、以下のようなコードを使用して、JSON デシリアライズで使用されるアノテーションを検索し、それらを <code>BUILD_TIME</code> 分析のリフレクション階層に追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">    DotName JSON_DESERIALIZE = DotName.createSimple(JsonDeserialize.class.getName());
+
+    IndexView index = combinedIndexBuildItem.getIndex();
+
+    // handle the various @JsonDeserialize cases
+    for (AnnotationInstance deserializeInstance : index.getAnnotations(JSON_DESERIALIZE)) {
+        AnnotationTarget annotationTarget = deserializeInstance.target();
+        if (CLASS.equals(annotationTarget.kind())) {
+            DotName dotName = annotationTarget.asClass().name();
+            Type jandexType = Type.create(dotName, Type.Kind.CLASS);
+            reflectiveHierarchyClass.produce(new ReflectiveHierarchyBuildItem(jandexType));
+        }
+
+    }</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="visualizing-build-step-dependencies"><a class="anchor" href="#visualizing-build-step-dependencies"></a>2.3.9. ビルドステップの依存関係の可視化</h4>
+<div class="paragraph">
+<p>It can occasionally be useful to see a visual representation of the interactions between the various build steps. For such cases, adding <code>-Dquarkus.builder.graph-output=build.dot</code> when building an application
+will result in the creation of the <code>build.dot</code> file in the project&#8217;s root directory. See <a href="https://graphviz.org/resources/">this</a> for a list of software that can open the file and show the actual visual representation.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuration"><a class="anchor" href="#configuration"></a>2.4. 設定</h3>
+<div class="paragraph">
+<p>Quarkusの設定は、 <a href="https://smallrye.io/smallrye-config/Main/">SmallRye Config</a> をベースにしています。 <a href="https://smallrye.io/smallrye-config/Main/">SmallRye Config</a> で提供されるすべての機能は、Quarkusでも利用可能です。</p>
+</div>
+<div class="paragraph">
+<p>エクステンションは、 <a href="https://smallrye.io/smallrye-config/Main/config/mappings/">SmallRye Configの@ConfigMapping</a> を使用して、Extensionが必要とする設定をマッピングする必要があります。これにより、Quarkusは、各設定フェーズにマッピングのインスタンスを自動的に公開し、設定ドキュメントを生成することができます。</p>
+</div>
+<div class="sect3">
+<h4 id="config-phases"><a class="anchor" href="#config-phases"></a>2.4.1. 設定フェーズ</h4>
+<div class="paragraph">
+<p>設定マッピングは設定フェーズによって厳密に制約されており、対応するフェーズ以外から設定マッピングにアクセスしようとするとエラーが発生します。設定マッピングは、その中に含まれるキーがいつ設定から読み出され、いつアプリケーションから利用できるようになるかを決定するものです。 <code>io.quarkus.runtime.annotations.ConfigPhase</code> で定義されているフェーズは次のとおりです：</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 6.6666%;">
+<col style="width: 6.6666%;">
+<col style="width: 6.6666%;">
+<col style="width: 6.6666%;">
+<col style="width: 53.3336%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">フェーズ名</th>
+<th class="tableblock halign-center valign-top">ビルド時に読取、利用可</th>
+<th class="tableblock halign-center valign-top">実行時に利用可</th>
+<th class="tableblock halign-center valign-top">スタティック初期化時の読取</th>
+<th class="tableblock halign-center valign-top">起動時の再読取（ネイティブ実行可能ファイル）</th>
+<th class="tableblock halign-left valign-top">備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>BUILD_TIME</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✗</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✗</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✗</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ビルドに影響を与えるものに適しています。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>BUILD_AND_RUN_TIME_FIXED</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✗</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✗</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ビルドに影響し、ランタイムコードで表示される必要があるものに適しています。実行時に設定から読み取られません。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>RUN_TIME</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✗</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ビルド時には使用できません。すべてのモードで開始時に読み取ります。</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><code>BUILD_TIME</code> 以外のすべての場合、設定マッピングインターフェースと、そこに含まれるすべての設定グループと型は、エクステンションの実行時アーティファクトに配置されるか、そこから到達可能でなければなりません。 <code>BUILD_TIME</code> フェーズの設定マッピングは、エクステンションの実行時アーティファクトまたはデプロイアメントアーティファクトのいずれかに配置されるか、そこから到達可能であれば大丈夫です。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="configuration-example"><a class="anchor" href="#configuration-example"></a>2.4.2. 設定例</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">import io.quarkus.runtime.annotations.ConfigPhase;
+import io.quarkus.runtime.annotations.ConfigRoot;
+import io.smallrye.config.ConfigMapping;
+import io.smallrye.config.WithDefault;
+
+import java.io.File;
+import java.util.logging.Level;
+
+/**
+ * Logging configuration.
+ */
+@ConfigMapping(prefix = "quarkus.log")      <i class="conum" data-value="1"></i><b>(1)</b>
+@ConfigRoot(phase = ConfigPhase.RUN_TIME)   <i class="conum" data-value="2"></i><b>(2)</b>
+public interface LogConfiguration {
+    // ...
+
+    /**
+     * Configuration properties for the logging file handler.
+     */
+    FileConfig file();
+
+    interface FileConfig {
+        /**
+         * Enable logging to a file.
+         */
+        @WithDefault("true")
+        boolean enable();
+
+        /**
+         * The log format.
+         */
+        @WithDefault("%d{yyyy-MM-dd HH:mm:ss,SSS} %h %N[%i] %-5p [%c{1.}] (%t) %s%e%n")
+        String format();
+
+        /**
+         * The level of logs to be written into the file.
+         */
+        @WithDefault("ALL")
+        Level level();
+
+        /**
+         * The name of the file in which logs will be written.
+         */
+        @WithDefault("application.log")
+        File path();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">public class LoggingProcessor {
+    // ...
+
+    /*
+     * Logging configuration.
+     */
+    LogConfiguration config; <i class="conum" data-value="3"></i><b>(3)</b>
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>設定プロパティー名は、セグメントに分割できます。たとえば、<code>quarkus.log.file.enable</code> のようなプロパティー名は、次のセグメントに分割できます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus</code> - Quarkusが主張する名前空間で、<code>@ConfigMapping</code> インタフェースのプレフィックスです。</p>
+</li>
+<li>
+<p><code>enabled</code> - <code>@ConfigGroup</code> アノテーションが付けられた <code>FileConfig</code> クラスの <code>enable</code> フィールドに対応する名前セグメント。</p>
+</li>
+<li>
+<p><code>file</code> - このクラスの <code>file</code> フィールドに対応する名前セグメント。</p>
+</li>
+<li>
+<p><code>enable</code> - <code>FileConfig</code> クラスの <code>enable</code> フィールドに対応する名前セグメント。</p>
+</li>
+</ul>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@ConfigMapping</code> のアノテーションは、インターフェースが設定マッピングであることを示し、この場合、 <code>quarkus.log</code> セグメントに対応するものであることを示しています。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>@ConfigRoot</code> アノテーションは、設定がどの設定フェーズに適用されるかを示したものです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>ここで、<code>LoggingProcessor</code> は、<code>@ConfigRoot</code> アノテーションを検出することによって <code>LogConfiguration</code> インスタンスを自動的に挿入します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>上記の例に対応する <code>application.properties</code> は次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-properties hljs" data-lang="properties">quarkus.log.file.enable=true
+quarkus.log.file.level=DEBUG
+quarkus.log.file.path=/tmp/debug.log</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これらのプロパティには <code>format</code> が定義されていないため、代わりに <code>@WithDefault</code> のデフォルト値が使用されます。</p>
+</div>
+<div class="paragraph">
+<p>A configuration mapping name can contain an extra suffix segment for the case where there are configuration
+mappings for multiple <a href="#config-phases">設定フェーズ</a>. Classes which correspond to the <code>BUILD_TIME</code> and <code>BUILD_AND_RUN_TIME_FIXED</code>
+may end with <code>BuildTimeConfig</code> or <code>BuildTimeConfiguration</code>, classes which correspond to the <code>RUN_TIME</code> phase
+may end with <code>RuntimeConfig</code>, <code>RunTimeConfig</code>, <code>RuntimeConfiguration</code> or <code>RunTimeConfiguration</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="configuration-reference-documentation"><a class="anchor" href="#configuration-reference-documentation"></a>2.4.3. 設定リファレンスドキュメント</h4>
+<div class="paragraph">
+<p>設定は各エクステンションの重要な部分であるため、適切に文書化される必要があります。各設定プロパティには、適切なJavadocコメントを付ける必要があります。</p>
+</div>
+<div class="paragraph">
+<p>コーディング時にドキュメントを利用できるのは便利ですが、設定ドキュメントもエクステンションガイドで利用できるようにする必要があります。Quarkusのビルドでは、Javadocのコメントに基づいて設定ドキュメントが自動的に生成されますが、各ガイドに明示的に記載する必要があります。</p>
+</div>
+<div class="sect4">
+<h5 id="writing-the-documentation"><a class="anchor" href="#writing-the-documentation"></a>2.4.3.1. ドキュメントの書き方</h5>
+<div class="paragraph">
+<p>各設定プロパティには、その目的を説明するJavadocが必要です。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>最初のセンテンスは、サマリー表に含まれるため、意味があり、自己完結していることが望ましいです。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>標準的なJavadocのコメントは単純なドキュメントには全く問題ありませんが（むしろ推奨）、AsciiDocはヒント、ソースコードの抽出、リストなどに適しています：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">/**
+ * Class name of the Hibernate ORM dialect. The complete list of bundled dialects is available in the
+ * https://docs.jboss.org/hibernate/stable/orm/javadocs/org/hibernate/dialect/package-summary.html[Hibernate ORM JavaDoc].
+ *
+ * [NOTE]
+ * ====
+ * Not all the dialects are supported in GraalVM native executables: we currently provide driver extensions for
+ * PostgreSQL, MariaDB, Microsoft SQL Server and H2.
+ * ====
+ *
+ * @asciidoclet
+ */
+Optional&lt;String&gt; dialect();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>AsciiDocを使用するには、Javadocのコメントに <code>@asciidoclet</code> タグを付ける必要があります。このタグは、Quarkus生成ツールのマーカーとして使用されるだけでなく、Javadoc生成のための <code>javadoc</code> プロセスでも使用されるなど、2つの目的があります。</p>
+</div>
+<div class="paragraph">
+<p>より詳細な例:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// @formatter:off
+/**
+ * Name of the file containing the SQL statements to execute when Hibernate ORM starts.
+ * Its default value differs depending on the Quarkus launch mode:
+ *
+ * * In dev and test modes, it defaults to `import.sql`.
+ *   Simply add an `import.sql` file in the root of your resources directory
+ *   and it will be picked up without having to set this property.
+ *   Pass `no-file` to force Hibernate ORM to ignore the SQL import file.
+ * * In production mode, it defaults to `no-file`.
+ *   It means Hibernate ORM won't try to execute any SQL import file by default.
+ *   Pass an explicit value to force Hibernate ORM to execute the SQL import file.
+ *
+ * If you need different SQL statements between dev mode, test (`@QuarkusTest`) and in production, use Quarkus
+ * https://quarkus.io/guides/config#configuration-profiles[configuration profiles facility].
+ *
+ * [source,property]
+ * .application.properties
+ * ----
+ * %dev.quarkus.hibernate-orm.sql-load-script = import-dev.sql
+ * %test.quarkus.hibernate-orm.sql-load-script = import-test.sql
+ * %prod.quarkus.hibernate-orm.sql-load-script = no-file
+ * ----
+ *
+ * [NOTE]
+ * ====
+ * Quarkus supports `.sql` file with SQL statements or comments spread over multiple lines.
+ * Each SQL statement must be terminated by a semicolon.
+ * ====
+ *
+ * @asciidoclet
+ */
+// @formatter:on
+Optional&lt;String&gt; sqlLoadScript();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Javadocコメントでインデントを尊重するためには（複数行に広がるリスト項目やインデントされたソースコード）、Eclipseの自動フォーマッターを無効にする必要があります（フォーマッターはビルドに自動的に含まれます）。マーカーは <code>// @formatter:off</code>/<code>// @formatter:on</code> .これらは、個別のコメントと、 <code>//</code> マーカーの後に必須のスペースが必要です。</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>オープンブロック( <code>--</code> )は、AsciiDocドキュメントではサポートされていません。他のタイプのブロック（source, admonitions&#8230;&#8203;）はすべてサポートされています。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>デフォルトでは、ドキュメント・ジェネレーターは、ハイフンで区切られたフィールド名を <code>java.util.Map</code> のキーとして使用します。 この動作をオーバーライドするには、 <code>io.quarkus.runtime.annotations.ConfigDocMapKey</code> アノテーションを使用します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ConfigMapping(prefix = "quarkus.some")
+@ConfigRoot
+public interface SomeConfig {
+    /**
+     * Namespace configuration.
+     */
+    @WithParentName
+    @ConfigDocMapKey("cache-name") <i class="conum" data-value="1"></i><b>(1)</b>
+    Map&lt;String, Name&gt; namespace();
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>これにより、 <code>quarkus.some."namespace"</code> の代わりに <code>quarkus.some."cache-name"</code> という名前の設定マップキーが生成されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>It is possible to write a textual explanation for the documentation default value, this is useful when it is generated: <code>@ConfigDocDefault("explain how this is generated")</code>.</p>
+</div>
+<div class="paragraph">
+<p><code>@ConfigDocEnumValue</code> gives a way to explicitly customize the string displayed in the documentation when listing accepted values for an enum.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="writing-section-documentation"><a class="anchor" href="#writing-section-documentation"></a>2.4.3.2. セクションのドキュメントを書く</h5>
+<div class="paragraph">
+<p>指定したグループの設定セクションを生成するには、 <code>@ConfigDocSection</code> アノテーションを使用してください:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">/**
+* Config group related configuration.
+* Amazing introduction here
+*/
+@ConfigDocSection <i class="conum" data-value="1"></i><b>(1)</b>
+ConfigGroupConfig configGroup();</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>これは、生成されたドキュメントに <code>configGroup</code> の設定項目のセクションドキュメントを追加します。セクションのタイトルと導入は、設定項目のjavadocから導出されます。javadocの最初の文章がセクションのタイトルとみなされ、残りの文章がセクションの導入として使用されます。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="generating-the-documentation"><a class="anchor" href="#generating-the-documentation"></a>2.4.3.3. ドキュメントの生成</h5>
+<div class="paragraph">
+<p>ドキュメントを生成するには次を実施します:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>./mvnw -DquicklyDocs</code> の実行</p>
+</li>
+<li>
+<p>グローバルまたは特定のエクステンションディレクトリ（例： <code>extensions/mailer</code> ）で実行することができます。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>ドキュメントはプロジェクトのルートにあるグローバル <code>target/asciidoc/generated/config/</code> で生成されます。</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="including-the-documentation-in-the-extension-guide"><a class="anchor" href="#including-the-documentation-in-the-extension-guide"></a>2.4.3.4. エクステンションガイドにドキュメントを含める</h5>
+<div class="paragraph">
+<p>生成された設定リファレンスドキュメントをガイドに含めるには、次のようにします：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">include::{generated-dir}/config/quarkus-your-extension.adoc[opts=optional, leveloffset=+1]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>特定のコンフィググループのみを含める場合：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">include::{generated-dir}/hyphenated-config-group-class-name-with-runtime-or-deployment-namespace-replaced-by-config-group-namespace.adoc[opts=optional, leveloffset=+1]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>例えば、 <code>io.quarkus.vertx.http.runtime.FormAuthConfig</code> 設定グループは <code>quarkus-vertx-http-config-group-form-auth-config.adoc</code> という名前のファイルに生成されます。</p>
+</div>
+<div class="paragraph">
+<p>幾つかの推奨事項:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>opts=optional</code> は、設定ドキュメントの一部しか生成されていない場合に、ビルドを失敗させないために必須です。</p>
+</li>
+<li>
+<p>ドキュメントは、タイトルレベル2（すなわち、 <code>==</code> ）で生成されます。 <code>leveloffset=+N</code> で調整が必要な場合があります。</p>
+</li>
+<li>
+<p>設定ドキュメント全体はガイドの途中に入れるべきではありません。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>ガイドに <code>application.properties</code> の例が含まれている場合、コードスニペットのすぐ下にヒントを記載する必要があります：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">[TIP]
+For more information about the extension configuration please refer to the &lt;&lt;configuration-reference,Configuration Reference&gt;&gt;.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、ガイドの最後には、充実した設定資料が掲載されています：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">[[configuration-reference]]
+== Configuration Reference
+
+include::{generated-dir}/config/quarkus-your-extension.adoc[opts=optional, leveloffset=+1]</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>All documentation should be generated and validated before being committed.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="conditional-step-inclusion"><a class="anchor" href="#conditional-step-inclusion"></a>2.5. 条件付きステップを含める</h3>
+<div class="paragraph">
+<p>特定の条件下では、特定の <code>@BuildStep</code> のみを含めることができます。<code>@BuildStep</code> アノテーションには、<code>onlyIf</code> と <code>onlyIfNot</code> の 2 つのオプションパラメーターがあります。これらのパラメーターは、<code>BooleanSupplier</code> を実装する 1 つ以上のクラスに設定できます。ビルドステップは、メソッドが <code>true</code> (<code>onlyIf</code> の場合) または <code>false</code> (<code>onlyIfNot</code> の場合) を返す場合にのみ含まれます。</p>
+</div>
+<div class="paragraph">
+<p>条件クラスは、ビルド時フェーズに属する限り、 <a href="#configuration">設定マッピング</a> を注入することができます。実行時設定は、条件クラスでは利用できません。</p>
+</div>
+<div class="paragraph">
+<p>条件クラスは、タイプ <code>io.quarkus.runtime.LaunchMode</code> の値を注入することもできます。コンストラクターパラメーターとフィールドインジェクションがサポートされています。</p>
+</div>
+<div class="listingblock">
+<div class="title">条件付きビルドステップの例</div>
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@BuildStep(onlyIf = IsDevMode.class)
+LogCategoryBuildItem enableDebugLogging() {
+    return new LogCategoryBuildItem("org.your.quarkus.extension", Level.DEBUG);
+}
+
+static class IsDevMode implements BooleanSupplier {
+    LaunchMode launchMode;
+
+    public boolean getAsBoolean() {
+        return launchMode == LaunchMode.DEVELOPMENT;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+別のエクステンションの有無を条件としてビルドステップを作成する必要がある場合は、<a href="#capabilities">Capabilities</a> を使用できます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>@BuildSteps</code> を使用して、特定のクラスのすべてのビルドステップに一連の条件を適用することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="title">ビルドステップを @BuildSteps でクラス単位で条件指定する。</div>
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@BuildSteps(onlyIf = MyDevModeProcessor.IsDevMode.class) <i class="conum" data-value="1"></i><b>(1)</b>
+class MyDevModeProcessor {
+
+    @BuildStep
+    SomeOutputBuildItem mainBuildStep(SomeOtherBuildItem input) { <i class="conum" data-value="2"></i><b>(2)</b>
+        return new SomeOutputBuildItem(input.getValue());
+    }
+
+    @BuildStep
+    SomeOtherOutputBuildItem otherBuildStep(SomeOtherInputBuildItem input) { <i class="conum" data-value="3"></i><b>(3)</b>
+        return new SomeOtherOutputBuildItem(input.getValue());
+    }
+
+    static class IsDevMode implements BooleanSupplier {
+        LaunchMode launchMode;
+
+        public boolean getAsBoolean() {
+            return launchMode == LaunchMode.DEVELOPMENT;
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>この条件は <code>MyDevModeProcessor</code> で定義されたすべてのメソッドに適用されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>メインのビルドステップは、dev モードでのみ実行されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>もう一つのビルドステップは、dev モードでのみ実行されます。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="bytecode-recording"><a class="anchor" href="#bytecode-recording"></a>2.6. バイトコードの記録</h3>
+<div class="paragraph">
+<p>ビルドプロセスの主要なアウトプットの1つは、記録されたバイトコードです。このバイトコードは、実際に実行時環境を設定します。例えば、Undertowを起動するために、出来上がったアプリケーションには、すべてのServletインスタンスを直接登録し、その後Undertowを起動するバイトコードが含まれます。</p>
+</div>
+<div class="paragraph">
+<p>バイトコードを直接書くのは複雑なので、代わりにバイトコードレコーダーを使っています。デプロイメント時には、実際の実行時 ロジックを含むレコーダー オブジェクトが呼び出されますが、これらの呼び出しは通常通りに行われるのではなく、インターセプトされて記録されます (これが名前の由来です)。この記録は、実行時に同じ一連の呼び出しを実行するバイトコードを生成するために使用されます。これは本質的には遅延実行の一形態であり、デプロイメント時に行われた呼び出しが実行時まで延期されます。</p>
+</div>
+<div class="paragraph">
+<p>典型的な「Hello World」タイプの例を見てみましょう。これをQuarkusの方法で行うには、次のようにレコーダーを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@Recorder
+class HelloRecorder {
+
+  public void sayHello(String name) {
+    System.out.println("Hello" + name);
+  }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、このレコーダーを使用するビルドステップを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@Record(RUNTIME_INIT)
+@BuildStep
+public void helloBuildStep(HelloRecorder recorder) {
+    recorder.sayHello("World");
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このビルドステップを実行しても、コンソールには何も表示されません。これは、注入された <code>HelloRecorder</code> が、実際にはすべての呼び出しを記録するプロキシであるためです。代わりに、生成されたQuarkusプログラムを実行すると、コンソールに「Hello World」が出力されます。</p>
+</div>
+<div class="paragraph">
+<p>レコーダーのメソッドは値を返すことができますが、その値はプロキシ可能なものでなければなりません（プロキシ不可能なアイテムを返す場合は、 <code>io.quarkus.runtime.RuntimeValue</code> で囲みます）。これらのプロキシは、直接呼び出すことはできませんが、他のレコーダーのメソッドに渡すことができます。これは、他の <code>@BuildStep</code> メソッドも含めて、どのようなレコーダ・メソッドでもよいので、これらのレコーダの呼び出しの結果をラップした <code>BuildItem</code> インスタンスを生成するのが一般的なパターンです。</p>
+</div>
+<div class="paragraph">
+<p>例えば、Servletの配置に任意の変更を加えるために、Undertowは <code>ServletExtensionBuildItem</code> を持っています。これは <code>ServletExtension</code> インスタンスをラップした <code>MultiBuildItem</code> です。他のモジュールのレコーダーから <code>ServletExtension</code> を返すと、Undertowはそれを使用し、Undertowを起動するレコーダー・メソッドに渡すことができます。</p>
+</div>
+<div class="paragraph">
+<p>実行時には、生成された順にバイトコードが呼び出されます。つまり、ビルドステップの依存関係は、生成されたバイトコードが実行される順序を暗黙のうちに制御します。上の例では、 <code>ServletExtensionBuildItem</code> を生成するバイトコードが、それを消費するバイトコードよりも先に実行されることがわかっています。</p>
+</div>
+<div class="paragraph">
+<p>レコーダーに渡すことができるオブジェクトは以下の通りです。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>プリミティブ</p>
+</li>
+<li>
+<p>文字列</p>
+</li>
+<li>
+<p>クラス&lt;?&gt; オブジェクト</p>
+</li>
+<li>
+<p>前回のレコーダー起動時に返されたオブジェクト</p>
+</li>
+<li>
+<p>すべてのプロパティー (またはパブリックフィールド) の引数なしコンストラクターとゲッター/セッターを持つオブジェクト</p>
+</li>
+<li>
+<p>フィールド名と一致するパラメーター名を持つ <code>@RecordableConstructor</code> でアノテーションが付けられたコンストラクターを持つオブジェクト</p>
+</li>
+<li>
+<p><code>io.quarkus.deployment.recording.RecorderContext#registerSubstitution(Class, Class, Class)</code> メカニズムによる任意のオブジェクト</p>
+</li>
+<li>
+<p>上記の配列、リスト、マップ</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>記録するオブジェクトの一部のフィールドを無視する必要がある場合（ビルド時に存在する値を実行時に反映させるべきではない場合）には、そのフィールドに <code>@IgnoreProperty</code> を配置することができます。</p>
+</div>
+<div class="paragraph">
+<p>クラスがQuarkusに依存できない場合、エクステンションが <code>io.quarkus.deployment.recording.RecordingAnnotationsProvider</code> SPIを実装していれば、Quarkusは任意のカスタムアノテーションを使用することができます。</p>
+</div>
+<div class="paragraph">
+<p>この同じSPIを使用して、 <code>@RecordableConstructor</code> の代わりになるカスタムアノテーションを提供することも可能です。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="injecting-configuration-into-recorders"><a class="anchor" href="#injecting-configuration-into-recorders"></a>2.6.1. レコーダーへの設定の注入</h4>
+<div class="paragraph">
+<p>フェーズ <code>RUNTIME</code> または <code>BUILD_AND_RUNTIME_FIXED</code> の設定オブジェクトは、コンストラクターインジェクションを介してレコーダーに注入できます。レコーダが必要とする設定オブジェクトを取得するコンストラクターを作成するだけです。レコーダに複数のコンストラクターがある場合は、Quarkus で使用するコンストラクターに <code>@Inject</code> でアノテーションを付けることができます。レコーダーがランタイム設定を注入したいが、静的初期化時にも使用される場合は、<code>RuntimeValue&lt;ConfigObject&gt;</code> を注入する必要があります。この値は、ランタイムメソッドが呼び出されてた場合にのみ設定されます。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="recordercontext"><a class="anchor" href="#recordercontext"></a>2.6.2. RecorderContext</h4>
+<div class="paragraph">
+<p><code>io.quarkus.deployment.recording.RecorderContext</code> は、バイトコードの記録を強化するためのいくつかの便利なメソッドを提供しています。これには、引数なしのコンストラクタを持たないクラスの作成関数の登録、オブジェクト置換の登録（基本的には、シリアル化不可能なオブジェクトからシリアル化可能なオブジェクトへの変換、およびその逆）、クラスプロキシの作成などがあります。このインターフェースは、 <code>@Record</code> のメソッドにメソッドパラメータとして直接注入することができます。</p>
+</div>
+<div class="paragraph">
+<p>Calling <code>classProxy</code> with a given fully-qualified class name will create a <code>Class</code> instance that can be passed into a recorder
+method, and at runtime will be substituted with the class whose name was passed in to <code>classProxy()</code>.
+However, this method should not be needed in most use cases because directly loading deployment/application classes at processing time in build steps is safe.
+Therefore, this method is deprecated.
+Nonetheless, there are some use cases where this method comes in handy, such as referring to classes that were generated in previous build steps using <code>GeneratedClassBuildItem</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="runtime-classpath-check"><a class="anchor" href="#runtime-classpath-check"></a>2.6.3. Runtime Classpath check</h4>
+<div class="paragraph">
+<p>Extensions often need a way to determine whether a given class is part of the application&#8217;s runtime classpath.
+The proper way for an extension to perform this check is to use <code>io.quarkus.bootstrap.classloading.QuarkusClassLoader.isClassPresentAtRuntime</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="printing-step-execution-time"><a class="anchor" href="#printing-step-execution-time"></a>2.6.4. ステップ実行時間の出力</h4>
+<div class="paragraph">
+<p>時には、アプリケーションを実行したときに、各スタートアップタスク（各バイトコードの記録結果）にかかる正確な時間を知りたい場合があります。この情報を確認する最も簡単な方法は、 <code>-Dquarkus.debug.print-startup-times=true</code> システムプロパティを付けてQuarkusアプリケーションを起動することです。出力は以下のようになります:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">Build step LoggingResourceProcessor.setupLoggingRuntimeInit completed in: 42ms
+Build step ConfigGenerationBuildStep.checkForBuildTimeConfigChange completed in: 4ms
+Build step SyntheticBeansProcessor.initRuntime completed in: 0ms
+Build step ConfigBuildStep.validateConfigProperties completed in: 1ms
+Build step ResteasyStandaloneBuildStep.boot completed in: 95ms
+Build step VertxHttpProcessor.initializeRouter completed in: 1ms
+Build step VertxHttpProcessor.finalizeRouter completed in: 4ms
+Build step LifecycleEventsBuildStep.startupEvent completed in: 1ms
+Build step VertxHttpProcessor.openSocket completed in: 93ms
+Build step ShutdownListenerBuildStep.setupShutdown completed in: 1ms</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="contexts-and-dependency-injection"><a class="anchor" href="#contexts-and-dependency-injection"></a>2.7. コンテキストと依存性インジェクション</h3>
+<div class="sect3">
+<h4 id="extension-points"><a class="anchor" href="#extension-points"></a>2.7.1. 拡張ポイント</h4>
+<div class="paragraph">
+<p>CDIベースのランタイムとして、Quarkusのエクステンションは、多くの場合、エクステンションの動作の一部としてCDI Beanを利用できるようにしています。ただし、Quarkus DIソリューションはCDI Portable Extensionsをサポートしていません。代わりに、Quarkusのエクステンションは、さまざまな <a href="cdi-reference.html">Build Time Extension Point</a>を利用することができます。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="quarkus-dev-ui"><a class="anchor" href="#quarkus-dev-ui"></a>2.8. Quarkus Dev UI</h3>
+<div class="paragraph">
+<p>エクステンションを <a href="dev-ui.html">Quarkus Dev UI</a>に対応させることで、開発者の利便性を高めることができます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="extension-defined-endpoints"><a class="anchor" href="#extension-defined-endpoints"></a>2.9. エクステンションで定義されたエンドポイント</h3>
+<div class="paragraph">
+<p>エクステンションは、Health、Metrics、OpenAPI、Swagger UIなどのエンドポイントと一緒に提供される、アプリケーション以外のエンドポイントを追加することができます。</p>
+</div>
+<div class="paragraph">
+<p><code>NonApplicationRootPathBuildItem</code> を使用して、エンドポイントを定義します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@BuildStep
+RouteBuildItem myExtensionRoute(NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem) {
+    return nonApplicationRootPathBuildItem.routeBuilder()
+                .route("custom-endpoint")
+                .handler(new MyCustomHandler())
+                .displayOnNotFoundPage()
+                .build();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上記のパスが「/」で始まっていないのは、相対パスであることを示しています。上記のエンドポイントは、設定されたノンアプリケーションエンドポイントのルートからの相対パスで提供されます。アプリケーション以外のエンドポイントのルートは、デフォルトでは <code>/q</code> となっており、結果的にエンドポイントは <code>/q/custom-endpoint</code> にあることになります。</p>
+</div>
+<div class="paragraph">
+<p>絶対パスは異なる方法で処理されます。上記が <code>route("/custom-endpoint")</code> を呼び出すと、生成されるエンドポイントは '/custom-endpoint' に保存されます。</p>
+</div>
+<div class="paragraph">
+<p>エクステンションがネストした非アプリケーションのエンドポイントを必要とする場合:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@BuildStep
+RouteBuildItem myNestedExtensionRoute(NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem) {
+    return nonApplicationRootPathBuildItem.routeBuilder()
+                .nestedRoute("custom-endpoint", "deep")
+                .handler(new MyCustomHandler())
+                .displayOnNotFoundPage()
+                .build();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>デフォルトの非アプリケーションエンドポイントルートが <code>/q</code> の場合、<code>/q/custom-endpoint/deep</code> にエンドポイントが作成されます。</p>
+</div>
+<div class="paragraph">
+<p>絶対パスは、ネストされたエンドポイントにも影響を与えます。上記が <code>nestedRoute ("custom-endpoint"、"/deep")</code> を呼び出した場合、生成されるエンドポイントは <code>/deep</code> にあります。</p>
+</div>
+<div class="paragraph">
+<p>Refer to the <a href="all-config#quarkus-vertx-http_quarkus-http-non-application-root-path">Quarkus Vertx HTTP configuration reference</a>
+for details on how the non-application root path is configured.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="extension-health-check"><a class="anchor" href="#extension-health-check"></a>2.10. エクステンションヘルスチェック</h3>
+<div class="paragraph">
+<p>ヘルスチェックは <code>quarkus-smallrye-health</code> のエクステンションを介して提供されます。これは、livenessとreadinessのチェック機能の両方を提供します。</p>
+</div>
+<div class="paragraph">
+<p>エクステンションを書くときには、開発者が自分で書かなくても自動的に含まれるようにすることができるエクステンションのヘルスチェックを提供することが有益です。</p>
+</div>
+<div class="paragraph">
+<p>ヘルスチェックを行うためには、以下のようにしましょう。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus-smallrye-health</code> ヘルスチェックを <strong>オプションの</strong> 依存関係としてランタイムモジュールにインポートすることで、ヘルスチェックが含まれていない場合でもアプリケーションのサイズに影響を与えないようにします。</p>
+</li>
+<li>
+<p><a href="smallrye-health">SmallRye Health</a> ガイドに従ってヘルスチェックを作成します。エクステンションの readiness チェックのみを提供することをお勧めします (liveness チェックは、アプリケーションが稼働中で軽量である必要があるというファクトを示すために設計されています)。</p>
+</li>
+<li>
+<p>デプロイメントモジュールに <code>quarkus-smallrye-health-spi</code> ライブラリをインポートします。</p>
+</li>
+<li>
+<p>デプロイメントモジュールに、 <code>HealthBuildItem</code> を生成するビルドステップを追加します。</p>
+</li>
+<li>
+<p>設定アイテム <code>quarkus.&lt;extension&gt;.health.enabled</code> を介して、デフォルトでは有効になっているエクステンションのヘルスチェックを無効にする方法を追加します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>以下は、データソースの readiness を検証するための <code>DataSourceHealthCheck</code> を提供する Agroal エクステンションの例です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@BuildStep
+HealthBuildItem addHealthCheck(AgroalBuildTimeConfig agroalBuildTimeConfig) {
+    return new HealthBuildItem("io.quarkus.agroal.runtime.health.DataSourceHealthCheck",
+            agroalBuildTimeConfig.healthEnabled);
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="extension-metrics"><a class="anchor" href="#extension-metrics"></a>2.11. エクステンションメトリクス</h3>
+<div class="paragraph">
+<p><code>quarkus-micrometer</code> エクステンションと <code>quarkus-smallrye-metrics</code> エクステンションは、メトリクスを収集するためのサポートを提供します。互換性についての注意点として、 <code>quarkus-micrometer</code> エクステンションは MP Metrics API を Micrometer ライブラリのプリミティブに適応させているので、MP Metrics API に依存しているコードを壊すことなく <code>quarkus-micrometer</code> エクステンションを有効にすることができます。Micrometer が出力するメトリクスは異なることに注意してください。詳細は <code>quarkus-micrometer</code> エクステンションのドキュメントを参照してください。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+MP Metrics API の互換性レイヤは、将来的には別のエクステンションに移行する予定です。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>エクステンションがオプションのメトリクスエクステンションとインタラクトして独自のメトリクスを追加するために使用できる、幅広いパターンが 2 つあります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>コンシューマーパターン: エクステンションは <code>MetricsFactoryConsumerBuildItem</code> を宣言し、それを使用してメトリクスエクステンションにバイトコードレコーダーを提供します。メトリクスエクステンションが初期化されると、登録されたコンシューマーを反復処理し、<code>MetricsFactory</code> で初期化します。このファクトリーは、API に依存しないメトリクスの宣言に使用できます。これは、統計を収集するためのインストルメント可能なオブジェクト (Hibernate の <code>Statistics</code> クラスなど) を提供するエクステンションに適しています。</p>
+</li>
+<li>
+<p>バインダーパターン: エクステンションは、メトリクスシステムに応じて完全に異なる収集実装の使用を選択できます。<code>Optional&lt;MetricsCapabilityBuildItem&gt; metricsCapability</code> ビルドステップパラメーターを使用して、アクティブなメトリクスエクステンション (smallrye-metrics や micrometer など) に基づいて API 固有メトリクスを宣言または初期化できます。このパターンは、 <code>MetricsFactory::metricsSystemSupported()</code> を使用して、レコーダー内のアクティブなメトリクスエクステンションをテストすることにより、コンシューマーパターンと組み合わせることができます。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>メトリクスのサポートはオプションです。エクステンションはビルドステップで <code>Optional&lt;MetricsCapabilityBuildItem&gt; metricsCapability</code> を使用して、有効化されたメトリクスエクステンションの存在をテストできます。追加の設定を使用して、メトリクスの動作を制御することを検討してください。たとえば、データソースメトリクスは高額になる可能性があるため、追加の設定フラグを使用して、個々のデータソースでメトリクス収集を有効にします。</p>
+</div>
+<div class="paragraph">
+<p>エクステンションのメトリクスを追加するとき、以下のいずれかの状況に陥ることがあります:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>エクステンションで使用される基盤となるライブラリーは、特定のメトリクス API (MP Metrics、Micrometer、またはその他) を直接使用します。</p>
+</li>
+<li>
+<p>基盤となるライブラリーは、メトリクスを収集するために独自のメカニズムを使用し、Hibernate の <code>Statistics</code> クラスや Vert.x <code>MetricsOptions</code> などの独自の API を使用してランタイムにそれらを利用できるようにします。</p>
+</li>
+<li>
+<p>基礎となるライブラリーがメトリクスを提供しない (またはライブラリーがまったくない) ため、インストルメンテーションを追加する必要があります。</p>
+</li>
+</ol>
+</div>
+<div class="sect3">
+<h4 id="case-1-the-library-uses-a-metrics-library-directly"><a class="anchor" href="#case-1-the-library-uses-a-metrics-library-directly"></a>2.11.1. ケース1：ライブラリがメトリクス・ライブラリを直接利用する場合</h4>
+<div class="paragraph">
+<p>ライブラリーがメトリクス API を直接使用する場合、2 つのオプションがあります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Optional&lt;MetricsCapabilityBuildItem&gt; metricsCapability</code> パラメーターを使用して、ビルドステップでサポートされているメトリクス API (smallrye-metrics や micrometer など) をテストし、それを使用して API 固有の Bean またはビルドアイテムを選択的に宣言または初期化します。</p>
+</li>
+<li>
+<p><code>MetricsFactory</code> を使用する別のビルドステップを作成し、バイトコードレコーダー内の 'MetricsFactory::metricsSystemSupported()' メソッドを使用して、必要なメトリクス API がサポートされている場合に必要なリソースを初期化します (smallrye-metrics や micrometer など)。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>アクティブなメトリクスエクステンションがない場合、またはエクステンションがライブラリーに必要な API をサポートしていない場合、エクステンションはフォールバックを提供しなければならない可能性があります。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="case-2-the-library-provides-its-own-metric-api"><a class="anchor" href="#case-2-the-library-provides-its-own-metric-api"></a>2.11.2. ケース 2: ライブラリーが独自のメトリクス API を提供している</h4>
+<div class="paragraph">
+<p>独自のメトリクス API を提供するライブラリーの例は 2 つあります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>エクステンションは、Agroal が <code>io.agroal.api.AgroalDataSourceMetrics</code> で行うように、インストルメント可能なオブジェクトを定義します。</p>
+</li>
+<li>
+<p>エクステンションは、Jaeger が <code>io.jaegertracing.spi.MetricsFactory</code> で行うように、独自のメトリクスの抽象化を提供します。</p>
+</li>
+</ul>
+</div>
+<div class="sect4">
+<h5 id="observing-instrumentable-objects"><a class="anchor" href="#observing-instrumentable-objects"></a>2.11.2.1. インストルメント可能なオブジェクトの観察</h5>
+<div class="paragraph">
+<p>まず、インストルメント可能オブジェクト (<code>io.agroal.api.AgroalDataSourceMetrics</code>) の場合を見てみましょう。この場合、次のことができます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>RUNTIME_INIT</code> または <code>STATIC_INIT</code> レコーダーを使用して <code>MetricsFactory</code> コンシューマーを定義して <code>MetricsFactoryConsumerBuildItem</code> を生成する <code>BuildStep</code> を定義します。たとえば以下は、メトリクスが一般的に Agroal とデータソースの両方で有効になっている場合にのみ <code>MetricsFactoryConsumerBuildItem</code> を作成します。</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@BuildStep
+@Record(ExecutionTime.RUNTIME_INIT)
+void registerMetrics(AgroalMetricsRecorder recorder,
+        DataSourcesBuildTimeConfig dataSourcesBuildTimeConfig,
+        BuildProducer&lt;MetricsFactoryConsumerBuildItem&gt; datasourceMetrics,
+        List&lt;AggregatedDataSourceBuildTimeConfigBuildItem&gt; aggregatedDataSourceBuildTimeConfigs) {
+
+    for (AggregatedDataSourceBuildTimeConfigBuildItem aggregatedDataSourceBuildTimeConfig : aggregatedDataSourceBuildTimeConfigs) {
+        // Create a MetricsFactory consumer to register metrics for a data source
+        // IFF metrics are enabled globally and for the data source
+        // (they are enabled for each data source by default if they are also enabled globally)
+        if (dataSourcesBuildTimeConfig.metricsEnabled &amp;&amp;
+                aggregatedDataSourceBuildTimeConfig.getJdbcConfig().enableMetrics.orElse(true)) {
+            datasourceMetrics.produce(new MetricsFactoryConsumerBuildItem(
+                    recorder.registerDataSourceMetrics(aggregatedDataSourceBuildTimeConfig.getName())));
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>関連するレコーダーは、提供された <code>MetricsFactory</code> を使用してメトリクスを登録する必要があります。Agroal の場合、これは <code>MetricFactory</code> API を使用して <code>io.agroal.api.AgroalDataSourceMetrics</code> メソッドを監視することを意味します。以下はその例です。</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">/* RUNTIME_INIT */
+public Consumer&lt;MetricsFactory&gt; registerDataSourceMetrics(String dataSourceName) {
+    return new Consumer&lt;MetricsFactory&gt;() {
+        @Override
+        public void accept(MetricsFactory metricsFactory) {
+            String tagValue = DataSourceUtil.isDefault(dataSourceName) ? "default" : dataSourceName;
+            AgroalDataSourceMetrics metrics = getDataSource(dataSourceName).getMetrics();
+
+            // When using MP Metrics, the builder uses the VENDOR registry by default.
+            metricsFactory.builder("agroal.active.count")
+                    .description(
+                            "Number of active connections. These connections are in use and not available to be acquired.")
+                    .tag("datasource", tagValue)
+                    .buildGauge(metrics::activeCount);
+            ....</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>MetricsFactory</code> は、メトリクスを登録するための流動的なビルダーを提供し、最後のステップでは、<code>Supplier</code> または <code>ToDoubleFunction</code> に基づいてゲージまたはカウンターを構築します。タイマーは、<code>Callable</code>、<code>Runnable</code>、または <code>Supplier</code> の実装をラップするか、<code>TimeRecorder</code> を使用して時間のチャンクを蓄積することができます。基盤となるメトリクスエクステンションは、定義された関数を観察または測定するための適切なアーティファクトを作成します。</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="using-a-metrics-api-specific-implementation"><a class="anchor" href="#using-a-metrics-api-specific-implementation"></a>2.11.2.2. メトリクス API 固有の実装の使用</h5>
+<div class="paragraph">
+<p>metrics-API 固有の実装を使用することが、状況によっては優先される場合があります。たとえば、Jaeger は、カウンターとゲージを定義するために使用する独自のメトリクスインターフェイス <code>io.jaegertracing.spi.MetricsFactory</code> を定義します。そのインターフェイスからメトリクスシステムへの直接マッピングは最も効率的です。この場合、これらの特殊な実装を分離し、メトリクス API が任意のコンパイル時依存関係を維持できるように、活発なクラスローディングを回避することが重要です。</p>
+</div>
+<div class="paragraph">
+<p><code>Optional&lt;MetricsCapabilityBuildItem&gt; metricsCapability</code> をビルドステップで使用して、Bean の初期化または他のビルドアイテムの生成を選択的に制御できます。たとえば Jaeger エクステンションは、以下を使用して、特殊なメトリクス API アダプターの初期化を制御できます。</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">/* RUNTIME_INIT */
+@BuildStep
+@Record(ExecutionTime.RUNTIME_INIT)
+void setupTracer(JaegerDeploymentRecorder jdr, JaegerBuildTimeConfig buildTimeConfig, JaegerConfig jaeger,
+        ApplicationConfig appConfig, Optional&lt;MetricsCapabilityBuildItem&gt; metricsCapability) {
+
+    // Indicates that this extension would like the SSL support to be enabled
+    extensionSslNativeSupport.produce(new ExtensionSslNativeSupportBuildItem(Feature.JAEGER.getName()));
+
+    if (buildTimeConfig.enabled) {
+        // To avoid dependency creep, use two separate recorder methods for the two metrics systems
+        if (buildTimeConfig.metricsEnabled &amp;&amp; metricsCapability.isPresent()) {
+            if (metricsCapability.get().metricsSupported(MetricsFactory.MICROMETER)) {
+                jdr.registerTracerWithMicrometerMetrics(jaeger, appConfig);
+            } else {
+                jdr.registerTracerWithMpMetrics(jaeger, appConfig);
+            }
+        } else {
+            jdr.registerTracerWithoutMetrics(jaeger, appConfig);
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>MetricsFactory</code> を使用するレコーダーは　<code>MetricsFactory::metricsSystemSupported()</code> を使用して、同様の方法でバイトコード記録中にメトリクスオブジェクトの初期化を制御できます。</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="case-3-it-is-necessary-to-collect-metrics-within-the-extension-code"><a class="anchor" href="#case-3-it-is-necessary-to-collect-metrics-within-the-extension-code"></a>2.11.3. ケース3：エクステンションコード内でメトリクスを収集する必要がある</h4>
+<div class="paragraph">
+<p>独自のメトリクスを最初から定義するには、2 つの基本的なオプションがあります。汎用 <code>MetricFactory</code> ビルダーを使用するか、バインダーパターンに従い、有効なメトリクスエクステンション固有のインストルメンテーションを作成します。</p>
+</div>
+<div class="paragraph">
+<p>エクステンションに依存しない <code>MetricFactory</code> API を使用するために、プロセッサーは、<code>RUNTIME_INIT</code> または <code>STATIC_INIT</code> レコーダを使用して <code>MetricsFactory</code> コンシューマを定義する <code>MetricsFactoryConsumerBuildItem</code> を生成する <code>BuildStep</code> を定義できます。</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@BuildStep
+@Record(ExecutionTime.RUNTIME_INIT)
+MetricsFactoryConsumerBuildItem registerMetrics(MyExtensionRecorder recorder) {
+    return new MetricsFactoryConsumerBuildItem(recorder.registerMetrics());
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>+
+- 関連するレコーダは、提供された <code>MetricsFactory</code> を使用してメトリクスを登録する必要があります。例:</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">final LongAdder extensionCounter = new LongAdder();
+
+/* RUNTIME_INIT */
+public Consumer&lt;MetricsFactory&gt; registerMetrics() {
+    return new Consumer&lt;MetricsFactory&gt;() {
+        @Override
+        public void accept(MetricsFactory metricsFactory) {
+            metricsFactory.builder("my.extension.counter")
+                    .buildGauge(extensionCounter::longValue);
+            ....</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>メトリクスエクステンションはオプションです。メトリクス関連の初期化を他のエクステンション設定から分離し、メトリクス API の熱心なインポートを回避するようにコードを構造化します。メトリクスの収集もコストがかかる可能性があります。メトリクスのサポートの有無が十分でない場合は、追加のエクステンション固有の設定を使用してメトリクスの動作を制御することを検討してください。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="customizing-json-handling-from-an-extension"><a class="anchor" href="#customizing-json-handling-from-an-extension"></a>2.12. エクステンションからJSON処理をカスタマイズする</h3>
+<div class="paragraph">
+<p>エクステンションはしばしば、エクステンションが提供する型のシリアライザやデシリアライザを登録する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>このため、Jackson 拡張モジュールと JSON-B 拡張モジュールの両方で、エクステンション内からシリアライザ/デシリアライザを登録する方法を提供しています。</p>
+</div>
+<div class="paragraph">
+<p>すべての人がJSONを必要とするわけではないことを覚えておいてください。そのため、オプションとする必要があります。</p>
+</div>
+<div class="paragraph">
+<p>エクステンションがJSON関連のカスタマイズを提供しようとする場合は、JacksonとJSON-Bの両方のカスタマイズを提供することを強くお勧めします。</p>
+</div>
+<div class="sect3">
+<h4 id="customizing-jackson"><a class="anchor" href="#customizing-jackson"></a>2.12.1. Jackson のカスタマイズ</h4>
+<div class="paragraph">
+<p>まず、エクステンションのランタイムモジュールに <code>quarkus-jackson</code> への <strong>オプションの</strong> 依存関係を追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+  &lt;artifactId&gt;quarkus-jackson&lt;/artifactId&gt;
+  &lt;optional&gt;true&lt;/optional&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、Jackson 用のシリアライザまたはデシリアライザ (またはその両方) を作成します。 <code>mongodb-panache</code> のエクステンションで例を見ることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">public class ObjectIdSerializer extends StdSerializer&lt;ObjectId&gt; {
+    public ObjectIdSerializer() {
+        super(ObjectId.class);
+    }
+    @Override
+    public void serialize(ObjectId objectId, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
+            throws IOException {
+        if (objectId != null) {
+            jsonGenerator.writeString(objectId.toString());
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>エクステンションのデプロイメントモジュールの <code>quarkus-jackson-spi</code> に依存関係を追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+  &lt;artifactId&gt;quarkus-jackson-spi&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>プロセッサーにビルドステップを追加して、<code>JacksonModuleBuildItem</code> を介して Jackson モジュールを登録します。すべての Jackson モジュールで一意のモジュール名を付ける必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@BuildStep
+JacksonModuleBuildItem registerJacksonSerDeser() {
+    return new JacksonModuleBuildItem.Builder("ObjectIdModule")
+                    .add(io.quarkus.mongodb.panache.jackson.ObjectIdSerializer.class.getName(),
+                            io.quarkus.mongodb.panache.jackson.ObjectIdDeserializer.class.getName(),
+                            ObjectId.class.getName())
+                    .build();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、Jackson エクステンションは、生成されたビルドアイテムを使用して、Jackson 内で自動的にモジュールを登録します。</p>
+</div>
+<div class="paragraph">
+<p>If you need more customization capabilities than registering a module,
+you can produce a CDI bean that implements <code>io.quarkus.jackson.ObjectMapperCustomizer</code> via an <code>AdditionalBeanBuildItem</code>.
+More info about customizing Jackson can be found on the JSON guide <a href="rest-json#json">Configuring JSON support</a></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="customizing-json-b"><a class="anchor" href="#customizing-json-b"></a>2.12.2. JSON-B のカスタマイズ</h4>
+<div class="paragraph">
+<p>まず、エクステンションのランタイムモジュールに <code>quarkus-jsonb</code> への <strong>オプションの</strong> 依存関係を追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+  &lt;artifactId&gt;quarkus-jsonb&lt;/artifactId&gt;
+  &lt;optional&gt;true&lt;/optional&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、JSON-B のシリアライザーまたはデシリアライザー、あるいはその両方を作成します。<code>mongodb-panache</code> エクステンションでその例を確認できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">public class ObjectIdSerializer implements JsonbSerializer&lt;ObjectId&gt; {
+    @Override
+    public void serialize(ObjectId obj, JsonGenerator generator, SerializationContext ctx) {
+        if (obj != null) {
+            generator.write(obj.toString());
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>エクステンションのデプロイメントモジュールで <code>quarkus-jsonb-spi</code> に依存関係を追加。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+  &lt;artifactId&gt;quarkus-jsonb-spi&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>プロセッサーにビルドステップを追加して、<code>JsonbSerializerBuildItem</code> を介してシリアライザーを登録します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-java hljs" data-lang="java">@BuildStep
+JsonbSerializerBuildItem registerJsonbSerializer() {
+    return new JsonbSerializerBuildItem(io.quarkus.mongodb.panache.jsonb.ObjectIdSerializer.class.getName()));
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、JSON-B エクステンションは、生成されたビルドアイテムを使用して、シリアライザー/デシリアライザーを自動的に登録します。</p>
+</div>
+<div class="paragraph">
+<p>If you need more customization capabilities than registering a serializer or a deserializer,
+you can produce a CDI bean that implements <code>io.quarkus.jsonb.JsonbConfigCustomizer</code> via an <code>AdditionalBeanBuildItem</code>.
+More info about customizing JSON-B can be found on the JSON guide <a href="rest-json#json">Configuring JSON support</a></p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="integrating-with-development-mode"><a class="anchor" href="#integrating-with-development-mode"></a>2.13. 開発モードとの連携</h3>
+<div class="paragraph">
+<p>開発モードとの統合や、現在の状態に関する情報を得るために使用できる様々なAPIがあります。</p>
+</div>
+<div class="sect3">
+<h4 id="handling-restarts"><a class="anchor" href="#handling-restarts"></a>2.13.1. 再起動のハンドリング</h4>
+<div class="paragraph">
+<p>Quarkusの起動時には、特にこの起動に関する情報を与える <code>io.quarkus.deployment.builditem.LiveReloadBuildItem</code> が存在することが保証されています。特に、</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>クリーンスタートなのか、ライブリロードなのか</p>
+</li>
+<li>
+<p>ライブリロードで、変更されたファイルやクラスがリロードのきっかけになっているかどうか</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>また、静的なフィールドに頼ることなく、再起動の間に情報を保存するために使用できるグローバルなコンテキストマップを提供しています。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="triggering-live-reload"><a class="anchor" href="#triggering-live-reload"></a>2.13.2. ライブリロードのトリガー</h4>
+<div class="paragraph">
+<p>しかし、すべてのアプリケーションがHTTPアプリケーションであるとは限らず、エクステンションによっては他のイベントに基づいてライブリロードをトリガしたい場合もあります。これを実現するには、実行時モジュールで <code>io.quarkus.dev.spi.HotReplacementSetup</code> を実装し、その実装をリストアップする <code>META-INF/services/io.quarkus.dev.spi.HotReplacementSetup</code> を追加する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>起動時には <code>setupHotDeployment</code> メソッドが呼び出され、提供された <code>io.quarkus.dev.spi.HotReplacementContext</code> を使って変更されたファイルのスキャンを開始することができます。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="dev-services"><a class="anchor" href="#dev-services"></a>2.13.3. Dev Services</h4>
+<div class="paragraph">
+<p>Where extensions use an external service, adding a Dev Service can improve the user experience in development and test modes.
+See <a href="extension-writing-dev-service">how to write a Dev Service</a> for more details.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="testing-extensions"><a class="anchor" href="#testing-extensions"></a>2.14. エクステンションのテスト</h3>
+<div class="paragraph">
+<p>Quarkus エクステンションのテストは <code>io.quarkus.test.QuarkusUnitTest</code> JUnit 5 拡張モジュールを使用してください。このエクステンションを使用すると、特定の機能をテストする Arquillian スタイルのテストを行うことができます。ユーザーアプリケーションのテストは <code>io.quarkus.test.junit.QuarkusTest</code> を経由して行う必要があるため、ユーザーアプリケーションのテストを目的としたものではありません。主な違いは、 <code>QuarkusTest</code> は実行開始時にアプリケーションを起動するだけで、 <code>QuarkusUnitTest</code> は各テストクラスごとにカスタムの Quarkus アプリケーションを展開するという点です。</p>
+</div>
+<div class="paragraph">
+<p>これらのテストもデプロイメントモジュールに配置される必要があります。もし追加のQuarkusモジュールがテストに必要な場合は、それらのデプロイメントモジュールもテストスコープ付きの依存関係として追加しなければなりません。</p>
+</div>
+<div class="paragraph">
+<p>なお、 <code>QuarkusUnitTest</code> は、 <code>quarkus-junit5-internal</code> モジュールに入っています。</p>
+</div>
+<div class="paragraph">
+<p>テストクラスの例は次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.health.test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.enterprise.inject.Instance;
+import jakarta.inject.Inject;
+
+import org.eclipse.microprofile.health.Liveness;
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+import io.quarkus.test.QuarkusUnitTest;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+
+import io.restassured.RestAssured;
+
+public class FailingUnitTest {
+
+    @RegisterExtension                                                                  <i class="conum" data-value="1"></i><b>(1)</b>
+    static final QuarkusUnitTest config = new QuarkusUnitTest()
+            .setArchiveProducer(() -&gt;
+                    ShrinkWrap.create(JavaArchive.class)                                <i class="conum" data-value="2"></i><b>(2)</b>
+                            .addClasses(FailingHealthCheck.class)
+                            .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml")
+            );
+
+    @Inject                                                                             <i class="conum" data-value="3"></i><b>(3)</b>
+    @Liveness
+    Instance&lt;HealthCheck&gt; checks;
+
+    @Test
+    public void testHealthServlet() {
+        RestAssured.when().get("/q/health").then().statusCode(503);                       <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+
+    @Test
+    public void testHealthBeans() {
+        List&lt;HealthCheck&gt; check = new ArrayList&lt;&gt;();                                    <i class="conum" data-value="5"></i><b>(5)</b>
+        for (HealthCheck i : checks) {
+            check.add(i);
+        }
+        assertEquals(1, check.size());
+        assertEquals(HealthCheckResponse.State.DOWN, check.get(0).call().getState());
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>QuarkusUnitTest</code> エクステンションは、静的フィールドと一緒に使用する必要があります。静的でないフィールドで使用した場合、テストアプリケーションは開始されません。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>このプロデューサーは、テストするアプリケーションを構築するために使用されます。Shrinkwrap を使用して、テストする JavaArchive を作成します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>テストデプロイメントからテストケースに直接 Bean を注入することが可能です。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>このメソッドは、ヘルスチェックサーブレットを直接呼び出し、応答を検証します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>このメソッドは、注入されたヘルスチェック Bean を使用して、期待される結果を返していることを確認します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>エクステンションがビルド時に正しく失敗することをテストする場合は、<code>setExpectedException</code> メソッドを使用します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.hibernate.orm;
+
+import io.quarkus.runtime.configuration.ConfigurationException;
+import io.quarkus.test.QuarkusUnitTest;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+
+public class PersistenceAndQuarkusConfigTest {
+
+    @RegisterExtension
+    static QuarkusUnitTest runner = new QuarkusUnitTest()
+            .setExpectedException(ConfigurationException.class)                     <i class="conum" data-value="1"></i><b>(1)</b>
+            .withApplicationRoot((jar) -&gt; jar
+                    .addAsManifestResource("META-INF/some-persistence.xml", "persistence.xml")
+                    .addAsResource("application.properties"));
+
+    @Test
+    public void testPersistenceAndConfigTest() {
+        // should not be called, deployment exception should happen first:
+        // it's illegal to have Hibernate configuration properties in both the
+        // application.properties and in the persistence.xml
+        Assertions.fail();
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>これは、Quarkus のデプロイが特定の例外で失敗することを JUnit に伝えます。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="testing-hot-reload"><a class="anchor" href="#testing-hot-reload"></a>2.15. ホットリロードのテスト</h3>
+<div class="paragraph">
+<p>開発モードでエクステンションが正しく動作し、アップデートを正しく処理できるかどうかを検証するテストを書くことも可能です。</p>
+</div>
+<div class="paragraph">
+<p>ほとんどのエクステンションでは、これは「箱から出してすぐに」動作しますが、この機能が期待通りに動作しているかどうかを確認するためにスモークテストを行うことをお勧めします。このテストには <code>QuarkusDevModeTest</code> を使用します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class ServletChangeTestCase {
+
+    @RegisterExtension
+    final static QuarkusDevModeTest test = new QuarkusDevModeTest()
+            .setArchiveProducer(new Supplier&lt;&gt;() {
+                @Override
+                public JavaArchive get() {
+                    return ShrinkWrap.create(JavaArchive.class)   <i class="conum" data-value="1"></i><b>(1)</b>
+                            .addClass(DevServlet.class)
+                            .addAsManifestResource(new StringAsset("Hello Resource"), "resources/file.txt");
+                }
+            });
+
+    @Test
+    public void testServletChange() throws InterruptedException {
+        RestAssured.when().get("/dev").then()
+                .statusCode(200)
+                .body(is("Hello World"));
+
+        test.modifySourceFile("DevServlet.java", new Function&lt;String, String&gt;() {  <i class="conum" data-value="2"></i><b>(2)</b>
+
+            @Override
+            public String apply(String s) {
+                return s.replace("Hello World", "Hello Quarkus");
+            }
+        });
+
+        RestAssured.when().get("/dev").then()
+                .statusCode(200)
+                .body(is("Hello Quarkus"));
+    }
+
+    @Test
+    public void testAddServlet() throws InterruptedException {
+        RestAssured.when().get("/new").then()
+                .statusCode(404);
+
+        test.addSourceFile(NewServlet.class);                                       <i class="conum" data-value="3"></i><b>(3)</b>
+
+        RestAssured.when().get("/new").then()
+                .statusCode(200)
+                .body(is("A new Servlet"));
+    }
+
+    @Test
+    public void testResourceChange() throws InterruptedException {
+        RestAssured.when().get("/file.txt").then()
+                .statusCode(200)
+                .body(is("Hello Resource"));
+
+        test.modifyResourceFile("META-INF/resources/file.txt", new Function&lt;String, String&gt;() { <i class="conum" data-value="4"></i><b>(4)</b>
+
+            @Override
+            public String apply(String s) {
+                return "A new resource";
+            }
+        });
+
+        RestAssured.when().get("file.txt").then()
+                .statusCode(200)
+                .body(is("A new resource"));
+    }
+
+    @Test
+    public void testAddResource() throws InterruptedException {
+
+        RestAssured.when().get("/new.txt").then()
+                .statusCode(404);
+
+        test.addResourceFile("META-INF/resources/new.txt", "New File");  <i class="conum" data-value="5"></i><b>(5)</b>
+
+        RestAssured.when().get("/new.txt").then()
+                .statusCode(200)
+                .body(is("New File"));
+
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>これによりデプロイメントが開始され、テストスイートの一部として変更できます。Quarkus は各テストメソッド間で再起動されるため、すべてのメソッドはクリーンなデプロイメントで開始されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>このメソッドを使用すると、クラスファイルのソースを変更できます。古いソースが関数に渡され、更新されたソースが返されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>このメソッドは、デプロイメントに新しいクラスファイルを追加します。使用されるソースは、現在のプロジェクトの一部である元のソースになります。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>このメソッドは静的リソースを変更します</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>このメソッドは新しい静的リソースを追加します</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="native-executable-support"><a class="anchor" href="#native-executable-support"></a>2.16. ネイティブ実行可能ファイルのサポート</h3>
+<div class="paragraph">
+<p>そこで Quarkus は、ネイティブの実行可能ビルドの特徴を制御する多くのビルドアイテムを提供します。これによりエクステンションは、リフレクション用のクラスの登録やネイティブ実行可能ファイルへの静的リソースの追加などのタスクをプログラムで実行できます。これらのビルドアイテムの一部を以下に示します。</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>io.quarkus.deployment.builditem.nativeimage.NativeImageResourceBuildItem</code></dt>
+<dd>
+<p>ネイティブ実行可能ファイルに静的なリソースをインクルードします。</p>
+</dd>
+<dt class="hdlist1"><code>io.quarkus.deployment.builditem.nativeimage.NativeImageResourceDirectoryBuildItem</code></dt>
+<dd>
+<p>ディレクトリの静的リソースをネイティブ実行可能ファイルにインクルードします。</p>
+</dd>
+<dt class="hdlist1"><code>io.quarkus.deployment.builditem.nativeimage.RuntimeReinitializedClassBuildItem</code></dt>
+<dd>
+<p>Substrate によってランタイムで再初期化されるクラス。これにより、静的イニシャライザーは 2 回実行されます。</p>
+</dd>
+<dt class="hdlist1"><code>io.quarkus.deployment.builditem.nativeimage.NativeImageSystemPropertyBuildItem</code></dt>
+<dd>
+<p>ネイティブ実行可能ファイルのビルド時に設定されるシステムプロパティです。</p>
+</dd>
+<dt class="hdlist1"><code>io.quarkus.deployment.builditem.nativeimage.NativeImageResourceBundleBuildItem</code></dt>
+<dd>
+<p>ネイティブ実行可能ファイルにリソースバンドルを含めます。</p>
+</dd>
+<dt class="hdlist1"><code>io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem</code></dt>
+<dd>
+<p>Substrate でリフレクションのクラスを登録します。コンストラクターは常に登録されますが、メソッドとフィールドはオプションです。</p>
+</dd>
+<dt class="hdlist1"><code>io.quarkus.deployment.builditem.nativeimage.RuntimeInitializedClassBuildItem</code></dt>
+<dd>
+<p>ビルド時ではなくランタイムで初期化されるクラス。これにより、クラスがネイティブ実行可能ビルドプロセスの一部として初期化されるとビルドに失敗するため、注意が必要です。</p>
+</dd>
+<dt class="hdlist1"><code>io.quarkus.deployment.builditem.nativeimage.NativeImageConfigBuildItem</code></dt>
+<dd>
+<p>上記の機能のほとんどを単一のビルドアイテムから制御できる便利な機能。</p>
+</dd>
+<dt class="hdlist1"><code>io.quarkus.deployment.builditem.NativeImageEnableAllCharsetsBuildItem</code></dt>
+<dd>
+<p>ネイティブイメージですべての文字セットを有効にすることを示します。</p>
+</dd>
+<dt class="hdlist1"><code>io.quarkus.deployment.builditem.ExtensionSslNativeSupportBuildItem</code></dt>
+<dd>
+<p>エクステンションがSSLを必要とし、ネイティブイメージのビルド中に有効にする必要があることをQuarkusに伝える便利な方法です。この機能を使用する場合は、 <a href="https://github.com/quarkusio/quarkus/blob/main/docs/src/main/asciidoc/native-and-ssl.adoc">ネイティブおよびSSLガイド</a> の、自動的にSSLサポートを提供するエクステンションのリストに、作成したエクステンションを追加することを忘れないでください。</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ide-support-tips"><a class="anchor" href="#ide-support-tips"></a>2.17. IDE サポートのヒント</h3>
+<div class="sect3">
+<h4 id="writing-quarkus-extensions-in-eclipse"><a class="anchor" href="#writing-quarkus-extensions-in-eclipse"></a>2.17.1. Eclipse での Quarkus 拡張の書き方</h4>
+<div class="paragraph">
+<p>EclipseでQuarkusエクステンションを書く際の唯一の特別な点は、エクステンションのビルドの一部としてAPT（Annotation Processing Tool）が必要であることです。つまり、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://marketplace.eclipse.org/content/m2e-apt" class="bare">https://marketplace.eclipse.org/content/m2e-apt</a> から <code>m2e-apt</code> をインストール</p>
+</li>
+<li>
+<p><code>pom.xml</code> にこのプロパティを追加します : <code>&lt;m2e.apt.activation&gt;jdt_apt&lt;/m2e.apt.activation&gt;</code> 。<code>io.quarkus:quarkus-build-parent</code> に依存している場合、既に追加済です。</p>
+</li>
+<li>
+<p>IDEで同時に <code>io.quarkus:quarkus-extension-processor</code> プロジェクトを開いている場合（例えば、QuarkusのソースをチェックアウトしてIDEで開いている場合）、そのプロジェクトを閉じる必要があります。そうしないと、Eclipseはそのプロジェクトに含まれるAPTプラグインを起動しません。</p>
+</li>
+<li>
+<p>エクステンションプロセッサのプロジェクトを閉じたばかりの場合は、Eclipse が Maven リポジトリからエクステンションプロセッサをピックアップするために、他のプロジェクトで <code>Maven &gt; Update Project</code> を必ず実行してください。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="troubleshooting-debugging-tips"><a class="anchor" href="#troubleshooting-debugging-tips"></a>2.18. トラブルシューティング / デバッグのヒント</h3>
+<div class="sect3">
+<h4 id="dump-the-generated-classes-to-the-file-system"><a class="anchor" href="#dump-the-generated-classes-to-the-file-system"></a>2.18.1. 生成・変換されたクラスの検査</h4>
+<div class="paragraph">
+<p>Quarkusでは、ビルドフェーズで多くのクラスが生成され、多くの場合、既存のクラスも変換されます。エクステンションの開発中に、生成されたバイトコードや変換されたクラスを見ることができるのは、非常に便利なことです。</p>
+</div>
+<div class="paragraph">
+<p>If you set the <code>quarkus.package.jar.decompiler.enabled</code> property to <code>true</code> then Quarkus will download and invoke the <a href="https://github.com/Vineflower/vineflower">Vineflower decompiler</a> and dump the result in the <code>decompiled</code> directory of the build tool output (<code>target/decompiled</code> for Maven for example).</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+このプロパティは、通常のプロダクションビルド時にのみ機能します（つまり、devモード/テストでは機能しません）。また、 <code>fast-jar</code> パッケージングタイプが使用されている場合（デフォルトの動作）には、このプロパティは機能しません。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>また、生成/変換されたクラスをファイルシステムにダンプして、IDEのデコンパイラなどで後から検査することができる3つのシステム・プロパティがあります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus.debug.generated-classes-dir</code> - Beanのメタデータのような、生成されたクラスをダンプします</p>
+</li>
+<li>
+<p><code>quarkus.debug.transformed-classes-dir</code> - Panache エンティティのような、変換されたクラスをダンプします</p>
+</li>
+<li>
+<p><code>quarkus.debug.generated-sources-dir</code> - ZIG ファイルをダンプします。ZIG ファイルは、スタックトレースで参照される生成されたコードのテキスト表現です。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>これらのプロパティは、開発モードやテストの実行時に、生成/変換されたクラスがクラスローダーのメモリ内に保持されているだけの場合に特に有効です。</p>
+</div>
+<div class="paragraph">
+<p>例えば、 <code>quarkus.debug.generated-classes-dir</code> システムプロパティを指定すると、これらのクラスがディスクに書き出され、開発モードで検査できるようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev -Dquarkus.debug.generated-classes-dir=dump-classes</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+プロパティー値は、Linux マシンの <code>/home/foo/dump</code> などの絶対パス、またはユーザーの作業ディレクトリーからの相対パスになります。つまり、<code>dump</code> は開発モードの <code>{user.dir}/target/dump`やテスト実行時の `{user.dir}/dump</code> に対応します。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>ディレクトリーに書き込まれた各クラスのログに行が表示されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">INFO  [io.qua.run.boo.StartupActionImpl] (main) Wrote /path/to/my/app/target/dump-classes/io/quarkus/arc/impl/ActivateRequestContextInterceptor_Bean.class</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このプロパティーは、テストを実行するときにも尊重されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw clean test -Dquarkus.debug.generated-classes-dir=target/dump-generated-classes</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>同様に、<code>quarkus.debug.transformed-classes-dir</code> プロパティーと <code>quarkus.debug.generated-sources-dir</code> プロパティーを使用して、関連する出力をダンプできます。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="multi-module-maven-projects-and-the-development-mode"><a class="anchor" href="#multi-module-maven-projects-and-the-development-mode"></a>2.18.2. マルチモジュールのMavenプロジェクトと開発モード</h4>
+<div class="paragraph">
+<p>example "モジュールを含むマルチモジュールのMavenプロジェクトでエクステンションを開発することはよくあります。しかし、開発モードでサンプルを実行する場合は、ローカルプロジェクトの依存関係を除外するために、 <code>-DnoDeps</code> システムプロパティを使用する必要があります。そうしないと、Quarkusがエクステンションクラスを監視しようとするため、クラスの読み込みに問題が生じる可能性があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw compile quarkus:dev -DnoDeps</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="indexer-does-not-include-your-external-dependency"><a class="anchor" href="#indexer-does-not-include-your-external-dependency"></a>2.18.3. インデクサーには外部依存関係は含まれていません</h4>
+<div class="paragraph">
+<p><code>@BuildStep</code> に <code>IndexDependencyBuildItem</code> アーティファクトを追加することを忘れないでください。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="sample-test-extension"><a class="anchor" href="#sample-test-extension"></a>2.19. サンプルテストエクステンション</h3>
+<div class="paragraph">
+<p>エクステンションの処理のリグレッションをテストするために使われるエクステンションがあります。これは <a href="https://github.com/quarkusio/quarkus/tree/main/integration-tests/test-extension/extension" class="bare">https://github.com/quarkusio/quarkus/tree/main/integration-tests/test-extension/extension</a> ディレクトリにあります。このセクションでは、test-extension のコードを使って、エクステンションの作者が通常行う必要のあるタスクについて触れます。</p>
+</div>
+<div class="sect3">
+<h4 id="features-and-capabilities"><a class="anchor" href="#features-and-capabilities"></a>2.19.1. フィーチャーとケイパビリティ</h4>
+<div class="sect4">
+<h5 id="features"><a class="anchor" href="#features"></a>2.19.1.1. 特徴</h5>
+<div class="paragraph">
+<p><em>フィーチャー</em> とは、エクステンションが提供する機能のことです。フィーチャーの名前は、アプリケーションの起動時にログに表示されます。</p>
+</div>
+<div class="listingblock">
+<div class="title">起動時の行の例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">2019-03-22 14:02:37,884 INFO  [io.quarkus] (main) Quarkus 999-SNAPSHOT started in 0.061s.
+2019-03-22 14:02:37,884 INFO  [io.quarkus] (main) Installed features: [cdi, test-extension] <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>ランタイムイメージにインストールされているフィーチャーのリスト</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>A feature can be registered in a <a href="#build-step-processors">ビルドステッププロセッサー</a> method that produces a <code>FeatureBuildItem</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">TestProcessor#feature()</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    @BuildStep
+    FeatureBuildItem feature() {
+        return new FeatureBuildItem("test-extension");
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>フィーチャー名には小文字のみを使用し、単語はダッシュで区切ります。例： <code>security-jpa</code> 。1 つのエクステンションが提供するフィーチャーは最大でも 1 つで、その名前は一意でなければなりません。複数のエクステンションが同じ名前のフィーチャーを登録した場合、ビルドは失敗します。</p>
+</div>
+<div class="paragraph">
+<p>The feature name should also map to a label in the extension&#8217;s <code>devtools/common/src/main/filtered/extensions.json</code> entry so that
+the feature name displayed by the startup line matches a label that one can use to select the extension when creating a project
+using the Quarkus maven plugin as shown in this example taken from the <a href="rest-json">Writing JSON REST Services</a> guide where the <code>rest-jackson</code> feature is referenced:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:3.15.2:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=rest-json \
+    -DclassName="org.acme.rest.json.FruitResource" \
+    -Dpath="/fruits" \
+    -Dextensions="rest,rest-jackson"
+cd rest-json</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="capabilities"><a class="anchor" href="#capabilities"></a>2.19.1.2. Capabilities</h5>
+<div class="paragraph">
+<p><em>ケイパビリティ</em> は、他のエクステンションから問い合わせ可能な技術的能力を表します。1つのエクステンションが複数のケイパビリティを提供することも、複数のエクステンションが同じケイパビリティを提供することもできます。デフォルトでは、ケイパビリティはユーザーに表示されません。エクステンションの存在を確認する際には、クラスパスベースのチェックではなく、ケイパビリティを使用する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>Capabilities can be registered in a <a href="#build-step-processors">ビルドステッププロセッサー</a> method that produces a <code>CapabilityBuildItem</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">TestProcessor#capability()</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    @BuildStep
+    void capabilities(BuildProducer&lt;CapabilityBuildItem&gt; capabilityProducer) {
+        capabilityProducer.produce(new CapabilityBuildItem("org.acme.test-transactions"));
+        capabilityProducer.produce(new CapabilityBuildItem("org.acme.test-metrics"));
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>エクステンションは、 <code>Capabilities</code> ビルドアイテムを使用して、登録されたケイパビリティを消費することができます。</p>
+</div>
+<div class="listingblock">
+<div class="title">TestProcessor#doSomeCoolStuff()</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    @BuildStep
+    void doSomeCoolStuff(Capabilities capabilities) {
+        if (capabilities.isPresent(Capability.TRANSACTIONS)) {
+          // do something only if JTA transactions are in...
+        }
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ケイパビリティは、<code>io.quarkus.security.jpa</code> のように、Java パッケージの命名規則に従う必要があります。コアエクステンションによって提供されるケイパビリティは、<code>io.quarkus.deployment.Capability</code> 列挙型にリストされている必要があり、それらの名前は常に <code>io.quarkus</code> の接頭辞で始まる必要があります。</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="bean-defining-annotations"><a class="anchor" href="#bean-defining-annotations"></a>2.19.2. アノテーションを定義する Bean</h4>
+<div class="paragraph">
+<p>The CDI layer processes CDI beans that are either explicitly registered or that it discovers based on bean defining annotations as defined in <a href="https://jakarta.ee/specifications/cdi/4.1/jakarta-cdi-spec-4.1.html#bean_defining_annotations">2.5.1. Bean defining annotations</a>. You can expand this set of annotations to include annotations your extension processes using a <code>BeanDefiningAnnotationBuildItem</code> as shown in this <code>TestProcessor#registerBeanDefinningAnnotations</code> example:</p>
+</div>
+<div class="listingblock">
+<div class="title">アノテーションを定義する Bean の登録</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.enterprise.context.ApplicationScoped;
+import org.jboss.jandex.DotName;
+import io.quarkus.extest.runtime.TestAnnotation;
+
+public final class TestProcessor {
+    static DotName TEST_ANNOTATION = DotName.createSimple(TestAnnotation.class.getName());
+    static DotName TEST_ANNOTATION_SCOPE = DotName.createSimple(ApplicationScoped.class.getName());
+
+...
+
+    @BuildStep
+    BeanDefiningAnnotationBuildItem registerX() {
+        <i class="conum" data-value="1"></i><b>(1)</b>
+        return new BeanDefiningAnnotationBuildItem(TEST_ANNOTATION, TEST_ANNOTATION_SCOPE);
+    }
+...
+}
+
+/**
+ * Marker annotation for test configuration target beans
+ */
+@Target({ TYPE })
+@Retention(RUNTIME)
+@Documented
+@Inherited
+public @interface TestAnnotation {
+}
+
+/**
+ * A sample bean
+ */
+@TestAnnotation <i class="conum" data-value="2"></i><b>(2)</b>
+public class ConfiguredBean implements IConfigConsumer {
+
+...</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Jandex <code>DotName</code> クラスを使用して、アノテーションクラスと CDI デフォルトスコープを登録します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>ConfiguredBean</code> は、CDI 標準 @ApplicationScoped でアノテーションが付けられた Bean と同じように CDI レイヤーによって処理されます。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="parsing-config-to-objects"><a class="anchor" href="#parsing-config-to-objects"></a>2.19.3. コンフィグをオブジェクトにパースする</h4>
+<div class="paragraph">
+<p>エクステンションの主な目的の1つは、動作の設定段階を実行段階から完全に分離することです。フレームワークは起動時に設定の解析や読み込みを行うことが多いですが、これをビルド時に行うことで、xmlパーサーなどのフレームワークへの実行時の依存を減らし、解析にかかる起動時間を短縮することができます。</p>
+</div>
+<div class="paragraph">
+<p>An example of parsing an XML config file using JAXB is shown in the <code>TestProcessor#parseServiceXmlConfig</code> method:</p>
+</div>
+<div class="listingblock">
+<div class="title">Parsing an XML Configuration into Runtime XmlConfig Instance</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    @BuildStep
+    @Record(STATIC_INIT)
+    RuntimeServiceBuildItem parseServiceXmlConfig(TestRecorder recorder) throws JAXBException {
+        RuntimeServiceBuildItem serviceBuildItem = null;
+        JAXBContext context = JAXBContext.newInstance(XmlConfig.class);
+        Unmarshaller unmarshaller = context.createUnmarshaller();
+        InputStream is = getClass().getResourceAsStream("/config.xml"); <i class="conum" data-value="1"></i><b>(1)</b>
+        if (is != null) {
+            log.info("Have XmlConfig, loading");
+            XmlConfig config = (XmlConfig) unmarshaller.unmarshal(is); <i class="conum" data-value="2"></i><b>(2)</b>
+...
+        }
+        return serviceBuildItem;
+    }</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>config.xml クラスパスリソースを探します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>見つかった場合は、JAXB コンテキストを使用して <code>XmlConfig.class</code> を解析します。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>ビルド環境で使用可能な /config.xml リソースがない場合、null の <code>RuntimeServiceBuildItem</code> が返され、生成されている <code>RuntimeServiceBuildItem</code> に基づく後続のロジックは実行されません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Typically, one is loading a configuration to create some runtime component/service as <code>parseServiceXmlConfig</code> is doing. We will come back to the rest of the behavior in <code>parseServiceXmlConfig</code> in the following <a href="#manage-non-cdi-service">非CDIサービスの管理</a> section.</p>
+</div>
+<div class="paragraph">
+<p>何らかの理由で設定を解析し、エクステンションプロセッサーの他のビルドステップで使用する必要がある場合は、解析された XmlConfig インスタンスを渡すために <code>XmlConfigBuildItem</code> を作成する必要があります。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you look at the XmlConfig code you will see that it does carry around the JAXB annotations. If you don&#8217;t want these in the runtime image, you could clone the XmlConfig instance into some POJO object graph and then replace XmlConfig with the POJO class.
+We will do this in <a href="#replacing-classes-in-native-image">ネイティブイメージにおいてクラスを置換する</a>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="scanning-deployments-using-jandex"><a class="anchor" href="#scanning-deployments-using-jandex"></a>2.19.4. Jandex を使用したデプロイメントのスキャン</h4>
+<div class="paragraph">
+<p>エクステンションが、処理が必要なBeanをマークするアノテーションやインターフェースを定義している場合、Javaアノテーション・インデクサーとオフライン・リフレクション・ライブラリであるJandex APIを使って、これらのBeanを見つけることができます。以下の <code>TestProcessor#scanForBeans</code> メソッドは、 <code>IConfigConsumer</code> インターフェースも実装している <code>@TestAnnotation</code> でアノテーションされたビーンを見つける方法を示しています。</p>
+</div>
+<div class="listingblock">
+<div class="title">Jandex の使用例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    static DotName TEST_ANNOTATION = DotName.createSimple(TestAnnotation.class.getName());
+...
+
+    @BuildStep
+    @Record(STATIC_INIT)
+    void scanForBeans(TestRecorder recorder, BeanArchiveIndexBuildItem beanArchiveIndex, <i class="conum" data-value="1"></i><b>(1)</b>
+            BuildProducer&lt;TestBeanBuildItem&gt; testBeanProducer) {
+        IndexView indexView = beanArchiveIndex.getIndex(); <i class="conum" data-value="2"></i><b>(2)</b>
+        Collection&lt;AnnotationInstance&gt; testBeans = indexView.getAnnotations(TEST_ANNOTATION); <i class="conum" data-value="3"></i><b>(3)</b>
+        for (AnnotationInstance ann : testBeans) {
+            ClassInfo beanClassInfo = ann.target().asClass();
+            try {
+                boolean isConfigConsumer = beanClassInfo.interfaceNames()
+                        .stream()
+                        .anyMatch(dotName -&gt; dotName.equals(DotName.createSimple(IConfigConsumer.class.getName()))); <i class="conum" data-value="4"></i><b>(4)</b>
+                if (isConfigConsumer) {
+                    Class&lt;IConfigConsumer&gt; beanClass = (Class&lt;IConfigConsumer&gt;) Class.forName(beanClassInfo.name().toString(), false, Thread.currentThread().getContextClassLoader());
+                    testBeanProducer.produce(new TestBeanBuildItem(beanClass)); <i class="conum" data-value="5"></i><b>(5)</b>
+                    log.infof("Configured bean: %s", beanClass);
+                }
+            } catch (ClassNotFoundException e) {
+                log.warn("Failed to load bean class", e);
+            }
+        }
+    }</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>BeanArchiveIndexBuildItem</code> に依存して、デプロイメントのインデックスが作成された後にビルドステップを実行します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>インデックスを取得します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>@TestAnnotation</code> でアノテーションが付けられたすべての Bean を検索します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>これらの Bean のどれが <code>IConfigConsumer</code> インターフェイスも持っているかを判別します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Bean クラスを <code>TestBeanBuildItem</code> に保存して、Bean インスタンスとインタラクトする後の RUNTIME_INIT ビルドステップで使用できるようにします。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="interacting-with-extension-beans"><a class="anchor" href="#interacting-with-extension-beans"></a>2.19.5. エクステンション Bean とのインタラクション</h4>
+<div class="paragraph">
+<p><code>io.quarkus.arc.runtime.BeanContainer</code> インターフェイスを使用して、エクステンション Bean とインタラクトできます。次の <code>configureBeans</code> メソッドは、前のセクションでスキャンされた Bean とのインタラクションを示しています。</p>
+</div>
+<div class="listingblock">
+<div class="title">CDI BeanContainer インターフェイスの使用</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// TestProcessor#configureBeans
+    @BuildStep
+    @Record(RUNTIME_INIT)
+    void configureBeans(TestRecorder recorder, List&lt;TestBeanBuildItem&gt; testBeans, <i class="conum" data-value="1"></i><b>(1)</b>
+            BeanContainerBuildItem beanContainer, <i class="conum" data-value="2"></i><b>(2)</b>
+            TestRunTimeConfig runTimeConfig) {
+
+        for (TestBeanBuildItem testBeanBuildItem : testBeans) {
+            Class&lt;IConfigConsumer&gt; beanClass = testBeanBuildItem.getConfigConsumer();
+            recorder.configureBeans(beanContainer.getValue(), beanClass, buildAndRunTimeConfig, runTimeConfig); <i class="conum" data-value="3"></i><b>(3)</b>
+        }
+    }
+
+// TestRecorder#configureBeans
+    public void configureBeans(BeanContainer beanContainer, Class&lt;IConfigConsumer&gt; beanClass,
+            TestBuildAndRunTimeConfig buildTimeConfig,
+            TestRunTimeConfig runTimeConfig) {
+        log.info("Begin BeanContainerListener callback\n");
+        IConfigConsumer instance = beanContainer.beanInstance(beanClass); <i class="conum" data-value="4"></i><b>(4)</b>
+        instance.loadConfig(buildTimeConfig, runTimeConfig); <i class="conum" data-value="5"></i><b>(5)</b>
+        log.infof("configureBeans, instance=%s\n", instance);
+    }</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>スキャンビルドステップから生成された <code>TestBeanBuildItem</code> を消費します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>BeanContainerBuildItem</code> を使用して、CDI Bean コンテナーが作成された後にこのビルドステップを実行するように命令します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>ランタイムレコーダーを呼び出して、Bean のインタラクションを記録します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>ランタイムレコーダは、そのタイプを使用して Bean を取得します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>ランタイムレコーダは <code>IConfigConsumer#loadConfig(&#8230;&#8203;)</code> メソッドを呼び出し、ランタイム情報を含む設定オブジェクトを渡します。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="manage-non-cdi-service"><a class="anchor" href="#manage-non-cdi-service"></a>2.19.6. 非CDIサービスの管理</h4>
+<div class="paragraph">
+<p>A common purpose for an extension is to integrate a non-CDI aware service into the CDI based Quarkus runtime.
+Step 1 of this task is to load any configuration needed in a STATIC_INIT build step as we did in <a href="#parsing-config-to-objects">コンフィグをオブジェクトにパースする</a>.
+Now we need to create an instance of the service using the configuration.
+Let&#8217;s return to the <code>TestProcessor#parseServiceXmlConfig</code> method to see how this can be done.</p>
+</div>
+<div class="listingblock">
+<div class="title">非CDIサービスの作成</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// TestProcessor#parseServiceXmlConfig
+    @BuildStep
+    @Record(STATIC_INIT)
+    RuntimeServiceBuildItem parseServiceXmlConfig(TestRecorder recorder) throws JAXBException {
+        RuntimeServiceBuildItem serviceBuildItem = null;
+        JAXBContext context = JAXBContext.newInstance(XmlConfig.class);
+        Unmarshaller unmarshaller = context.createUnmarshaller();
+        InputStream is = getClass().getResourceAsStream("/config.xml");
+        if (is != null) {
+            log.info("Have XmlConfig, loading");
+            XmlConfig config = (XmlConfig) unmarshaller.unmarshal(is);
+            log.info("Loaded XmlConfig, creating service");
+            RuntimeValue&lt;RuntimeXmlConfigService&gt; service = recorder.initRuntimeService(config); <i class="conum" data-value="1"></i><b>(1)</b>
+            serviceBuildItem = new RuntimeServiceBuildItem(service); <i class="conum" data-value="3"></i><b>(3)</b>
+        }
+        return serviceBuildItem;
+    }
+
+// TestRecorder#initRuntimeService
+    public RuntimeValue&lt;RuntimeXmlConfigService&gt; initRuntimeService(XmlConfig config) {
+        RuntimeXmlConfigService service = new RuntimeXmlConfigService(config); <i class="conum" data-value="2"></i><b>(2)</b>
+        return new RuntimeValue&lt;&gt;(service);
+    }
+
+// RuntimeServiceBuildItem
+    final public class RuntimeServiceBuildItem extends SimpleBuildItem {
+    private RuntimeValue&lt;RuntimeXmlConfigService&gt; service;
+
+    public RuntimeServiceBuildItem(RuntimeValue&lt;RuntimeXmlConfigService&gt; service) {
+        this.service = service;
+    }
+
+    public RuntimeValue&lt;RuntimeXmlConfigService&gt; getService() {
+        return service;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>ランタイムレコーダーを呼び出して、サービスの作成を記録します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>解析された <code>XmlConfig</code> インスタンスを使用して、<code>RuntimeXmlConfigService</code> のインスタンスを作成し、それを <code>RuntimeValue</code> でラップします。プロキシー不可能な非インターフェイスオブジェクトには <code>RuntimeValue</code> ラッパーを使用します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>サービスを開始する RUNTIME_INIT ビルドステップで使用するために、戻りサービス値を <code>RuntimeServiceBuildItem</code> にラップします。</td>
+</tr>
+</table>
+</div>
+<div class="sect4">
+<h5 id="starting-service"><a class="anchor" href="#starting-service"></a>2.19.6.1. サービスの開始</h5>
+<div class="paragraph">
+<p>ビルドフェーズでのサービスの作成を記録したので、起動時にランタイムでサービスを開始する方法を記録する必要があります。これは、<code>TestProcessor#startRuntimeService</code> メソッドに示されている RUNTIME_INIT ビルドステップを使用して行います。</p>
+</div>
+<div class="listingblock">
+<div class="title">非CDIサービスの開始/停止</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// TestProcessor#startRuntimeService
+    @BuildStep
+    @Record(RUNTIME_INIT)
+    ServiceStartBuildItem startRuntimeService(TestRecorder recorder, ShutdownContextBuildItem shutdownContextBuildItem , <i class="conum" data-value="1"></i><b>(1)</b>
+            RuntimeServiceBuildItem serviceBuildItem) throws IOException { <i class="conum" data-value="2"></i><b>(2)</b>
+        if (serviceBuildItem != null) {
+            log.info("Registering service start");
+            recorder.startRuntimeService(shutdownContextBuildItem, serviceBuildItem.getService()); <i class="conum" data-value="3"></i><b>(3)</b>
+        } else {
+            log.info("No RuntimeServiceBuildItem seen, check config.xml");
+        }
+        return new ServiceStartBuildItem("RuntimeXmlConfigService"); <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+
+// TestRecorder#startRuntimeService
+    public void startRuntimeService(ShutdownContext shutdownContext, RuntimeValue&lt;RuntimeXmlConfigService&gt; runtimeValue)
+            throws IOException {
+        RuntimeXmlConfigService service = runtimeValue.getValue();
+        service.startService(); <i class="conum" data-value="5"></i><b>(5)</b>
+        shutdownContext.addShutdownTask(service::stopService); <i class="conum" data-value="6"></i><b>(6)</b>
+    }</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>ShutdownContextBuildItemを消費してサービスのシャットダウンを登録します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>RuntimeServiceBuildItem</code> で取得した、以前に初期化したサービスを消費します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>ランタイムレコーダーを呼び出して、サービス開始の呼び出しを記録します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Produce a <code>ServiceStartBuildItem</code> to indicate the startup of a service. See <a href="#startup-shutdown-events">スタートアップとシャットダウンのイベント</a> for details.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>ランタイムレコーダはサービスインスタンス参照を取得し、その <code>startService</code> メソッドを呼び出します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>ランタイムレコーダーは、サービスインスタンスの <code>stopService</code> メソッドの呼び出しを Quarkus の <code>ShutdownContext</code> に登録します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>RuntimeXmlConfigService</code> のコードは、 <a href="https://github.com/quarkusio/quarkus/blob/main/integration-tests/test-extension/extension/runtime/src/main/java/io/quarkus/extest/runtime/RuntimeXmlConfigService.java">RuntimeXmlConfigService.java</a> で確認できます。</p>
+</div>
+<div class="paragraph">
+<p><code>RuntimeXmlConfigService</code> が開始されたことを検証するテストケースは、<code>ConfiguredBeanTest</code> と <code>NativeImageIT</code> の <code>testRuntimeXmlConfigService</code> テストにあります。</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="startup-shutdown-events"><a class="anchor" href="#startup-shutdown-events"></a>2.19.7. スタートアップとシャットダウンのイベント</h4>
+<div class="paragraph">
+<p>Quarkus コンテナーは、起動とシャットダウンのライフサイクルイベントをサポートして、コンテナーの起動とシャットダウンをコンポーネントに通知します。次の例のように、コンポーネントが監視できる CDI イベントが発生します。</p>
+</div>
+<div class="listingblock">
+<div class="title">コンテナの起動を観察</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.runtime.ShutdownEvent;
+import io.quarkus.runtime.StartupEvent;
+
+public class SomeBean {
+    /**
+     * Called when the runtime has started
+     * @param event
+     */
+    void onStart(@Observes StartupEvent event) { <i class="conum" data-value="1"></i><b>(1)</b>
+        System.out.printf("onStart, event=%s%n", event);
+    }
+
+    /**
+     * Called when the runtime is shutting down
+     * @param event
+    */
+    void onStop(@Observes ShutdownEvent event) { <i class="conum" data-value="2"></i><b>(2)</b>
+        System.out.printf("onStop, event=%s%n", event);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>StartupEvent</code> でランタイムの開始が通知されるのを確認します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>ランタイムのシャットダウン時に <code>ShutdownEvent</code> で通知されるのを確認します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>What is the relevance of startup and shutdown events for extension authors? We have already seen the use of a <code>ShutdownContext</code>
+to register a callback to perform shutdown tasks in the <a href="#starting-service">サービスの開始</a> section.
+These shutdown tasks would be called
+after a <code>ShutdownEvent</code> had been sent.</p>
+</div>
+<div class="paragraph">
+<p><code>StartupEvent</code> は、すべての <code>io.quarkus.deployment.builditem.ServiceStartBuildItem</code> プロデューサーが消費された後に実行されます。これは、<code>StartupEvent</code> が確認されるとアプリケーションコンポーネントが起動することを想定したサービスがエクステンションにある場合に、そのようなサービスを起動するためのランタイムコードを呼び出すビルドステップは、<code>StartupEvent</code> の送信前にランタイムコードが実行されるように <code>ServiceStartBuildItem</code> を作成する必要があることを意味します。<code>ServiceStartBuildItem</code> の作成については前のセクションで説明しましたが、確認のためにここでも繰り返します。</p>
+</div>
+<div class="listingblock">
+<div class="title">ServiceStartBuildItem の生成例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// TestProcessor#startRuntimeService
+    @BuildStep
+    @Record(RUNTIME_INIT)
+    ServiceStartBuildItem startRuntimeService(TestRecorder recorder, ShutdownContextBuildItem shutdownContextBuildItem,
+            RuntimeServiceBuildItem serviceBuildItem) throws IOException {
+...
+        return new ServiceStartBuildItem("RuntimeXmlConfigService"); <i class="conum" data-value="1"></i><b>(1)</b>
+    }</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>ServiceStartBuildItem</code> を生成し、これが <code>StartupEvent</code> の送信前に実行する必要のあるサービス開始ステップであることを示します。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="register-resources-for-use-in-native-image"><a class="anchor" href="#register-resources-for-use-in-native-image"></a>2.19.8. ネイティブイメージで使用するリソースの登録</h4>
+<div class="paragraph">
+<p>ビルド時にすべての設定またはリソースを消費できるわけではありません。ランタイムがアクセスする必要のあるクラスパスリソースがある場合は、これらのリソースをネイティブイメージにコピーする必要があることをビルドフェーズに通知する必要があります。そのためには、リソースバンドルの場合、1 つ以上の <code>NativeImageResourceBuildItem</code> または <code>NativeImageResourceBundleBuildItem</code> を生成することによって行われます。その例を、この <code>registerNativeImageResources</code> ビルドステップのサンプルに示します。</p>
+</div>
+<div class="listingblock">
+<div class="title">リソースと ResourceBundle の登録</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public final class MyExtProcessor {
+
+    @BuildStep
+    void registerNativeImageResources(BuildProducer&lt;NativeImageResourceBuildItem&gt; resource, BuildProducer&lt;NativeImageResourceBundleBuildItem&gt; resourceBundle) {
+        resource.produce(new NativeImageResourceBuildItem("/security/runtime.keys")); <i class="conum" data-value="1"></i><b>(1)</b>
+
+        resource.produce(new NativeImageResourceBuildItem(
+                "META-INF/my-descriptor.xml")); <i class="conum" data-value="2"></i><b>(2)</b>
+
+        resourceBundle.produce(new NativeImageResourceBuildItem("jakarta.xml.bind.Messages")); <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>/security/runtime.keys クラスパスリソースをネイティブイメージにコピーする必要があることを示します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>META-INF/my-descriptor.xml</code> リソースをネイティブイメージにコピーする必要があることを示します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>"jakarta.xml.bind.Messages"リソースバンドルがネイティブイメージにコピーされることを示します。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="service-files"><a class="anchor" href="#service-files"></a>2.19.9. サービスファイル</h4>
+<div class="paragraph">
+<p><code>META-INF/services</code> ファイルを使用している場合は、ネイティブイメージがそのファイルを見つけられるように、ファイルをリソースとして登録する必要があります。ただし、ランタイムでインスタンス化または検査できるように、リストされた各クラスをリフレクション用に登録する必要もあります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public final class MyExtProcessor {
+
+    @BuildStep
+    void registerNativeImageResources(BuildProducer&lt;ServiceProviderBuildItem&gt; services) {
+        String service = "META-INF/services/" + io.quarkus.SomeService.class.getName();
+
+        // find out all the implementation classes listed in the service files
+        Set&lt;String&gt; implementations =
+            ServiceUtil.classNamesNamedIn(Thread.currentThread().getContextClassLoader(),
+                                          service);
+
+        // register every listed implementation class so they can be instantiated
+        // in native-image at run-time
+        services.produce(
+            new ServiceProviderBuildItem(io.quarkus.SomeService.class.getName(),
+                                         implementations.toArray(new String[0])));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<code>ServiceProviderBuildItem</code> は、サービス実装クラスのリストをパラメーターとして受け取ります。サービスファイルからそれらを読み取らない場合、それらがサービスファイルの内容に対応していることを確認してください。サービスファイルは、ランタイムで読み取られ、使用されるためです。これは、サービスファイルの書き込みに代わる手段ではありません。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+これは、リフレクションを介したインスタンス化のために実装クラスのみを登録しますす (フィールドやメソッドは検査できません)。これを行う必要がある場合は、以下を実行してください。
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public final class MyExtProcessor {
+
+    @BuildStep
+    void registerNativeImageResources(BuildProducer&lt;NativeImageResourceBuildItem&gt; resource,
+                                     BuildProducer&lt;ReflectiveClassBuildItem&gt; reflectionClasses) {
+        String service = "META-INF/services/" + io.quarkus.SomeService.class.getName();
+
+        // register the service file so it is visible in native-image
+        resource.produce(new NativeImageResourceBuildItem(service));
+
+        // register every listed implementation class so they can be inspected/instantiated
+        // in native-image at run-time
+        Set&lt;String&gt; implementations =
+            ServiceUtil.classNamesNamedIn(Thread.currentThread().getContextClassLoader(),
+                                          service);
+        reflectionClasses.produce(
+            new ReflectiveClassBuildItem(true, true, implementations.toArray(new String[0])));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これはサービスをネイティブに実行する最も簡単な方法ですが、ビルド時に実装クラスをスキャンし、リフレクションに依存する代わりに static-init で登録するコードを生成する方法と比べると効率的ではありません。</p>
+</div>
+<div class="paragraph">
+<p>これは、リフレクション用のクラスを登録する代わりに、static-init レコーダを使用するように前のビルドステップを適合させることで実現できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public final class MyExtProcessor {
+
+    @BuildStep
+    @Record(ExecutionTime.STATIC_INIT)
+    void registerNativeImageResources(RecorderContext recorderContext,
+                                     SomeServiceRecorder recorder) {
+        String service = "META-INF/services/" + io.quarkus.SomeService.class.getName();
+
+        // read the implementation classes
+        Collection&lt;Class&lt;? extends io.quarkus.SomeService&gt;&gt; implementationClasses = new LinkedHashSet&lt;&gt;();
+        Set&lt;String&gt; implementations = ServiceUtil.classNamesNamedIn(Thread.currentThread().getContextClassLoader(),
+                                                                    service);
+        for(String implementation : implementations) {
+            implementationClasses.add((Class&lt;? extends io.quarkus.SomeService&gt;)
+                recorderContext.classProxy(implementation));
+        }
+
+        // produce a static-initializer with those classes
+        recorder.configure(implementationClasses);
+    }
+}
+
+@Recorder
+public class SomeServiceRecorder {
+
+    public void configure(List&lt;Class&lt;? extends io.quarkus.SomeService&gt;&gt; implementations) {
+        // configure our service statically
+        SomeServiceProvider serviceProvider = SomeServiceProvider.instance();
+        SomeServiceBuilder builder = serviceProvider.getSomeServiceBuilder();
+
+        List&lt;io.quarkus.SomeService&gt; services = new ArrayList&lt;&gt;(implementations.size());
+        // instantiate the service implementations
+        for (Class&lt;? extends io.quarkus.SomeService&gt; implementationClass : implementations) {
+            try {
+                services.add(implementationClass.getConstructor().newInstance());
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Unable to instantiate service " + implementationClass, e);
+            }
+        }
+
+        // build our service
+        builder.withSomeServices(implementations.toArray(new io.quarkus.SomeService[0]));
+        ServiceManager serviceManager = builder.build();
+
+        // register it
+        serviceProvider.registerServiceManager(serviceManager, Thread.currentThread().getContextClassLoader());
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="object-substitution"><a class="anchor" href="#object-substitution"></a>2.19.10. オブジェクトの置換</h4>
+<div class="paragraph">
+<p>ランタイムに渡されるビルドフェーズ中に作成されたオブジェクトは、ビルド時の状態からランタイムの起動時に作成および設定できるよう、デフォルトのコンストラクターを持っている必要があります。オブジェクトにデフォルトのコンストラクターがない場合、拡張アーティファクトの生成中に次のようなエラーが表示されます。</p>
+</div>
+<div class="listingblock">
+<div class="title">DSAPublicKey シリアル化エラー</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">	[error]: Build step io.quarkus.deployment.steps.MainClassBuildStep#build threw an exception: java.lang.RuntimeException: Unable to serialize objects of type class sun.security.provider.DSAPublicKeyImpl to bytecode as it has no default constructor
+	at io.quarkus.builder.Execution.run(Execution.java:123)
+	at io.quarkus.builder.BuildExecutionBuilder.execute(BuildExecutionBuilder.java:136)
+	at io.quarkus.deployment.QuarkusAugmentor.run(QuarkusAugmentor.java:110)
+	at io.quarkus.runner.RuntimeRunner.run(RuntimeRunner.java:99)
+	... 36 more</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Quarkus にそのようなクラスの処理方法を指示するために実装できる`io.quarkus.runtime.ObjectSubstitution` インターフェイスがあります。<code>DSAPublicKey</code> の実装例を次に示します。</p>
+</div>
+<div class="listingblock">
+<div class="title">DSAPublicKeyObjectSubstitution 例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.extest.runtime.subst;
+
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.DSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.logging.Logger;
+
+import io.quarkus.runtime.ObjectSubstitution;
+
+public class DSAPublicKeyObjectSubstitution implements ObjectSubstitution&lt;DSAPublicKey, KeyProxy&gt; {
+    private static final Logger log = Logger.getLogger("DSAPublicKeyObjectSubstitution");
+    @Override
+    public KeyProxy serialize(DSAPublicKey obj) { <i class="conum" data-value="1"></i><b>(1)</b>
+        log.info("DSAPublicKeyObjectSubstitution.serialize");
+        byte[] encoded = obj.getEncoded();
+        KeyProxy proxy = new KeyProxy();
+        proxy.setContent(encoded);
+        return proxy;
+    }
+
+    @Override
+    public DSAPublicKey deserialize(KeyProxy obj) { <i class="conum" data-value="2"></i><b>(2)</b>
+        log.info("DSAPublicKeyObjectSubstitution.deserialize");
+        byte[] encoded = obj.getContent();
+        X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(encoded);
+        DSAPublicKey dsaPublicKey = null;
+        try {
+            KeyFactory kf = KeyFactory.getInstance("DSA");
+            dsaPublicKey = (DSAPublicKey) kf.generatePublic(publicKeySpec);
+
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+        return dsaPublicKey;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>シリアル化メソッドは、デフォルトのコンストラクターなしでオブジェクトを取得し、<code>DSAPublicKey</code> の再作成に必要な情報を含む <code>KeyProxy</code> を作成します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>デシリアル化メソッドは <code>KeyProxy</code> を使用して、キーファクトリーでエンコードされた形式から <code>DSAPublicKey</code> を再作成します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>エクステンションは、次の <code>TestProcessor#loadDSAPublicKey</code> フラグメントに示すように、<code>ObjectSubstitutionBuildItem</code> を生成することでこの置換を登録します。</p>
+</div>
+<div class="listingblock">
+<div class="title">オブジェクト置換の登録</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    @BuildStep
+    @Record(STATIC_INIT)
+    PublicKeyBuildItem loadDSAPublicKey(TestRecorder recorder,
+            BuildProducer&lt;ObjectSubstitutionBuildItem&gt; substitutions) throws IOException, GeneralSecurityException {
+...
+        // Register how to serialize DSAPublicKey
+        ObjectSubstitutionBuildItem.Holder&lt;DSAPublicKey, KeyProxy&gt; holder = new ObjectSubstitutionBuildItem.Holder(
+                DSAPublicKey.class, KeyProxy.class, DSAPublicKeyObjectSubstitution.class);
+        ObjectSubstitutionBuildItem keysub = new ObjectSubstitutionBuildItem(holder);
+        substitutions.produce(keysub);
+
+        log.info("loadDSAPublicKey run");
+        return new PublicKeyBuildItem(publicKey);
+    }</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="replacing-classes-in-native-image"><a class="anchor" href="#replacing-classes-in-native-image"></a>2.19.11. ネイティブイメージにおいてクラスを置換する</h4>
+<div class="paragraph">
+<p>Graal SDK は、ネイティブイメージ内のクラスの置換をサポートしています。 <code>XmlConfig/XmlData</code> のクラスを、JAXB アノテーションに依存しないバージョンのクラスに置き換える方法の例を以下に示します。</p>
+</div>
+<div class="listingblock">
+<div class="title">Substitution of XmlConfig/XmlData クラスの例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.extest.runtime.graal;
+import java.util.Date;
+import com.oracle.svm.core.annotate.Substitute;
+import com.oracle.svm.core.annotate.TargetClass;
+import io.quarkus.extest.runtime.config.XmlData;
+
+@TargetClass(XmlConfig.class)
+@Substitute
+public final class Target_XmlConfig {
+
+    @Substitute
+    private String address;
+    @Substitute
+    private int port;
+    @Substitute
+    private ArrayList&lt;XData&gt; dataList;
+
+    @Substitute
+    public String getAddress() {
+        return address;
+    }
+
+    @Substitute
+    public int getPort() {
+        return port;
+    }
+
+    @Substitute
+    public ArrayList&lt;XData&gt; getDataList() {
+        return dataList;
+    }
+
+    @Substitute
+    @Override
+    public String toString() {
+        return "Target_XmlConfig{" +
+                "address='" + address + '\'' +
+                ", port=" + port +
+                ", dataList=" + dataList +
+                '}';
+    }
+}
+
+@TargetClass(XmlData.class)
+@Substitute
+public final class Target_XmlData {
+
+    @Substitute
+    private String name;
+    @Substitute
+    private String model;
+    @Substitute
+    private Date date;
+
+    @Substitute
+    public String getName() {
+        return name;
+    }
+
+    @Substitute
+    public String getModel() {
+        return model;
+    }
+
+    @Substitute
+    public Date getDate() {
+        return date;
+    }
+
+    @Substitute
+    @Override
+    public String toString() {
+        return "Target_XmlData{" +
+                "name='" + name + '\'' +
+                ", model='" + model + '\'' +
+                ", date='" + date + '\'' +
+                '}';
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ecosystem"><a class="anchor" href="#ecosystem"></a>3. エコシステムの統合</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Some extensions may be private, and some may wish to be part of the
+broader Quarkus ecosystem, and <a href="https://quarkus.io/extensions/">available for community re-use</a>.
+Inclusion in the Quarkiverse Hub is a convenient mechanism for handling
+continuous testing and publication.
+The <a href="https://hub.quarkiverse.io/home/#getting-an-extension-onboarded">Quarkiverse Hub wiki</a> has instructions
+for on-boarding your extension.</p>
+</div>
+<div class="paragraph">
+<p>または、継続的テストと公開を手動で処理することも可能です。</p>
+</div>
+<div class="sect2">
+<h3 id="ecosystem-ci"><a class="anchor" href="#ecosystem-ci"></a>3.1. エクステンションの継続的なテスト</h3>
+<div class="paragraph">
+<p>エクステンションの作者が、Quarkusの最新のスナップショットに対して自分のエクステンションを毎日簡単にテストできるようにするために、QuarkusはEcosystem CIという概念を導入しました。Ecosystem CIの <a href="https://github.com/quarkusio/quarkus-ecosystem-ci/blob/main/README.adoc">README</a>には、この機能を利用するためにGitHub Actionsジョブをセットアップする方法の詳細が記載されており、この <a href="https://www.youtube.com/watch?v=VpbRA1n0hHQ">ビデオ</a>ではそのプロセスの概要を説明しています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="publish-your-extension-in-registry-quarkus-io"><a class="anchor" href="#publish-your-extension-in-registry-quarkus-io"></a>3.2. エクステンションを registry.quarkus.io で公開</h3>
+<div class="paragraph">
+<p>エクステンションを <a href="tooling.html">Quarkusツール</a>に公開する前に、以下の要件が満たされていることを確認してください。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="extension-metadata#quarkus-extension-yaml">quarkus-extension.yaml</a> ファイル（エクステンションの <code>runtime/</code> モジュール内）には、最小限のメタデータが設定されている:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code></p>
+</li>
+<li>
+<p><code>description</code> (推奨アプローチのとおり runtime/pom.xml の <code>&lt;description&gt;</code> 要素にすでに設定されていない限り）</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>エクステンションがMaven Centralで公開されていること</p>
+</li>
+<li>
+<p>Your extension repository is configured to use the <a href="#ecosystem-ci">Ecosystem CI</a>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>それから、 <a href="https://github.com/quarkusio/quarkus-extension-catalog">Quarkus Extension Catalog</a>の <code>extensions/</code> ディレクトリに <code>your-extension.yaml</code> ファイルを追加するプルリクエストを作成する必要があります。YAMLは以下のような構造になっていなければなりません。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">group-id: &lt;YOUR_EXTENSION_RUNTIME_GROUP_ID&gt;
+artifact-id: &lt;YOUR_EXTENSION_RUNTIME_ARTIFACT_ID&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+When your repository contains multiple extensions, you need to create a separate file for each individual extension, not just one file for the entire repository.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>以上で完了です。プルリクエストがマージされると、スケジュールされたジョブがMaven Centralの新しいバージョンをチェックし、 <a href="extension-registry-user.html">Quarkus エクステンションレジストリ</a>をアップデートします。</p>
+</div>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#extension-philosophy">1. エクステンション哲学</a>
+<ul class="sectlevel2">
+<li><a href="#why-an-extension-framework">1.1. なぜエクステンションフレームワークなのか</a></li>
+<li><a href="#favor-build-time-work-over-runtime-work">1.2. ランタイムワークよりもビルドタイムワーク</a></li>
+<li><a href="#how-to-expose-configuration">1.3. 設定を公開する方法</a></li>
+<li><a href="#expose-your-components-via-cdi">1.4. CDI でコンポーネントを公開する</a></li>
+<li><a href="#some-types-of-extensions">1.5. エクステンションのタイプ</a></li>
+</ul>
+</li>
+<li><a href="#technical-aspect">2. 技術的な側面</a>
+<ul class="sectlevel2">
+<li><a href="#bootstrap-three-phases">2.1. ブートストラップの 3 つのフェーズと Quarkus 哲学</a></li>
+<li><a href="#project-setup">2.2. プロジェクトのセットアップ</a></li>
+<li><a href="#build-step-processors">2.3. ビルドステッププロセッサー</a></li>
+<li><a href="#configuration">2.4. 設定</a></li>
+<li><a href="#conditional-step-inclusion">2.5. 条件付きステップを含める</a></li>
+<li><a href="#bytecode-recording">2.6. バイトコードの記録</a></li>
+<li><a href="#contexts-and-dependency-injection">2.7. コンテキストと依存性インジェクション</a></li>
+<li><a href="#quarkus-dev-ui">2.8. Quarkus Dev UI</a></li>
+<li><a href="#extension-defined-endpoints">2.9. エクステンションで定義されたエンドポイント</a></li>
+<li><a href="#extension-health-check">2.10. エクステンションヘルスチェック</a></li>
+<li><a href="#extension-metrics">2.11. エクステンションメトリクス</a></li>
+<li><a href="#customizing-json-handling-from-an-extension">2.12. エクステンションからJSON処理をカスタマイズする</a></li>
+<li><a href="#integrating-with-development-mode">2.13. 開発モードとの連携</a></li>
+<li><a href="#testing-extensions">2.14. エクステンションのテスト</a></li>
+<li><a href="#testing-hot-reload">2.15. ホットリロードのテスト</a></li>
+<li><a href="#native-executable-support">2.16. ネイティブ実行可能ファイルのサポート</a></li>
+<li><a href="#ide-support-tips">2.17. IDE サポートのヒント</a></li>
+<li><a href="#troubleshooting-debugging-tips">2.18. トラブルシューティング / デバッグのヒント</a></li>
+<li><a href="#sample-test-extension">2.19. サンプルテストエクステンション</a></li>
+</ul>
+</li>
+<li><a href="#ecosystem">3. エコシステムの統合</a>
+<ul class="sectlevel2">
+<li><a href="#ecosystem-ci">3.1. エクステンションの継続的なテスト</a></li>
+<li><a href="#publish-your-extension-in-registry-quarkus-io">3.2. エクステンションを registry.quarkus.io で公開</a></li>
+</ul>
+</li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/building-my-first-extension">初めてのエクステンションの作成</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/class-loading-reference">クラスローディングリファレンス</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/conditional-extension-dependencies">条件付きエクステンション依存関係</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.15/guides/duplicated-context">コンテキストの重複、コンテキストローカル、非同期処理と伝播</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/capabilities">エクステンションケイパビリティ</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/extension-codestart">エクステンション Codestart</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/extension-metadata">Quarkus Extension Metadata</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/extension-registry-user">Quarkus Extension Registry</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/writing-native-applications-tips">ネイティブ・アプリケーションを作成するためのヒント</a></li>
+      
+        
+        <li class="howto"><a href="/version/3.15/guides/extension-writing-dev-service">Writing a Dev Service</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

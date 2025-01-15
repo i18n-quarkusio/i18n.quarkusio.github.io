@@ -1,0 +1,2663 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Quarkus SecurityでWebAuthnを使用 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/guides/security-webauthn" />
+  <meta property="og:title" content="Quarkus SecurityでWebAuthnを使用" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/security-webauthn">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/guides/security-webauthn">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/guides/security-webauthn" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/guides/security-webauthn">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/guides/security-webauthn">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/guides/security-webauthn">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/guides/security-webauthn">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" selected>3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <a class="editlink" href="https://github.com/quarkusio/quarkus/edit/main/docs/src/main/asciidoc/security-webauthn.adoc">このページを編集</a>
+      
+      <h1 class="text-caps">Quarkus SecurityでWebAuthnを使用 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、Quarkus アプリケーションで、パスワードの代わりに WebAuthn 認証を使用する方法を説明します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>この技術は、previewと考えられています。</p>
+</div>
+<div class="paragraph">
+<p><em>preview</em> では、下位互換性やエコシステムでの存在は保証されていません。具体的な改善には設定や API の変更が必要になるかもしれませんが、 <em>stable</em> になるための計画は現在進行中です。フィードバックは <a href="https://groups.google.com/d/forum/quarkus-dev">メーリングリスト</a> や <a href="https://github.com/quarkusio/quarkus/issues">GitHub の課題管理</a> で受け付けています。</p>
+</div>
+<div class="paragraph">
+<p>とりうるステータスの完全なリストについては、 <a href="https://quarkus.io/faq/#extension-status">FAQの項目</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>約15分</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 17+がインストールされ、 <code>JAVA_HOME</code> が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.9.9</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルをビルドしたい場合、MandrelまたはGraalVM（あるいはネイティブなコンテナビルドを使用する場合はDocker）をインストールし、 <a href="building-native-image.html#configuring-graalvm">適切に設定</a>していること</p>
+</li>
+<li>
+<p>A WebAuthn or PassKeys-capable device, or <a href="https://developer.chrome.com/docs/devtools/webauthn/">an emulator of those</a>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="introduction-to-webauthn"><a class="anchor" href="#introduction-to-webauthn"></a>WebAuthnの紹介</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://webauthn.guide/">WebAuthn</a> は、パスワードを置き換えるために設計された認証メカニズムです。つまり、新しいユーザーを登録したり、ログインしたりするサービスを書くたびに、パスワードを要求する代わりに、WebAuthn を使って、パスワードを置き換えるのです。</p>
+</div>
+<div class="paragraph">
+<p>WebAuthnは、パスワードをID証明に置き換えます。実際には、ユーザーは、パスワードを考案したり、保存したり、記憶したりする代わりに、あなたのサービスやウェブサイトのために特別にID証明を生成するハードウェアトークンを使用することになります。これは、ユーザーに携帯電話で親指を押してもらったり、パソコンで <a href="https://www.yubico.com">YubiKey</a> のボタンを押したりすることで実現可能です。</p>
+</div>
+<div class="paragraph">
+<p>そこで、ユーザーを登録する際に、ブラウザーでユーザー情報（ユーザー名、自分の名前など）を入力しパスワードを入力して本人確認をする代わりに、ボタンをクリックすると、WebAuthn ブラウザー API が実行され、何か（ボタンを押す、指紋を使う）をするように要求されます。すると、ブラウザーはパスワードの代わりに、サービスに送信できるID証明を生成します。</p>
+</div>
+<div class="paragraph">
+<p>この登録時のID証明は、ほとんどが公開鍵で構成されています。実際にはいろいろなものがありますが、最も興味深いのは公開鍵です。この公開鍵は、あなたのデバイスやブラウザに保存されているわけではありません。この公開鍵は、対象となるサービスのために特別に生成され（そのURIに関連付けられます）、ハードウェア認証デバイスから導出されたものです。したがって、ハードウェア認証デバイスとターゲットサービスの関連付けは、常に同じ秘密鍵と公開鍵のペアを導き出すことになります。例えば、YubiKeyを別のコンピュータに持ち出しても、同じターゲットサービスに対して同じ秘密鍵と公開鍵を生成し続けることができます。</p>
+</div>
+<div class="paragraph">
+<p>そのため、登録時にはパスワードの代わりに（主に）公開鍵を送信し、サービスはその情報を新しいユーザーアカウントのWebAuthnクレデンシャルとして保存し、これが後にあなたを識別することになります。</p>
+</div>
+<div class="paragraph">
+<p>そして、そのサービスにログインする必要があるとき、パスワードを入力する代わりに（これは存在しませんよ）、ログインフォームのボタンを押すと、ブラウザーが何かを尋ねてきて、パスワードの代わりに署名をサービスに送信してくれます。その署名にはあなたの認証ハードウェアと対象サービスから得られる秘密鍵が必要なので、あなたのサービスがそれを受け取ると、それがあなたがクレデンシャルとして保存した公開鍵の署名と一致するかどうかを検証することができるのです。</p>
+</div>
+<div class="paragraph">
+<p>つまり、まとめると、登録時にはパスワードの代わりに生成した公開鍵を送信し、ログイン時にはその公開鍵に対する署名を送信することで、ユーザーが登録時の人物であることを確認することができるのです。</p>
+</div>
+<div class="paragraph">
+<p>実際にはもう少し複雑で、ハードウェア認証機能を使う前にサーバーとハンドシェイクする必要があるため（チャレンジを求めるなど）、サービスには常に2つの呼び出しがあります。1つはログインや登録の一つ前のハードウェア認証デバイスを呼び出す前、そしてもう1つは通常のログインや登録の時です。</p>
+</div>
+<div class="paragraph">
+<p>また、公開鍵以外にも保存するフィールドはたくさんありますが、それについては私たちがお手伝いします。</p>
+</div>
+<div class="paragraph">
+<p>Just in case you get there wondering what&#8217;s the relation with <a href="https://fidoalliance.org/passkeys/">PassKeys</a>
+and whether we support it: sure, yes, PassKeys is a way that your authenticator devices can share and sync
+their credentials, which you can then use with our WebAuthn authentication.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The WebAuthn specification requires HTTPS to be used for communication with the server, though
+some browsers allow <code>localhost</code>. If you must use HTTPS in dev mode, you can always use the
+<a href="https://docs.quarkiverse.io/quarkus-ngrok/dev/index.html">quarkus-ngrok</a> extension.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="architecture"><a class="anchor" href="#architecture"></a>アーキテクチャ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>この例では、4つのエンドポイントを提供する、非常にシンプルなマイクロサービスを構築します:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>/api/public</code></p>
+</li>
+<li>
+<p><code>/api/public/me</code></p>
+</li>
+<li>
+<p><code>/api/users/me</code></p>
+</li>
+<li>
+<p><code>/api/admin</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>/api/public</code> エンドポイントは匿名でアクセスすることができます。 <code>/api/public/me</code> エンドポイントは匿名でアクセスでき、現在のユーザー名がある場合はそのユーザー名を、ない場合は <code>&lt;not logged in&gt;</code> を返します。 <code>/api/admin</code> エンドポイントは RBAC (Role-Based Access Control) で保護されており、 <code>admin</code> のロールを与えられたユーザーのみがアクセスすることができます。このエンドポイントでは、 <code>@RolesAllowed</code> アノテーションを使用して、アクセス制約を宣言的に適用しています。 <code>/api/users/me</code> のエンドポイントも RBAC (Role-Based Access Control) で保護されており， <code>user</code> のロールが付与されたユーザのみがアクセスできるようになっています．レスポンスとして、ユーザーに関する詳細情報を含むJSONドキュメントが返されます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution"><a class="anchor" href="#solution"></a>ソリューション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次の章で紹介する手順に沿って、ステップを踏んでアプリを作成することをお勧めします。ただし、完成した例にそのまま進んでも構いません。</p>
+</div>
+<div class="paragraph">
+<p>Gitレポジトリをクローンするか <code>git clone <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code> 、 <a href="https://github.com/quarkusio/quarkus-quickstarts/archive/main.zip">アーカイブ</a> をダウンロードします。</p>
+</div>
+<div class="paragraph">
+<p>ソリューションは <code>security-webauthn-quickstart</code> <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/main/security-webauthn-quickstart">ディレクトリ</a> にあります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-maven-project"><a class="anchor" href="#creating-the-maven-project"></a>Mavenプロジェクトの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、新しいプロジェクトが必要です。以下のコマンドで新規プロジェクトを作成します。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:security-webauthn-quickstart \
+    --extension='security-webauthn,jdbc-postgresql,rest,hibernate-orm-panache' \
+    --no-code
+cd security-webauthn-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:3.17.6:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=security-webauthn-quickstart \
+    -Dextensions='security-webauthn,jdbc-postgresql,rest,hibernate-orm-panache' \
+    -DnoCode
+cd security-webauthn-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Windowsユーザーの場合:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>cmdを使用する場合、（バックスラッシュ <code>\</code> を使用せず、すべてを同じ行に書かないでください）。</p>
+</li>
+<li>
+<p>Powershellを使用する場合は、 <code>-D</code> パラメータを二重引用符で囲んでください。例: <code>"-DprojectArtifactId=security-webauthn-quickstart"</code></p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>選択したデータベースコネクターライブラリを追加することを忘れないでください。ここでは、PostgreSQLをIDストアとして使用しています。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>このコマンドは Maven プロジェクトを生成し、WebAuthn を使ってユーザー認証を行うための <code>security-webauthn</code> エクステンションをインポートします。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusプロジェクトをすでに設定している場合は、プロジェクトのベースディレクトリで次のコマンドを実行することで、 <code>security-webauthn</code> エクステンションをプロジェクトに追加できます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus extension add security-webauthn</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:add-extension -Dextensions='security-webauthn'</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew addExtension --extensions='security-webauthn'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、 <code>pom.xml</code> に以下が追加されます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-security-webauthn&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-security-webauthn")</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application"><a class="anchor" href="#writing-the-application"></a>アプリケーションの記述</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、 <code>/api/public</code> のエンドポイントを実装することから始めましょう。以下のソースコードからわかるように、これは通常のJakarta RESTリソースに過ぎません：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.webauthn;
+
+import java.security.Principal;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.SecurityContext;
+
+@Path("/api/public")
+public class PublicResource {
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String publicResource() {
+        return "public";
+   }
+
+    @GET
+    @Path("/me")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String me(@Context SecurityContext securityContext) {
+        Principal user = securityContext.getUserPrincipal();
+        return user != null ? user.getName() : "&lt;not logged in&gt;";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>/api/admin</code> エンドポイントのソースコードも非常にシンプルです。ここでの主な違いは、 <code>admin</code> ロールで付与されたユーザーだけがエンドポイントにアクセスできるように <code>@RolesAllowed</code> アノテーションを使用していることです:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.webauthn;
+
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/api/admin")
+public class AdminResource {
+
+    @GET
+    @RolesAllowed("admin")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String adminResource() {
+         return "admin";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>最後に、 <code>/api/users/me</code> エンドポイントを考えてみましょう。下のソースコードを見ればわかるように、 <code>user</code> の役割を持つユーザのみを信頼しています。現在認証されているプリンシパルへのアクセスを得るために <code>SecurityContext</code> を使用しており、ユーザーの名前を返します。この情報はデータベースから読み込まれます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.webauthn;
+
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.SecurityContext;
+
+@Path("/api/users")
+public class UserResource {
+
+    @GET
+    @RolesAllowed("user")
+    @Path("/me")
+    public String me(@Context SecurityContext securityContext) {
+        return securityContext.getUserPrincipal().getName();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="storing-our-webauthn-credentials"><a class="anchor" href="#storing-our-webauthn-credentials"></a>WebAuthnのクレデンシャルの保存</h3>
+<div class="paragraph">
+<p>これで、WebAuthn クレデンシャルがデータベースにどのように保存されるかを、3 つのエンティティで説明できるようになりました。ユーザー (実際には複数の WebAuthn クレデンシャルとロールなどの他のデータを持つことができます) あたり 1 つのクレデンシャルしか保存しないように、モデルを簡略化したことに注意してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.webauthn;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.vertx.ext.auth.webauthn.Authenticator;
+import io.vertx.ext.auth.webauthn.PublicKeyCredential;
+
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"userName", "credID"}))
+@Entity
+public class WebAuthnCredential extends PanacheEntity {
+
+    /**
+     * The username linked to this authenticator
+     */
+    public String userName;
+
+    /**
+     * The type of key (must be "public-key")
+     */
+    public String type = "public-key";
+
+    /**
+     * The non user identifiable id for the authenticator
+     */
+    public String credID;
+
+    /**
+     * The public key associated with this authenticator
+     */
+    public String publicKey;
+
+    /**
+     * The signature counter of the authenticator to prevent replay attacks
+     */
+    public long counter;
+
+    public String aaguid;
+
+    /**
+     * The Authenticator attestation certificates object, a JSON like:
+     * &lt;pre&gt;{@code
+     *   {
+     *     "alg": "string",
+     *     "x5c": [
+     *       "base64"
+     *     ]
+     *   }
+     * }&lt;/pre&gt;
+     */
+    /**
+     * The algorithm used for the public credential
+     */
+    public PublicKeyCredential alg;
+
+    /**
+     * The list of X509 certificates encoded as base64url.
+     */
+    @OneToMany(mappedBy = "webAuthnCredential")
+    public List&lt;WebAuthnCertificate&gt; x5c = new ArrayList&lt;&gt;();
+
+    public String fmt;
+
+    // owning side
+    @OneToOne
+    public User user;
+
+    public WebAuthnCredential() {
+    }
+
+    public WebAuthnCredential(Authenticator authenticator, User user) {
+        aaguid = authenticator.getAaguid();
+        if(authenticator.getAttestationCertificates() != null)
+            alg = authenticator.getAttestationCertificates().getAlg();
+        counter = authenticator.getCounter();
+        credID = authenticator.getCredID();
+        fmt = authenticator.getFmt();
+        publicKey = authenticator.getPublicKey();
+        type = authenticator.getType();
+        userName = authenticator.getUserName();
+        if(authenticator.getAttestationCertificates() != null
+                &amp;&amp; authenticator.getAttestationCertificates().getX5c() != null) {
+            for (String x5c : authenticator.getAttestationCertificates().getX5c()) {
+                WebAuthnCertificate cert = new WebAuthnCertificate();
+                cert.x5c = x5c;
+                cert.webAuthnCredential = this;
+                this.x5c.add(cert);
+            }
+        }
+        this.user = user;
+        user.webAuthnCredential = this;
+    }
+
+    public static List&lt;WebAuthnCredential&gt; findByUserName(String userName) {
+        return list("userName", userName);
+    }
+
+    public static List&lt;WebAuthnCredential&gt; findByCredID(String credID) {
+        return list("credID", credID);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>また、クレデンシャルのための第二のエンティティが必要です:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.webauthn;
+
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+
+
+@Entity
+public class WebAuthnCertificate extends PanacheEntity {
+
+    @ManyToOne
+    public WebAuthnCredential webAuthnCredential;
+
+    /**
+     * The list of X509 certificates encoded as base64url.
+     */
+    public String x5c;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして最後に、私たちのユーザー・エンティティーです:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.webauthn;
+
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+
+@Table(name = "user_table")
+@Entity
+public class User extends PanacheEntity {
+
+    @Column(unique = true)
+    public String userName;
+
+    // non-owning side, so we can add more credentials later
+    @OneToOne(mappedBy = "user")
+    public WebAuthnCredential webAuthnCredential;
+
+    public static User findByUserName(String userName) {
+        return User.find("userName", userName).firstResult();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="a-note-about-usernames-and-credential-ids"><a class="anchor" href="#a-note-about-usernames-and-credential-ids"></a>ユーザー名とクレデンシャルIDに関する注意点</h4>
+<div class="paragraph">
+<p>WebAuthnは、ユーザー名（ユーザーごとにユニーク）とクレデンシャルID（認証デバイスごとにユニーク）の組み合わせに依存します。</p>
+</div>
+<div class="paragraph">
+<p>このように識別子が2つ存在する理由、およびそれらがクレデンシャル自体のユニークキーでない理由は次のとおりです:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>1人のユーザーが複数の認証デバイスを持つことができるため、1つのユーザー名が複数のクレデンシャルIDに対応し、そのすべてが同じユーザーを識別することができます。</p>
+</li>
+<li>
+<p>一人の人が異なるユーザー名で複数のユーザーアカウントを持ち、その全員が同じ認証デバイスを持つことができるため、認証デバイスは複数のユーザーで共有されることがあります。そのため、1つのクレデンシャルIDを複数の異なるユーザーが使用することがあります。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>ただし、ユーザー名とクレデンシャルIDの組み合わせは、クレデンシャルテーブルのユニーク制約である必要があります。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="exposing-your-entities-to-quarkus-webauthn"><a class="anchor" href="#exposing-your-entities-to-quarkus-webauthn"></a>Quarkus WebAuthnにエンティティを公開する</h3>
+<div class="paragraph">
+<p>Quarkus WebAuthn エクステンションでクレデンシャルをロードおよび保存できるようにするには、 <code>WebAuthnUserProvider</code> を実装する bean を定義する必要があります。ここで、データモデルを WebAuthn セキュリティモデルに変換する方法を Quarkus に指示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.webauthn;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import io.smallrye.common.annotation.Blocking;
+import jakarta.enterprise.context.ApplicationScoped;
+
+import io.quarkus.security.webauthn.WebAuthnUserProvider;
+import io.smallrye.mutiny.Uni;
+import io.vertx.ext.auth.webauthn.AttestationCertificates;
+import io.vertx.ext.auth.webauthn.Authenticator;
+import jakarta.transaction.Transactional;
+
+import static org.acme.security.webauthn.WebAuthnCredential.findByCredID;
+import static org.acme.security.webauthn.WebAuthnCredential.findByUserName;
+
+@Blocking
+@ApplicationScoped
+public class MyWebAuthnSetup implements WebAuthnUserProvider {
+
+    @Transactional
+    @Override
+    public Uni&lt;List&lt;Authenticator&gt;&gt; findWebAuthnCredentialsByUserName(String userName) {
+        return Uni.createFrom().item(toAuthenticators(findByUserName(userName)));
+    }
+
+    @Transactional
+    @Override
+    public Uni&lt;List&lt;Authenticator&gt;&gt; findWebAuthnCredentialsByCredID(String credID) {
+        return Uni.createFrom().item(toAuthenticators(findByCredID(credID)));
+    }
+
+    @Transactional
+    @Override
+    public Uni&lt;Void&gt; updateOrStoreWebAuthnCredentials(Authenticator authenticator) {
+        // leave the scooby user to the manual endpoint, because if we do it here it will be created/updated twice
+        if(!authenticator.getUserName().equals("scooby")) {
+            User user = User.findByUserName(authenticator.getUserName());
+            if(user == null) {
+                // new user
+                User newUser = new User();
+                newUser.userName = authenticator.getUserName();
+                WebAuthnCredential credential = new WebAuthnCredential(authenticator, newUser);
+                credential.persist();
+                newUser.persist();
+            } else {
+                // existing user
+                user.webAuthnCredential.counter = authenticator.getCounter();
+            }
+        }
+        return Uni.createFrom().nullItem();
+    }
+
+    private static List&lt;Authenticator&gt; toAuthenticators(List&lt;WebAuthnCredential&gt; dbs) {
+        return dbs.stream().map(MyWebAuthnSetup::toAuthenticator).collect(Collectors.toList());
+    }
+
+    private static Authenticator toAuthenticator(WebAuthnCredential credential) {
+        Authenticator ret = new Authenticator();
+        ret.setAaguid(credential.aaguid);
+        AttestationCertificates attestationCertificates = new AttestationCertificates();
+        attestationCertificates.setAlg(credential.alg);
+        ret.setAttestationCertificates(attestationCertificates);
+        ret.setCounter(credential.counter);
+        ret.setCredID(credential.credID);
+        ret.setFmt(credential.fmt);
+        ret.setPublicKey(credential.publicKey);
+        ret.setType(credential.type);
+        ret.setUserName(credential.userName);
+        return ret;
+    }
+
+    @Override
+    public Set&lt;String&gt; getRoles(String userId) {
+        if(userId.equals("admin")) {
+            return Set.of("user", "admin");
+        }
+        return Collections.singleton("user");
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-html-application"><a class="anchor" href="#writing-the-html-application"></a>HTMLアプリケーションの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次に、すべてのAPIへのリンクと、新規ユーザー登録、ログイン、ログアウトを行うためのWebページを <code>src/main/resources/META-INF/resources/index.html</code> に記述する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;Login&lt;/title&gt;
+    &lt;script src="/q/webauthn/webauthn.js" type="text/javascript" charset="UTF-8"&gt;&lt;/script&gt;
+    &lt;style&gt;
+     .container {
+      display: grid;
+      grid-template-columns: auto auto auto;
+     }
+     button, input {
+      margin: 5px 0;
+     }
+     .item {
+      padding: 20px;
+     }
+     nav &gt; ul {
+       list-style-type: none;
+       margin: 0;
+       padding: 0;
+       overflow: hidden;
+       background-color: #333;
+     }
+
+     nav &gt; ul &gt; li {
+       float: left;
+     }
+
+     nav &gt; ul &gt; li &gt; a {
+       display: block;
+       color: white;
+       text-align: center;
+       padding: 14px 16px;
+       text-decoration: none;
+     }
+
+     nav &gt; ul &gt; li &gt; a:hover {
+       background-color: #111;
+     }
+    &lt;/style&gt;
+  &lt;/head&gt;
+
+  &lt;body&gt;
+    &lt;nav&gt;
+     &lt;ul&gt;
+      &lt;li&gt;&lt;a href="/api/public"&gt;Public API&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="/api/users/me"&gt;User API&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="/api/admin"&gt;Admin API&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="/q/webauthn/logout"&gt;Logout&lt;/a&gt;&lt;/li&gt;
+     &lt;/ul&gt;
+    &lt;/nav&gt;
+    &lt;div class="container"&gt;
+     &lt;div class="item"&gt;
+      &lt;h1&gt;Status&lt;/h1&gt;
+      &lt;div id="result"&gt;&lt;/div&gt;
+     &lt;/div&gt;
+     &lt;div class="item"&gt;
+      &lt;h1&gt;Login&lt;/h1&gt;
+      &lt;p&gt;
+       &lt;input id="userNameLogin" placeholder="User name"/&gt;&lt;br/&gt;
+       &lt;button id="login"&gt;Login&lt;/button&gt;
+      &lt;/p&gt;
+     &lt;/div&gt;
+     &lt;div class="item"&gt;
+      &lt;h1&gt;Register&lt;/h1&gt;
+      &lt;p&gt;
+       &lt;input id="userNameRegister" placeholder="User name"/&gt;&lt;br/&gt;
+       &lt;input id="firstName" placeholder="First name"/&gt;&lt;br/&gt;
+       &lt;input id="lastName" placeholder="Last name"/&gt;&lt;br/&gt;
+       &lt;button id="register"&gt;Register&lt;/button&gt;
+      &lt;/p&gt;
+     &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;script type="text/javascript"&gt;
+      const webAuthn = new WebAuthn({
+        callbackPath: '/q/webauthn/callback',
+        registerPath: '/q/webauthn/register',
+        loginPath: '/q/webauthn/login'
+      });
+
+      const result = document.getElementById('result');
+
+      fetch('/api/public/me')
+        .then(response =&gt; response.text())
+        .then(name =&gt; result.append("User: "+name));
+
+      const loginButton = document.getElementById('login');
+
+      loginButton.addEventListener("click", (e) =&gt; {
+        var userName = document.getElementById('userNameLogin').value;
+        result.replaceChildren();
+        webAuthn.login({ name: userName })
+          .then(body =&gt; {
+            result.append("User: "+userName);
+          })
+          .catch(err =&gt; {
+            result.append("Login failed: "+err);
+          });
+        return false;
+      });
+
+      const registerButton = document.getElementById('register');
+
+      registerButton.addEventListener("click", (e) =&gt; {
+        var userName = document.getElementById('userNameRegister').value;
+        var firstName = document.getElementById('firstName').value;
+        var lastName = document.getElementById('lastName').value;
+        result.replaceChildren();
+        webAuthn.register({ name: userName, displayName: firstName + " " + lastName })
+          .then(body =&gt; {
+            result.append("User: "+userName);
+          })
+          .catch(err =&gt; {
+            result.append("Registration failed: "+err);
+          });
+        return false;
+      });
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-application"><a class="anchor" href="#testing-the-application"></a>アプリケーションのテスト</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>アプリケーションは保護され、IDは私たちのデータベースから提供されるようになりました。</p>
+</div>
+<div class="paragraph">
+<p>次のようにdevモードでアプリケーションを実行します:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これで、PostgreSQL Dev Service コンテナが起動します。ブラウザで <a href="http://localhost:8080" class="bare">http://localhost:8080</a> を開いてください。</p>
+</div>
+<div class="paragraph">
+<p>初期状態では、クレデンシャルが登録されておらず、現在のユーザーもいない状態です。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="/guides/images/webauthn-1.png" alt="webauthn 1">
+</div>
+</div>
+<div class="paragraph">
+<p>左側に現在のユーザーが表示され、上部メニューで公開APIにアクセスしてみると、うまくいくはずですが、ユーザーAPIとadmin APIは失敗して現在のページにリダイレクトされます。</p>
+</div>
+<div class="paragraph">
+<p>まず、右側の <code>Register</code> フォームにユーザー名、氏名を入力し、 <code>Register</code> ボタンを押して、WebAuthn のクレデンシャルを登録します:</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="/guides/images/webauthn-2.png" alt="webauthn 2">
+</div>
+</div>
+<div class="paragraph">
+<p>Your browser will ask you to activate your WebAuthn authenticator (you will need a WebAuthn-capable browser
+and possibly device, or you can use <a href="https://developer.chrome.com/docs/devtools/webauthn/">an emulator of those</a>):</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="/guides/images/webauthn-3.png" alt="webauthn 3">
+</div>
+</div>
+<div class="paragraph">
+<p>その後、ログインし、ユーザーAPIにアクセスできるようになったことを確認できます。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="/guides/images/webauthn-4.png" alt="webauthn 4">
+</div>
+</div>
+<div class="paragraph">
+<p>この段階で、 <code>Logout</code> し、 <code>Login</code> のフォームにユーザー名を入力することができます:</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="/guides/images/webauthn-5.png" alt="webauthn 5">
+</div>
+</div>
+<div class="paragraph">
+<p>その後、 <code>Login</code> ボタンを押せば、ログイン状態になります:</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="/guides/images/webauthn-4.png" alt="webauthn 4">
+</div>
+</div>
+<div class="paragraph">
+<p>admin APIは、 <code>admin</code> のユーザー名で登録した場合のみアクセス可能です。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="webauthn-endpoints"><a class="anchor" href="#webauthn-endpoints"></a>WebAuthnのエンドポイント</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus WebAuthnエクステンションには、これらのRESTエンドポイントがあらかじめ定義されています:</p>
+</div>
+<div class="sect2">
+<h3 id="obtain-a-registration-challenge"><a class="anchor" href="#obtain-a-registration-challenge"></a>登録チャレンジの取得</h3>
+<div class="paragraph">
+<p><code>POST /q/webauthn/register</code> :登録チャレンジの設定と取得</p>
+</div>
+<div class="listingblock">
+<div class="title">リクエスト</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+ "name": "userName", <i class="conum" data-value="1"></i><b>(1)</b>
+ "displayName": "Mr Nice Guy" <i class="conum" data-value="2"></i><b>(2)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>必須</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>オプション</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">レスポンス</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+ "rp": {
+   "name": "Quarkus server"
+  },
+ "user": {
+   "id": "ryPi43NJSx6LFYNitrOvHg",
+   "name": "FroMage",
+   "displayName": "Mr Nice Guy"
+  },
+  "challenge": "6tkVLgYzp5yJz_MtnzCy6VRMkHuN4f4C-_hukRmsuQ_MQl7uxJweiqH8gaFkm_mEbKzlUbOabJM3nLbi08i1Uw",
+  "pubKeyCredParams": [
+    {
+     "alg": -7,
+     "type":"public-key"
+    },
+    {
+     "alg": -257,
+     "type": "public-key"
+    }
+  ],
+  "authenticatorSelection": {
+   "requireResidentKey": false,
+   "userVerification": "discouraged"
+  },
+  "timeout": 60000,
+  "attestation": "none",
+  "extensions": {
+   "txAuthSimple": ""
+  }
+ }</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="trigger-a-registration"><a class="anchor" href="#trigger-a-registration"></a>登録をトリガーする</h3>
+<div class="paragraph">
+<p><code>POST /q/webauthn/callback</code> :登録をトリガーします</p>
+</div>
+<div class="listingblock">
+<div class="title">リクエスト</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+ "id": "boMwU-QwZ_RsToPTG3iC50g8-yiKbLc3A53tgWMhzbNEQAJIlbWgchmwbt5m0ssqQNR0IM_WxCmcfKWlEao7Fg",
+ "rawId": "boMwU-QwZ_RsToPTG3iC50g8-yiKbLc3A53tgWMhzbNEQAJIlbWgchmwbt5m0ssqQNR0IM_WxCmcfKWlEao7Fg",
+ "response": {
+  "attestationObject": "&lt;DATA&gt;",
+  "clientDataJSON":"&lt;DATA&gt;"
+ },
+ "type": "public-key"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これは、ボディを持たない204を返却します</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="obtain-a-login-challenge"><a class="anchor" href="#obtain-a-login-challenge"></a>ログインチャレンジの取得</h3>
+<div class="paragraph">
+<p><code>POST /q/webauthn/login</code> :ログインチャレンジのセットアップと取得</p>
+</div>
+<div class="listingblock">
+<div class="title">リクエスト</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+ "name": "userName" <i class="conum" data-value="1"></i><b>(1)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>必須</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">レスポンス</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+ "challenge": "RV4hqKHezkWSxpOICBkpx16yPJFGMZrkPlJP-Wp8w4rVl34VIzCT7AP0Q5Rv-3JCU3jwu-j3VlOgyNMDk2AqDg",
+ "timeout": 60000,
+ "userVerification": "discouraged",
+ "extensions": {
+  "txAuthSimple": ""
+ },
+ "allowCredentials": [
+  {
+   "type": "public-key",
+   "id": "boMwU-QwZ_RsToPTG3iC50g8-yiKbLc3A53tgWMhzbNEQAJIlbWgchmwbt5m0ssqQNR0IM_WxCmcfKWlEao7Fg",
+   "transports": [
+    "usb",
+    "nfc",
+    "ble",
+    "internal"
+   ]
+  }
+ ]
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="trigger-a-login"><a class="anchor" href="#trigger-a-login"></a>ログインをトリガーする</h3>
+<div class="paragraph">
+<p><code>POST /q/webauthn/callback</code> :ログインをトリガーします</p>
+</div>
+<div class="listingblock">
+<div class="title">リクエスト</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+ "id": "boMwU-QwZ_RsToPTG3iC50g8-yiKbLc3A53tgWMhzbNEQAJIlbWgchmwbt5m0ssqQNR0IM_WxCmcfKWlEao7Fg",
+ "rawId": "boMwU-QwZ_RsToPTG3iC50g8-yiKbLc3A53tgWMhzbNEQAJIlbWgchmwbt5m0ssqQNR0IM_WxCmcfKWlEao7Fg",
+ "response": {
+  "clientDataJSON": "&lt;DATA&gt;",
+  "authenticatorData": "&lt;DATA&gt;",
+  "signature": "&lt;DATA&gt;",
+  "userHandle": ""
+ },
+ "type": "public-key"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これは、ボディを持たない204を返却します</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="logout"><a class="anchor" href="#logout"></a>ログアウト</h3>
+<div class="paragraph">
+<p><code>GET /q/webauthn/logout</code> :ログアウトします。</p>
+</div>
+<div class="paragraph">
+<p>これは、アプリケーションのルートURIへの302リダイレクトを返します。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="webauthn-javascript-library"><a class="anchor" href="#webauthn-javascript-library"></a>WebAuthn JavaScript ライブラリ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ブラウザでWebAuthnを設定するには多くのJavaScriptが必要なため、Quarkus WebAuthnエクステンションには、WebAuthnのエンドポイントとの対話を支援するJavaScriptライブラリが同梱されています（ <code>/q/webauthn/webauthn.js</code> ）。このように設定することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">&lt;script src="/q/webauthn/webauthn.js" type="text/javascript" charset="UTF-8"&gt;&lt;/script&gt;
+&lt;script type="text/javascript"&gt;
+  // configure where our endpoints are
+  const webAuthn = new WebAuthn({
+    callbackPath: '/q/webauthn/callback',
+    registerPath: '/q/webauthn/register',
+    loginPath: '/q/webauthn/login'
+  });
+  // use the webAuthn APIs here
+&lt;/script&gt;</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="invoke-registration"><a class="anchor" href="#invoke-registration"></a>登録の呼出</h3>
+<div class="paragraph">
+<p><code>webAuthn.register</code> メソッドは、登録チャレンジエンドポイントを呼び出し、次に認証デバイスを呼び出してその登録のためのコールバックエンドポイントを呼び出し、 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise オブジェクト</a> を返します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">webAuthn.register({ name: userName, displayName: firstName + " " + lastName })
+  .then(body =&gt; {
+    // do something now that the user is registered
+  })
+  .catch(err =&gt; {
+    // registration failed
+  });</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="invoke-login"><a class="anchor" href="#invoke-login"></a>ログインの呼出</h3>
+<div class="paragraph">
+<p><code>webAuthn.login</code> メソッドは、ログインチャレンジのエンドポイントを呼び出し、次に認証デバイスを呼び出してそのログインのコールバックエンドポイントを呼び出し、 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promiseオブジェクト</a> を返します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">webAuthn.login({ name: userName })
+  .then(body =&gt; {
+    // do something now that the user is logged in
+  })
+  .catch(err =&gt; {
+    // login failed
+  });</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="only-invoke-the-registration-challenge-and-authenticator"><a class="anchor" href="#only-invoke-the-registration-challenge-and-authenticator"></a>登録チャレンジと認証デバイスのみを呼出</h3>
+<div class="paragraph">
+<p><code>webAuthn.registerOnly</code> メソッドは登録チャレンジのエンドポイントを呼び出し、次に認証ツールを呼び出して、コールバックエンドポイントに送信するのに適した JSON オブジェクトを含む <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise オブジェクト</a> を返します。その JSON オブジェクトを使用して、たとえば隠しフォーム <code>input</code> 要素にクレデンシャルを格納し、通常の HTML フォームの一部として送信することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">webAuthn.registerOnly({ name: userName, displayName: firstName + " " + lastName })
+  .then(body =&gt; {
+    // store the registration JSON in form elements
+    document.getElementById('webAuthnId').value = body.id;
+    document.getElementById('webAuthnRawId').value = body.rawId;
+    document.getElementById('webAuthnResponseAttestationObject').value = body.response.attestationObject;
+    document.getElementById('webAuthnResponseClientDataJSON').value = body.response.clientDataJSON;
+    document.getElementById('webAuthnType').value = body.type;
+  })
+  .catch(err =&gt; {
+    // registration failed
+  });</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="only-invoke-the-login-challenge-and-authenticator"><a class="anchor" href="#only-invoke-the-login-challenge-and-authenticator"></a>ログインチャレンジと認証デバイスのみを呼出</h3>
+<div class="paragraph">
+<p><code>webAuthn.loginOnly</code> メソッドはログインチャレンジのエンドポイントを呼び出し、次にオーセンティケータを呼び出して、コールバックエンドポイントに送信するのに適した JSON オブジェクトを含む <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise オブジェクト</a> を返します。その JSON オブジェクトを使用して、たとえば隠しフォーム <code>input</code> 要素にクレデンシャルを格納したり、通常の HTML フォームの一部として送信したりすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">webAuthn.loginOnly({ name: userName })
+  .then(body =&gt; {
+    // store the login JSON in form elements
+    document.getElementById('webAuthnId').value = body.id;
+    document.getElementById('webAuthnRawId').value = body.rawId;
+    document.getElementById('webAuthnResponseClientDataJSON').value = body.response.clientDataJSON;
+    document.getElementById('webAuthnResponseAuthenticatorData').value = body.response.authenticatorData;
+    document.getElementById('webAuthnResponseSignature').value = body.response.signature;
+    document.getElementById('webAuthnResponseUserHandle').value = body.response.userHandle;
+    document.getElementById('webAuthnType').value = body.type;
+  })
+  .catch(err =&gt; {
+    // login failed
+  });</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="handling-login-and-registration-endpoints-yourself"><a class="anchor" href="#handling-login-and-registration-endpoints-yourself"></a>ログインと登録のエンドポイントを自分でハンドリングする</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>時には、ユーザーを登録するためにユーザー名以外のデータを要求したり、カスタムバリデーションでログインや登録を処理したいので、WebAuthnコールバックエンドポイントでは十分でないことがあります。</p>
+</div>
+<div class="paragraph">
+<p>この場合、JavaScript ライブラリの <code>WebAuthn.loginOnly</code> と <code>WebAuthn.registerOnly</code> メソッドを使用し、認証データを hidden フォーム要素に格納し、フォームペイロードの一部としてサーバーに送信し、カスタムログインまたは登録エンドポイントに送信することができます。</p>
+</div>
+<div class="paragraph">
+<p>If you are storing them in form input elements, you can then use the <code>WebAuthnLoginResponse</code> and
+<code>WebAuthnRegistrationResponse</code> classes, mark them as <code>@BeanParam</code> and then use the <code>WebAuthnSecurity.login</code>
+and <code>WebAuthnSecurity.register</code> methods to replace the <code>/q/webauthn/callback</code> endpoint. This even
+allows you to create two separate endpoints for handling login and registration at different endpoints.</p>
+</div>
+<div class="paragraph">
+<p>In most cases you can keep using the <code>/q/webauthn/login</code> and <code>/q/webauthn/register</code> challenge-initiating
+endpoints, because this is not where custom logic is required.</p>
+</div>
+<div class="paragraph">
+<p>For example, here&#8217;s how you can handle a custom login and register action:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.webauthn;
+
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.BeanParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+
+import org.jboss.resteasy.reactive.RestForm;
+
+import io.quarkus.security.webauthn.WebAuthnLoginResponse;
+import io.quarkus.security.webauthn.WebAuthnRegisterResponse;
+import io.quarkus.security.webauthn.WebAuthnSecurity;
+import io.vertx.ext.auth.webauthn.Authenticator;
+import io.vertx.ext.web.RoutingContext;
+
+@Path("")
+public class LoginResource {
+
+    @Inject
+    WebAuthnSecurity webAuthnSecurity;
+
+    // Provide an alternative implementation of the /q/webauthn/callback endpoint, only for login
+    @Path("/login")
+    @POST
+    @Transactional
+    public Response login(@RestForm String userName,
+                          @BeanParam WebAuthnLoginResponse webAuthnResponse,
+                          RoutingContext ctx) {
+        // Input validation
+        if(userName == null || userName.isEmpty() || !webAuthnResponse.isSet() || !webAuthnResponse.isValid()) {
+            return Response.status(Status.BAD_REQUEST).build();
+        }
+
+        User user = User.findByUserName(userName);
+        if(user == null) {
+            // Invalid user
+            return Response.status(Status.BAD_REQUEST).build();
+        }
+        try {
+            Authenticator authenticator = this.webAuthnSecurity.login(webAuthnResponse, ctx).await().indefinitely();
+            // bump the auth counter
+            user.webAuthnCredential.counter = authenticator.getCounter();
+            // make a login cookie
+            this.webAuthnSecurity.rememberUser(authenticator.getUserName(), ctx);
+            return Response.ok().build();
+        } catch (Exception exception) {
+            // handle login failure - make a proper error response
+            return Response.status(Status.BAD_REQUEST).build();
+        }
+    }
+
+    // Provide an alternative implementation of the /q/webauthn/callback endpoint, only for registration
+    @Path("/register")
+    @POST
+    @Transactional
+    public Response register(@RestForm String userName,
+                             @BeanParam WebAuthnRegisterResponse webAuthnResponse,
+                             RoutingContext ctx) {
+        // Input validation
+        if(userName == null || userName.isEmpty() || !webAuthnResponse.isSet() || !webAuthnResponse.isValid()) {
+            return Response.status(Status.BAD_REQUEST).build();
+        }
+
+        User user = User.findByUserName(userName);
+        if(user != null) {
+            // Duplicate user
+            return Response.status(Status.BAD_REQUEST).build();
+        }
+        try {
+            // store the user
+            Authenticator authenticator = this.webAuthnSecurity.register(webAuthnResponse, ctx).await().indefinitely();
+            User newUser = new User();
+            newUser.userName = authenticator.getUserName();
+            WebAuthnCredential credential = new WebAuthnCredential(authenticator, newUser);
+            credential.persist();
+            newUser.persist();
+            // make a login cookie
+            this.webAuthnSecurity.rememberUser(newUser.userName, ctx);
+            return Response.ok().build();
+        } catch (Exception ignored) {
+            // handle login failure
+            // make a proper error response
+            return Response.status(Status.BAD_REQUEST).build();
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+ <code>WebAuthnSecurity</code> のメソッドはユーザークッキーを設定したり読み込んだりしないので、自分で対処する必要がありますが、JWT などのユーザーを保存する他の手段を使用することができます。手動でログインクッキーを設定したい場合は、同じ <code>WebAuthnSecurity</code> クラスの <code>rememberUser(String userName, RoutingContext ctx)</code> と <code>logout(RoutingContext ctx)</code> のメソッドを使用することができます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="blocking-version"><a class="anchor" href="#blocking-version"></a>ブロッキング版</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>WebAuthnSecurity</code> データベースへのデータアクセスにブロックを使っている場合、 <code>register</code> と <code>login</code> のメソッドでは、 <code>WebAuthnUserProvider</code> のデータアクセス以外に非同期なものはないので、 <code>.await().indefinitely()</code> のメソッドで、安全にブロックをすることができます。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus WebAuthnエンドポイントに、これらの呼び出しをワーカープールに委ねるように指示するために、 <code>@Blocking</code> アノテーションを <code>WebAuthnUserProvider</code> クラスに追加する必要があります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="virtual-threads-version"><a class="anchor" href="#virtual-threads-version"></a>Virtual-Threads version</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>WebAuthnSecurity</code> データベースへのデータアクセスにブロックを使っている場合、 <code>register</code> と <code>login</code> のメソッドでは、 <code>WebAuthnUserProvider</code> のデータアクセス以外に非同期なものはないので、 <code>.await().indefinitely()</code> のメソッドで、安全にブロックをすることができます。</p>
+</div>
+<div class="paragraph">
+<p>You will have to add the <code>@RunOnVirtualThread</code> annotation on your <code>WebAuthnUserProvider</code> class in order to tell the
+Quarkus WebAuthn endpoints to defer those calls to virtual threads.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-webauthn"><a class="anchor" href="#testing-webauthn"></a>WebAuthnのテスト</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>通常、ハードウェアトークンが必要なため、WebAuthn のテストは複雑です。そのため、私たちは <code>quarkus-test-security-webauthn</code> というヘルパーライブラリを作りました。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-test-security-webauthn&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">testImplementation("io.quarkus:quarkus-test-security-webauthn")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これを使うと、 <code>WebAuthnHardware</code> を使って認証トークンをエミュレートしたり、WebAuthn のエンドポイントを呼び出すために <code>WebAuthnEndpointHelper</code> ヘルパーメソッドを使ったり、カスタムエンドポイントのためにフォームデータを埋めたりすることができるようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.webauthn.test;
+
+import static io.restassured.RestAssured.given;
+
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.security.webauthn.WebAuthnController;
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.webauthn.WebAuthnEndpointHelper;
+import io.quarkus.test.security.webauthn.WebAuthnHardware;
+import io.restassured.RestAssured;
+import io.restassured.filter.Filter;
+import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
+import io.vertx.core.json.JsonObject;
+
+@QuarkusTest
+public class WebAuthnResourceTest {
+
+    enum User {
+        USER, ADMIN;
+    }
+    enum Endpoint {
+        DEFAULT, MANUAL;
+    }
+
+    @Test
+    public void testWebAuthnUser() {
+        testWebAuthn("FroMage", User.USER, Endpoint.DEFAULT);
+        testWebAuthn("scooby", User.USER, Endpoint.MANUAL);
+    }
+
+    @Test
+    public void testWebAuthnAdmin() {
+        testWebAuthn("admin", User.ADMIN, Endpoint.DEFAULT);
+    }
+
+    private void testWebAuthn(String userName, User user, Endpoint endpoint) {
+        Filter cookieFilter = new RenardeCookieFilter();
+        WebAuthnHardware token = new WebAuthnHardware();
+
+        verifyLoggedOut(cookieFilter);
+
+        // two-step registration
+        String challenge = WebAuthnEndpointHelper.invokeRegistration(userName, cookieFilter);
+        JsonObject registrationJson = token.makeRegistrationJson(challenge);
+        if(endpoint == Endpoint.DEFAULT)
+            WebAuthnEndpointHelper.invokeCallback(registrationJson, cookieFilter);
+        else {
+            invokeCustomEndpoint("/register", cookieFilter, request -&gt; {
+                WebAuthnEndpointHelper.addWebAuthnRegistrationFormParameters(request, registrationJson);
+                request.formParam("userName", userName);
+            });
+        }
+
+        // verify that we can access logged-in endpoints
+        verifyLoggedIn(cookieFilter, userName, user);
+
+        // logout
+        WebAuthnEndpointHelper.invokeLogout(cookieFilter);
+
+        verifyLoggedOut(cookieFilter);
+
+        // two-step login
+        challenge = WebAuthnEndpointHelper.invokeLogin(userName, cookieFilter);
+        JsonObject loginJson = token.makeLoginJson(challenge);
+        if(endpoint == Endpoint.DEFAULT)
+            WebAuthnEndpointHelper.invokeCallback(loginJson, cookieFilter);
+        else {
+            invokeCustomEndpoint("/login", cookieFilter, request -&gt; {
+                WebAuthnEndpointHelper.addWebAuthnLoginFormParameters(request, loginJson);
+                request.formParam("userName", userName);
+            });
+        }
+
+        // verify that we can access logged-in endpoints
+        verifyLoggedIn(cookieFilter, userName, user);
+
+        // logout
+        WebAuthnEndpointHelper.invokeLogout(cookieFilter);
+
+        verifyLoggedOut(cookieFilter);
+    }
+
+    private void invokeCustomEndpoint(String uri, Filter cookieFilter, Consumer&lt;RequestSpecification&gt; requestCustomiser) {
+        RequestSpecification request = given()
+        .when();
+        requestCustomiser.accept(request);
+        request
+        .filter(cookieFilter)
+        .redirects().follow(false)
+        .log().ifValidationFails()
+        .post(uri)
+        .then()
+        .statusCode(200)
+        .log().ifValidationFails()
+        .cookie(WebAuthnEndpointHelper.getChallengeCookie(), Matchers.is(""))
+        .cookie(WebAuthnEndpointHelper.getChallengeUsernameCookie(), Matchers.is(""))
+        .cookie(WebAuthnEndpointHelper.getMainCookie(), Matchers.notNullValue());
+    }
+
+    private void verifyLoggedIn(Filter cookieFilter, String userName, User user) {
+        // public API still good
+        RestAssured.given().filter(cookieFilter)
+        .when()
+        .get("/api/public")
+        .then()
+        .statusCode(200)
+        .body(Matchers.is("public"));
+        // public API user name
+        RestAssured.given().filter(cookieFilter)
+        .when()
+        .get("/api/public/me")
+        .then()
+        .statusCode(200)
+        .body(Matchers.is(userName));
+
+        // user API accessible
+        RestAssured.given().filter(cookieFilter)
+        .when()
+        .get("/api/users/me")
+        .then()
+        .statusCode(200)
+        .body(Matchers.is(userName));
+
+        // admin API?
+        if(user == User.ADMIN) {
+            RestAssured.given().filter(cookieFilter)
+            .when()
+            .get("/api/admin")
+            .then()
+            .statusCode(200)
+            .body(Matchers.is("admin"));
+        } else {
+            RestAssured.given().filter(cookieFilter)
+            .when()
+            .get("/api/admin")
+            .then()
+            .statusCode(403);
+        }
+    }
+
+    private void verifyLoggedOut(Filter cookieFilter) {
+        // public API still good
+        RestAssured.given().filter(cookieFilter)
+        .when()
+        .get("/api/public")
+        .then()
+        .statusCode(200)
+        .body(Matchers.is("public"));
+        // public API user name
+        RestAssured.given().filter(cookieFilter)
+        .when()
+        .get("/api/public/me")
+        .then()
+        .statusCode(200)
+        .body(Matchers.is("&lt;not logged in&gt;"));
+
+        // user API not accessible
+        RestAssured.given()
+        .filter(cookieFilter)
+        .redirects().follow(false)
+        .when()
+        .get("/api/users/me")
+        .then()
+        .statusCode(302)
+        .header("Location", Matchers.is("http://localhost:8081/"));
+
+        // admin API not accessible
+        RestAssured.given()
+        .filter(cookieFilter)
+        .redirects().follow(false)
+        .when()
+        .get("/api/admin")
+        .then()
+        .statusCode(302)
+        .header("Location", Matchers.is("http://localhost:8081/"));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このテストでは、その <code>WebAuthnUserProvider</code> のユーザーを更新する提供されたコールバックエンドポイントと、ユーザーを処理する自作した <code>LoginResource</code> エンドポイントの両方をテストしているので、 <code>WebAuthnUserProvider</code> を <code>scooby</code> ユーザーを更新しないものに上書きする必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.webauthn.test;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+import org.acme.security.webauthn.MyWebAuthnSetup;
+
+import io.quarkus.test.Mock;
+import io.smallrye.mutiny.Uni;
+import io.vertx.ext.auth.webauthn.Authenticator;
+
+@Mock
+@ApplicationScoped
+public class TestUserProvider extends MyWebAuthnSetup {
+    @Override
+    public Uni&lt;Void&gt; updateOrStoreWebAuthnCredentials(Authenticator authenticator) {
+        // delegate the scooby user to the manual endpoint, because if we do it here it will be
+        // created/updated twice
+        if(authenticator.getUserName().equals("scooby"))
+            return Uni.createFrom().nullItem();
+        return super.updateOrStoreWebAuthnCredentials(authenticator);
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration-reference"><a class="anchor" href="#configuration-reference"></a>設定リファレンス</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The security encryption key can be set with the
+<a href="all-config#quarkus-vertx-http_quarkus.http.auth.session.encryption-key"><code>quarkus.http.auth.session.encryption-key</code></a>
+configuration option, as described in the <a href="security-authentication-mechanisms#form-auth">security guide</a>.</p>
+</div>
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="ビルド時に固定"></i></span>ビルド時に固定される構成プロパティ - 他のすべての構成プロパティは実行時にオーバーライド可能 <input type="search" id="config-search-0" placeholder="FILTER CONFIGURATION" disabled></p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference searchable configuration-reference-all-rows">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><span class="header-title">Configuration property</span></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">型</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-security-webauthn_quarkus-webauthn-enabled"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-enabled"><code>quarkus.webauthn.enabled</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-1" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If the WebAuthn extension is enabled.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8232">QUARKUS_WEBAUTHN_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8232" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-origin"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-origin"><code>quarkus.webauthn.origin</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-2" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The origin of the application. The origin is basically protocol, host and port. If you are calling WebAuthn API while your application is located at <code><a href="https://example.com/login" class="bare">https://example.com/login</a></code>, then origin will be <code><a href="https://example.com" class="bare">https://example.com</a></code>. If you are calling from <code><a href="http://localhost:2823/test" class="bare">http://localhost:2823/test</a></code>, then the origin will be <code><a href="http://localhost:2823" class="bare">http://localhost:2823</a></code>. Please note that WebAuthn API will not work on pages loaded over HTTP, unless it is localhost, which is considered secure context.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8233">QUARKUS_WEBAUTHN_ORIGIN</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8233" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-transports"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-transports"><code>quarkus.webauthn.transports</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-3" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Authenticator Transports allowed by the application. Authenticators can interact with the user web browser through several transports. Applications may want to restrict the transport protocols for extra security hardening reasons. By default, all transports should be allowed. If your application is to be used by mobile phone users, you may want to restrict only the <code>INTERNAL</code> authenticator to be allowed. Permitted values are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>USB</code> - USB connected authenticators (e.g.: Yubikey&#8217;s)</p>
+</li>
+<li>
+<p><code>NFC</code> - NFC connected authenticators (e.g.: Yubikey&#8217;s)</p>
+</li>
+<li>
+<p><code>BLE</code> - Bluetooth LE connected authenticators</p>
+</li>
+<li>
+<p><code>INTERNAL</code> - Hardware security chips (e.g.: Intel TPM2.0)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8234">QUARKUS_WEBAUTHN_TRANSPORTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8234" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>list of <code>usb</code>, <code>nfc</code>, <code>ble</code>, <code>hybrid</code>, <code>internal</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>USB,NFC,BLE,INTERNAL</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-relying-party-id"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-relying-party-id"><code>quarkus.webauthn.relying-party.id</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-4" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The id (or domain name of your server)</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8235">QUARKUS_WEBAUTHN_RELYING_PARTY_ID</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8235" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-relying-party-name"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-relying-party-name"><code>quarkus.webauthn.relying-party.name</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-5" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>A user friendly name for your server</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8236">QUARKUS_WEBAUTHN_RELYING_PARTY_NAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8236" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>Quarkus server</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-authenticator-attachment"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-authenticator-attachment"><code>quarkus.webauthn.authenticator-attachment</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-6" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Kind of Authenticator Attachment allowed. Authenticators can connect to your device in two forms:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>PLATFORM</code> - The Authenticator is built-in to your device (e.g.: Security chip)</p>
+</li>
+<li>
+<p><code>CROSS_PLATFORM</code> - The Authenticator can roam across devices (e.g.: USB Authenticator)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For security reasons your application may choose to restrict to a specific attachment mode. If omitted, then any mode is permitted.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8237">QUARKUS_WEBAUTHN_AUTHENTICATOR_ATTACHMENT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8237" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><code>platform</code>, <code>cross-platform</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-require-resident-key"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-require-resident-key"><code>quarkus.webauthn.require-resident-key</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-7" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Resident key required. A resident (private) key, is a key that cannot leave your authenticator device, this means that you cannot reuse the authenticator to log into a second computer.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8238">QUARKUS_WEBAUTHN_REQUIRE_RESIDENT_KEY</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8238" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-user-verification"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-user-verification"><code>quarkus.webauthn.user-verification</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-8" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>User Verification requirements. Webauthn applications may choose <code>REQUIRED</code> verification to assert that the user is present during the authentication ceremonies, but in some cases, applications may want to reduce the interactions with the user, i.e.: prevent the use of pop-ups. Valid values are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>REQUIRED</code> - User must always interact with the browser</p>
+</li>
+<li>
+<p><code>PREFERRED</code> - User should always interact with the browser</p>
+</li>
+<li>
+<p><code>DISCOURAGED</code> - User should avoid interact with the browser</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8239">QUARKUS_WEBAUTHN_USER_VERIFICATION</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8239" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><code>required</code>, <code>preferred</code>, <code>discouraged</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>DISCOURAGED</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-timeout"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-timeout"><code>quarkus.webauthn.timeout</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-9" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Non-negative User Verification timeout. Authentication must occur within the timeout, this will prevent the user browser from being blocked with a pop-up required user verification, and the whole ceremony must be completed within the timeout period. After the timeout, any previously issued challenge is automatically invalidated.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8240">QUARKUS_WEBAUTHN_TIMEOUT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8240" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-security-webauthn_quarkus-webauthn"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>60s</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-attestation"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-attestation"><code>quarkus.webauthn.attestation</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-10" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Device Attestation Preference. During registration, applications may want to attest the device. Attestation is a cryptographic verification of the authenticator hardware. Attestation implies that the privacy of the users may be exposed and browsers might override the desired configuration on the user&#8217;s behalf. Valid values are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>NONE</code> - no attestation data is sent with registration</p>
+</li>
+<li>
+<p><code>INDIRECT</code> - attestation data is sent with registration, yielding anonymized data by a trusted CA</p>
+</li>
+<li>
+<p><code>DIRECT</code> - attestation data is sent with registration</p>
+</li>
+<li>
+<p><code>ENTERPRISE</code> - no attestation data is sent with registration. The device AAGUID is returned unaltered.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8241">QUARKUS_WEBAUTHN_ATTESTATION</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8241" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><code>none</code>, <code>indirect</code>, <code>direct</code>, <code>enterprise</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>NONE</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-pub-key-cred-params"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-pub-key-cred-params"><code>quarkus.webauthn.pub-key-cred-params</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-11" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Allowed Public Key Credential algorithms by preference order. Webauthn mandates that all authenticators must support at least the following 2 algorithms: <code>ES256</code> and <code>RS256</code>. Applications may require stronger keys and algorithms, for example: <code>ES512</code> or <code>EdDSA</code>. Note that the use of stronger algorithms, e.g.: <code>EdDSA</code> may require Java 15 or a cryptographic <code>JCE</code> provider that implements the algorithms.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8242">QUARKUS_WEBAUTHN_PUB_KEY_CRED_PARAMS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8242" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>list of <code>es256</code>, <code>es384</code>, <code>es512</code>, <code>ps256</code>, <code>ps384</code>, <code>ps512</code>, <code>es256k</code>, <code>rs256</code>, <code>rs384</code>, <code>rs512</code>, <code>rs1</code>, <code>ed-dsa</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>ES256,RS256</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-challenge-length"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-challenge-length"><code>quarkus.webauthn.challenge-length</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-12" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Length of the challenges exchanged between the application and the browser. Challenges must be at least 32 bytes.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8243">QUARKUS_WEBAUTHN_CHALLENGE_LENGTH</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8243" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>64</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-login-page"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-login-page"><code>quarkus.webauthn.login-page</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-13" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The login page</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8244">QUARKUS_WEBAUTHN_LOGIN_PAGE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8244" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>/login.html</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-session-timeout"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-session-timeout"><code>quarkus.webauthn.session-timeout</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-14" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The inactivity (idle) timeout When inactivity timeout is reached, cookie is not renewed and a new login is enforced.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8245">QUARKUS_WEBAUTHN_SESSION_TIMEOUT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8245" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-security-webauthn_quarkus-webauthn"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>PT30M</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-new-cookie-interval"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-new-cookie-interval"><code>quarkus.webauthn.new-cookie-interval</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-15" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>How old a cookie can get before it will be replaced with a new cookie with an updated timeout, also referred to as "renewal-timeout". Note that smaller values will result in slightly more server load (as new encrypted cookies will be generated more often); however, larger values affect the inactivity timeout because the timeout is set when a cookie is generated. For example if this is set to 10 minutes, and the inactivity timeout is 30m, if a user&#8217;s last request is when the cookie is 9m old then the actual timeout will happen 21m after the last request because the timeout is only refreshed when a new cookie is generated. That is, no timeout is tracked on the server side; the timestamp is encoded and encrypted in the cookie itself, and it is decrypted and parsed with each request.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8246">QUARKUS_WEBAUTHN_NEW_COOKIE_INTERVAL</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8246" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-security-webauthn_quarkus-webauthn"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>PT1M</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-cookie-name"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-cookie-name"><code>quarkus.webauthn.cookie-name</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-16" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The cookie that is used to store the persistent session</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8247">QUARKUS_WEBAUTHN_COOKIE_NAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8247" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>quarkus-credential</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-challenge-cookie-name"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-challenge-cookie-name"><code>quarkus.webauthn.challenge-cookie-name</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-17" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The cookie that is used to store the challenge data during login/registration</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8248">QUARKUS_WEBAUTHN_CHALLENGE_COOKIE_NAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8248" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>_quarkus_webauthn_challenge</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-challenge-username-cookie-name"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-challenge-username-cookie-name"><code>quarkus.webauthn.challenge-username-cookie-name</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-18" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The cookie that is used to store the username data during login/registration</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8249">QUARKUS_WEBAUTHN_CHALLENGE_USERNAME_COOKIE_NAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8249" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>_quarkus_webauthn_username</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-cookie-same-site"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-cookie-same-site"><code>quarkus.webauthn.cookie-same-site</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-19" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>SameSite attribute for the session cookie.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8250">QUARKUS_WEBAUTHN_COOKIE_SAME_SITE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8250" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><code>strict</code>, <code>lax</code>, <code>none</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>strict</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-cookie-path"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-cookie-path"><code>quarkus.webauthn.cookie-path</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-20" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The cookie path for the session cookies.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8251">QUARKUS_WEBAUTHN_COOKIE_PATH</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8251" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>/</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-security-webauthn_quarkus-webauthn-cookie-max-age"></a> <span class="property-path"><a href="#quarkus-security-webauthn_quarkus-webauthn-cookie-max-age"><code>quarkus.webauthn.cookie-max-age</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-21" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Max-Age attribute for the session cookie. This is the amount of time the browser will keep the cookie. The default value is empty, which means the cookie will be kept until the browser is closed.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-8252">QUARKUS_WEBAUTHN_COOKIE_MAX_AGE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-8252" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-security-webauthn_quarkus-webauthn"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+</tbody>
+</table>
+<div id="duration-note-anchor-quarkus-security-webauthn_quarkus-webauthn" class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">期間フォーマットについて</div>
+<div class="paragraph">
+<p>To write duration values, use the standard <code>java.time.Duration</code> format.
+See the <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html#parse(java.lang.CharSequence)">Duration#parse() Java API documentation</a> for more information.</p>
+</div>
+<div class="paragraph">
+<p>数字で始まる簡略化した書式を使うこともできます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値のみの場合は、秒単位の時間を表します。</p>
+</li>
+<li>
+<p>数値の後に <code>ms</code> が続く場合は、ミリ秒単位の時間を表します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>その他の場合は、簡略化されたフォーマットが解析のために <code>java.time.Duration</code> フォーマットに変換されます：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値の後に <code>h</code> 、 <code>m</code> 、 <code>s</code> が続く場合は、その前に <code>PT</code> が付けられます。</p>
+</li>
+<li>
+<p>数値の後に <code>d</code> が続く場合は、その前に <code>P</code> が付けられます。</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="references"><a class="anchor" href="#references"></a>参照</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="security-overview">Quarkus Securityの概要</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#introduction-to-webauthn">WebAuthnの紹介</a></li>
+<li><a href="#architecture">アーキテクチャ</a></li>
+<li><a href="#solution">ソリューション</a></li>
+<li><a href="#creating-the-maven-project">Mavenプロジェクトの作成</a></li>
+<li><a href="#writing-the-application">アプリケーションの記述</a>
+<ul class="sectlevel2">
+<li><a href="#storing-our-webauthn-credentials">WebAuthnのクレデンシャルの保存</a></li>
+<li><a href="#exposing-your-entities-to-quarkus-webauthn">Quarkus WebAuthnにエンティティを公開する</a></li>
+</ul>
+</li>
+<li><a href="#writing-the-html-application">HTMLアプリケーションの作成</a></li>
+<li><a href="#testing-the-application">アプリケーションのテスト</a></li>
+<li><a href="#webauthn-endpoints">WebAuthnのエンドポイント</a>
+<ul class="sectlevel2">
+<li><a href="#obtain-a-registration-challenge">登録チャレンジの取得</a></li>
+<li><a href="#trigger-a-registration">登録をトリガーする</a></li>
+<li><a href="#obtain-a-login-challenge">ログインチャレンジの取得</a></li>
+<li><a href="#trigger-a-login">ログインをトリガーする</a></li>
+<li><a href="#logout">ログアウト</a></li>
+</ul>
+</li>
+<li><a href="#webauthn-javascript-library">WebAuthn JavaScript ライブラリ</a>
+<ul class="sectlevel2">
+<li><a href="#invoke-registration">登録の呼出</a></li>
+<li><a href="#invoke-login">ログインの呼出</a></li>
+<li><a href="#only-invoke-the-registration-challenge-and-authenticator">登録チャレンジと認証デバイスのみを呼出</a></li>
+<li><a href="#only-invoke-the-login-challenge-and-authenticator">ログインチャレンジと認証デバイスのみを呼出</a></li>
+</ul>
+</li>
+<li><a href="#handling-login-and-registration-endpoints-yourself">ログインと登録のエンドポイントを自分でハンドリングする</a></li>
+<li><a href="#blocking-version">ブロッキング版</a></li>
+<li><a href="#virtual-threads-version">Virtual-Threads version</a></li>
+<li><a href="#testing-webauthn">WebAuthnのテスト</a></li>
+<li><a href="#configuration-reference">設定リファレンス</a></li>
+<li><a href="#references">参照</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="reference"><a href="/guides/security-authorize-web-endpoints-reference">ウェブエンドポイントの認可</a></li>
+      
+        
+        <li class="tutorial"><a href="/guides/security-oidc-code-flow-authentication-tutorial">Quarkus - 認可コードフローのOpenID Connectを使用してWebアプリケーションを保護</a></li>
+      
+        
+        <li class="guide"><a href="/guides/security-keycloak-admin-client">Keycloak Admin Clientの使用</a></li>
+      
+        
+        <li class="howto"><a href="/guides/security-keycloak-authorization">OpenID Connect (OIDC)とKeycloakを使用した認可の一元化</a></li>
+      
+        
+        <li class="concepts"><a href="/guides/security-authentication-mechanisms">Quarkusの認証メカニズム</a></li>
+      
+        
+        <li class="concepts"><a href="/guides/security-basic-authentication">Basic認証</a></li>
+      
+        
+        <li class="guide"><a href="/guides/security-jwt-build">Build, sign, and encrypt JSON Web Tokens</a></li>
+      
+        
+        <li class="concepts"><a href="/guides/security-openid-connect-providers">よく知られたOpenID Connect プロバイダーの設定</a></li>
+      
+        
+        <li class="guide"><a href="/guides/security-csrf-prevention">クロスサイトリクエストフォージェリー対策</a></li>
+      
+        
+        <li class="howto"><a href="/guides/security-openid-connect-dev-services">OpenID Connect (OIDC)のDev ServicesとDev UI</a></li>
+      
+        
+        <li class="howto"><a href="/guides/security-basic-authentication-howto">ベーシック認証の有効化</a></li>
+      
+        
+        <li class="tutorial"><a href="/guides/security-getting-started-tutorial">Basic認証とJakarta Persistenceを使ったセキュリティ入門</a></li>
+      
+        
+        <li class="concepts"><a href="/guides/security-identity-providers">アイデンティティ・プロバイダー</a></li>
+      
+        
+        <li class="reference"><a href="/guides/security-openid-connect-client-reference">OpenID Connect (OIDC) と OAuth2 クライアントおよびフィルター</a></li>
+      
+        
+        <li class="reference"><a href="/guides/security-openid-connect-client-registration">OpenID Connect (OIDC) and OAuth2 dynamic client registration</a></li>
+      
+        
+        <li class="concepts"><a href="/guides/security-oidc-bearer-token-authentication">OpenID Connect (OIDC) ベアラートークン認証</a></li>
+      
+        
+        <li class="reference"><a href="/guides/security-oidc-configuration-properties-reference">OpenID Connect (OIDC) 設定プロパティ</a></li>
+      
+        
+        <li class="concepts"><a href="/guides/security-oidc-code-flow-authentication">Web アプリケーションを保護するための OpenID Connect 認可コードフローメカニズム</a></li>
+      
+        
+        <li class="tutorial"><a href="/guides/security-openid-connect-client">OpenID Connectクライアントとトークン伝搬クイックスタート</a></li>
+      
+        
+        <li class="concepts"><a href="/guides/security-proactive-authentication">プロアクティブ認証</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

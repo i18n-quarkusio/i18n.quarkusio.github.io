@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Eclipse Adoptium、大量Java SE配布APIにQuarkusを採用 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/blog/adoptium-customer-story/" />
+  <meta property="og:title" content="Eclipse Adoptium、大量Java SE配布APIにQuarkusを採用" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/blog/adoptium-customer-story/">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="post">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/blog/adoptium-customer-story/">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="active">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/blog/adoptium-customer-story/" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/blog/adoptium-customer-story/">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/blog/adoptium-customer-story/">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/blog/adoptium-customer-story/">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/blog/adoptium-customer-story/">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    <div class="full-width-breadcrumb-bg align-self">
+  <div class="width-12-12">
+      <p class="returnlink"><a href="/blog">Blog</a> <i class="fas fa-chevron-right"></i> Eclipse Adoptium、大量Java SE配布APIにQuarkusを採用</p>
+  </div>
+</div>
+
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+    <div class="grid-wrapper">
+      <div class="width-12-12">
+        <div class="post-date">
+          September 15, 2021 
+          
+            <span class="tags"><a href="/blog/tag/user-story">#user-story</a></span>
+          
+        </div>
+        <h1 class="post-title">Eclipse Adoptium、大量Java SE配布APIにQuarkusを採用</h1>
+        <div class="grid-wrapper">
+          <div class="width-8-12 width-12-12-m byline-wrapper">
+            
+            
+              <img class="headshot" src="https://www.gravatar.com/avatar/0295b91cac6981b8bb87bf0d73dc0621">
+            
+            <p class="byline">By <a href="/author/jfalkner">James Falkner</a></p>
+          </div>
+          <div class="width-12-12">
+              <div id="preamble">
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/posts/quarkus-user-stories/adoptium/adoptium-logo.png" alt="Adoptium logo" width="300" height="300">
+</div>
+</div>
+<div class="paragraph">
+<p>Javaは世界中で <a href="https://www.daxx.com/blog/development-trends/number-software-developers-world" target="_blank" rel="noopener">何百万人もの</a>開発者に使用されており、Redmonkによると、 <a href="https://redmonk.com/sogrady/2021/08/05/language-rankings-6-21/" target="_blank" rel="noopener">最近</a>最も使用されているプログラミング言語の第2位に <a href="https://redmonk.com/sogrady/2021/08/05/language-rankings-6-21/" target="_blank" rel="noopener">返り咲い</a>たとのことです。Javaのランタイムおよび開発キットには多くのディストリビューションがありますが、Eclipse Temurin（旧称AdoptOpenJDK）ディストリビューションが最も <a href="https://snyk.io/jvm-ecosystem-report-2021/" target="_blank" rel="noopener">人気が</a>あることがわかっています。最近、AdoptOpenJDKプロジェクトは、 <a href="https://adoptium.net/" target="_blank" rel="noopener">Eclipse Adoptium</a>としてEclipse Foundationに移されました。Adoptiumの目的は、Javaエコシステム全体で使用される高品質なTCK認証ランタイムと関連技術を促進しサポートすることです。Adoptiumは、定期的なビルド、テスト、認証、そしてもちろん、Javaを使った評価、プロトタイプ、本番ワークロードの実行を必要とする何百万人もの開発者にバイナリを提供することによってこれを行います。他のオープンソースのEclipseプロジェクトと同様に、配布APIを支えるチームはほとんどがボランティアであるため、彼らは自分たちの使命を果たすために使用する時間やリソース、技術の最適化を常に模索しています。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-challenge"><a class="anchor" href="#the-challenge"></a>チャレンジ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>開発者は <a href="https://adoptium.net/" target="_blank" rel="noopener">Adoptium のウェブサイト</a>からワンクリックで直接ディストリビューションをダウンロードできますが、例えば CI/CD パイプラインでこのプロセスを自動化することはより困難になります。これは、Javaのバージョン、リリースタイプ、オペレーティングシステム、アーキテクチャ、JVMの実装などのバリエーションが多いために特に顕著です。そのため、Adoptiumは、これらの変数に基づいてプログラムで事前に構築されたバイナリを発見してアクセスする方法を提供する必要があり、 <a href="https://api.adoptium.net/q/swagger-ui/" target="_blank" rel="noopener">エンドユーザAPI</a>を作成しました。</p>
+</div>
+<div class="paragraph">
+<p>AdoptOpenJDKのダウンロード数が <a href="https://dash.adoptopenjdk.net/trends" target="_blank" rel="noopener">1日あたり約50万</a>件と非常に多いため、APIのパフォーマンスが重要な検討事項となりました。さらに、Adoptium は従来のデータセンターを持たず、これらはすべてMicrosoft Azure上のクラウドで実行されます。不必要なスペースを占有するワークロードを継続的に実行すると、コストが増大する可能性があります。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/posts/quarkus-user-stories/adoptium/download-trends.png" alt="Download trends">
+</div>
+<div class="title">Figure 1. <a href="https://dash.adoptopenjdk.net/trends">dash.adapttopenjdk.net</a>からの Adoptium ディストリビューションの最近のダウンロード統計です。</div>
+</div>
+<div class="paragraph">
+<p>2017年、技術チームがAPIを公開する最初の試みは、Node.js + Expressを使ったものでした。リクエスト量や配信バリエーションの数が増えるにつれ、チームはレスポンスタイムが遅くなっていることに気づきましたが、これは量の問題だけではなく、初期に行ったアーキテクチャの選択が原因でした。特に、フロントエンドとバックエンドが同じアプリ内にあるモノリシックアーキテクチャでは、バックエンドが同時リクエストを処理している間、フロントエンドが明らかに遅くなっていました。また、APIにページネーションがないため、結果の最初の数要素だけが必要な場合でも、リクエストが巨大な結果を返すことがありました。</p>
+</div>
+<div class="paragraph">
+<p>APIの説明を維持するための技術運営委員会の主任開発者は次のように説明しています:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>既存のAPIには設計上の欠陥があり、修正するのは容易ではありませんでしたので、新たな実装に置き換えることを検討していました。私たちの小さなチームは、JavaScriptよりもJVM言語の経験が豊富で、これはJavaデータを提供するAPIだったので、自分たちのドッグフードを食べるのは良いことだと考えました。</p>
+</div>
+<div class="paragraph">
+<p><strong>-Adoptium Technical Steering Committeeのリードデベロッパー</strong></p>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="enter-quarkus"><a class="anchor" href="#enter-quarkus"></a>Quarkusへ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>2019年7月、チームは、Javaエコシステムの他のフレームワークとの関連作業を通じてQuarkusを発見しました。彼らは特に、Quarkusが約束する、Node.jsやGolangに匹敵する優れたパフォーマンスと小さなフットプリントに興味を持ちました。さらに、Quarkusは <a href="https://quarkus.io/guides/kotlin" target="_blank" rel="noopener">Kotlinをファーストクラスでサポートしている</a>ため、チームはJavaとKotlinの両方の経験をQuarkusで再利用することができました。</p>
+</div>
+<div class="paragraph">
+<p>The team found Quarkus extremely easy to develop, especially the <a href="https://quarkus.io/developer-joy#live-coding" target="_blank" rel="noopener">Live Coding capability</a>. The familiar JAX-RS APIs in Quarkus made it easy to create the necessary endpoints. The lead engineer explains further:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>QuarkusがJAX-RSを使用していることは非常に気に入っています。私たちがすでに慣れ親しんでいることだからです。また、Quarkusで利用できる <a href="https://quarkus.io/guides/openapi-swaggerui" target="_blank" rel="noopener">OpenAPIエクステンション</a>により、追加作業なしでAPIをSwagger APIブラウザとして公開することが非常に簡単になりました。</p>
+</div>
+<div class="paragraph">
+<p><strong>-Adoptium Technical Steering Committeeのリードデベロッパー</strong></p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>また、Quarkusを使ったライブコーディングは、アプリケーションの開発に非常に役立ちました。</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Quarkusでの開発では、ライブコーディングによる高速なフィードバックループが非常に役立ちました。起動が速いのはいいことですが、私たちのアプリは長時間稼働しているので、それほど重要ではありませんでした。しかし、開発中にAPIを微調整する際に、すぐに再テストができることで、開発時間を大幅に短縮することができました。</p>
+</div>
+<div class="paragraph">
+<p><strong>-Adoptium Technical Steering Committeeのリードデベロッパー</strong></p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>JVM上のQuarkusの初期設定でのパフォーマンスは、期待をいとも簡単に超えるものでした。</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>当初は、ほとんどのAPIで1秒以下のレスポンスタイムを実現し、1秒間に約1万件のリクエストを処理できるようにしたいと考えていました。最適化を一切行わなかったにもかかわらず、ほとんどのAPIで1ms以内に応答するようになり、要求していたスループットを簡単に上回ることができました。これは、予測可能な将来に必要とされる数をはるかに上回るものです。また、Quarkusのアプリは、より多くのトラフィックを処理し、より多くの機能を提供しているにもかかわらず、（Node.jsと比較して）半分以下のCPU時間しか使用していません。</p>
+</div>
+<div class="paragraph">
+<p><strong>-Adoptium Technical Steering Committeeのリードデベロッパー</strong></p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>全体的に見て、Quarkusへの移行は、開発者の生産性や運用効率の面で実際にメリットがあり、非常にポジティブな経験となりました。チームは2019年11月からAdoptium APIの本番でQuarkusを使用しており、非常に安定していることを示しました。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="an-active-community"><a class="anchor" href="#an-active-community"></a>活発なコミュニティ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>コミュニティは、Quarkusを含め、あらゆるオープンソースプロジェクトの成功に欠かせない要素です。採用を決定する際にコミュニティの健全性が重要視されるのは当然のことです。Adoptiumでは、これは例を見れば明らかです。</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>今年の初めに、QuarkusのRESTEasy Reactiveコンポーネントにメモリリークがあることがわかりました。数日のうちに、Quarkusのコミュニティと協力して、問題を特定して修正することができました。これにより、長期的には問題を迅速に解決することができるという確信を得ることができました。</p>
+</div>
+<div class="paragraph">
+<p><strong>-Adoptium Technical Steering Committeeのリードデベロッパー</strong></p>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="whats-next-for-adoptium"><a class="anchor" href="#whats-next-for-adoptium"></a>Adoptiumの次なる展開</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>AdoptiumはQuarkusを採用したことに非常に満足しており、継続的なテストやMongoDB（選択したデータベース）のDev servicesサポートなど、Quarkusの新しい機能を試すことを楽しみにしています。</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>全体的に見て、Quarkusの機能には非常に感銘を受けましたし、Quarkusコミュニティでの経験も素晴らしいものでした。今後もQuarkusがどのように進化していくのか、また、JavaコミュニティのJavaディストリビューションのニーズに応える方法を改善していくことを楽しみにしています。</p>
+</div>
+<div class="paragraph">
+<p><strong>-Adoptium Technical Steering Committeeのリードデベロッパー</strong></p>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="more-information"><a class="anchor" href="#more-information"></a>詳細</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://api.adoptium.net/q/swagger-ui/">Adoptium API</a></p>
+</li>
+<li>
+<p><a href="https://github.com/adoptium/api.adoptium.net">Adoptium API Source code</a></p>
+</li>
+<li>
+<p><a href="https://adoptium.net/faq.html">Adoptium FAQ</a></p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="about-eclipse-adoptium"><a class="anchor" href="#about-eclipse-adoptium"></a>Eclipse Adoptiumについて</h3>
+<div class="paragraph">
+<p>Eclipse Adoptium Top-Level Projectの使命は、Javaエコシステム内で使用される高品質のランタイムと関連技術を生産することです。Eclipse Adoptiumはまた、コードとしてのオープンソースのインフラストラクチャ、包括的な継続的統合ビルドとテストファーム、および広範な品質保証テストを含む成果物を提供します。これらの成果物は、Eclipse Adoptiumプロジェクトや他のランタイム技術構築者が、安全で、Java SE TCKでテストされ、準拠した、生産可能なランタイムを確実に提供するために使用することができます。</p>
+</div>
+</div>
+</div>
+</div>
+              
+          </div>
+          <div class="width-12-12"><div class="share-page">
+  <a class="share-linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=https://quarkus.io/blog/adoptium-customer-story/&title=Eclipse Adoptium、大量Java SE配布APIにQuarkusを採用" rel="nofollow" target="_blank" title="Share on LinkedIn">
+    <i class="fa-brands fa-linkedin fa-xl"></i>
+  </a>
+  <a class="share-x" href="https://x.com/intent/tweet?text=Eclipse Adoptium、大量Java SE配布APIにQuarkusを採用&url=https://quarkus.io/blog/adoptium-customer-story/&via=quarkusio&related=quarkusio" rel="nofollow" target="_blank" title="Share on X">
+    <i class="fa-brands fa-square-x-twitter fa-xl"></i>
+  </a>
+  <a class="share-facebook" href="https://facebook.com/sharer.php?u=https://quarkus.io/blog/adoptium-customer-story/" rel="nofollow" target="_blank" title="Share on Facebook">
+    <i class="fa-brands fa-square-facebook fa-xl"></i>
+  </a>
+  <a class="share-reddit" href="http://www.reddit.com/submit?url=https://quarkus.io/blog/adoptium-customer-story/" onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;" title="Share on Reddit" >
+    <i class="fa-brands fa-square-reddit fa-xl"></i>
+  </a>
+  <a class="share-email" href="mailto:?subject=Eclipse Adoptium、大量Java SE配布APIにQuarkusを採用&amp;body=Eclipse Adoptium、大量Java SE配布APIにQuarkusを採用 https://quarkus.io/blog/adoptium-customer-story/" title="Share via Email" >
+    <i class="fa-solid fa-envelope fa-xl"></i>
+  </a>
+</div>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+  <script src="https://giscus.app/client.js"
+        data-repo="quarkusio/quarkus"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkxMzk5MTQ5MzI="
+        data-category="Quarkus Blog/Website"
+        data-category-id="DIC_kwDOCFbutM4CAFFV"
+        data-mapping="og:title"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+  </script>
+  </div>
+</div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

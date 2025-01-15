@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>OpenShift上のアプリケーションのデプロイにQuarkusがどのように使用されたか。 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/blog/quarkus-deploys-apps-on-openshift/" />
+  <meta property="og:title" content="OpenShift上のアプリケーションのデプロイにQuarkusがどのように使用されたか。" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/blog/quarkus-deploys-apps-on-openshift/">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="post">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/blog/quarkus-deploys-apps-on-openshift/">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="active">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/blog/quarkus-deploys-apps-on-openshift/" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/blog/quarkus-deploys-apps-on-openshift/">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/blog/quarkus-deploys-apps-on-openshift/">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/blog/quarkus-deploys-apps-on-openshift/">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/blog/quarkus-deploys-apps-on-openshift/">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    <div class="full-width-breadcrumb-bg align-self">
+  <div class="width-12-12">
+      <p class="returnlink"><a href="/blog">Blog</a> <i class="fas fa-chevron-right"></i> OpenShift上のアプリケーションのデプロイにQuarkusがどのように使用されたか。</p>
+  </div>
+</div>
+
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+    <div class="grid-wrapper">
+      <div class="width-12-12">
+        <div class="post-date">
+          June 25, 2021 
+          
+            <span class="tags"><a href="/blog/tag/openshift">#openshift</a><a href="/blog/tag/user-story">#user-story</a></span>
+          
+        </div>
+        <h1 class="post-title">OpenShift上のアプリケーションのデプロイにQuarkusがどのように使用されたか。</h1>
+        <div class="grid-wrapper">
+          <div class="width-8-12 width-12-12-m byline-wrapper">
+            
+            
+              <img class="headshot" src="https://www.gravatar.com/avatar/70ce41ab2185391f57cdf3391649d09d">
+            
+            <p class="byline">By <a href="/author/vsevel">Vincent Sevel</a></p>
+          </div>
+          <div class="width-12-12">
+              <div class="paragraph">
+<p>この記事では、Kubernetes上でのアプリケーションのデプロイに関して、私が仕事上で直面している特定の課題について、Quarkusを使ってどのように目標を達成するソリューションを提供できたかについてフィードバックします。</p>
+</div>
+<div class="sect1">
+<h2 id="the-challenge"><a class="anchor" href="#the-challenge"></a>チャレンジ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>数年前から、私はKubernetesのプロジェクトに参加しています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>新しい技術（アプリケーション・フレームワークやミドルウェア製品）をより簡単に、より早く導入する。</p>
+</li>
+<li>
+<p><a href="https://helm.sh/docs/howto/charts_tips_and_tricks/#complex-charts-with-many-dependencies">アンブレラチャートパターン</a>のように、サービスの上に論理的な展開の抽象化を行うことで、相互に関連する分散型サービスを展開する際の管理負担を軽減する。</p>
+</li>
+<li>
+<p>アプリケーションチームがコンポーネントをデプロイするために必要な作業を限定し、Kubernetesのデプロイメントオブジェクトを超標準化する。</p>
+</li>
+<li>
+<p>ハイブリッドクラウドのデプロイモデルへの移行</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>これらの目標に加えて、アプリケーションがテナントごとにデプロイされるという事実に関連した制約がありました（つまり、規制に関連した理由もありますが、マルチテナントではありません）。アプリケーションによっては、数十のテナントが存在する可能性があり、その場合、テナントごとにアプリケーションを1回デプロイすることになります（つまり、あるアプリケーションに10のテナントがあった場合、本番では10のプロセスが実行されることになります）。しかし、物理的にプロセスを分離する必要がある場合は、異なるビジネスルールに基づいて、一部のテナント、IT環境、地理的ゾーンの間で、設定の一部を共有することができます。高度に単純化、因数分解された構成部分は、開発チームにとっては真の意味での単純さの源となり、デプロイメントプロセスにとっては真の意味での複雑さの源となります。</p>
+</div>
+<div class="paragraph">
+<p>プロジェクト終了時には、さまざまなクラスターで10,000個のポッドが含まれているという予測もありました。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="first-attempts"><a class="anchor" href="#first-attempts"></a>最初の試み</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>その複雑さを考慮して、私たちは設定とデプロイのための独自のツールを作成しました。最初のバージョンはAnsibleをベースにしたもので、Towerのワークフローに対応していました。さまざまな理由から、1年前にJavaで書き直すことにしました。主な理由は:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>パフォーマンスの向上</p>
+</li>
+<li>
+<p>アルゴリズムの複雑さに対応できる高レベルの言語の使用</p>
+</li>
+<li>
+<p>ユニットテストや統合テストの充実したサポート</p>
+</li>
+<li>
+<p>高品質な開発ツール（IDEなど）による生産性の向上</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>しかし、一つ気になったのは、メモリ消費量、CPU使用率、起動時間でした。というのも、あるアプリケーションでは、各テナントがそれぞれのデプロイメントプロセスで独立してデプロイされるからです。というのも、アプリケーションフレームワークは生産性や標準化の面では優れていますが、抽象化の面ではリソースコストがかかるからです。そのため、プログラムはプレーンなJavaで書かれており、サイズもユースケースも十分に小さかったので、クリーンなコードのためにいくつかのパターン（例：コンストラクタベースのインジェクションを手作業で行う）に頼ることを条件に、それで済ませることができました。このプログラムは <em>ocpdeploy</em> といいます。</p>
+</div>
+<div class="paragraph">
+<p>Tower からの移行に伴い、Tekton パイプラインのタスクとして _ocpdeploy_を実行することで、Kubernetes インフラストラクチャを活用することにしました。これにより、再現性が得られ、異なるアプリケーションや、同じアプリケーションの異なるテナントを異なる _ocpdeploy_バージョンでデプロイすることができました。java (他のハイレベル言語でも可) を使用することで、設定処理のための複雑なアルゴリズムを実装することができる一方で、高いレベルの生産性と保守可能なコードを提供し、広範なリグレッション・テスト・スイートのおかげで _ocpdeploy_のリリースの品質レベルが向上しました。</p>
+</div>
+<div class="paragraph">
+<p>全てが順調だったのは、複数のテナントを同時にデプロイしたり、異なるアプリケーションをデプロイするようになるまでです。 _ocpdeploy_コンテナのサイズは <code>200 millicores</code> 、RAMは <code>280 Mb</code> でした。いくつかのアプリケーションでは、約30のテナントがあり、それらはすべて並行してデプロイされます。これは30ポッドを意味し、 <code>6 cores</code> と <code>8 Gb</code> のRAMを占めていました。しかし、デプロイは多くの場合、営業時間後の午後7時から8時の間に行われることが多いのです。また、起動時にクラスタに負担をかけるSpringBootやWildFlyのアプリケーションに加えて、複数のデプロイを並行して実行する場合、 _ocpdeploy_自体が受ける影響を心配し始めました。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="enter-the-quarkus-universe"><a class="anchor" href="#enter-the-quarkus-universe"></a>Quarkus Universeへの参加</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>1年前、私たちは _Ocpdeploy_でQuarkusのPOCを開始することにしました。その目的は、QuarkusをGraalVMの実行可能ファイルとしてデプロイすることでした。遭遇した主な課題は、使用していたいくつかのライブラリでGraalVMがサポートされていないことに関連していました。FreeMarker、 <a href="https://github.com/hierynomus/smbj">SMBJ</a>（Server Message Block SMB2およびSMB3プロトコルを実装したJavaクライアントライブラリ）、Fabric8 OpenShiftクライアント（OpenShift固有のCRDをインスタンス化する際）、そして独自の集中型ログシステムにログを送信する自作のJavaエージェントです。</p>
+</div>
+<div class="paragraph">
+<p>幸いなことに、コマンドモードアプリケーションのサポート、restクライアント、Vaultエクステンション、Fabric8 Kubernetes Clientのサポートなど、他の部分はすでにQuarkusに存在しており、コアに追加された新しいOpenShift Clientエクステンションのベースとなりました。Kubernetes Clientエクステンションだけでも、プロジェクトにとって大きな後押しとなりました。というのも、スタート時にはArgoが利用できなかったので、 <em>apply_と _prune</em> を自分たちで実装しなければならなかったからです。</p>
+</div>
+<div class="paragraph">
+<p>FreeMarkerについては、 <a href="https://github.com/ppalaga">ppalaga</a>と <a href="https://github.com/carlosthe19916">carlosthe19916</a>の作業に大きく影響されたコードで、Quarkiverseに新しいエクステンションを導入しました。SMBJについては、社内のQuarkiverseでエクステンションを作成しました。また、ロギングクライアントについては、 <code>quarkus-logging-gelf</code> のエクステンションからヒントを得て、追加の社内エクステンションを作成しました。</p>
+</div>
+<div class="paragraph">
+<p>ライブラリをネイティブで動作させるには、Quarkusプロジェクトから提供される非常に優れたドキュメントと、フレームワークでのサポート（ _プロセッサ_や _レコーダー_など）が役立ちました。 <a href="https://quarkus.io/guides/writing-native-applications-tips#native-in-extension">Quarkusのエクステンションでネイティブをサポートする</a>。</p>
+</div>
+<div class="paragraph">
+<p>ちょっとした問題が発生したとき（SMBJは思ったよりも厄介だった）、 <a href="https://medium.com/GraalVM/introducingthe-tracing-agent-simplifying-GraalVM-native-image-configuration-c3b56c486271">GraalVMのトレースエージェント</a>から助けを得ました。</p>
+</div>
+<div class="paragraph">
+<p>時々使用していたエクステンションのリストは以下の通りです。 <code>cdi, config-yaml, freemarker, hibernate-validator, kubernetes-client, openshift-client, rest-client, restclient-jackson, vault</code> (加えて、SMBJと私たちの内部集中型ログシステムのための内部エクステンション)。</p>
+</div>
+<div class="paragraph">
+<p>最終的には、必要なライブラリがすべてネイティブモードで動作するようになったので、アプリケーションを _本物の_Quarkusアプリケーションのように移行する作業に切り替えることができました。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>必要に応じて qualifiers や producers を用いたインジェクションを使用。</p>
+</li>
+<li>
+<p>（当時における）新しい <a href="https://quarkus.io/blog/quarkus-test-profiles/">QuarkusTestのプロファイル</a>を含む、さまざまなモッキングアプローチを使用するためのテストの書き換え。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>これにより、Kubernetesのyaml生成、 <em>snapshot</em>、様々な状況での _replay_を通じた広範なテストが可能となり、すべての設定を _MP config_に準拠したものに変換することができました。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="benchmarks"><a class="anchor" href="#benchmarks"></a>ベンチマーク</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>そして、いくつかのベンチマークを実行し、旧バージョンと比較してリソース消費量を評価しました。起動時間についてはあまり気にしていませんでした。非常に優れていることはわかっていましたから。起動時間が数秒以内に収まっていれば（プレーンなJavaバージョンで経験していたことですが）、問題ありませんでした。しかし、メモリとCPUの消費は別の話でした。この試みは、実際に何らかの利益が得られることを期待して行われました。</p>
+</div>
+<div class="paragraph">
+<p>プレーンなJavaバージョンでは、 <code>180 Mb</code> までコンテナを絞り込むことができました（それ以下では、 _OOM_になるか、 _GC_がパフォーマンスを殺してしまいます）。また、ネイティブ版では、 <code>50 Mb</code> まで下げることができました。</p>
+</div>
+<div class="paragraph">
+<p>そして、さまざまな構成（ <code>plain Java 180 Mb</code> 、 <code>Quarkus native 180 Mb</code> 、 <code>Quarkus jvm 180 Mb</code> 、 <code>Quarkus native 50 Mb</code> 、 <code>50 millicores request=limit</code> から始めて、 <code>100</code> 、 <code>150</code> 、 &#8230;&#8203;）で数回の実行を行いました。</p>
+</div>
+<div class="paragraph">
+<p><code>50 millicores</code> では、 <code>Quarkus native 180 Mb</code> が 20 秒、 <code>Quarkus native 50 Mb</code> が 60 秒、その他の 2 つが 300 秒で実行されます。つまり、 <code>180 Mb</code> を <em>ocpdeploy</em> に許可すれば、300秒から20秒になるということです。 _15_倍の改善です。</p>
+</div>
+<div class="paragraph">
+<p><code>250 millicores</code> では、 <code>Quarkus native 180 Mb</code> が5秒以下、 <code>Quarkus native 50 Mb</code> が10秒、その他の2つが40秒前後でした。</p>
+</div>
+<div class="paragraph">
+<p>また、デプロイメントを60秒以下にするために、どれだけのCPUが必要かを調べました。</p>
+</div>
+<div class="paragraph">
+<p><code>Quarkus native 50 Mb</code> では <code>50 millicores</code> 、 <code>plain Java 180 Mb</code> と <code>Quarkus jvm 180 Mb</code> では <code>240 millicores</code> でした（ <code>Quarkus native 180 Mb</code> は、最初のテストで説明したように「最悪」の結果が 20 秒だったため、対象外となりました）。つまり、時間に制約がある場合は、 <code>240 millicores</code> から <code>50 millicores</code> へ、また、 <code>180 Mb</code> から <code>50 Mb</code> へは、Quarkus native へ移行することで対応できるということです。</p>
+</div>
+<div class="paragraph">
+<p><code>Quarkus native 180 Mb</code> と <code>50 Mb</code> の比較も興味深いものでした。というのも、メモリと CPU のノブを上げ下げすることで、ユースケースの実行時間を調整できることがわかったからです。実行時間とリソース消費の間のスイートスポットをどこに設定するかは、私たち次第です。</p>
+</div>
+<div class="paragraph">
+<p>最後に興味深い観察結果として、 <code>plain Java 180 Mb</code> の結果が <code>Quarkus jvm 180 Mb</code> とほぼ同じだったことが挙げられます。これは、保守性と生産性を提供するアプリケーションフレームワークのコストが、私たちのケースでは0だったということです。ケーキを食べているようなものですね。私たちの場合、メモリとCPUを大幅に節約できるのであれば、実行速度が遅くても構わないと考えていましたが、それが実現できました。</p>
+</div>
+<div class="paragraph">
+<p>Program execution in seconds for different limits (in millicores)</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"></th>
+<th class="tableblock halign-left valign-top">plain Java (180Mb)</th>
+<th class="tableblock halign-left valign-top">Quarkus Native (180Mb)</th>
+<th class="tableblock halign-left valign-top">Quarkus JVM (180Mb)</th>
+<th class="tableblock halign-left valign-top">Quarkus Native (50Mb)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">50m</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">283</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">18</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">306</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">61</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">100m</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">95</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">120</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">32</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">250m</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">38</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">43</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">500m</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">17</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">21</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">1000m</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">1500m</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">2000m</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">7</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">7</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">No Limit</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+</tr>
+</tbody>
+</table>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/posts/quarkus-user-stories/ocpdeploy/results.png" alt="results">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="a-few-issues"><a class="anchor" href="#a-few-issues"></a>いくつかの問題点</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>GraalVMでアドホック・ライブラリを動作させる上での課題以外にも、予期せぬ動作やちょっとした問題点がいくつかありました。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>不明なアプリケーション設定プロパティに対する警告の欠落 <a href="https://github.com/quarkusio/quarkus/issues/14889">#14889</a></p>
+</li>
+<li>
+<p><code>src/main/resources/application.yaml</code> で設定した場合、pojoの設定上のデフォルトは同じ動作をするべき。 <a href="https://github.com/quarkusio/quarkus/issues/13423">#13423</a></p>
+</li>
+<li>
+<p><code>quarkus-config-yaml</code> の依存関係なしで application.yaml が提供された場合、警告または失敗する <a href="https://github.com/quarkusio/quarkus/issues/13227">#13227</a></p>
+</li>
+<li>
+<p>_MP Rest Client_2.0 <a href="https://github.com/quarkusio/quarkus/issues/10520">#10520</a>へのアップグレード。待望のものであり、"リダイレクトへの追従 "が可能になります。</p>
+</li>
+<li>
+<p>アノテーションでテストごとにモックを定義する方法があればと思いましたが、これは <a href="https://groups.google.com/g/quarkus-dev/c/IBojyD1BplY/m/NWFmsX3NBwAJ">このスレッド</a>で回答されています。</p>
+</li>
+<li>
+<p>証明書をビルド時ではなく実行時に提供できない（GraalVMの制限) <a href="https://github.com/oracle/graal/pull/3091">#3091</a></p>
+</li>
+<li>
+<p><a href="https://groups.google.com/g/Quarkus-dev/c/xCU6Yvw__ks/m/cogHVvNsAwAJ">このスレッド</a> で議論されているように、テストにおける <code>src/main/resources/application.properties</code> の可視性; 以来、"Use AbstractLocationConfigSourceLoader to load application.properties and application.yaml" <a href="https://github.com/quarkusio/quarkus/pull/15282">#15282</a> など、多くの作業が行われてきました、そのため、再チェックが必要です</p>
+</li>
+<li>
+<p><a href="https://groups.google.com/g/Quarkus-dev/c/_g-6qfUFA3A/m/2s9XjTVxAwAJ">このスレッド</a>で議論されているように、オプションの設定プロパティが空の値で上書きされます。</p>
+</li>
+<li>
+<p>Quarkus YAML設定キーは暗黙のうちにエスケープされる <a href="https://github.com/quarkusio/quarkus/issues/11744">#11744</a></p>
+</li>
+<li>
+<p><a href="https://groups.google.com/g/Quarkus-dev/c/KXzJ2UPGRvI/m/3AEsLvZNBAAJ">アーカイブに含まれるapplication.properties</a></p>
+</li>
+<li>
+<p><code>quarkus-config-yaml</code> の依存関係なしで application.yaml が提供された場合、警告または失敗する <a href="https://github.com/quarkusio/quarkus/issues/13227">#13227</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>これはかなりの量に見えますが、実際にはこれらの箇条書きはどれも大きな問題ではなく、回避できないものでもありませんでした。いくつかの問題は設定に関するものでしたが、これはプログラムがTektonタスクとして実行されていたためで、Tektonではオプションのパラメータを定義する際の柔軟性が限られています。ここに挙げたのは、回避しなければならなかった点のみです。多くの問題や質問は、Google Groupでの回答や実際の修正により、進行中に解決されました。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ci-for-native-builds"><a class="anchor" href="#ci-for-native-builds"></a>ネイティブビルドのためのCI</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>もう一つの課題は、ネイティブビルドの時間と、その間のメモリとCPUの使用量に関するものでした。そこで私たちがとった方法は、マスターでのみネイティブ実行可能ファイルを生成し、フィーチャーブランチではjvmモードでテストを実行するというものでした。必要であれば、特定のフィーチャーブランチでネイティブテストを行うという選択肢もあります。しかし、新しいライブラリを統合するのでなければ、jvmテストを通過させることで、ネイティブでも同様の動作をするという十分な自信を持つことができました。</p>
+</div>
+<div class="paragraph">
+<p>もう一つの工夫は、新しいビルドが開始されたときに、 _マスター_の現在のビルドをキャンセルすることでした。理論的には、別のコミットが行われたためにビルドがキャンセルされるのはフラストレーションがたまるかもしれません。実際には、PRが _master_にマージされる割合は低いままだったので、この問題はありませんでした。</p>
+</div>
+<div class="paragraph">
+<p>しかし、社内で開発するQuarkusアプリケーションの数を増やしたいと考えた場合、ビルドインフラのサイズには疑問が残ります。</p>
+</div>
+<div class="paragraph">
+<p>オリジナルのソリューションと比較した場合の唯一の欠点は、リグレッションテストスイートの実行が遅くなったことです。 _MPconfig_を使用していたので、異なるコンフィグをテストするたびに、新しいQuarkusコンテキストを起動する必要がありました。幸いなことに、新しいコンテキストの起動はQuarkusでは非常に高速ですが、それでも元々のプレーンなJavaソリューションに比べればかなり遅いです。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="it-is-all-about-the-community"><a class="anchor" href="#it-is-all-about-the-community"></a>すべてはコミュニティのために</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Vault、FreeMarker、OpenShift Clientのエクステンションの作業の他に、Quarkus内外でいくつかのPRに貢献し始めました。これは、以下のような改善を得るためのプロセスをスピードアップすることを期待しています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>CRDオブジェクトに <code>appendResourceVersionInObject</code> を追加 <a href="https://github.com/fabric8io/kubernetes-client/pull/2365">#2365</a>(merged)</p>
+</li>
+<li>
+<p>cert-manager エクステンションサポートの追加 <a href="https://github.com/fabric8io/kubernetes-client/pull/2930">#2930</a>(merged)</p>
+</li>
+<li>
+<p>ci で cekit を使って distroless イメージをビルド <a href="https://github.com/quarkusio/quarkus-images/pull/118">#118</a>(merged)</p>
+</li>
+<li>
+<p>ネイティブイメージの実行時にルート証明書を設定できるようにしました <a href="https://github.com/oracle/graal/pull/3091">#3091</a> (_teshull_はオラクルの Christian Wimmer から GraalVM 21.3 リリースのための作業を任されました)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>特筆すべきは、Quarkusのコミュニティが成功の大きな要因になっていることです:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>googleグループやzulipなど、stackoverflowなどで質問に答えること。</p>
+</li>
+<li>
+<p>問題をタイムリーに調査し、状況に応じて、修正、正しいアプローチの適用に関するガイダンス、または回避策を提供すること。</p>
+</li>
+<li>
+<p>設定などの改善に前向きであること。</p>
+</li>
+<li>
+<p>PRを迅速にレビューし、貢献を促進すること。</p>
+</li>
+<li>
+<p>高い頻度でリリースすること。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="takeovers"><a class="anchor" href="#takeovers"></a>引継ぎ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>移行に要した期間はわずか数ヶ月で、昨年末にはQuarkusを搭載した _ocpdeploy_で最初のOpenShiftアプリケーションのデプロイを開始しました。それ以来、何百ものデプロイメントを実行するために使用されました。限られた労力で新しいリリースのペースを追うことができました。バグはほとんど発生せず、通常は次のリリースに間に合うように修正されました。Quarkusが提供するアプリケーションフレームワークにより、コードの構造化が進み、保守性が向上し、モック機能やテストプロファイルを使ったテストが容易になりました。 _ocpdeploy_の開発は、Quarkusの開発者ではなく、Javaの専門家でもないチームメンバーによって行われたことも興味深い点です。これは、フレームワークが、全体的な構造（例：コンポーネント、テスト、構成、ci）が整ってしまえば、それを忘れることができるほど軽量であることを示しています。</p>
+</div>
+<div class="paragraph">
+<p>私たちのプログラムは、それが動作しなければビジネスが止まらないという意味で、ビジネスクリティカルではありませんでした。しかし、OpenShiftのマイクロサービスをすべてデプロイするには、このプログラムしかありません。 _ocpdeploy_は明らかに超高度なものではなく、Quarkusでできることの表面をなぞっただけでしたが、それでも私たちのために動いてくれたので、さまざまなユースケースに取り組めることがわかりました。</p>
+</div>
+<div class="paragraph">
+<p>結論として、Quarkusの強力なセールスポイントは以下の通りだと思います。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>積極的にフィードバックに耳を傾け、貢献を歓迎する生き生きとしたコミュニティ</p>
+</li>
+<li>
+<p>ハイスピードで開発されたプロジェクト</p>
+</li>
+<li>
+<p>汎用性のある適切なポジショニング（クラウドネイティブ、デベロッパー満足度、&#8230;&#8203;）。</p>
+</li>
+<li>
+<p>Quarkus の価値観に反するような仕様であっても、現実的に少しでも曲げようとする姿勢</p>
+</li>
+<li>
+<p>コンパクトなコアとエクステンションを持ち、迅速な拡張を可能にすることで、イノベーションを育むアーキテクチャ</p>
+</li>
+<li>
+<p>デフォルトではネイティブをサポートしていますが、jvmモードでもいくつかの改良が加えられていること</p>
+</li>
+<li>
+<p>コアのエクステンション、ユニバースエクステンション（例：camel）、Quarkiverseによる急成長のエコシステム</p>
+</li>
+<li>
+<p>開発モード（ローカルおよびリモート）</p>
+</li>
+<li>
+<p>ビルド時の初期化などのパターンを実現するためのエクステンションを開発するためのフレームワーク</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>10年前、15年前のアプリストアと同じように、私が考える今後の主な課題は、エクステンションのエコシステムが、品質を犠牲にすることなく量的に成長するようにすることです。あるいは、少なくともエクステンションを評価する方法を提供して、ビジネスクリティカルなアプリケーションを構築する人々が、テクノロジーへの投資が適切であることを保証できるようにすることです。言い換えれば、"広く広く "に加えて "深く "ということです。私が考えるもう一つの課題は、企業の準備状況のギャップを徐々に埋めていくことです。例えば、今日、部分的に開発されているソリューションを完成させ、最も一般的なユースケースに対して明確で成熟したソリューションを提供できるようにすることです。</p>
+</div>
+<div class="paragraph">
+<p>それが、Quarkusがエンタープライズに勝つ方法です。そして、これが動き出しているのがわかります。</p>
+</div>
+<div class="paragraph">
+<p>このプロジェクトにはとても期待しています。早くユースケースを広げたいですね。</p>
+</div>
+</div>
+</div>
+              
+          </div>
+          <div class="width-12-12"><div class="share-page">
+  <a class="share-linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=https://quarkus.io/blog/quarkus-deploys-apps-on-openshift/&title=OpenShift上のアプリケーションのデプロイにQuarkusがどのように使用されたか。" rel="nofollow" target="_blank" title="Share on LinkedIn">
+    <i class="fa-brands fa-linkedin fa-xl"></i>
+  </a>
+  <a class="share-x" href="https://x.com/intent/tweet?text=OpenShift上のアプリケーションのデプロイにQuarkusがどのように使用されたか。&url=https://quarkus.io/blog/quarkus-deploys-apps-on-openshift/&via=quarkusio&related=quarkusio" rel="nofollow" target="_blank" title="Share on X">
+    <i class="fa-brands fa-square-x-twitter fa-xl"></i>
+  </a>
+  <a class="share-facebook" href="https://facebook.com/sharer.php?u=https://quarkus.io/blog/quarkus-deploys-apps-on-openshift/" rel="nofollow" target="_blank" title="Share on Facebook">
+    <i class="fa-brands fa-square-facebook fa-xl"></i>
+  </a>
+  <a class="share-reddit" href="http://www.reddit.com/submit?url=https://quarkus.io/blog/quarkus-deploys-apps-on-openshift/" onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;" title="Share on Reddit" >
+    <i class="fa-brands fa-square-reddit fa-xl"></i>
+  </a>
+  <a class="share-email" href="mailto:?subject=OpenShift上のアプリケーションのデプロイにQuarkusがどのように使用されたか。&amp;body=OpenShift上のアプリケーションのデプロイにQuarkusがどのように使用されたか。 https://quarkus.io/blog/quarkus-deploys-apps-on-openshift/" title="Share via Email" >
+    <i class="fa-solid fa-envelope fa-xl"></i>
+  </a>
+</div>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+  <script src="https://giscus.app/client.js"
+        data-repo="quarkusio/quarkus"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkxMzk5MTQ5MzI="
+        data-category="Quarkus Blog/Website"
+        data-category-id="DIC_kwDOCFbutM4CAFFV"
+        data-mapping="og:title"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+  </script>
+  </div>
+</div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

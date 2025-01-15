@@ -1,0 +1,2254 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>JWT RBAC の使用 - 3.2 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.2/guides/security-jwt" />
+  <meta property="og:title" content="JWT RBAC の使用 - 3.2" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/security-jwt">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.2/guides/security-jwt">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.2/guides/security-jwt" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.2/guides/security-jwt">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.2/guides/security-jwt">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.2/guides/security-jwt">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.2/guides/security-jwt">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.2/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" selected>3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">JWT RBAC の使用 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、Quarkusアプリケーションが <a href="https://github.com/smallrye/smallrye-jwt/">SmallRye JWT</a> を利用して、 <a href="https://tools.ietf.org/html/rfc7519">JSON Web Token</a> を検証し、MicroProfile JWT <code>org.eclipse.microprofile.jwt.JsonWebToken</code> として表現し、Bearer Token Authorizationと <a href="https://en.wikipedia.org/wiki/Role-based_access_control">Role-Based Access Control</a> を使用してQuarkus HTTPエンドポイントへのセキュアなアクセスを提供する方法について説明します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Quarkus OpenID Connect <code>quarkus-oidc</code> エクステンションは、ベアラートークン認証にも対応しており、 <code>smallrye-jwt</code> を使用して、ベアラートークンを <code>JsonWebToken</code> として表します。
+詳細については、 <a href="security-oidc-bearer-token-authentication">OIDCベアラートークン認証</a> ガイドを参照してください。
+Quarkus アプリケーションで OIDC 認可コードフローを使用してユーザーを認証する必要がある場合は、OpenID Connect エクステンションを使用する必要があります。
+詳細については、 <a href="security-oidc-code-flow-authentication">Webアプリケーションを保護するためのOIDCコードフロー</a> メカニズムを参照してください。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>約15分</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 11+ がインストールされ、 <code>JAVA_HOME</code>  が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.9.3</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルをビルドしたい場合、MandrelまたはGraalVM（あるいはネイティブなコンテナビルドを使用する場合はDocker）をインストールし、 <a href="building-native-image.html#configuring-graalvm">適切に設定</a>していること</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="quickstart"><a class="anchor" href="#quickstart"></a>クイックスタート</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="solution"><a class="anchor" href="#solution"></a>ソリューション</h3>
+<div class="paragraph">
+<p>次の章で紹介する手順に沿って、ステップを踏んでアプリを作成することをお勧めします。ただし、すぐに完成した例に飛んでも構いません。</p>
+</div>
+<div class="paragraph">
+<p>Gitレポジトリをクローンするか <code>git clone -b 3.2 <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code> 、 <a href="https://github.com/quarkusio/quarkus-quickstarts/archive/3.2.zip">アーカイブ</a> をダウンロードします。</p>
+</div>
+<div class="paragraph">
+<p>ソリューションは <code>security-jwt-quickstart</code> <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/3.2/security-jwt-quickstart">ディレクトリ</a> にあります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="creating-the-maven-project"><a class="anchor" href="#creating-the-maven-project"></a>Mavenプロジェクトの作成</h3>
+<div class="paragraph">
+<p>まず、以下のコマンドで新規プロジェクトを作成します:</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:security-jwt-quickstart \
+    --extension='resteasy-reactive-jackson,smallrye-jwt,smallrye-jwt-build' \
+    --no-code
+cd security-jwt-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:3.2.12.Final:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=security-jwt-quickstart \
+    -Dextensions='resteasy-reactive-jackson,smallrye-jwt,smallrye-jwt-build' \
+    -DnoCode
+cd security-jwt-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>このコマンドは、RESTエンドポイントを持つMavenプロジェクトを生成し、MicroProfile JWT RBAC サポートを含む <code>smallrye-jwt</code> エクステンションをインポートします。</p>
+</div>
+<div class="paragraph">
+<p>すでにQuarkusプロジェクトが設定されている場合は、プロジェクトのベースディレクトリーで以下のコマンドを実行することで、プロジェクトに <code>smallrye-jwt</code> エクステンションを追加することができます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus extension add 'smallrye-jwt,smallrye-jwt-build'</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:add-extension -Dextensions='smallrye-jwt,smallrye-jwt-build'</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew addExtension --extensions='smallrye-jwt,smallrye-jwt-build'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、 <code>pom.xml</code> に以下が追加されます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-smallrye-jwt&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-smallrye-jwt-build&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-smallrye-jwt")
+implementation("io.quarkus:quarkus-smallrye-jwt-build")</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="examine-the-jakarta-rest-resource"><a class="anchor" href="#examine-the-jakarta-rest-resource"></a>Jakarta REST リソースの調査</h3>
+<div class="paragraph">
+<p>RESTエンドポイントを <code>src/main/java/org/acme/security/jwt/TokenSecuredResource.java</code> に以下の内容で作成します。</p>
+</div>
+<div class="listingblock">
+<div class="title">REST エンドポイント V1</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.jwt;
+
+import java.security.Principal;
+
+import jakarta.annotation.security.PermitAll;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.SecurityContext;
+
+import org.eclipse.microprofile.jwt.JsonWebToken;
+
+@Path("/secured")
+public class TokenSecuredResource {
+
+    @Inject
+    JsonWebToken jwt; <i class="conum" data-value="1"></i><b>(1)</b>
+
+    @GET()
+    @Path("permit-all")
+    @PermitAll <i class="conum" data-value="2"></i><b>(2)</b>
+    @Produces(MediaType.TEXT_PLAIN)
+    public String hello(@Context SecurityContext ctx) {
+        return getResponseString(ctx); <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+
+    private String getResponseString(SecurityContext ctx) {
+        String name;
+        if (ctx.getUserPrincipal() == null) { <i class="conum" data-value="4"></i><b>(4)</b>
+            name = "anonymous";
+        } else if (!ctx.getUserPrincipal().getName().equals(jwt.getName())) { <i class="conum" data-value="5"></i><b>(5)</b>
+            throw new InternalServerErrorException("Principal and JsonWebToken names do not match");
+        } else {
+            name = ctx.getUserPrincipal().getName(); <i class="conum" data-value="6"></i><b>(6)</b>
+        }
+        return String.format("hello + %s,"
+            + " isHttps: %s,"
+            + " authScheme: %s,"
+            + " hasJWT: %s",
+            name, ctx.isSecure(), ctx.getAuthenticationScheme(), hasJwt()); <i class="conum" data-value="7"></i><b>(7)</b>
+    }
+
+    private boolean hasJwt() {
+        return jwt.getClaimNames() != null;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>ここでは、java.security.PrincipalのエクステンションであるJsonWebTokenインターフェイスを注入しています。これは、現在の認証済みトークンに関連するクレームへのアクセスを提供する、java.security.Principalインターフェースの拡張です。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>@PermitAll は、JSR 250 の一般的なセキュリティーアノテーションであり、認証されているかどうかに関係なく、特定のエンドポイントにすべての呼び出し元がアクセスできることを示します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>ここでは、Jakarta REST SecurityContext を注入して呼び出しのセキュリティ状態を検査し、 <code>getResponseString()</code> 関数を使用して応答文字列を入力しています。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>ここでは、リクエストのユーザー/呼び出し元の <code>Principal</code> を null と照合して、呼び出しが安全でないかどうかを確認します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>ここでは、JsonWebToken が現在の Principal を表しているため、Principal と JsonWebToken が同じ名前であることを確認します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>ここで、Principal の名前を取得します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>構築した応答では、呼び出し元の名前、リクエスト <code>SecurityContext</code> の <code>isSecure()</code> と <code>getAuthenticationScheme()</code> の状態、null 以外の <code>JsonWebToken</code> が挿入されたかどうかを利用します。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="run-the-application"><a class="anchor" href="#run-the-application"></a>アプリケーションの実行</h3>
+<div class="paragraph">
+<p>これで、アプリケーションを実行する準備が整いました。以下を使用してください。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次のような出力が得られるはずです。</p>
+</div>
+<div class="listingblock">
+<div class="title">quarkus:dev 出力</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">[INFO] Scanning for projects...
+[INFO]
+[INFO] ----------------------&lt; org.acme:security-jwt-quickstart &gt;-----------------------
+[INFO] Building security-jwt-quickstart 1.0.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+...
+Listening for transport dt_socket at address: 5005
+2020-07-15 16:09:50,883 INFO  [io.quarkus] (Quarkus Main Thread) security-jwt-quickstart 1.0.0-SNAPSHOT on JVM (powered by Quarkus 999-SNAPSHOT) started in 1.073s. Listening on: http://0.0.0.0:8080
+2020-07-15 16:09:50,885 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
+2020-07-15 16:09:50,885 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, mutiny, resteasy-reactive, resteasy-reactive-jackson, security, smallrye-context-propagation, smallrye-jwt, vertx, vertx-web]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>REST エンドポイントが実行されているので、curl のようなコマンドラインツールを使ってアクセスすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="title"> /secured/permit-all に対するcurl コマンド</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ curl http://127.0.0.1:8080/secured/permit-all; echo
+hello + anonymous, isHttps: false, authScheme: null, hasJWT: false</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このリクエストではJWTを設定していませんので、エンドポイントから見たセキュリティーステートがあるとは期待できず、レスポンスもそれに沿ったものとなっています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ユーザー名は anonymous (匿名) です。</p>
+</li>
+<li>
+<p>isHttps は https を使用しないので false です。</p>
+</li>
+<li>
+<p>authScheme は null です。</p>
+</li>
+<li>
+<p>hasJWTは false です。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Ctrl-Cを使用してQuarkusサーバーを停止します。</p>
+</div>
+<div class="paragraph">
+<p>では実際に何かをセキュア化してみましょう。下記の新しいエンドポイントメソッド <code>helloRolesAllowed</code> を見てみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="title">REST エンドポイント V2</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.jwt;
+
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.SecurityContext;
+
+import org.eclipse.microprofile.jwt.JsonWebToken;
+
+@Path("/secured")
+@RequestScoped
+public class TokenSecuredResource {
+
+    @Inject
+    JsonWebToken jwt; <i class="conum" data-value="1"></i><b>(1)</b>
+
+    @GET
+    @Path("permit-all")
+    @PermitAll
+    @Produces(MediaType.TEXT_PLAIN)
+    public String hello(@Context SecurityContext ctx) {
+        return getResponseString(ctx);
+    }
+
+    @GET
+    @Path("roles-allowed") <i class="conum" data-value="2"></i><b>(2)</b>
+    @RolesAllowed({ "User", "Admin" }) <i class="conum" data-value="3"></i><b>(3)</b>
+    @Produces(MediaType.TEXT_PLAIN)
+    public String helloRolesAllowed(@Context SecurityContext ctx) {
+        return getResponseString(ctx) + ", birthdate: " + jwt.getClaim("birthdate").toString(); <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+
+    private String getResponseString(SecurityContext ctx) {
+        String name;
+        if (ctx.getUserPrincipal() == null) {
+            name = "anonymous";
+        } else if (!ctx.getUserPrincipal().getName().equals(jwt.getName())) {
+            throw new InternalServerErrorException("Principal and JsonWebToken names do not match");
+        } else {
+            name = ctx.getUserPrincipal().getName();
+        }
+        return String.format("hello + %s,"
+            + " isHttps: %s,"
+            + " authScheme: %s,"
+            + " hasJWT: %s",
+            name, ctx.isSecure(), ctx.getAuthenticationScheme(), hasJwt());
+    }
+
+    private boolean hasJwt() {
+        return jwt.getClaimNames() != null;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>ここでは、<code>JsonWebToken</code> を挿入します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>この新しいエンドポイントは /secured/roles-allowed に存在します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>@RolesAllowed は、"User" または "Admin" ロールが割り当てられている場合は呼び出し元が特定のエンドポイントにアクセスできることを示す JSR 250 の一般的なセキュリティーアノテーションです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>ここでは、<code>hello</code> メソッドと同じ方法で応答を作成しますが、挿入された <code>JsonWebToken</code> を直接呼び出すことで JWT <code>birthdate</code> クレームの値を追加します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>TokenSecuredResource</code> にこの追加を行った後 、 <code>./mvnw compile quarkus:dev</code> コマンドを再実行し、次のように <code>curl -v <a href="http://127.0.0.1:8080/secured/roles-allowed" class="bare">http://127.0.0.1:8080/secured/roles-allowed</a> ; echo</code> を使用して、新しいエンドポイントへのアクセスを試行してみてください。</p>
+</div>
+<div class="paragraph">
+<p>出力は以下のようになるはずです:</p>
+</div>
+<div class="listingblock">
+<div class="title">/secured/roles-allowed の curl コマンド</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ curl -v http://127.0.0.1:8080/secured/roles-allowed; echo
+*   Trying 127.0.0.1...
+* TCP_NODELAY set
+* Connected to 127.0.0.1 (127.0.0.1) port 8080 (#0)
+&gt; GET /secured/roles-allowed HTTP/1.1
+&gt; Host: 127.0.0.1:8080
+&gt; User-Agent: curl/7.54.0
+&gt; Accept: */*
+&gt;
+&lt; HTTP/1.1 401 Unauthorized
+&lt; Connection: keep-alive
+&lt; Content-Type: text/html;charset=UTF-8
+&lt; Content-Length: 14
+&lt; Date: Sun, 03 Mar 2019 16:32:34 GMT
+&lt;
+* Connection #0 to host 127.0.0.1 left intact
+Not authorized</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>素晴らしいですね。リクエストに JWT トークンを提供していないため、エンドポイントにはアクセスできないはずであり、実際にアクセスできませんでした。代わりに HTTP 401 Unauthorized エラーを受け取りました。エンドポイントにアクセスするためには、有効な JWT を取得して渡す必要があります。これには 2 つのステップがあります。1) SmallRye JWT エクステンションに JWT の検証方法に関する情報を設定し、2) 適切なクレームを持つ適合する JWT を生成します。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuring-the-smallrye-jwt-extension-security-information"><a class="anchor" href="#configuring-the-smallrye-jwt-extension-security-information"></a>SmallRye JWT エクステンションセキュリティー情報の設定</h3>
+<div class="paragraph">
+<p>次の内容で <code>security-jwt-quickstart/src/main/resources/application.properties</code> を作成します。</p>
+</div>
+<div class="listingblock">
+<div class="title">TokenSecuredResource の application.properties</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.jwt.verify.publickey.location=publicKey.pem <i class="conum" data-value="1"></i><b>(1)</b>
+mp.jwt.verify.issuer=https://example.com/issuer <i class="conum" data-value="2"></i><b>(2)</b>
+
+quarkus.native.resources.includes=publicKey.pem <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>公開鍵の場所は、クラスパスのpublicKey.pemの場所を指すように設定しています。この鍵は、パートB <a href="#add-public-key">公開鍵の追加</a> で追加します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>発行者を URL 文字列 <code><a href="https://example.com/issuer" class="bare">https://example.com/issuer</a></code> に設定しています。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>ネイティブ実行可能ファイルのリソースとして公開鍵を含めています。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="add-public-key"><a class="anchor" href="#add-public-key"></a>公開鍵の追加</h3>
+<div class="paragraph">
+<p><a href="https://tools.ietf.org/html/rfc7519">JWT 仕様</a> は、使用できる JWT のさまざまなレベルのセキュリティーを定義しています。MicroProfile JWT RBAC 仕様では、RSA-256 署名アルゴリズムで署名された JWT が必要です。これには、RSA 公開鍵ペアが必要です。REST エンドポイントサーバー側では、リクエストとともに送信された JWT を検証するために使用する RSA 公開鍵の場所を設定する必要があります。以前に設定され た <code>mp.jwt.verify.publickey.location=publicKey.pem</code> 設定は、公開鍵がクラスパスで <code>publicKey.pem</code> として使用可能であることを想定しています。これを行うには、次のコンテンツを <code>security-jwt-quickstart/src/main/resources/publicKey.pem</code> ファイルにコピーします。</p>
+</div>
+<div class="listingblock">
+<div class="title">RSA 公開鍵 PEM コンテンツ</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlivFI8qB4D0y2jy0CfEq
+Fyy46R0o7S8TKpsx5xbHKoU1VWg6QkQm+ntyIv1p4kE1sPEQO73+HY8+Bzs75XwR
+TYL1BmR1w8J5hmjVWjc6R2BTBGAYRPFRhor3kpM6ni2SPmNNhurEAHw7TaqszP5e
+UF/F9+KEBWkwVta+PZ37bwqSE4sCb1soZFrVz/UT/LF4tYpuVYt3YbqToZ3pZOZ9
+AX2o1GCG3xwOjkc4x0W7ezbQZdC9iftPxVHR8irOijJRRjcPDtA6vPKpzLl6CyYn
+sIYPd99ltwxTHjr3npfv/3Lw50bAkbT4HeLFxTx4flEoZLKO/g0bAoV2uqBhkA9x
+nQIDAQAB
+-----END PUBLIC KEY-----</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="generating-a-jwt"><a class="anchor" href="#generating-a-jwt"></a>JWT の生成</h3>
+<div class="paragraph">
+<p>多くの場合、 <a href="https://www.keycloak.org/">Keycloak</a> のようなIDマネージャからJWTを取得しますが、このクイックスタートでは、 <code>smallrye-jwt</code> が提供するJWT生成APIを使用して独自に生成することにします。詳細は、<a href="security-jwt-build">SmallRye JWTでJWTトークンを生成</a> を参照してください。</p>
+</div>
+<div class="paragraph">
+<p>次のリストからコードを取得し、<code>security-jwt-quickstart/src/test/java/org/acme/security/jwt/GenerateToken.java</code> に配置します。</p>
+</div>
+<div class="listingblock">
+<div class="title">GenerateToken メインドライバークラス</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.jwt;
+
+import java.util.Arrays;
+import java.util.HashSet;
+
+import org.eclipse.microprofile.jwt.Claims;
+
+import io.smallrye.jwt.build.Jwt;
+
+public class GenerateToken {
+    /**
+     * Generate JWT token
+     */
+    public static void main(String[] args) {
+        String token =
+           Jwt.issuer("https://example.com/issuer") <i class="conum" data-value="1"></i><b>(1)</b>
+             .upn("jdoe@quarkus.io") <i class="conum" data-value="2"></i><b>(2)</b>
+             .groups(new HashSet&lt;&gt;(Arrays.asList("User", "Admin"))) <i class="conum" data-value="3"></i><b>(3)</b>
+             .claim(Claims.birthdate.name(), "2001-07-13") <i class="conum" data-value="4"></i><b>(4)</b>
+           .sign();
+        System.out.println(token);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>iss</code> クレームは JWT の発行者です。トークンが有効であると認められるためには、これがサーバー側の <code>mp.jwt.verify.issuer</code> と一致する必要があります。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>upn</code> クレームは、MicroProfile JWT RBAC 仕様で、コンテナーセキュリティー API を介して表示される <code>Principal</code> に使用する優先クレームとして定義されています。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>group</code> クレームは、JWT ベアラーに関連付けられたグループとトップレベルのロールを提供します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>birthday</code> クレームです。機密性の高いクレームと見なすことができるため、クレームの暗号化を検討したくなるかもしれません。 <a href="security-jwt-build">SmallRye JWT を使用した JWT トークンの生成</a> を参照してください。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>このコードが機能するには、TokenSecuredResource アプリケーションにある公開鍵に対応する RSA 秘密鍵のコンテンツが必要であることに注意してください。次の PEM コンテンツを取得し、<code>security-jwt-quickstart/src/test/resources/privateKey.pem</code> に配置します。</p>
+</div>
+<div class="listingblock">
+<div class="title">RSA 秘密鍵 PEM コンテンツ</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCWK8UjyoHgPTLa
+PLQJ8SoXLLjpHSjtLxMqmzHnFscqhTVVaDpCRCb6e3Ii/WniQTWw8RA7vf4djz4H
+OzvlfBFNgvUGZHXDwnmGaNVaNzpHYFMEYBhE8VGGiveSkzqeLZI+Y02G6sQAfDtN
+qqzM/l5QX8X34oQFaTBW1r49nftvCpITiwJvWyhkWtXP9RP8sXi1im5Vi3dhupOh
+nelk5n0BfajUYIbfHA6ORzjHRbt7NtBl0L2J+0/FUdHyKs6KMlFGNw8O0Dq88qnM
+uXoLJiewhg9332W3DFMeOveel+//cvDnRsCRtPgd4sXFPHh+UShkso7+DRsChXa6
+oGGQD3GdAgMBAAECggEAAjfTSZwMHwvIXIDZB+yP+pemg4ryt84iMlbofclQV8hv
+6TsI4UGwcbKxFOM5VSYxbNOisb80qasb929gixsyBjsQ8284bhPJR7r0q8h1C+jY
+URA6S4pk8d/LmFakXwG9Tz6YPo3pJziuh48lzkFTk0xW2Dp4SLwtAptZY/+ZXyJ6
+96QXDrZKSSM99Jh9s7a0ST66WoxSS0UC51ak+Keb0KJ1jz4bIJ2C3r4rYlSu4hHB
+Y73GfkWORtQuyUDa9yDOem0/z0nr6pp+pBSXPLHADsqvZiIhxD/O0Xk5I6/zVHB3
+zuoQqLERk0WvA8FXz2o8AYwcQRY2g30eX9kU4uDQAQKBgQDmf7KGImUGitsEPepF
+KH5yLWYWqghHx6wfV+fdbBxoqn9WlwcQ7JbynIiVx8MX8/1lLCCe8v41ypu/eLtP
+iY1ev2IKdrUStvYRSsFigRkuPHUo1ajsGHQd+ucTDf58mn7kRLW1JGMeGxo/t32B
+m96Af6AiPWPEJuVfgGV0iwg+HQKBgQCmyPzL9M2rhYZn1AozRUguvlpmJHU2DpqS
+34Q+7x2Ghf7MgBUhqE0t3FAOxEC7IYBwHmeYOvFR8ZkVRKNF4gbnF9RtLdz0DMEG
+5qsMnvJUSQbNB1yVjUCnDAtElqiFRlQ/k0LgYkjKDY7LfciZl9uJRl0OSYeX/qG2
+tRW09tOpgQKBgBSGkpM3RN/MRayfBtmZvYjVWh3yjkI2GbHA1jj1g6IebLB9SnfL
+WbXJErCj1U+wvoPf5hfBc7m+jRgD3Eo86YXibQyZfY5pFIh9q7Ll5CQl5hj4zc4Y
+b16sFR+xQ1Q9Pcd+BuBWmSz5JOE/qcF869dthgkGhnfVLt/OQzqZluZRAoGAXQ09
+nT0TkmKIvlza5Af/YbTqEpq8mlBDhTYXPlWCD4+qvMWpBII1rSSBtftgcgca9XLB
+MXmRMbqtQeRtg4u7dishZVh1MeP7vbHsNLppUQT9Ol6lFPsd2xUpJDc6BkFat62d
+Xjr3iWNPC9E9nhPPdCNBv7reX7q81obpeXFMXgECgYEAmk2Qlus3OV0tfoNRqNpe
+Mb0teduf2+h3xaI1XDIzPVtZF35ELY/RkAHlmWRT4PCdR0zXDidE67L6XdJyecSt
+FdOUH8z5qUraVVebRFvJqf/oGsXc4+ex1ZKUTbY0wqY1y9E39yvB3MaTmZFuuqk8
+f3cg+fr8aou7pr9SHhJlZCU=
+-----END PRIVATE KEY-----</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>smallrye.jwt.sign.key.location</code> プロパティーを使用して、この秘密署名鍵を指します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">OpenSSL を使用した鍵の生成</div>
+<div class="paragraph">
+<p>OpenSSL コマンドラインツールを使用して、公開鍵と秘密鍵のペアを生成することもできます。</p>
+</div>
+<div class="listingblock">
+<div class="title">鍵を生成するための openssl コマンド</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">openssl genrsa -out rsaPrivateKey.pem 2048
+openssl rsa -pubout -in rsaPrivateKey.pem -out publicKey.pem</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>秘密鍵を生成して PKCS#8 形式に変換するには、追加の手順が必要です。</p>
+</div>
+<div class="listingblock">
+<div class="title">秘密鍵を変換するための openssl コマンド</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">openssl pkcs8 -topk8 -nocrypt -inform pem -in rsaPrivateKey.pem -outform pem -out privateKey.pem</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このクイックスタートで使用される鍵の代わりに、生成された鍵のペアを使用できます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>これで、<code>TokenSecuredResource</code> エンドポイントで使用する JWT を生成できます。これを行うには、次のコマンドを実行します。</p>
+</div>
+<div class="listingblock">
+<div class="title">JWT 生成出力のサンプル</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ mvn exec:java -Dexec.mainClass=org.acme.security.jwt.GenerateToken -Dexec.classpathScope=test -Dsmallrye.jwt.sign.key.location=privateKey.pem
+
+eyJraWQiOiJcL3ByaXZhdGVLZXkucGVtIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJqZG9lLXVzaW5nLWp3dC1yYmFjIiwiYXVkIjoidXNpbmctand0LXJiYWMiLCJ1cG4iOiJqZG9lQHF1YXJrdXMuaW8iLCJiaXJ0aGRhdGUiOiIyMDAxLTA3LTEzIiwiYXV0aF90aW1lIjoxNTUxNjU5Njc2LCJpc3MiOiJodHRwczpcL1wvcXVhcmt1cy5pb1wvdXNpbmctand0LXJiYWMiLCJyb2xlTWFwcGluZ3MiOnsiZ3JvdXAyIjoiR3JvdXAyTWFwcGVkUm9sZSIsImdyb3VwMSI6Ikdyb3VwMU1hcHBlZFJvbGUifSwiZ3JvdXBzIjpbIkVjaG9lciIsIlRlc3RlciIsIlN1YnNjcmliZXIiLCJncm91cDIiXSwicHJlZmVycmVkX3VzZXJuYW1lIjoiamRvZSIsImV4cCI6MTU1MTY1OTk3NiwiaWF0IjoxNTUxNjU5Njc2LCJqdGkiOiJhLTEyMyJ9.O9tx_wNNS4qdpFhxeD1e7v4aBNWz1FCq0UV8qmXd7dW9xM4hA5TO-ZREk3ApMrL7_rnX8z81qGPIo_R8IfHDyNaI1SLD56gVX-NaOLS2OjfcbO3zOWJPKR_BoZkYACtMoqlWgIwIRC-wJKUJU025dHZiNL0FWO4PjwuCz8hpZYXIuRscfFhXKrDX1fh3jDhTsOEFfu67ACd85f3BdX9pe-ayKSVLh_RSbTbBPeyoYPE59FW7H5-i8IE-Gqu838Hz0i38ksEJFI25eR-AJ6_PSUD0_-TV3NjXhF3bFIeT4VSaIZcpibekoJg0cQm-4ApPEcPLdgTejYHA-mupb8hSwg</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>JWT 文字列は Base64 URL でエンコードされた文字列で、'.' で区切られた 3 つのパートで構成されています。最初のパートは JWT ヘッダー、2 つ目のパートは JWT クレーム、3 つ目のパートは JWT シグネチャーです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="finally-secured-access-to-securedroles-allowed"><a class="anchor" href="#finally-secured-access-to-securedroles-allowed"></a>/secured/roles-allowed へのセキュリティーで保護されたアクセス</h3>
+<div class="paragraph">
+<p>これを使用して、/secured/roles-allowed エンドポイントにセキュリティーで保護されたリクエストを作成しましょう。Quarkus サーバーが引き続き開発モードで実行されていることを確認してから、次のコマンドを実行し、前の手順で生成された自分の JWT バージョンを使用していることを確認します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -H "Authorization: Bearer eyJraWQiOiJcL3ByaXZhdGVLZXkucGVtIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJqZG9lLXVzaW5nLWp3dC1yYmFjIiwiYXVkIjoidXNpbmctand0LXJiYWMiLCJ1cG4iOiJqZG9lQHF1YXJrdXMuaW8iLCJiaXJ0aGRhdGUiOiIyMDAxLTA3LTEzIiwiYXV0aF90aW1lIjoxNTUxNjUyMDkxLCJpc3MiOiJodHRwczpcL1wvcXVhcmt1cy5pb1wvdXNpbmctand0LXJiYWMiLCJyb2xlTWFwcGluZ3MiOnsiZ3JvdXAyIjoiR3JvdXAyTWFwcGVkUm9sZSIsImdyb3VwMSI6Ikdyb3VwMU1hcHBlZFJvbGUifSwiZ3JvdXBzIjpbIkVjaG9lciIsIlRlc3RlciIsIlN1YnNjcmliZXIiLCJncm91cDIiXSwicHJlZmVycmVkX3VzZXJuYW1lIjoiamRvZSIsImV4cCI6MTU1MTY1MjM5MSwiaWF0IjoxNTUxNjUyMDkxLCJqdGkiOiJhLTEyMyJ9.aPA4Rlc4kw7n_OZZRRk25xZydJy_J_3BRR8ryYLyHTO1o68_aNWWQCgpnAuOW64svPhPnLYYnQzK-l2vHX34B64JySyBD4y_vRObGmdwH_SEufBAWZV7mkG3Y4mTKT3_4EWNu4VH92IhdnkGI4GJB6yHAEzlQI6EdSOa4Nq8Gp4uPGqHsUZTJrA3uIW0TbNshFBm47-oVM3ZUrBz57JKtr0e9jv0HjPQWyvbzx1HuxZd6eA8ow8xzvooKXFxoSFCMnxotd3wagvYQ9ysBa89bgzL-lhjWtusuMFDUVYwFqADE7oOSOD4Vtclgq8svznBQ-YpfTHfb9QEcofMlpyjNA" http://127.0.0.1:8080/secured/roles-allowed; echo</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">JWT を含む /secured/roles-allowed の curl コマンド</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ curl -H "Authorization: Bearer eyJraWQ..." http://127.0.0.1:8080/secured/roles-allowed; echo
+hello + jdoe@quarkus.io, isHttps: false, authScheme: Bearer, hasJWT: true, birthdate: 2001-07-13</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>成功! これで、以下が得られます</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="mailto:jdoe@quarkus.io">jdoe@quarkus.io</a> という非匿名の発信者名</p>
+</li>
+<li>
+<p>ベアラーの認証スキーム</p>
+</li>
+<li>
+<p>非 null の JsonWebToken</p>
+</li>
+<li>
+<p>birthdate クレームの値</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="using-the-jsonwebtoken-and-claim-injection"><a class="anchor" href="#using-the-jsonwebtoken-and-claim-injection"></a>JsonWebToken とクレーム挿入の使用</h3>
+<div class="paragraph">
+<p>さて、安全なRESTエンドポイントにアクセスするためにJWTを生成できるようになったので、 <code>JsonWebToken</code> インターフェースとJWTクレームを使ってさらに何ができるかを見てみましょう。 <code>org.eclipse.microprofile.jwt.JsonWebToken</code> インターフェースは <code>java.security.Principal</code> インターフェースを拡張したもので、実際には前回使用した <code>jakarta.ws.rs.core.SecurityContext#getUserPrincipal()</code> 呼び出しによって返されるオブジェクトの型です。つまり、CDIを使用せず、RESTコンテナ <code>SecurityContext</code> にアクセスできるコードは、 <code>SecurityContext#getUserPrincipal()</code> をキャストすることで、呼び出し元の <code>JsonWebToken</code> インターフェースを取得することができます。</p>
+</div>
+<div class="paragraph">
+<p><code>JsonWebToken</code> インターフェイスは、基盤となる JWT のクレームにアクセスするためのメソッドを定義します。これは、JWT に存在する可能性のある MicroProfile JWT RBAC 仕様および任意のクレームで必要な一般的クレームのアクセッサを提供します。。</p>
+</div>
+<div class="paragraph">
+<p>すべての JWT クレームを挿入することもできます。<code>TokenSecuredResource</code> を別のエンドポイント /secured/roles-allowed-admin で拡張してみましょう。これは、(<code>JsonWebToken</code> から取得するのではなく) 挿入された <code>birthdate</code> クレームを使用します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.jwt;
+
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.SecurityContext;
+
+import org.eclipse.microprofile.jwt.Claim;
+import org.eclipse.microprofile.jwt.Claims;
+import org.eclipse.microprofile.jwt.JsonWebToken;
+
+@Path("/secured")
+@RequestScoped
+public class TokenSecuredResource {
+
+    @Inject
+    JsonWebToken jwt; <i class="conum" data-value="1"></i><b>(1)</b>
+    @Inject
+    @Claim(standard = Claims.birthdate)
+    String birthdate; <i class="conum" data-value="2"></i><b>(2)</b>
+
+    @GET
+    @Path("permit-all")
+    @PermitAll
+    @Produces(MediaType.TEXT_PLAIN)
+    public String hello(@Context SecurityContext ctx) {
+        return getResponseString(ctx);
+    }
+
+    @GET
+    @Path("roles-allowed")
+    @RolesAllowed({ "User", "Admin" })
+    @Produces(MediaType.TEXT_PLAIN)
+    public String helloRolesAllowed(@Context SecurityContext ctx) {
+        return getResponseString(ctx) + ", birthdate: " + jwt.getClaim("birthdate").toString();
+    }
+
+    @GET
+    @Path("roles-allowed-admin")
+    @RolesAllowed("Admin")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String helloRolesAllowedAdmin(@Context SecurityContext ctx) {
+        return getResponseString(ctx) + ", birthdate: " + birthdate; <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+
+    private String getResponseString(SecurityContext ctx) {
+        String name;
+        if (ctx.getUserPrincipal() == null) {
+            name = "anonymous";
+        } else if (!ctx.getUserPrincipal().getName().equals(jwt.getName())) {
+            throw new InternalServerErrorException("Principal and JsonWebToken names do not match");
+        } else {
+            name = ctx.getUserPrincipal().getName();
+        }
+        return String.format("hello + %s,"
+            + " isHttps: %s,"
+            + " authScheme: %s,"
+            + " hasJWT: %s",
+            name, ctx.isSecure(), ctx.getAuthenticationScheme(), hasJwt());
+    }
+
+    private boolean hasJwt() {
+        return jwt.getClaimNames() != null;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>ここでは、JsonWebToken を挿入します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>ここでは、<code>birthday</code> クレームを <code>String</code> として挿入します。これが <code>@RequestScoped</code> スコープが必要になった理由です。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>ここでは、挿入された <code>birthday</code> クレームを使用して、最終的な応答を作成します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>次に、トークンを再度生成して実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -H "Authorization: Bearer eyJraWQiOiJcL3ByaXZhdGVLZXkucGVtIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJqZG9lLXVzaW5nLWp3dC1yYmFjIiwiYXVkIjoidXNpbmctand0LXJiYWMiLCJ1cG4iOiJqZG9lQHF1YXJrdXMuaW8iLCJiaXJ0aGRhdGUiOiIyMDAxLTA3LTEzIiwiYXV0aF90aW1lIjoxNTUxNjUyMDkxLCJpc3MiOiJodHRwczpcL1wvcXVhcmt1cy5pb1wvdXNpbmctand0LXJiYWMiLCJyb2xlTWFwcGluZ3MiOnsiZ3JvdXAyIjoiR3JvdXAyTWFwcGVkUm9sZSIsImdyb3VwMSI6Ikdyb3VwMU1hcHBlZFJvbGUifSwiZ3JvdXBzIjpbIkVjaG9lciIsIlRlc3RlciIsIlN1YnNjcmliZXIiLCJncm91cDIiXSwicHJlZmVycmVkX3VzZXJuYW1lIjoiamRvZSIsImV4cCI6MTU1MTY1MjM5MSwiaWF0IjoxNTUxNjUyMDkxLCJqdGkiOiJhLTEyMyJ9.aPA4Rlc4kw7n_OZZRRk25xZydJy_J_3BRR8ryYLyHTO1o68_aNWWQCgpnAuOW64svPhPnLYYnQzK-l2vHX34B64JySyBD4y_vRObGmdwH_SEufBAWZV7mkG3Y4mTKT3_4EWNu4VH92IhdnkGI4GJB6yHAEzlQI6EdSOa4Nq8Gp4uPGqHsUZTJrA3uIW0TbNshFBm47-oVM3ZUrBz57JKtr0e9jv0HjPQWyvbzx1HuxZd6eA8ow8xzvooKXFxoSFCMnxotd3wagvYQ9ysBa89bgzL-lhjWtusuMFDUVYwFqADE7oOSOD4Vtclgq8svznBQ-YpfTHfb9QEcofMlpyjNA" http://127.0.0.1:8080/secured/roles-allowed-admin; echo</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ curl -H "Authorization: Bearer eyJraWQ..." http://127.0.0.1:8080/secured/roles-allowed-admin; echo
+hello + jdoe@quarkus.io, isHttps: false, authScheme: Bearer, hasJWT: true, birthdate: 2001-07-13</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="package-and-run-the-application"><a class="anchor" href="#package-and-run-the-application"></a>アプリケーションをパッケージ化して実行する</h3>
+<div class="paragraph">
+<p>いつものように、アプリケーションは以下の方法でパッケージ化できます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、 <code>java -jar target/quarkus-app/quarkus-run.jar</code> を使って実行します:</p>
+</div>
+<div class="listingblock">
+<div class="title">ランナー jar の例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ java -jar target/quarkus-app/quarkus-run.jar
+2019-03-28 14:27:48,839 INFO  [io.quarkus] (main) Quarkus 3.2.12.Final started in 0.796s. Listening on: http://[::]:8080
+2019-03-28 14:27:48,841 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy-reactive, resteasy-reactive-jackson, security, smallrye-jwt]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルを <code>./mvnw clean package -Pnative</code> で生成することもできます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build --native</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install -Dnative</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build -Dquarkus.package.type=native</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">ネイティブ実行可能ファイル例</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">[INFO] Scanning for projects...
+...
+[security-jwt-quickstart-runner:25602]     universe:     493.17 ms
+[security-jwt-quickstart-runner:25602]      (parse):     660.41 ms
+[security-jwt-quickstart-runner:25602]     (inline):   1,431.10 ms
+[security-jwt-quickstart-runner:25602]    (compile):   7,301.78 ms
+[security-jwt-quickstart-runner:25602]      compile:  10,542.16 ms
+[security-jwt-quickstart-runner:25602]        image:   2,797.62 ms
+[security-jwt-quickstart-runner:25602]        write:     988.24 ms
+[security-jwt-quickstart-runner:25602]      [total]:  43,778.16 ms
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  51.500 s
+[INFO] Finished at: 2019-03-28T14:30:56-07:00
+[INFO] ------------------------------------------------------------------------
+
+$ ./target/security-jwt-quickstart-runner
+2019-03-28 14:31:37,315 INFO  [io.quarkus] (main) Quarkus 0.12.0 started in 0.006s. Listening on: http://[::]:8080
+2019-03-28 14:31:37,316 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy-reactive, resteasy-reactive-jackson, security, smallrye-jwt]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="explore-the-solution"><a class="anchor" href="#explore-the-solution"></a>ソリューションの探索</h3>
+<div class="paragraph">
+<p>The solution repository located in the <code>security-jwt-quickstart</code> <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/3.2/security-jwt-quickstart">directory</a> contains all the versions we have worked through in this quickstart guide as well as some additional endpoints that illustrate subresources with injection of <code>JsonWebToken</code>s and their claims into those using the CDI APIs.
+We suggest that you check out the quickstart solutions and explore the <code>security-jwt-quickstart</code> directory to learn more about the SmallRye JWT extension features.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="reference-guide"><a class="anchor" href="#reference-guide"></a>リファレンスガイド</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="supported-injection-scopes"><a class="anchor" href="#supported-injection-scopes"></a>サポートされている注入スコープ</h3>
+<div class="paragraph">
+<p><code>org.eclipse.microprofile.jwt.JsonWebToken</code> が注入される場合、<code>@ApplicationScoped</code>、<code>@Singleton</code>、および <code>@RequestScoped</code> の外部 Bean 注入スコープがすべてサポートされます。また、現在のトークンが示されていることを確認するために、<code>JsonWebToken</code> の <code>@RequestScoped</code> スコープが適用されます。</p>
+</div>
+<div class="paragraph">
+<p>ただし、個々のトークンクレームが <code>String</code> などの単純な型として挿入される場合は、<code>@RequestScoped</code> を使用する必要があります。以下はその例です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.security.jwt;
+
+import jakarta.inject.Inject;
+import org.eclipse.microprofile.jwt.Claim;
+import org.eclipse.microprofile.jwt.Claims;
+
+@Path("/secured")
+@RequestScoped
+public class TokenSecuredResource {
+
+    @Inject
+    @Claim(standard = Claims.birthdate)
+    String birthdate;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>注入された <code>JsonWebToken</code> を使用して個々のクレームにアクセスすることもできます。その場合、<code>@RequestScoped</code> を設定する必要はありません。</p>
+</div>
+<div class="paragraph">
+<p>詳細については、 <a href="https://download.eclipse.org/microprofile/microprofile-jwt-auth-1.2/microprofile-jwt-auth-spec-1.2.html#_cdi_injection_requirements">MP JWT CDI 注入要件</a> を参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="supported-public-key-formats"><a class="anchor" href="#supported-public-key-formats"></a>サポートされている公開鍵形式</h3>
+<div class="paragraph">
+<p>公開鍵には、優先順位に従って指定された次のいずれかの形式が適用さされます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Public Key Cryptography Standards #8 (PKCS#8) PEM</p>
+</li>
+<li>
+<p>JSON Web Key (JWK)</p>
+</li>
+<li>
+<p>JSON Web Key Set (JWKS)</p>
+</li>
+<li>
+<p>JSON Web Key (JWK) Base64 URL エンコード</p>
+</li>
+<li>
+<p>JSON Web Key Set (JWKS) Base64 URL エンコード</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="dealing-with-the-verification-keys"><a class="anchor" href="#dealing-with-the-verification-keys"></a>検証鍵の処理</h3>
+<div class="paragraph">
+<p>非対称 RSA または楕円曲線 (EC) 鍵を使用してトークンの署名を検証する必要がある場合は、<code>mp.jwt.verify.publickey.location</code> プロパティーを使用してローカルまたはリモートの検証鍵を参照します。</p>
+</div>
+<div class="paragraph">
+<p><code>mp.jwt.verify.publickey.algorithm</code> を使用して検証アルゴリズムをカスタマイズします (デフォルトは <code>RS256</code>)。たとえば、EC 鍵を操作する場合は <code>ES256</code> に設定します。</p>
+</div>
+<div class="paragraph">
+<p>対称秘密鍵を使用してトークン署名を検証する必要がある場合は、JSON Web 鍵 (JWK) または JSON Web 鍵セット (JWK セット) 形式のいずれかを使用して、この秘密鍵を表す必要があります。以下はその例です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+ "keys": [
+   {
+     "kty":"oct",
+     "kid":"secretKey",
+     "k":"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow"
+   }
+ ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この秘密鍵 JWK も、<code>smallrye.jwt.verify.key.location</code> で参照する必要があります。<code>smallrye.jwt.verify.algorithm</code> は <code>HS256</code>/<code>HS384</code>/<code>HS512</code> に設定する必要があります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jwt-parser"><a class="anchor" href="#jwt-parser"></a>JWTParser を使用した JsonWebToken の解析と検証</h3>
+<div class="paragraph">
+<p>JWT トークンを挿入できない場合、たとえば、サービスリクエストペイロードに埋め込まれていたり、サービスエンドポイントが別の経路でトークンを取得する場合、<code>JWTParser</code> を使用できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import org.eclipse.microprofile.jwt.JsonWebToken;
+import io.smallrye.jwt.auth.principal.JWTParser;
+...
+@Inject JWTParser parser;
+
+String token = getTokenFromOidcServer();
+
+// Parse and verify the token
+JsonWebToken jwt = parser.parse(token);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これを使用して、トークンの検証または復号化の方法をカスタマイズすることもできます。たとえば、ローカルの <code>SecretKey</code> を指定できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import javax.crypto.SecretKey;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.core.NewCookie;
+import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.jwt.JsonWebToken;
+import io.smallrye.jwt.auth.principal.JWTParser;
+import io.smallrye.jwt.build.Jwt;
+
+@Path("/secured")
+public class SecuredResource {
+  @Inject JWTParser parser;
+  private String secret = "AyM1SysPpbyDfgZld3umj1qzKObwVMko";
+
+  @GET
+  @Produces("text/plain")
+  public Response getUserName(@CookieParam("jwt") String jwtCookie) {
+    Response response = null;
+    if (jwtCookie == null) {
+        // Create a JWT token signed using the 'HS256' algorithm
+        String newJwtCookie = Jwt.upn("Alice").signWithSecret(secret);
+        // or create a JWT token encrypted using the 'A256KW' algorithm
+        // Jwt.upn("alice").encryptWithSecret(secret);
+        return Response.ok("Alice").cookie(new NewCookie("jwt", newJwtCookie)).build();
+    } else {
+        // All mp.jwt and smallrye.jwt properties are still effective, only the verification key is customized.
+        JsonWebToken jwt = parser.verify(jwtCookie, secret);
+        // or jwt = parser.decrypt(jwtCookie, secret);
+        return Response.ok(jwt.getName()).build();
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>また、 <code>quarkus-smallrye-jwt</code> が提供する <code>HTTP</code> サポート無しで <code>JWTParser</code> を使用する方法については、SmallRye <a href="#add-smallrye-jwt">JWT を直接追加する方法</a> を参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="token-decryption"><a class="anchor" href="#token-decryption"></a>トークン復号化</h3>
+<div class="paragraph">
+<p>アプリケーションが暗号化されたクレームや暗号化・内部署名付きクレームを持つトークンを受け入れる必要がある場合は、必要な作業は、復号化キーを指す <code>smallrye.jwt.decrypt.key.location</code> を設定することだけです。</p>
+</div>
+<div class="paragraph">
+<p>この鍵プロパティのみが設定されている場合、受信トークンには暗号化クレームのみが含まれることが期待されます。 <code>mp.jwt.verify.publickey</code> または <code>mp.jwt.verify.publickey.location</code> のいずれかの検証プロパティも設定されている場合、受信トークンには暗号化・内部署名付きトークンが含まれることが期待されます。</p>
+</div>
+<div class="paragraph">
+<p><a href="security-jwt-build">SmallRye JWT を使用した JWT トークンの生成</a> を参照し、暗号化または内部署名されてから暗号化されたトークンをすぐに生成する方法を確認してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="custom-factories"><a class="anchor" href="#custom-factories"></a>カスタムファクトリー</h3>
+<div class="paragraph">
+<p><code>io.smallrye.jwt.auth.principal.DefaultJWTCallerPrincipalFactory</code> は、デフォルトで JWT トークンを解析および検証し、それらを <code>JsonWebToken</code> プリンシパルに変換するために使用されます。設定セクションにリストされている <code>MP JWT</code> および <code>smallrye-jwt</code> プロパティーを使用して、JWT トークンを検証およびカスタマイズします。</p>
+</div>
+<div class="paragraph">
+<p>たとえば、ファイアウォールによってすでに検証されているトークンの再検証を回避するために独自のファクトリーを提供する必要がある場合は、<code>META-INF/services/io.smallrye.jwt.auth.principal.JWTCallerPrincipalFactory</code> リソースを提供すして <code>ServiceLoader</code> メカニズムを使用するか、単純に次のような <code>Alternative</code> CDI Bean 実装を持つことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import jakarta.annotation.Priority;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Alternative;
+import org.jose4j.jwt.JwtClaims;
+import org.jose4j.jwt.consumer.InvalidJwtException;
+import io.smallrye.jwt.auth.principal.DefaultJWTCallerPrincipal;
+import io.smallrye.jwt.auth.principal.JWTAuthContextInfo;
+import io.smallrye.jwt.auth.principal.JWTCallerPrincipal;
+import io.smallrye.jwt.auth.principal.JWTCallerPrincipalFactory;
+import io.smallrye.jwt.auth.principal.ParseException;
+
+@ApplicationScoped
+@Alternative
+@Priority(1)
+public class TestJWTCallerPrincipalFactory extends JWTCallerPrincipalFactory {
+
+    @Override
+    public JWTCallerPrincipal parse(String token, JWTAuthContextInfo authContextInfo) throws ParseException {
+        try {
+            // Token has already been verified, parse the token claims only
+            String json = new String(Base64.getUrlDecoder().decode(token.split("\\.")[1]), StandardCharsets.UTF_8);
+            return new DefaultJWTCallerPrincipal(JwtClaims.parse(json));
+        } catch (InvalidJwtException ex) {
+            throw new ParseException(ex.getMessage());
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="token-propagation"><a class="anchor" href="#token-propagation"></a>トークンの伝播</h3>
+<div class="paragraph">
+<p>下流サービスへのベアラアクセストークンの伝搬については、 <a href="security-openid-connect-client#token-propagation">トークンの伝搬</a> の項を参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="integration-testing"><a class="anchor" href="#integration-testing"></a>テスト</h3>
+<div class="sect3">
+<h4 id="integration-testing-wiremock"><a class="anchor" href="#integration-testing-wiremock"></a>Wiremock</h4>
+<div class="paragraph">
+<p>もし、 <code>mp.jwt.verify.publickey.location</code> が HTTPS または HTTP ベースの JsonWebKey (JWK) セットを指すように設定している場合は、 <a href="security-oidc-bearer-token-authentication#integration-testing">OpenID Connect Bearer Token結合テスト</a> <code>Wiremock</code> のセクションで説明したのと同じアプローチが使えますが、代わりに MP JWT 設定プロパティを使うように <code>application.properties</code> を変更するだけです：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># keycloak.url is set by OidcWiremockTestResource
+mp.jwt.verify.publickey.location=${keycloak.url}/realms/quarkus/protocol/openid-connect/certs
+mp.jwt.verify.issuer=${keycloak.url}/realms/quarkus</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="integration-testing-keycloak"><a class="anchor" href="#integration-testing-keycloak"></a>Keycloak</h4>
+<div class="paragraph">
+<p>Keycloakと連携し、 <code>mp.jwt.verify.publickey.location</code> 、HTTPSまたはHTTPベースのJsonWebKey (JWK)セットを指すように設定している場合は、 <a href="security-oidc-bearer-token-authentication#integration-testing">OpenID Connect Bearer Token結合テスト</a> Keycloakセクションで説明したのと同じアプローチを使用できますが、代わりにMP JWT設定プロパティを使用するように <code>application.properties</code> を変更するだけです：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># keycloak.url is set by DevServices for Keycloak
+mp.jwt.verify.publickey.location=${keycloak.url}/realms/quarkus/protocol/openid-connect/certs
+mp.jwt.verify.issuer=${keycloak.url}/realms/quarkus</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Keycloakが発行したトークンは、レルムエンドポイントアドレスが <code>iss</code> （発行者）クレームに設定されていることに注目してください。</p>
+</div>
+<div class="paragraph">
+<p>QuarkusアプリケーションがDockerコンテナで実行されている場合、DevServices for Keycloakによって起動されたKeycloak dockerコンテナとネットワークインターフェースを共有し、QuarkusアプリケーションとKeycloakは内部の共有Dockerネットワークを通じて互いに通信することができます。</p>
+</div>
+<div class="paragraph">
+<p>そのような場合は、代わりに以下のような設定にしてください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># keycloak.url is set by DevServices for Keycloak,
+# Quarkus will access it via an internal shared docker network interface.
+mp.jwt.verify.publickey.location=${keycloak.url}/realms/quarkus/protocol/openid-connect/certs
+
+# Issuer is set to the docker bridge localhost endpoint address represented by the `client.quarkus.oidc.auth-server-url` property
+mp.jwt.verify.issuer=${client.quarkus.oidc.auth-server-url}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="integration-testing-public-key"><a class="anchor" href="#integration-testing-public-key"></a>ローカル公開鍵</h4>
+<div class="paragraph">
+<p><a href="security-oidc-bearer-token-authentication#integration-testing">OpenID Connect Bearer Token結合テスト</a> <code>Local Public Key</code> のセクションで説明したのと同じアプローチを使用できますが、代わりに MP JWT 設定プロパティを使用するように <code>application.properties</code> を変更するだけです：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.jwt.verify.publickey=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlivFI8qB4D0y2jy0CfEqFyy46R0o7S8TKpsx5xbHKoU1VWg6QkQm+ntyIv1p4kE1sPEQO73+HY8+Bzs75XwRTYL1BmR1w8J5hmjVWjc6R2BTBGAYRPFRhor3kpM6ni2SPmNNhurEAHw7TaqszP5eUF/F9+KEBWkwVta+PZ37bwqSE4sCb1soZFrVz/UT/LF4tYpuVYt3YbqToZ3pZOZ9AX2o1GCG3xwOjkc4x0W7ezbQZdC9iftPxVHR8irOijJRRjcPDtA6vPKpzLl6CyYnsIYPd99ltwxTHjr3npfv/3Lw50bAkbT4HeLFxTx4flEoZLKO/g0bAoV2uqBhkA9xnQIDAQAB
+# set it to the issuer value which is used to generate the tokens
+mp.jwt.verify.issuer=${keycloak.url}/realms/quarkus
+
+# required to sign the tokens
+smallrye.jwt.sign.key.location=privateKey.pem</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="integration-testing-security-annotation"><a class="anchor" href="#integration-testing-security-annotation"></a>TestSecurity アノテーション</h4>
+<div class="paragraph">
+<p>以下の依存関係を追加します。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-test-security-jwt&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">testImplementation("io.quarkus:quarkus-test-security-jwt")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次のようなテストコードを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import static org.hamcrest.Matchers.is;
+import org.junit.jupiter.api.Test;
+import io.quarkus.test.common.http.TestHTTPEndpoint;
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
+import io.quarkus.test.security.jwt.Claim;
+import io.quarkus.test.security.jwt.JwtSecurity;
+import io.restassured.RestAssured;
+
+@QuarkusTest
+@TestHTTPEndpoint(ProtectedResource.class)
+public class TestSecurityAuthTest {
+
+    @Test
+    @TestSecurity(user = "userJwt", roles = "viewer")
+    public void testJwt() {
+        RestAssured.when().get("test-security-jwt").then()
+                .body(is("userJwt:viewer"));
+    }
+
+    @Test
+    @TestSecurity(user = "userJwt", roles = "viewer")
+    @JwtSecurity(claims = {
+            @Claim(key = "email", value = "user@gmail.com")
+    })
+    public void testJwtWithClaims() {
+        RestAssured.when().get("test-security-jwt-claims").then()
+                .body(is("userJwt:viewer:user@gmail.com"));
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ここで、<code>ProtectedResource</code> クラスは次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Path("/web-app")
+@Authenticated
+public class ProtectedResource {
+
+    @Inject
+    JsonWebToken accessToken;
+
+    @GET
+    @Path("test-security-jwt")
+    public String testSecurityOidc() {
+        return accessToken.getName() + ":" + accessToken.getGroups().iterator().next();
+    }
+
+    @GET
+    @Path("test-security-jwt-claims")
+    public String testSecurityOidcUserInfoMetadata() {
+        return accessToken.getName() + ":" + accessToken.getGroups().iterator().next()
+                + ":" + accessToken.getClaim("email");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>@TestSecurity</code> アノテーションは常に使用する必要があり、その <code>user</code> プロパティーは <code>JsonWebToken.getName()</code> として返され、<code>roles</code> プロパティーは <code>JsonWebToken.getGroups()</code> として返されることに注意してください。<code>@JwtSecurity</code> アノテーションはオプションであり、追加のトークンクレームを設定するために使用できます。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>@TestSecurity</code> と <code>@JwtSecurity</code> は、次のようにメタアノテーションで組み合わせることができます：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ ElementType.METHOD })
+    @TestSecurity(user = "userOidc", roles = "viewer")
+    @OidcSecurity(introspectionRequired = true,
+        introspection = {
+            @TokenIntrospection(key = "email", value = "user@gmail.com")
+        }
+    )
+    public @interface TestSecurityMetaAnnotation {
+
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これは、同じセキュリティ設定のセットを複数のテストメソッドで使用する必要がある場合に特に便利です。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="how-to-check-the-errors-in-the-logs"><a class="anchor" href="#how-to-check-the-errors-in-the-logs"></a>ログでエラーを確認する方法</h3>
+<div class="paragraph">
+<p>トークンの検証または復号化エラーの詳細を確認するには、<code>io.quarkus.smallrye.jwt.runtime.auth.MpJwtValidator</code> <code>TRACE</code> レベルのログを有効にしてください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.log.category."io.quarkus.smallrye.jwt.runtime.auth.MpJwtValidator".level=TRACE
+quarkus.log.category."io.quarkus.smallrye.jwt.runtime.auth.MpJwtValidator".min-level=TRACE</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="proactive-authentication"><a class="anchor" href="#proactive-authentication"></a>プロアクティブ認証</h3>
+<div class="paragraph">
+<p>パブリックエンドポイントメソッド呼び出し時のトークン検証を省略したい場合は、 <a href="security-proactive-authentication">プロアクティブ認証</a> を無効にします。</p>
+</div>
+<div class="paragraph">
+<p>トークンの検証が実行されていない場合、パブリックメソッドで挿入された <code>JsonWebToken</code> にアクセスできないことに注意してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="add-smallrye-jwt"><a class="anchor" href="#add-smallrye-jwt"></a>SmallRye JWT を直接追加する方法</h3>
+<div class="paragraph">
+<p><a href="#jwt-parser">JWTParserでJsonWebTokenを解析・検証</a> するには、以下のような状況では、 <code>quarkus-smallrye-jwt</code> の代わりに <code>smallrye-jwt</code> を直接使用します:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>HTTP</code> をサポートしていないQuarkusエクステンション、例えば <code>Quarkus GRPC</code> などを使用している場合。</p>
+</li>
+<li>
+<p>You provide an extension-specific <code>HTTP</code>, the support of which conflicts with the support of those offered by <code>quarkus-smallrye-jwt</code> and <code>Vert.x HTTP</code>, such as <code>Quarkus Amazon Lambda</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>まず、 <code>smallrye-jwt</code> の依存関係を追加することから始めます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.smallrye&lt;/groupId&gt;
+    &lt;artifactId&gt;smallrye-jwt&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.smallrye:smallrye-jwt")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>さらに、<code>application.properties</code> を更新して、<code>smallrye-jwt</code> によって提供されるすべての CDI プロデューサーを次のように含めます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.index-dependency.smallrye-jwt.group-id=io.smallrye
+quarkus.index-dependency.smallrye-jwt.artifact-id=smallrye-jwt</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration-reference"><a class="anchor" href="#configuration-reference"></a>設定リファレンス</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="quarkus-configuration"><a class="anchor" href="#quarkus-configuration"></a>Quarkus の設定</h3>
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="ビルド時に固定"></i></span>ビルド時に固定される構成プロパティ - 他のすべての構成プロパティは実行時にオーバーライド可能 <input type="search" id="config-search-0" placeholder="FILTER CONFIGURATION" disabled></p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference searchable configuration-reference-all-rows">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-smallrye-jwt_configuration"></a><a href="#quarkus-smallrye-jwt_configuration">Configuration property</a></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">型</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-smallrye-jwt_quarkus-smallrye-jwt-enabled"></a><code><a href="#quarkus-smallrye-jwt_quarkus-smallrye-jwt-enabled">quarkus.smallrye-jwt.enabled</a></code></p>
+</div>
+<div id="conf-collapsible-desc-1" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The MP-JWT configuration object</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38780">QUARKUS_SMALLRYE_JWT_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38780" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-smallrye-jwt_quarkus-smallrye-jwt-rsa-sig-provider"></a><code><a href="#quarkus-smallrye-jwt_quarkus-smallrye-jwt-rsa-sig-provider">quarkus.smallrye-jwt.rsa-sig-provider</a></code></p>
+</div>
+<div id="conf-collapsible-desc-2" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The name of the <code>java.security.Provider</code> that supports SHA256withRSA signatures</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38781">QUARKUS_SMALLRYE_JWT_RSA_SIG_PROVIDER</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38781" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>SunRsaSign</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-smallrye-jwt_quarkus-smallrye-jwt-blocking-authentication"></a><code><a href="#quarkus-smallrye-jwt_quarkus-smallrye-jwt-blocking-authentication">quarkus.smallrye-jwt.blocking-authentication</a></code></p>
+</div>
+<div id="conf-collapsible-desc-3" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Enable this property if fetching the remote keys can be a time-consuming operation. Do not enable it if you use the local keys.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38782">QUARKUS_SMALLRYE_JWT_BLOCKING_AUTHENTICATION</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38782" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-smallrye-jwt_quarkus-smallrye-jwt-silent"></a><code><a href="#quarkus-smallrye-jwt_quarkus-smallrye-jwt-silent">quarkus.smallrye-jwt.silent</a></code></p>
+</div>
+<div id="conf-collapsible-desc-4" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Always create HTTP 401 challenge, even for requests containing no authentication credentials. JWT authentication mechanism will return HTTP 401 when an authentication challenge is required. However if it is used alongside one of the interactive authentication mechanisms then returning HTTP 401 to the users accessing the application from a browser may not be desired. If you prefer you can request that JWT authentication mechanism does not create a challenge in such cases by setting this property to 'true'.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38783">QUARKUS_SMALLRYE_JWT_SILENT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38783" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="microprofile-jwt-configuration"><a class="anchor" href="#microprofile-jwt-configuration"></a>MicroProfile JWT の設定</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">プロパティ名</th>
+<th class="tableblock halign-left valign-top">デフォルト</th>
+<th class="tableblock halign-left valign-top">説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.jwt.verify.publickey</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.jwt.verify.publickey</code> 設定プロパティでは、公開鍵のテキストそのものを文字列として提供することができます。公開鍵は、 <a href="#supported-public-key-formats">サポートされる公開鍵の形式</a> セクションで定義された順序で、提供された文字列から解析されます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.jwt.verify.publickey.location</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Config プロパティーを使用すると、公開鍵の外部または内部の場所を指定できます。値は相対パスまたは URL の場合があります。値が HTTPS ベースの JWK セットを指している場合、ネイティブモードで機能するには、<code>quarkus.ssl.native</code> プロパティーも <code>true</code> に設定する必要があります。詳細については <a href="native-and-ssl">ネイティブ実行可能ファイルで SSL を使用する場合</a> を参照してください。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.jwt.verify.publickey.algorithm</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><code>RS256</code></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">署名アルゴリズム。 <code>ES256</code> に設定して、楕円曲線署名アルゴリズムをサポートします。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.jwt.decrypt.key.location</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Config プロパティーを使用すると、秘密復号化鍵の外部または内部の場所を指定できます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.jwt.verify.issuer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Config プロパティーは、サーバーが有効として受け入れる JWT の <code>iss</code> (発行者) クレームの値を指定します。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.jwt.verify.audiences</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">トークン <code>aud</code> クレームに含まれる可能性のあるオーディエンスのコンマ区切りリスト。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.jwt.verify.clock.skew</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><code>60</code></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">トークンの有効期限と年齢確認時に使用されるクロックスキュー（秒）。トークンの有効期限切れ後、現在時刻がこのプロパティで指定された秒数以内であれば、期限切れのトークンは受理されます。デフォルト値は60秒です。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.jwt.verify.token.age</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><code>none</code></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">トークン発行時刻 <code>iat</code> から経過してはならない秒数です。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.jwt.token.header</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><code>Authorization</code></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Cookie</code> などの別のヘッダーを使用してトークンを渡す場合は、このプロパティーを設定します。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.jwt.token.cookie</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">トークンを含む Cookie の名前。このプロパティーは、<code>mp.jwt.token.header</code> が <code>Cookie</code> に設定されている場合にのみ有効になります。</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="additional-smallrye-jwt-configuration"><a class="anchor" href="#additional-smallrye-jwt-configuration"></a>追加の SmallRye JWT 設定</h3>
+<div class="paragraph">
+<p>SmallRye JWTには、トークン処理をカスタマイズするために使用できる、より多くのプロパティーが用意されています。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">プロパティ名</th>
+<th class="tableblock halign-left valign-top">デフォルト</th>
+<th class="tableblock halign-left valign-top">説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.verify.key.location</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NONE</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">公開鍵と秘密鍵の両方を指すことができる検証鍵の場所。秘密鍵は JWK 形式でのみ使用できます。このプロパティーが設定されている場合、'mp.jwt.verify.publickey.location' は無視されることに注意してください。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.verify.algorithm</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">署名アルゴリズム。このプロパティーは、<code>HS256</code> などの必要な対称アルゴリズムを設定するためにのみ使用する必要があります。<code>ES256</code> などの非対称アルゴリズムの設定に使用することは推奨されません。代わりに 'mp.jwt.verify.publickey.algorithm' を使用してください。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.verify.key-format</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><code>ANY</code></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">このプロパティーを <code>PEM_KEY</code>、<code>PEM_CERTIFICATE</code>、<code>JWK</code>、<code>JWK_BASE64URL</code> などの特定のキー鍵形式に設定して、検証鍵のロード方法を最適化します。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.verify.relax-key-validation</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">検証鍵の検証を緩和します。このプロパティーを <code>true</code> に設定すると、2048 ビット未満の長さの公開 RSA 鍵が許可されます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.verify.certificate-thumbprint</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">このプロパティーが有効になっている場合、署名されたトークンには 'x5t' または 'x5t#S256' X509Certificatex5t 拇印ヘッダーが含まれている必要があります。この場合、検証鍵は JWK または PEM 証明書鍵形式でのみ使用できます。JWK 鍵には、'x5c' (Base64 でエンコードされた X509Certificate) プロパティーが設定されている必要があります。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.token.header</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><code>Authorization</code></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Cookie</code> などの別のヘッダーを使用してトークンを渡す場合は、このプロパティーを設定します。このプロパティーは推奨されていません。'mp.jwt.token.header' を使用してください。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.token.cookie</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">トークンを含む Cookie の名前。このプロパティーは、<code>smallrye.jwt.token.header</code> が <code>Cookie</code> に設定されている場合にのみ有効になります。このプロパティーは推奨されていません。'mp.jwt.token.cookie` を使用してください。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.always-check-authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.token.header</code> が <code>Cookie</code> に設定されていても、名前が <code>smallrye.jwt.token.cookie</code> の Cookie が存在しない場合、<code>Authorization</code> ヘッダーがチェックされるようにこのプロパティーを <code>true</code> に設定します。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.token.schemes</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><code>Bearer</code></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DPoP</code> などの単一または複数の代替スキームを含むコンマ区切りのリスト。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.token.kid</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">鍵の識別子。設定されている場合、検証 JWK 鍵とすべての JWT トークンには、一致する <code>kid</code> ヘッダーが必要です。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.time-to-live</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JWT を使用するために発行できる最大秒数。事実上、JWT の有効期限と発行日との差はこの値を超えてはなりません。このプロパティーを正でない値に設定すると、トークンが有効な 'iat' (で発行された) クレームを持つための要件が緩和されます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.require.named-principal</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><code>true</code></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">アプリケーションが名前を返す <code>java.security.Principal</code> に依存している場合、トークンには <code>upn</code> または <code>preferred_username</code> または <code>sub</code> クレームが設定されている必要があります。このプロパティーを設定すると、アプリケーションコードが null 以外の <code>Principal</code> 名を確実に処理するためにこれらのクレームのいずれも使用できない場合に、SmallRye JWT は例外を出力します。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.path.sub</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">件名を含むクレームへのパス。これはトップレベルの JSON オブジェクトから始まり、複数のセグメントを含めることができます。各セグメントは JSON オブジェクト名のみを表します (例: <code>realms/subject</code>)。このプロパティーは、トークンに sub クレームがないが、サブジェクトが別のクレームに設定されている場合に使用できます。namespace で修飾されたクレームには二重引用符を使用します。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.claims.sub</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">現在のトークンに使用可能な標準またはカスタムの <code>sub</code> クレームがない場合に、このプロパティーを使用して、デフォルトのサブクレーム値を設定できます。事実上、このプロパティーを使用して、<code>upn</code>、<code>preferred_username</code>、<code>sub`クレームが設定されていない場合に `java.security.Principal</code> 名をカスタマイズできます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.path.groups</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">グループを含むクレームへのパス。これはトップレベルの JSON オブジェクトから始まり、複数のセグメントを含めることができます。各セグメントは JSON オブジェクト名のみを表します (例: <code>realm/groups</code>)。このプロパティーは、トークンに 'groups' クレームがないが、グループが別のクレームに設定されている場合に使用できます。namespace で修飾されたクレームには二重引用符を使用します。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.groups-separator</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>' '</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">複数のグループ値を含む可能性のある文字列を分割するためのセパレーター。これは、<code>smallrye.jwt.path.groups</code> プロパティーが値が文字列のカスタムクレームを指している場合にのみ使用されます。標準の OAuth2 <code>scope</code> クレームにはスペースで区切られたシーケンスが含まれている可能性があるため、デフォルト値はスペース 1 個です。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.claims.groups</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">このプロパティーを使用して、現在のトークンに使用可能な標準またはカスタムのグループクレームがない場合に、デフォルトのグループクレーム値を設定できます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.jwks.refresh-interval</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>60</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JWK キャッシュの更新間隔 (分単位)。<code>mp.jwt.verify.publickey.location</code> が HTTP または HTTPS URL ベースの JWK セットを指し、正の <code>max-age</code> パラメーター値を持つ HTTP <code>Cache-Control</code> レスポンスヘッダーが JWK HTTPS エンドポイントから返されない限り無視されます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.jwks.forced-refresh-interval</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>30</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">強制 JWK キャッシュ更新間隔 (分単位)。現在のトークンの <code>kid</code> ヘッダーと一致する <code>kid</code> プロパティーを持つ JWK キーがキャッシュにないためにトークンの検証が失敗した場合に発生する可能性がある強制更新の試行頻度を制限するために使用されます。<code>mp.jwt.verify.publickey.location</code> が HTTP または HTTPS URL ベースの JWK セットを指していない限り、無視されます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.expiration.grace</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">有効期限を秒単位で指定します。デフォルトでは、現在時刻がトークンの有効期限から1分以内であれば、期限切れのトークンはまだ受け入れられます。このプロパティは非推奨です。代わりに <code>mp.jwt.verify.clock.skew</code> を使用してください。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.verify.aud</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">トークン <code>aud</code> クレームに含まれる可能性のあるオーディエンスのコンマ区切りリスト。このプロパティーは推奨されません。<code>mp.jwt.verify.audiences</code> を使用してください。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.required.claims</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">トークンに含める必要のあるクレームのコンマ区切りリスト。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.decrypt.key.location</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Config プロパティーを使用すると、秘密復号化鍵の外部または内部の場所を指定できます。このプロパティーは推奨されません。'mp.jwt.decrypt.key.location' を使用してください。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.decrypt.algorithm</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><code>RSA_OAEP</code></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">復号化アルゴリズム。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.decrypt.key</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">文字列として提供される復号化キー。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.token.decryption.kid</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">復号化キー識別子。設定されている場合、復号化 JWK キーとすべての JWT トークンには、一致する <code>kid</code> ヘッダーが必要です。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.client.tls.certificate.path</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">キーを <code>HTTPS</code> 経由でフェッチする必要がある場合は、TLS の信頼できる証明書へのパスを設定する必要があります。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.client.tls.trust-all</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">すべてのホスト名を信頼します。キーを <code>HTTPS</code> 経由でフェッチする必要があり、このプロパティーが <code>true</code> に設定されている場合、デフォルトですべてのホスト名が信頼されます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.client.tls.hosts</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">信頼できるホスト名のセット。キーを <code>HTTPS</code> 経由でフェッチする必要があり、<code>smallrye.jwt.client.tls.trust-all</code> が <code>false</code> に設定されている場合、このプロパティーを使用して信頼できるホスト名を設定できます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.http.proxy.host</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HTTP プロキシーホスト。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.http.proxy.port</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>80</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HTTP プロキシーポート。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.keystore.type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><code>JKS</code></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.jwt.verify.publickey.location</code> または <code>mp.jwt.decrypt.key.location</code> が <code>KeyStore</code> ファイルを指している場合、このプロパティーを使用してキーストアタイプをカスタマイズできます。設定されていない場合は、ファイル名がチェックされ、<code>JKS</code> がデフォルトで設定される前にキーストアタイプが決定されます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.keystore.provider</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>mp.jwt.verify.publickey.location</code> または <code>mp.jwt.decrypt.key.location</code> が <code>KeyStore</code> ファイルを指している場合、このプロパティーを使用して <code>KeyStore</code> プロバイダーをカスタマイズできます。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.keystore.password</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">キーストアのパスワード。<code>mp.jwt.verify.publickey.location</code> または <code>mp.jwt.decrypt.key.location</code> の場合、このプロパティーが設定されています。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.keystore.verify.key.alias</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">このプロパティーは、<code>mp.jwt.verify.publickey.location`が`KeyStore`ファイルを指している場合に、`KeyStore</code> から抽出される公開検証鍵を一致する証明書から識別するために設定する必要があります。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.keystore.decrypt.key.alias</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">このプロパティは、 <code>mp.jwt.decrypt.key.location</code> が <code>KeyStore</code> ファイルを指している場合、プライベートな復号鍵を特定するために設定する必要があります。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>smallrye.jwt.keystore.decrypt.key.password</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">このプロパティは、 <code>mp.jwt.decrypt.key.location</code> が <code>KeyStore</code> ファイルを指しているときに、 <code>KeyStore</code> にある秘密鍵のパスワードが <code>smallrye.jwt.keystore.password</code> と異なる場合に設定されることがあります。</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="references"><a class="anchor" href="#references"></a>参照</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://download.eclipse.org/microprofile/microprofile-jwt-auth-1.2/microprofile-jwt-auth-spec-1.2.html">MP JWT 1.2 HTML</a></p>
+</li>
+<li>
+<p><a href="https://download.eclipse.org/microprofile/microprofile-jwt-auth-1.2/microprofile-jwt-auth-spec-1.2.pdf">MP JWT 1.2 PDF</a></p>
+</li>
+<li>
+<p><a href="https://github.com/smallrye/smallrye-jwt">SmallRye JWT</a></p>
+</li>
+<li>
+<p><a href="https://tools.ietf.org/html/rfc7519">JSON Web Token</a></p>
+</li>
+<li>
+<p><a href="https://tools.ietf.org/html/rfc7515">JSON Web Signature</a></p>
+</li>
+<li>
+<p><a href="https://tools.ietf.org/html/rfc7516">JSON Web Encryption</a></p>
+</li>
+<li>
+<p><a href="https://tools.ietf.org/html/rfc7518">JSON Web Algorithms</a></p>
+</li>
+<li>
+<p><a href="security-jwt-build">JSONウェブトークン (JWT) のビルド、署名、暗号化</a></p>
+</li>
+<li>
+<p><a href="security-authentication-mechanisms#combining-authentication-mechanisms">認証メカニズムの組み合わせ</a></p>
+</li>
+<li>
+<p><a href="security-overview">Quarkus Securityの概要</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#quickstart">クイックスタート</a>
+<ul class="sectlevel2">
+<li><a href="#solution">ソリューション</a></li>
+<li><a href="#creating-the-maven-project">Mavenプロジェクトの作成</a></li>
+<li><a href="#examine-the-jakarta-rest-resource">Jakarta REST リソースの調査</a></li>
+<li><a href="#run-the-application">アプリケーションの実行</a></li>
+<li><a href="#configuring-the-smallrye-jwt-extension-security-information">SmallRye JWT エクステンションセキュリティー情報の設定</a></li>
+<li><a href="#add-public-key">公開鍵の追加</a></li>
+<li><a href="#generating-a-jwt">JWT の生成</a></li>
+<li><a href="#finally-secured-access-to-securedroles-allowed">/secured/roles-allowed へのセキュリティーで保護されたアクセス</a></li>
+<li><a href="#using-the-jsonwebtoken-and-claim-injection">JsonWebToken とクレーム挿入の使用</a></li>
+<li><a href="#package-and-run-the-application">アプリケーションをパッケージ化して実行する</a></li>
+<li><a href="#explore-the-solution">ソリューションの探索</a></li>
+</ul>
+</li>
+<li><a href="#reference-guide">リファレンスガイド</a>
+<ul class="sectlevel2">
+<li><a href="#supported-injection-scopes">サポートされている注入スコープ</a></li>
+<li><a href="#supported-public-key-formats">サポートされている公開鍵形式</a></li>
+<li><a href="#dealing-with-the-verification-keys">検証鍵の処理</a></li>
+<li><a href="#jwt-parser">JWTParser を使用した JsonWebToken の解析と検証</a></li>
+<li><a href="#token-decryption">トークン復号化</a></li>
+<li><a href="#custom-factories">カスタムファクトリー</a></li>
+<li><a href="#token-propagation">トークンの伝播</a></li>
+<li><a href="#integration-testing">テスト</a></li>
+<li><a href="#how-to-check-the-errors-in-the-logs">ログでエラーを確認する方法</a></li>
+<li><a href="#proactive-authentication">プロアクティブ認証</a></li>
+<li><a href="#add-smallrye-jwt">SmallRye JWT を直接追加する方法</a></li>
+</ul>
+</li>
+<li><a href="#configuration-reference">設定リファレンス</a>
+<ul class="sectlevel2">
+<li><a href="#quarkus-configuration">Quarkus の設定</a></li>
+<li><a href="#microprofile-jwt-configuration">MicroProfile JWT の設定</a></li>
+<li><a href="#additional-smallrye-jwt-configuration">追加の SmallRye JWT 設定</a></li>
+</ul>
+</li>
+<li><a href="#references">参照</a></li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

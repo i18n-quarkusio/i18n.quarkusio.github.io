@@ -1,0 +1,2412 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>アプリケーションデータのキャッシング - main - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/main/guides/cache" />
+  <meta property="og:title" content="アプリケーションデータのキャッシング - main" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/cache">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/main/guides/cache">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/main/guides/cache" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/main/guides/cache">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/main/guides/cache">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/main/guides/cache">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/main/guides/cache">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/main/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" selected>Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <a class="editlink" href="https://github.com/quarkusio/quarkus/edit/main/docs/src/main/asciidoc/cache.adoc">このページを編集</a>
+      
+      <h1 class="text-caps">アプリケーションデータのキャッシング </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、QuarkusアプリケーションのCDI管理されたBeanでアプリケーションデータのキャッシングを有効にする方法について説明します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>約15分</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 17+がインストールされ、 <code>JAVA_HOME</code> が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.9.9</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルをビルドしたい場合、MandrelまたはGraalVM（あるいはネイティブなコンテナビルドを使用する場合はDocker）をインストールし、 <a href="building-native-image.html#configuring-graalvm">適切に設定</a>していること</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="scenario"><a class="anchor" href="#scenario"></a>シナリオ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusアプリケーションで、ユーザーが今後3日間の天気予報を取得できるREST APIを公開したいとします。問題は、一度に1日分のリクエストしか受け付けず、応答に時間がかかる外部の気象サービスに依存しなければならないことです。天気予報は12時間に一度更新されるので、サービスのレスポンスをキャッシュすればAPIのパフォーマンスは間違いなく向上します。</p>
+</div>
+<div class="paragraph">
+<p>これをQuarkusの単一のアノテーションを使用して行います。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>In this guide, we use the default Quarkus Cache backend (Caffeine).
+You can use Infinispan or Redis instead.
+Refer to the <a href="cache-infinispan-reference">Infinispan cache backend reference</a> to configure the Infinispan backend.
+Refer to the <a href="cache-redis-reference">Redis cache backend reference</a> to configure the Redis backend.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution"><a class="anchor" href="#solution"></a>ソリューション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次の章で紹介する手順に沿って、ステップを踏んでアプリを作成することをお勧めします。ただし、完成した例にそのまま進んでも構いません。</p>
+</div>
+<div class="paragraph">
+<p>Gitレポジトリをクローンするか <code>git clone -b development <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code> 、 <a href="https://github.com/quarkusio/quarkus-quickstarts/archive/development.zip">アーカイブ</a> をダウンロードします。</p>
+</div>
+<div class="paragraph">
+<p>ソリューションは <code>cache-quickstart</code> <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/development/cache-quickstart">ディレクトリ</a> にあります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-maven-project"><a class="anchor" href="#creating-the-maven-project"></a>Mavenプロジェクトの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、以下のコマンドで新しいQuarkusプロジェクトを作成します。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:cache-quickstart \
+    --extension='cache,rest-jackson' \
+    --no-code
+cd cache-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus:quarkus-maven-plugin:999-SNAPSHOT:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=cache-quickstart \
+    -Dextensions='cache,rest-jackson' \
+    -DnoCode
+cd cache-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Windowsユーザーの場合:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>cmdを使用する場合、（バックスラッシュ <code>\</code> を使用せず、すべてを同じ行に書かないでください）。</p>
+</li>
+<li>
+<p>Powershellを使用する場合は、 <code>-D</code> パラメータを二重引用符で囲んでください。例: <code>"-DprojectArtifactId=cache-quickstart"</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>このコマンドはプロジェクトを生成し、 <code>cache</code> と <code>rest-jackson</code> エクステンションモジュールをインポートします。</p>
+</div>
+<div class="paragraph">
+<p>すでにQuarkusプロジェクトが設定されている場合は、プロジェクトのベースディレクトリーで以下のコマンドを実行することで、プロジェクトに <code>cache</code> エクステンションを追加することができます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus extension add cache</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:add-extension -Dextensions='cache'</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew addExtension --extensions='cache'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、 <code>pom.xml</code> に以下が追加されます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-cache&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-cache")</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-rest-api"><a class="anchor" href="#creating-the-rest-api"></a>REST APIの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まずは、外部気象サービスへの非常に遅い呼び出しをシミュレートするサービスを作成してみましょう。以下の内容で <code>src/main/java/org/acme/cache/WeatherForecastService.java</code> を作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.cache;
+
+import java.time.LocalDate;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+public class WeatherForecastService {
+
+    public String getDailyForecast(LocalDate date, String city) {
+        try {
+            Thread.sleep(2000L); <i class="conum" data-value="1"></i><b>(1)</b>
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return date.getDayOfWeek() + " will be " + getDailyResult(date.getDayOfMonth() % 4) + " in " + city;
+    }
+
+    private String getDailyResult(int dayOfMonthModuloFour) {
+        switch (dayOfMonthModuloFour) {
+            case 0:
+                return "sunny";
+            case 1:
+                return "cloudy";
+            case 2:
+                return "chilly";
+            case 3:
+                return "rainy";
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>遅さの原因はここにあります。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>また、ユーザーが次の3日間の天気予報を求めたときに送信されるレスポンスを含むクラスも必要です。 <code>src/main/java/org/acme/cache/WeatherForecast.java</code> をこのように作成します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.cache;
+
+import java.util.List;
+
+public class WeatherForecast {
+
+    private List&lt;String&gt; dailyForecasts;
+
+    private long executionTimeInMs;
+
+    public WeatherForecast(List&lt;String&gt; dailyForecasts, long executionTimeInMs) {
+        this.dailyForecasts = dailyForecasts;
+        this.executionTimeInMs = executionTimeInMs;
+    }
+
+    public List&lt;String&gt; getDailyForecasts() {
+        return dailyForecasts;
+    }
+
+    public long getExecutionTimeInMs() {
+        return executionTimeInMs;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>あとは、RESTリソースを作成するだけです。 この内容で <code>src/main/java/org/acme/cache/WeatherForecastResource.java</code> ファイルを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.cache;
+
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.MediaType;
+
+import org.jboss.resteasy.reactive.RestQuery;
+
+@Path("/weather")
+public class WeatherForecastResource {
+
+    @Inject
+    WeatherForecastService service;
+
+    @GET
+    public WeatherForecast getForecast(@RestQuery String city, @RestQuery long daysInFuture) { <i class="conum" data-value="1"></i><b>(1)</b>
+        long executionStart = System.currentTimeMillis();
+        List&lt;String&gt; dailyForecasts = Arrays.asList(
+                service.getDailyForecast(LocalDate.now().plusDays(daysInFuture), city),
+                service.getDailyForecast(LocalDate.now().plusDays(daysInFuture + 1L), city),
+                service.getDailyForecast(LocalDate.now().plusDays(daysInFuture + 2L), city));
+        long executionEnd = System.currentTimeMillis();
+        return new WeatherForecast(dailyForecasts, executionEnd - executionStart);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>daysInFuture</code> クエリパラメーターが省略された場合、3 日間の天気予報は現在の日から始まります。それ以外の場合は、現在の日に <code>daysInFuture</code> の値を加えたものから始まります。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>終わりました!すべて上手く動いているか確認してみましょう。</p>
+</div>
+<div class="paragraph">
+<p>まず、プロジェクトディレクトリからDevモードでアプリケーションを実行します。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、ブラウザから <code><a href="http://localhost:8080/weather?city=Raleigh" class="bare">http://localhost:8080/weather?city=Raleigh</a></code> を呼び出します。6秒ほど長い時間が経過すると、アプリケーションはこのような回答をします:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{"dailyForecasts":["MONDAY will be cloudy in Raleigh","TUESDAY will be chilly in Raleigh","WEDNESDAY will be rainy in Raleigh"],"executionTimeInMs":6001}</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>コードを実行する日によってレスポンスの内容が異なる場合があります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>何度も同じURLを呼び出してみても、必ず6秒で返事が返ってきます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="enabling-the-cache"><a class="anchor" href="#enabling-the-cache"></a>キャッシュの有効化</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusアプリケーションが動いたので、外部の気象サービスのレスポンスをキャッシュすることで、レスポンスタイムを大幅に改善してみましょう。 <code>WeatherForecastService</code> クラスを次のように修正します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.cache;
+
+import java.time.LocalDate;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+import io.quarkus.cache.CacheResult;
+
+@ApplicationScoped
+public class WeatherForecastService {
+
+    @CacheResult(cacheName = "weather-cache") <i class="conum" data-value="1"></i><b>(1)</b>
+    public String getDailyForecast(LocalDate date, String city) {
+        try {
+            Thread.sleep(2000L);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return date.getDayOfWeek() + " will be " + getDailyResult(date.getDayOfMonth() % 4) + " in " + city;
+    }
+
+    private String getDailyResult(int dayOfMonthModuloFour) {
+        switch (dayOfMonthModuloFour) {
+            case 0:
+                return "sunny";
+            case 1:
+                return "cloudy";
+            case 2:
+                return "chilly";
+            case 3:
+                return "rainy";
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>このアノテーション(もちろん関連するインポートも)を追加しただけです。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code><a href="http://localhost:8080/weather?city=Raleigh" class="bare">http://localhost:8080/weather?city=Raleigh</a></code> をもう一度呼び出して確認してみてください。返事が来るまでにまだ長い時間待たされています。これはサーバーが再起動したばかりでキャッシュが空になっているので正常です。</p>
+</div>
+<div class="paragraph">
+<p>ちょっと待って!? <code>WeatherForecastService</code> のアップデート後、サーバーが勝手に再起動した?はい、これは、 <code>live coding</code> と呼ばれる開発者のためのQuarkusの驚くべき機能の一つです。</p>
+</div>
+<div class="paragraph">
+<p>前回の呼び出しでキャッシュが読み込まれたので、同じ URL を呼び出してみてください。今度は、 <code>executionTimeInMs</code> の値が 0 に近い超高速な応答が返ってくるはずです。</p>
+</div>
+<div class="paragraph">
+<p>URL <code><a href="http://localhost:8080/weather?city=Raleigh&amp;daysInFuture=1" class="bare">http://localhost:8080/weather?city=Raleigh&amp;daysInFuture=1</a></code> を使って未来のある日から始めるとどうなるか見てみましょう。要求された日のうち2つはすでにキャッシュに読み込まれていたので、2秒後に回答が得られるはずです。</p>
+</div>
+<div class="paragraph">
+<p>また、同じURLを別の都市で呼び出してみて、再度キャッシュの動作を確認することもできます。最初の呼び出しには6秒ほどかかり、次の呼び出しにはすぐに出ます。</p>
+</div>
+<div class="paragraph">
+<p>おめでとうございます。たった1行のコードでQuarkusアプリケーションにアプリケーションデータのキャッシングを追加できました!</p>
+</div>
+<div class="paragraph">
+<p>Quarkusアプリケーションのデータキャッシング機能について詳しく知りたいですか?以下のセクションでは、この機能について知っておくべきことをすべて紹介します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="annotations-api"><a class="anchor" href="#annotations-api"></a>アノテーションを利用したキャッシング</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusは、CDI管理されたBeanで使用できる、キャッシング機能を有効にするアノテーションのセットを提供します。</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>プライベートメソッドではアノテーションのキャッシュは許可されていません。package-private (明示的な修飾子を持たない) を含む他のアクセス修飾子では問題なく動作します。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="cacheresult"><a class="anchor" href="#cacheresult"></a>@CacheResult</h3>
+<div class="paragraph">
+<p>可能な限り、メソッド本体を実行せずにキャッシュからメソッドの結果を読み込みます。</p>
+</div>
+<div class="paragraph">
+<p><code>@CacheResult</code> でアノテーションされたメソッドが呼び出されると、Quarkusはキャッシュキーを計算し、それを使用して、そのメソッドがすでに呼び出されているかどうかをキャッシュでチェックします。キャッシュキーの計算方法については、このガイドの <a href="#cache-keys-building-logic">キャッシュキー構築ロジック</a> のセクションを参照してください。 キャッシュ内に値が見つかった場合、その値が返され、アノテーションされたメソッドが実際に実行されることはありません。 値が見つからない場合、アノテーションされたメソッドが呼び出され、返された値は計算されたキーを使用してキャッシュに格納されます。</p>
+</div>
+<div class="paragraph">
+<p><code>CacheResult</code> でアノテーションされたメソッドは、キャッシュミスのロックメカニズムによって保護されています。複数の同時呼び出しが同じ欠落キーからキャッシュ値を取得しようとした場合、メソッドは一度だけ呼び出されます。最初の同時呼び出しはメソッドの呼び出しをトリガし、その後の同時呼び出しはキャッシュされた結果を取得するためにメソッドの呼び出しの終了を待ちます。 <code>lockTimeout</code> パラメーターを使用すると、所定の遅延後にロックを中断することができます。ロックのタイムアウトは既定では無効になっており、ロックが中断されることはありません。詳細は、パラメーター Javadoc を参照してください。</p>
+</div>
+<div class="paragraph">
+<p>このアノテーションは、 <code>void</code> を返すメソッドでは使用できません。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Quarkusは、基礎となるCaffeineプロバイダとは異なり、 <code>null</code> の値をキャッシュすることもできます。 <a href="#negative-cache">このトピックの詳細は以下</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cacheinvalidate"><a class="anchor" href="#cacheinvalidate"></a>@CacheInvalidate</h3>
+<div class="paragraph">
+<p>キャッシュからエントリーを削除します。</p>
+</div>
+<div class="paragraph">
+<p><code>@CacheInvalidate</code> のアノテーションが付いたメソッドが呼び出されると、Quarkus はキャッシュキーを計算し、それを使ってキャッシュから既存のエントリを削除しようとします。 キャッシュキーの計算方法については、このガイドの <a href="#cache-keys-building-logic">キャッシュキー構築ロジック</a> のセクションを参照してください。 もしキーがどのキャッシュエントリも特定できない場合は、何も起こりません。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cacheinvalidateall"><a class="anchor" href="#cacheinvalidateall"></a>@CacheInvalidateAll</h3>
+<div class="paragraph">
+<p><code>@CacheInvalidateAll</code> でアノテーションされたメソッドが呼び出されると、Quarkusはキャッシュからすべてのエントリーを削除します。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cachekey"><a class="anchor" href="#cachekey"></a>@CacheKey</h3>
+<div class="paragraph">
+<p>メソッドの引数が <code>@CacheKey</code> でアノテーションされている場合、 <code>@CacheResult</code> または <code>@CacheInvalidate</code> でアノテーションされたメソッドの呼び出し時にキャッシュキーの一部として識別されます。</p>
+</div>
+<div class="paragraph">
+<p>このアノテーションはオプションで、メソッドの引数の一部がキャッシュキーの一部ではない場合にのみ使用されるべきです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cache-keys-building-logic"><a class="anchor" href="#cache-keys-building-logic"></a>キャッシュキー構築ロジック</h3>
+<div class="paragraph">
+<p>キャッシュキーはアノテーションAPIにより、以下のロジックで構築されます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p> <code>io.quarkus.cache.CacheKeyGenerator</code> が <code>@CacheResult</code> または <code>@CacheInvalidate</code> アノテーションで宣言されている場合、キャッシュ・キーの生成に使用されます。いくつかのメソッド引数の存在する可能性のある <code>@CacheKey</code> アノテーションは無視されます。</p>
+</li>
+<li>
+<p>このメソッドに引数がなければ、キャッシュキーはキャッシュ名から作成される <code>io.quarkus.cache.DefaultCacheKey</code> のインスタンスとなります。</p>
+</li>
+<li>
+<p>このメソッドが正確に1つの引数を持つ場合、この引数はキャッシュキーとなります。</p>
+</li>
+<li>
+<p>メソッドに複数の引数があり、 <code>@CacheKey</code> でアノテーションされたものが１つだけある場合、このアノテーションされた引数がキャッシュキーとなります。</p>
+</li>
+<li>
+<p>メソッドが <code>@CacheKey</code> でアノテーションされた複数の引数を持つ場合、キャッシュキーはこれらのアノテーションされた引数から構築される <code>io.quarkus.cache.CompositeCacheKey</code> のインスタンスになります。</p>
+</li>
+<li>
+<p>メソッドが複数の引数を持ち、そのどれにも <code>@CacheKey</code> でアノテーションされていない場合、キャッシュキーはすべてのメソッド引数から構築される <code>io.quarkus.cache.CompositeCacheKey</code> のインスタンスになります。</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>キーの一部である非プリミティブメソッドの各引数は、キャッシュが期待通りに動作するために、 <code>equals()</code> と <code>hashCode()</code> を正しく実装する必要があります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>キャッシュキーが複数のメソッド引数から構築される場合、それらが明示的に <code>@CacheKey</code> で識別されているかどうかに関わらず、構築ロジックはメソッドシグネチャ内のこれらの引数の順序に依存します。一方、引数名は全く使用されず、キャッシュキーには何の影響も与えません。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.cache;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+import io.quarkus.cache.CacheInvalidate;
+import io.quarkus.cache.CacheResult;
+
+@ApplicationScoped
+public class CachedService {
+
+    @CacheResult(cacheName = "foo")
+    public Object load(String keyElement1, Integer keyElement2) {
+        // Call expensive service here.
+    }
+
+    @CacheInvalidate(cacheName = "foo")
+    public void invalidate1(String keyElement2, Integer keyElement1) { <i class="conum" data-value="1"></i><b>(1)</b>
+    }
+
+    @CacheInvalidate(cacheName = "foo")
+    public void invalidate2(Integer keyElement2, String keyElement1) { <i class="conum" data-value="2"></i><b>(2)</b>
+    }
+
+    @CacheInvalidate(cacheName = "foo")
+    public void invalidate3(Object notPartOfTheKey, @CacheKey String keyElement1, @CacheKey Integer keyElement2) { <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+
+    @CacheInvalidate(cacheName = "foo")
+    public void invalidate4(Object notPartOfTheKey, @CacheKey Integer keyElement2, @CacheKey String keyElement1) { <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>このメソッドを呼び出すと、キー要素名が入れ替わっていても <code>load</code> メソッドでキャッシュされた値が無効になります。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>このメソッドを呼び出すと、キー要素の順序が異なるため、 <code>load</code> メソッドでキャッシュされた値が無効になることはありません。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>このメソッドを呼び出すと、キー要素の順序が同じなので、 <code>load</code> メソッドでキャッシュされた値が無効になります。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>このメソッドを呼び出すと、キー要素の順序が異なるため、 <code>load</code> メソッドでキャッシュされた値が無効になることはありません。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="generating-a-cache-key-with-cachekeygenerator"><a class="anchor" href="#generating-a-cache-key-with-cachekeygenerator"></a><code>CacheKeyGenerator</code> でキャッシュキーを生成する</h3>
+<div class="paragraph">
+<p>メソッドの引数以外もキャッシュ・キーに含めたい場合があります。これは、 <code>io.quarkus.cache.CacheKeyGenerator</code> インターフェイスを実装し、その実装を <code>@CacheResult</code> または <code>@CacheInvalidate</code> アノテーションの <code>keyGenerator</code> フィールドで宣言することで実現できます。</p>
+</div>
+<div class="paragraph">
+<p>このクラスは、CDI Bean を表すか、public no-args コンストラクタを宣言する必要があります。
+それが CDI Bean を表している場合、キー・ジェネレータはキャッシュ・キーの計算中に注入されます。
+そうでない場合は、キャッシュ・キーの計算ごとに、その既定のコンストラクタを使用してキー・ジェネレータの新しいインスタンスが作成されます。</p>
+</div>
+<div class="paragraph">
+<p>CDIの場合，そのBean型の集合にそのクラスをもつBeanが正確に一つ存在しなければならず，そうでない場合，ビルドは失敗します。
+Beanのスコープに関連付けられたコンテキストは， <code>CacheKeyGenerator#generate()</code> メソッドが呼び出されるとき，有効でなければなりません。
+スコープが <code>@Dependent</code> の場合， <code>CacheKeyGenerator#generate()</code> メソッドが完了すると，Bean インスタンスは破棄されます。</p>
+</div>
+<div class="paragraph">
+<p>以下のキージェネレータはCDI Beanとして注入されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.cache;
+
+import java.lang.reflect.Method;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+import io.quarkus.cache.CacheKeyGenerator;
+import io.quarkus.cache.CompositeCacheKey;
+
+@ApplicationScoped
+public class ApplicationScopedKeyGen implements CacheKeyGenerator {
+
+    @Inject
+    AnythingYouNeedHere anythingYouNeedHere; <i class="conum" data-value="1"></i><b>(1)</b>
+
+    @Override
+    public Object generate(Method method, Object... methodParams) { <i class="conum" data-value="2"></i><b>(2)</b>
+        return new CompositeCacheKey(anythingYouNeedHere.getData(), methodParams[1]); <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>キージェネレータにCDI Beanをインジェクトすることで、外部データをキャッシュキーに含めることができます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td> <code>Method</code> を使っている間、メソッドのいくつかは高価になることがあるため注意してください。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>インデックスからアクセスする前に、このメソッドが十分な引数を持っていることを確認してください。そうでないと、キャッシュキーの計算中に <code>IndexOutOfBoundsException</code> が投げられるかもしれません。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>以下のキージェネレータは、デフォルトのコンストラクタを使用してインスタンス化されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.cache;
+
+import java.lang.reflect.Method;
+
+import io.quarkus.cache.CacheKeyGenerator;
+import io.quarkus.cache.CompositeCacheKey;
+
+public class NotABeanKeyGen implements CacheKeyGenerator {
+
+    // CDI injections won't work here because it's not a CDI bean.
+
+    @Override
+    public Object generate(Method method, Object... methodParams) {
+        return new CompositeCacheKey(method.getName(), methodParams[0]); <i class="conum" data-value="1"></i><b>(1)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>メソッド名をキャッシュキーに含めることは、 <code>Method</code> の他のメソッドとは異なり、高価なものではありません。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>どちらの種類のキージェネレーターも、同様の方法で使用することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.cache;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+import org.acme.cache.ApplicationScopedKeyGen;
+import org.acme.cache.NotABeanKeyGen;
+
+import io.quarkus.cache.CacheKey;
+import io.quarkus.cache.CacheInvalidate;
+import io.quarkus.cache.CacheResult;
+
+@ApplicationScoped
+public class CachedService {
+
+    @CacheResult(cacheName = "foo", keyGenerator = ApplicationScopedKeyGen.class) <i class="conum" data-value="1"></i><b>(1)</b>
+    public Object load(@CacheKey Object notUsedInKey, String keyElement) { <i class="conum" data-value="2"></i><b>(2)</b>
+        // Call expensive service here.
+    }
+
+    @CacheInvalidate(cacheName = "foo", keyGenerator = NotABeanKeyGen.class) <i class="conum" data-value="3"></i><b>(3)</b>
+    public void invalidate(Object keyElement) {
+    }
+
+    @CacheInvalidate(cacheName = "foo", keyGenerator = NotABeanKeyGen.class)
+    @CacheInvalidate(cacheName = "bar")
+    public void invalidate(Integer param0, @CacheKey BigDecimal param1) { <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>このキージェネレーターはCDI Beanです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>キー・ジェネレータが <code>@CacheResult</code> アノテーションで宣言されているため、 <code>@CacheKey</code> アノテーションは無視されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>このキージェネレーターはCDI Beanではありません。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>@CacheKey</code> アノテーションは <code>foo</code> キャッシュデータが無効化されると無視されますが、<code>bar</code> キャッシュデータが無効化されると <code>param1</code> がキャッシュキーになります。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="programmatic-api"><a class="anchor" href="#programmatic-api"></a>プログラムAPIを使ったキャッシング</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusは、アノテーションAPIを使用して宣言された任意のキャッシュから値を保存、取得、削除するために使用できるプログラムAPIも提供しています。プログラムAPIからのすべての操作はノンブロッキングで、フードの下で <a href="https://smallrye.io/smallrye-mutiny/">Mutiny</a> に依存しています。</p>
+</div>
+<div class="paragraph">
+<p>キャッシュされたデータにプログラムでアクセスする前に、 <code>io.quarkus.cache.Cache</code> のインスタンスを取得する必要があります。以下のセクションでは、その方法をご紹介します。</p>
+</div>
+<div class="sect2">
+<h3 id="injecting-a-cache-with-the-cachename-annotation"><a class="anchor" href="#injecting-a-cache-with-the-cachename-annotation"></a><code>@CacheName</code> アノテーションとともに <code>Cache</code> をインジェクトする</h3>
+<div class="paragraph">
+<p><code>io.quarkus.cache.CacheName</code> は、フィールド、コンストラクタパラメータ、またはメソッドのパラメータに使用して、 <code>Cache</code> をインジェクトすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.cache;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+import io.quarkus.cache.Cache;
+import io.quarkus.cache.CacheName;
+import io.smallrye.mutiny.Uni;
+
+@ApplicationScoped
+public class CachedExpensiveService {
+
+    @Inject <i class="conum" data-value="1"></i><b>(1)</b>
+    @CacheName("my-cache")
+    Cache cache;
+
+    public Uni&lt;String&gt; getNonBlockingExpensiveValue(Object key) { <i class="conum" data-value="2"></i><b>(2)</b>
+        return cache.get(key, k -&gt; { <i class="conum" data-value="3"></i><b>(3)</b>
+            /*
+             * Put an expensive call here.
+             * It will be executed only if the key is not already associated with a value in the cache.
+             */
+        });
+    }
+
+    public String getBlockingExpensiveValue(Object key) {
+        return cache.get(key, k -&gt; {
+            // Put an expensive call here.
+        }).await().indefinitely(); <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>これはオプションです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>このメソッドは、ノンブロッキングである <code>Uni&lt;String&gt;</code> タイプを返します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>k</code> 引数には、キャッシュキーの値が含まれています。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>呼び出しをノンブロッキングにする必要がない場合は、このようにしてブロッキングでキャッシュ値を取得することができます。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="retrieving-a-cache-from-the-cachemanager"><a class="anchor" href="#retrieving-a-cache-from-the-cachemanager"></a> <code>CacheManager</code> から <code>Cache</code> を取得しています。</h3>
+<div class="paragraph">
+<p><code>Cache</code> のインスタンスを取得するもう一つの方法は、まず <code>io.quarkus.cache.CacheManager</code> をインジェクトし、その名前から目的の <code>Cache</code> を取得するやり方です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.cache;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+import io.quarkus.cache.Cache;
+import io.quarkus.cache.CacheManager;
+
+import java.util.Optional;
+
+@Singleton
+public class CacheClearer {
+
+    private final CacheManager cacheManager;
+
+    public CacheClearer(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
+    }
+
+    public void clearCache(String cacheName) {
+        Optional&lt;Cache&gt; cache = cacheManager.getCache(cacheName);
+        if (cache.isPresent()) {
+            cache.get().invalidateAll().await().indefinitely();
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="building-a-programmatic-cache-key"><a class="anchor" href="#building-a-programmatic-cache-key"></a>プログラムキャッシュキーの構築</h3>
+<div class="paragraph">
+<p>プログラムキャッシュキーを構築する前に、アノテーションメソッドが呼び出されたときにアノテーションAPIによってキャッシュキーがどのように構築されるかを知っておく必要があります。これについては、このガイドの &lt;&lt;cache-keys-building-logic&gt; セクションで説明されています。</p>
+</div>
+<div class="paragraph">
+<p>アノテーションAPIを使って保存されたキャッシュ値を、プログラムAPIを使って取得または削除したい場合、両方のAPIで同じキーが使われていることを確認する必要があります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="retrieving-all-keys-from-a-caffeinecache"><a class="anchor" href="#retrieving-all-keys-from-a-caffeinecache"></a><code>CaffeineCache</code> からすべてのキーを取得します。</h3>
+<div class="paragraph">
+<p>特定の <code>CaffeineCache</code> からのキャッシュキーは、以下に示すように、変更不可能な <code>Set</code> として取得できます。セットに対するイテレーションが進行している間にキャッシュエントリが変更された場合、セットは変更されないままとなります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.cache;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+import io.quarkus.cache.Cache;
+import io.quarkus.cache.CacheName;
+import io.quarkus.cache.CaffeineCache;
+
+import java.util.Set;
+
+@ApplicationScoped
+public class CacheKeysService {
+
+    @CacheName("my-cache")
+    Cache cache;
+
+    public Set&lt;Object&gt; getAllCacheKeys() {
+        return cache.as(CaffeineCache.class).keySet();
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="populating-a-caffeinecache"><a class="anchor" href="#populating-a-caffeinecache"></a><code>CaffeineCache</code> にデータを追加する</h3>
+<div class="paragraph">
+<p><code>CaffeineCache</code> にデータを追加するには <code>CaffeineCache#put(Object, CompletableFuture)</code> メソッドを使います。 このメソッドは <code>CompletableFuture</code> をキャッシュ内の与えられたキーと関連付けます。キャッシュに以前からそのキーに関連する値が入っていた場合、古い値はこの <code>CompletableFuture</code> に置き換えられます。非同期計算が失敗した場合、そのエントリは自動的に削除されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.cache;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+import io.quarkus.cache.Cache;
+import io.quarkus.cache.CacheName;
+import io.quarkus.cache.CaffeineCache;
+
+import java.util.concurrent.CompletableFuture;
+
+@ApplicationScoped
+public class CacheService {
+
+    @CacheName("my-cache")
+    Cache cache;
+
+    @PostConstruct
+    public void initialize() {
+        cache.as(CaffeineCache.class).put("foo", CompletableFuture.completedFuture("bar"));
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="retrieving-a-value-if-a-key-is-present-from-a-caffeinecache"><a class="anchor" href="#retrieving-a-value-if-a-key-is-present-from-a-caffeinecache"></a><code>CaffeineCache</code> からすべてのキーを取得する</h3>
+<div class="paragraph">
+<p>特定の <code>CaffeineCache</code> からのキャッシュ値は、以下に示すように存在する場合に取得できます。 与えられたキーがキャッシュに含まれている場合、このメソッドは指定されたキーがマッピングされた <code>CompletableFuture</code> を返します。 その <code>CompletableFuture</code> は計算中であるか、あるいは既に終了している可能性があります。 そうでなければ、このメソッドは <code>null</code> を返します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.cache;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+import io.quarkus.cache.Cache;
+import io.quarkus.cache.CacheName;
+import io.quarkus.cache.CaffeineCache;
+
+import java.util.concurrent.CompletableFuture;
+
+@ApplicationScoped
+public class CacheKeysService {
+
+    @CacheName("my-cache")
+    Cache cache;
+
+    public CompletableFuture&lt;Object&gt; getIfPresent(Object key) {
+        return cache.as(CaffeineCache.class).getIfPresent(key);
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="changing-the-expiration-policy-or-the-maximum-size-of-a-caffeinecache-in-real-time"><a class="anchor" href="#changing-the-expiration-policy-or-the-maximum-size-of-a-caffeinecache-in-real-time"></a>リアルタイムで <code>CaffeineCache</code> の有効期限ポリシーや最大サイズを変更</h3>
+<div class="paragraph">
+<p><code>CaffeineCache</code> の有効期限ポリシーは、そのポリシーが Quarkus の設定で最初に指定されている場合、Quarkus アプリの実行中に変更することができます。同様に、 <code>CaffeineCache</code> の最大サイズも、設定に定義された初期最大サイズでキャッシュが構築された場合、リアルタイムで変更できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.cache;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+import io.quarkus.cache.Cache;
+import io.quarkus.cache.CacheManager;
+import io.quarkus.cache.CaffeineCache;
+
+import java.time.Duration;
+import java.util.Optional;import javax.inject.Singleton;
+
+@Singleton
+public class CacheConfigManager {
+
+    private final CacheManager cacheManager;
+
+    public CacheConfigManager(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
+    }
+
+    public void setExpireAfterAccess(String cacheName, Duration duration) {
+        Optional&lt;Cache&gt; cache = cacheManager.getCache(cacheName);
+        if (cache.isPresent()) {
+            cache.get().as(CaffeineCache.class).setExpireAfterAccess(duration); <i class="conum" data-value="1"></i><b>(1)</b>
+        }
+    }
+
+    public void setExpireAfterWrite(String cacheName, Duration duration) {
+        Optional&lt;Cache&gt; cache = cacheManager.getCache(cacheName);
+        if (cache.isPresent()) {
+            cache.get().as(CaffeineCache.class).setExpireAfterWrite(duration); <i class="conum" data-value="2"></i><b>(2)</b>
+        }
+    }
+
+    public void setMaximumSize(String cacheName, long maximumSize) {
+        Optional&lt;Cache&gt; cache = cacheManager.getCache(cacheName);
+        if (cache.isPresent()) {
+            cache.get().as(CaffeineCache.class).setMaximumSize(maximumSize); <i class="conum" data-value="3"></i><b>(3)</b>
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>この行は、キャッシュが <code>expire-after-access</code> という設定値で構築された場合にのみ機能します。そうでない場合は、 <code>IllegalStateException</code> がスローされます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>この行は、キャッシュが <code>expire-after-write</code> という設定値で構築された場合にのみ機能します。そうでない場合は、 <code>IllegalStateException</code> がスローされます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>この行は、キャッシュが <code>maximum-size</code> という設定値で構築された場合にのみ機能します。そうでない場合は、 <code>IllegalStateException</code> がスローされます。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>CaffeineCache</code> の <code>setExpireAfterAccess</code> 、 <code>setExpireAfterWrite</code> 、 <code>setMaximumSize</code> メソッドは、 キャッシュ操作のアトミックスコープ内から決して呼び出してはいけません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-the-underlying-caching-provider"><a class="anchor" href="#configuring-the-underlying-caching-provider"></a>基礎となるキャッシングプロバイダーの設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このエクステンションは、基礎となるキャッシュプロバイダとして <a href="https://github.com/ben-manes/caffeine">Caffeine</a> を使用しています。Caffeine は高性能で最適に近いキャッシングライブラリです。</p>
+</div>
+<div class="sect2">
+<h3 id="caffeine-configuration-properties"><a class="anchor" href="#caffeine-configuration-properties"></a>Caffeine設定プロパティ</h3>
+<div class="paragraph">
+<p>Quarkusアプリケーションのデータキャッシュエクステンションをバックアップする各Caffeineキャッシュは、 <code>application.properties</code> ファイルの以下のプロパティーを使用して設定することができます。デフォルトでは、設定されていない場合、キャッシュはどのようなタイプのエヴィクションも実行しません。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>以下のすべてのプロパティーで <code>cache-name</code> を設定したいキャッシュの実名に置き換える必要があります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="ビルド時に固定"></i></span>ビルド時に固定される構成プロパティ - 他のすべての構成プロパティは実行時にオーバーライド可能 <input type="search" id="config-search-0" placeholder="FILTER CONFIGURATION" disabled></p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference searchable configuration-reference-all-rows">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><span class="header-title">Configuration property</span></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">型</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-cache_quarkus-cache-type"></a> <span class="property-path"><a href="#quarkus-cache_quarkus-cache-type"><code>quarkus.cache.type</code></a></span>
+<button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-text='quarkus.cache.type' title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+<div id="conf-collapsible-desc-1" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Cache type.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-51647">QUARKUS_CACHE_TYPE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-51647" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>caffeine</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-cache_quarkus-cache-enabled"></a> <span class="property-path"><a href="#quarkus-cache_quarkus-cache-enabled"><code>quarkus.cache.enabled</code></a></span>
+<button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-text='quarkus.cache.enabled' title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+<div id="conf-collapsible-desc-2" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Whether or not the cache extension is enabled.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-51648">QUARKUS_CACHE_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-51648" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-cache_section_quarkus-cache-caffeine"></a> <span class="section-name section-level0"><a href="#quarkus-cache_section_quarkus-cache-caffeine">Default configuration applied to all Caffeine caches (lowest precedence)</a></span></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">型</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-cache_quarkus-cache-caffeine-initial-capacity"></a> <span class="property-path"><a href="#quarkus-cache_quarkus-cache-caffeine-initial-capacity"><code>quarkus.cache.caffeine.initial-capacity</code></a></span>
+<button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-text='quarkus.cache.caffeine.initial-capacity' title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+<div id="conf-collapsible-desc-3" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Minimum total size for the internal data structures. Providing a large enough estimate at construction time avoids the need for expensive resizing operations later, but setting this value unnecessarily high wastes memory.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-51649">QUARKUS_CACHE_CAFFEINE_INITIAL_CAPACITY</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-51649" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-cache_quarkus-cache-caffeine-maximum-size"></a> <span class="property-path"><a href="#quarkus-cache_quarkus-cache-caffeine-maximum-size"><code>quarkus.cache.caffeine.maximum-size</code></a></span>
+<button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-text='quarkus.cache.caffeine.maximum-size' title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+<div id="conf-collapsible-desc-4" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Maximum number of entries the cache may contain. Note that the cache <strong>may evict an entry before this limit is exceeded or temporarily exceed the threshold while evicting</strong>. As the cache size grows close to the maximum, the cache evicts entries that are less likely to be used again. For example, the cache may evict an entry because it hasn&#8217;t been used recently or very often.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-51650">QUARKUS_CACHE_CAFFEINE_MAXIMUM_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-51650" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">長</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-cache_quarkus-cache-caffeine-expire-after-write"></a> <span class="property-path"><a href="#quarkus-cache_quarkus-cache-caffeine-expire-after-write"><code>quarkus.cache.caffeine.expire-after-write</code></a></span>
+<button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-text='quarkus.cache.caffeine.expire-after-write' title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+<div id="conf-collapsible-desc-5" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Specifies that each entry should be automatically removed from the cache once a fixed duration has elapsed after the entry&#8217;s creation, or the most recent replacement of its value.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-51651">QUARKUS_CACHE_CAFFEINE_EXPIRE_AFTER_WRITE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-51651" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-cache_quarkus-cache"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-cache_quarkus-cache-caffeine-expire-after-access"></a> <span class="property-path"><a href="#quarkus-cache_quarkus-cache-caffeine-expire-after-access"><code>quarkus.cache.caffeine.expire-after-access</code></a></span>
+<button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-text='quarkus.cache.caffeine.expire-after-access' title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+<div id="conf-collapsible-desc-6" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Specifies that each entry should be automatically removed from the cache once a fixed duration has elapsed after the entry&#8217;s creation, the most recent replacement of its value, or its last read.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-51652">QUARKUS_CACHE_CAFFEINE_EXPIRE_AFTER_ACCESS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-51652" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-cache_quarkus-cache"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-cache_quarkus-cache-caffeine-metrics-enabled"></a> <span class="property-path"><a href="#quarkus-cache_quarkus-cache-caffeine-metrics-enabled"><code>quarkus.cache.caffeine.metrics-enabled</code></a></span>
+<button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-text='quarkus.cache.caffeine.metrics-enabled' title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+<div id="conf-collapsible-desc-7" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Whether or not metrics are recorded if the application depends on the Micrometer extension. Setting this value to <code>true</code> will enable the accumulation of cache stats inside Caffeine.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-51653">QUARKUS_CACHE_CAFFEINE_METRICS_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-51653" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-cache_quarkus-cache-caffeine-cache-name-initial-capacity"></a> <span class="property-path"><a href="#quarkus-cache_quarkus-cache-caffeine-cache-name-initial-capacity"><code>quarkus.cache.caffeine."cache-name".initial-capacity</code></a></span>
+<button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-text='quarkus.cache.caffeine."cache-name".initial-capacity' title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+<div id="conf-collapsible-desc-8" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Minimum total size for the internal data structures. Providing a large enough estimate at construction time avoids the need for expensive resizing operations later, but setting this value unnecessarily high wastes memory.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-51654">QUARKUS_CACHE_CAFFEINE__CACHE_NAME__INITIAL_CAPACITY</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-51654" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-cache_quarkus-cache-caffeine-cache-name-maximum-size"></a> <span class="property-path"><a href="#quarkus-cache_quarkus-cache-caffeine-cache-name-maximum-size"><code>quarkus.cache.caffeine."cache-name".maximum-size</code></a></span>
+<button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-text='quarkus.cache.caffeine."cache-name".maximum-size' title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+<div id="conf-collapsible-desc-9" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Maximum number of entries the cache may contain. Note that the cache <strong>may evict an entry before this limit is exceeded or temporarily exceed the threshold while evicting</strong>. As the cache size grows close to the maximum, the cache evicts entries that are less likely to be used again. For example, the cache may evict an entry because it hasn&#8217;t been used recently or very often.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-51655">QUARKUS_CACHE_CAFFEINE__CACHE_NAME__MAXIMUM_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-51655" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">長</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-cache_quarkus-cache-caffeine-cache-name-expire-after-write"></a> <span class="property-path"><a href="#quarkus-cache_quarkus-cache-caffeine-cache-name-expire-after-write"><code>quarkus.cache.caffeine."cache-name".expire-after-write</code></a></span>
+<button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-text='quarkus.cache.caffeine."cache-name".expire-after-write' title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+<div id="conf-collapsible-desc-10" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Specifies that each entry should be automatically removed from the cache once a fixed duration has elapsed after the entry&#8217;s creation, or the most recent replacement of its value.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-51656">QUARKUS_CACHE_CAFFEINE__CACHE_NAME__EXPIRE_AFTER_WRITE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-51656" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-cache_quarkus-cache"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-cache_quarkus-cache-caffeine-cache-name-expire-after-access"></a> <span class="property-path"><a href="#quarkus-cache_quarkus-cache-caffeine-cache-name-expire-after-access"><code>quarkus.cache.caffeine."cache-name".expire-after-access</code></a></span>
+<button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-text='quarkus.cache.caffeine."cache-name".expire-after-access' title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+<div id="conf-collapsible-desc-11" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Specifies that each entry should be automatically removed from the cache once a fixed duration has elapsed after the entry&#8217;s creation, the most recent replacement of its value, or its last read.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-51657">QUARKUS_CACHE_CAFFEINE__CACHE_NAME__EXPIRE_AFTER_ACCESS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-51657" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-cache_quarkus-cache"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-cache_quarkus-cache-caffeine-cache-name-metrics-enabled"></a> <span class="property-path"><a href="#quarkus-cache_quarkus-cache-caffeine-cache-name-metrics-enabled"><code>quarkus.cache.caffeine."cache-name".metrics-enabled</code></a></span>
+<button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-text='quarkus.cache.caffeine."cache-name".metrics-enabled' title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+<div id="conf-collapsible-desc-12" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Whether or not metrics are recorded if the application depends on the Micrometer extension. Setting this value to <code>true</code> will enable the accumulation of cache stats inside Caffeine.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-51658">QUARKUS_CACHE_CAFFEINE__CACHE_NAME__METRICS_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-51658" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+</tbody>
+</table>
+<div id="duration-note-anchor-quarkus-cache_quarkus-cache" class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">期間フォーマットについて</div>
+<div class="paragraph">
+<p>To write duration values, use the standard <code>java.time.Duration</code> format.
+See the <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html#parse(java.lang.CharSequence)">Duration#parse() Java API documentation</a> for more information.</p>
+</div>
+<div class="paragraph">
+<p>数字で始まる簡略化した書式を使うこともできます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値のみの場合は、秒単位の時間を表します。</p>
+</li>
+<li>
+<p>数値の後に <code>ms</code> が続く場合は、ミリ秒単位の時間を表します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>その他の場合は、簡略化されたフォーマットが解析のために <code>java.time.Duration</code> フォーマットに変換されます：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値の後に <code>h</code> 、 <code>m</code> 、 <code>s</code> が続く場合は、その前に <code>PT</code> が付けられます。</p>
+</li>
+<li>
+<p>数値の後に <code>d</code> が続く場合は、その前に <code>P</code> が付けられます。</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>キャッシュの設定は以下のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.cache.caffeine."foo".initial-capacity=10 <i class="conum" data-value="1"></i><b>(1)</b>
+quarkus.cache.caffeine."foo".maximum-size=20
+quarkus.cache.caffeine."foo".expire-after-write=60S
+quarkus.cache.caffeine."bar".maximum-size=1000 <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>foo</code> キャッシュの設定を行っています。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>bar</code> キャッシュの設定を行っています。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="enabling-micrometer-metrics"><a class="anchor" href="#enabling-micrometer-metrics"></a>マイクロメーターメトリクスの有効化</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="#annotations-api">アノテーションキャッシング API</a> を使って宣言された各キャッシュは、マイクロメーターのメトリクスを使ってモニターすることができます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>キャッシュ・メトリクスの収集は、アプリケーションが <code>quarkus-micrometer-registry-*</code> エクステンションに依存している場合にのみ機能します。QuarkusでMicrometerを使用する方法については、 <a href="telemetry-micrometer">Micrometerメトリクスガイド</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>デフォルトでは、キャッシュメトリクスの収集は無効になっています。 <code>application.properties</code> ファイルから有効にすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.cache.caffeine."foo".metrics-enabled=true</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>全ての計測手法のように、メトリクスの収集にはわずかなオーバーヘッドが伴い、アプリケーションのパフォーマンスに影響を与える可能性があります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>収集されたメトリクスには、以下のようなキャッシュの統計情報が含まれています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>キャッシュ内のエントリーのおおよその数</p>
+</li>
+<li>
+<p>キャッシュに追加されたエントリーの数</p>
+</li>
+<li>
+<p>ヒットとミスに関する情報を含む、キャッシュルックアップの実行回数</p>
+</li>
+<li>
+<p>エヴィクションの回数とエヴィクションエントリの重み</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>以下は、 <code>quarkus-micrometer-registry-prometheus</code> エクステンションに依存するアプリケーションで利用可能なキャッシュメトリクスの例です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs"># HELP cache_size The number of entries in this cache. This may be an approximation, depending on the type of cache.
+# TYPE cache_size gauge
+cache_size{cache="foo",} 8.0
+# HELP cache_puts_total The number of entries added to the cache
+# TYPE cache_puts_total counter
+cache_puts_total{cache="foo",} 12.0
+# HELP cache_gets_total The number of times cache lookup methods have returned a cached value.
+# TYPE cache_gets_total counter
+cache_gets_total{cache="foo",result="hit",} 53.0
+cache_gets_total{cache="foo",result="miss",} 12.0
+# HELP cache_evictions_total cache evictions
+# TYPE cache_evictions_total counter
+cache_evictions_total{cache="foo",} 4.0
+# HELP cache_eviction_weight_total The sum of weights of evicted entries. This total does not include manual invalidations.
+# TYPE cache_eviction_weight_total counter
+cache_eviction_weight_total{cache="foo",} 540.0</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="annotated-beans-examples"><a class="anchor" href="#annotated-beans-examples"></a>アノテーション付きBean例</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="implicit-simple-cache-key"><a class="anchor" href="#implicit-simple-cache-key"></a>暗黙の単純キャッシュキー</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.cache;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+import io.quarkus.cache.CacheInvalidate;
+import io.quarkus.cache.CacheInvalidateAll;
+import io.quarkus.cache.CacheResult;
+
+@ApplicationScoped
+public class CachedService {
+
+    @CacheResult(cacheName = "foo")
+    public Object load(Object key) { <i class="conum" data-value="1"></i><b>(1)</b>
+        // Call expensive service here.
+    }
+
+    @CacheInvalidate(cacheName = "foo")
+    public void invalidate(Object key) { <i class="conum" data-value="1"></i><b>(1)</b>
+    }
+
+    @CacheInvalidateAll(cacheName = "foo")
+    public void invalidateAll() {
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@CacheKey</code> アノテーションがないので、キャッシュキーは暗黙の了解です。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="explicit-composite-cache-key"><a class="anchor" href="#explicit-composite-cache-key"></a>明示的な合成キャッシュキー</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.cache;
+
+import jakarta.enterprise.context.Dependent;
+
+import io.quarkus.cache.CacheInvalidate;
+import io.quarkus.cache.CacheInvalidateAll;
+import io.quarkus.cache.CacheKey;
+import io.quarkus.cache.CacheResult;
+
+@Dependent
+public class CachedService {
+
+    @CacheResult(cacheName = "foo")
+    public String load(@CacheKey Object keyElement1, @CacheKey Object keyElement2, Object notPartOfTheKey) { <i class="conum" data-value="1"></i><b>(1)</b>
+        // Call expensive service here.
+    }
+
+    @CacheInvalidate(cacheName = "foo")
+    public void invalidate(@CacheKey Object keyElement1, @CacheKey Object keyElement2, Object notPartOfTheKey) { <i class="conum" data-value="1"></i><b>(1)</b>
+    }
+
+    @CacheInvalidateAll(cacheName = "foo")
+    public void invalidateAll() {
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>キャッシュキーは明示的に 2 つの要素で構成されています。メソッドシグネチャには、キーの一部ではない第三引数も含まれています。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="default-cache-key"><a class="anchor" href="#default-cache-key"></a>デフォルトのキャッシュキー</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.cache;
+
+import jakarta.enterprise.context.Dependent;
+
+import io.quarkus.cache.CacheInvalidate;
+import io.quarkus.cache.CacheInvalidateAll;
+import io.quarkus.cache.CacheResult;
+
+@Dependent
+public class CachedService {
+
+    @CacheResult(cacheName = "foo")
+    public String load() { <i class="conum" data-value="1"></i><b>(1)</b>
+        // Call expensive service here.
+    }
+
+    @CacheInvalidate(cacheName = "foo")
+    public void invalidate() { <i class="conum" data-value="1"></i><b>(1)</b>
+    }
+
+    @CacheInvalidateAll(cacheName = "foo")
+    public void invalidateAll() {
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>メソッドには引数がないため、キャッシュ名から派生した一意のデフォルトキャッシュキーが使用されます。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="multiple-annotations-on-a-single-method"><a class="anchor" href="#multiple-annotations-on-a-single-method"></a>単一のメソッドに複数のアノテーションを付与</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.cache;
+
+import jakarta.inject.Singleton;
+
+import io.quarkus.cache.CacheInvalidate;
+import io.quarkus.cache.CacheInvalidateAll;
+import io.quarkus.cache.CacheResult;
+
+@Singleton
+public class CachedService {
+
+    @CacheInvalidate(cacheName = "foo")
+    @CacheResult(cacheName = "foo")
+    public String forceCacheEntryRefresh(Object key) { <i class="conum" data-value="1"></i><b>(1)</b>
+        // Call expensive service here.
+    }
+
+    @CacheInvalidateAll(cacheName = "foo")
+    @CacheInvalidateAll(cacheName = "bar")
+    public void multipleInvalidateAll(Object key) { <i class="conum" data-value="2"></i><b>(2)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>このメソッドを使用して、指定されたキーに対応するキャッシュエントリーを強制的に更新することができます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>このメソッドは、一度の呼び出しで <code>foo</code> および <code>bar</code> キャッシュからのすべてのエントリーを無効にします。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="clear-all-application-caches"><a class="anchor" href="#clear-all-application-caches"></a>すべてのアプリケーションキャッシュの消去</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.cache;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+import io.quarkus.cache.CacheManager;
+
+@Singleton
+public class CacheClearer {
+
+    private final CacheManager cacheManager;
+
+    public CacheClearer(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
+    }
+
+    public void clearAllCaches() {
+        for (String cacheName : cacheManager.getCacheNames()) {
+            cacheManager.getCache(cacheName).get().invalidateAll().await().indefinitely();
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="negative-cache"><a class="anchor" href="#negative-cache"></a>ネガティブキャッシングとnull</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>(高価な)リモートコールの結果をキャッシュしたい場合があります。リモートコールが失敗した場合、結果や例外をキャッシュするのではなく、 次の呼び出しでリモートコールを再試行したい場合があります。</p>
+</div>
+<div class="paragraph">
+<p>シンプルなアプローチとしては、例外をキャッチして <code>null</code> を返すことで、呼び出し元がそれに応じて行動できるようにすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="title">サンプルコード</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    public void caller(int val) {
+
+        Integer result = callRemote(val); <i class="conum" data-value="1"></i><b>(1)</b>
+        if (result != null) {
+            System.out.println("Result is " + result);
+        else {
+            System.out.println("Got an exception");
+        }
+    }
+
+    @CacheResult(cacheName = "foo")
+    public Integer callRemote(int val)  {
+
+        try {
+            Integer val = remoteWebServer.getResult(val); <i class="conum" data-value="2"></i><b>(2)</b>
+            return val;
+        } catch (Exception e) {
+            return null; <i class="conum" data-value="3"></i><b>(3)</b>
+        }
+    }</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>リモートを呼び出すためにメソッドを実行</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>リモートコールを行い、その結果を返却</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>例外が発生時にリターンする</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>このアプローチには不幸な副作用があります。先に述べたように、Quarkusは <code>null</code> の値をキャッシュすることもできます。つまり、同じパラメーター値を持つ <code>callRemote()</code> への次の呼び出しは、キャッシュの外で応答され、 <code>null</code> が返され、リモートコールは行われないということです。これはシナリオによっては望ましいことかもしれませんが、通常は結果が返ってくるまでリモートコールを再試行したいものです。</p>
+</div>
+<div class="sect2">
+<h3 id="let-exceptions-bubble-up"><a class="anchor" href="#let-exceptions-bubble-up"></a>例外をバブルアップさせる</h3>
+<div class="paragraph">
+<p>リモートコールの結果をキャッシュ(マーカー)しないようにするには、コールされたメソッドから例外をバブルアップし、呼び出し側でキャッチする必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="title">例外をバブルアップ</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">   public void caller(int val) {
+       try {
+           Integer result = callRemote(val);  <i class="conum" data-value="1"></i><b>(1)</b>
+           System.out.println("Result is " + result);
+       } catch (Exception e) {
+           System.out.println("Got an exception");
+   }
+
+   @CacheResult(cacheName = "foo")
+   public Integer callRemote(int val) throws Exception { <i class="conum" data-value="2"></i><b>(2)</b>
+
+      Integer val = remoteWebServer.getResult(val);  <i class="conum" data-value="3"></i><b>(3)</b>
+      return val;
+
+   }</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>リモートを呼び出すためにメソッドを実行</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>例外がバブルアップする場合がある</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>これは、あらゆる種類のリモート例外を投げることができます</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>リモートへの呼び出しが例外をスローした場合、キャッシュは結果を保存しないので、 同じパラメーター値を持つ <code>callRemote()</code> への後続の呼び出しがキャッシュから応答されることはありません。その代わりに、リモートへの呼び出しを再度試みることになります。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="going-native"><a class="anchor" href="#going-native"></a>ネイティブ化</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Cache エクステンションは、ネイティブ実行可能ファイルの構築をサポートしています。</p>
+</div>
+<div class="paragraph">
+<p>実行時の速度を最適化するために、Caffeineはキャッシュ設定に応じて選択される多くのキャッシュ実装クラスを組み込んでいます。すべてのクラスを登録するのは非常にコストがかかるため、リフレクションのためにすべてのクラスを登録していません（登録されていないクラスはネイティブ実行可能ファイルに含まれません）。</p>
+</div>
+<div class="paragraph">
+<p>ここでは、最も一般的な実装を登録していますが、キャッシュの設定によっては、以下のようなエラーが発生する場合があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">2021-12-08 02:32:02,108 ERROR [io.qua.run.Application] (main) Failed to start application (with profile prod): java.lang.ClassNotFoundException: com.github.benmanes.caffeine.cache.PSAMS <i class="conum" data-value="1"></i><b>(1)</b>
+        at java.lang.Class.forName(DynamicHub.java:1433)
+        at java.lang.Class.forName(DynamicHub.java:1408)
+        at com.github.benmanes.caffeine.cache.NodeFactory.newFactory(NodeFactory.java:111)
+        at com.github.benmanes.caffeine.cache.BoundedLocalCache.&lt;init&gt;(BoundedLocalCache.java:240)
+        at com.github.benmanes.caffeine.cache.SS.&lt;init&gt;(SS.java:31)
+        at com.github.benmanes.caffeine.cache.SSMS.&lt;init&gt;(SSMS.java:64)
+        at com.github.benmanes.caffeine.cache.SSMSA.&lt;init&gt;(SSMSA.java:43)</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>PSAMS</code> は、Caffeineの数あるキャッシュ実装クラスのひとつなので、この部分は変わるかもしれません。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>このエラーが発生した場合は、アプリケーションクラスに以下のアノテーションを追加することで、簡単に修正することができます（あるいは、このアノテーションをホストするためだけに、 <code>Reflections</code> のような新しいクラスを作成することもできます）。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@RegisterForReflection(classNames = { "com.github.benmanes.caffeine.cache.PSAMS" }) <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>配列なので、複数のキャッシュ実装が必要な構成の場合、一度に登録することができます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>This annotation will register the cache implementation classes for reflection and this will include the classes into the native executable.
+More details about the <code>@RegisterForReflection</code> annotation can be found on  the <a href="writing-native-applications-tips#registerForReflection">native application tips</a> page.</p>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#scenario">シナリオ</a></li>
+<li><a href="#solution">ソリューション</a></li>
+<li><a href="#creating-the-maven-project">Mavenプロジェクトの作成</a></li>
+<li><a href="#creating-the-rest-api">REST APIの作成</a></li>
+<li><a href="#enabling-the-cache">キャッシュの有効化</a></li>
+<li><a href="#annotations-api">アノテーションを利用したキャッシング</a>
+<ul class="sectlevel2">
+<li><a href="#cacheresult">@CacheResult</a></li>
+<li><a href="#cacheinvalidate">@CacheInvalidate</a></li>
+<li><a href="#cacheinvalidateall">@CacheInvalidateAll</a></li>
+<li><a href="#cachekey">@CacheKey</a></li>
+<li><a href="#cache-keys-building-logic">キャッシュキー構築ロジック</a></li>
+<li><a href="#generating-a-cache-key-with-cachekeygenerator"><code>CacheKeyGenerator</code> でキャッシュキーを生成する</a></li>
+</ul>
+</li>
+<li><a href="#programmatic-api">プログラムAPIを使ったキャッシング</a>
+<ul class="sectlevel2">
+<li><a href="#injecting-a-cache-with-the-cachename-annotation"><code>@CacheName</code> アノテーションとともに <code>Cache</code> をインジェクトする</a></li>
+<li><a href="#retrieving-a-cache-from-the-cachemanager"> <code>CacheManager</code> から <code>Cache</code> を取得しています。</a></li>
+<li><a href="#building-a-programmatic-cache-key">プログラムキャッシュキーの構築</a></li>
+<li><a href="#retrieving-all-keys-from-a-caffeinecache"><code>CaffeineCache</code> からすべてのキーを取得します。</a></li>
+<li><a href="#populating-a-caffeinecache"><code>CaffeineCache</code> にデータを追加する</a></li>
+<li><a href="#retrieving-a-value-if-a-key-is-present-from-a-caffeinecache"><code>CaffeineCache</code> からすべてのキーを取得する</a></li>
+<li><a href="#changing-the-expiration-policy-or-the-maximum-size-of-a-caffeinecache-in-real-time">リアルタイムで <code>CaffeineCache</code> の有効期限ポリシーや最大サイズを変更</a></li>
+</ul>
+</li>
+<li><a href="#configuring-the-underlying-caching-provider">基礎となるキャッシングプロバイダーの設定</a>
+<ul class="sectlevel2">
+<li><a href="#caffeine-configuration-properties">Caffeine設定プロパティ</a></li>
+</ul>
+</li>
+<li><a href="#enabling-micrometer-metrics">マイクロメーターメトリクスの有効化</a></li>
+<li><a href="#annotated-beans-examples">アノテーション付きBean例</a>
+<ul class="sectlevel2">
+<li><a href="#implicit-simple-cache-key">暗黙の単純キャッシュキー</a></li>
+<li><a href="#explicit-composite-cache-key">明示的な合成キャッシュキー</a></li>
+<li><a href="#default-cache-key">デフォルトのキャッシュキー</a></li>
+<li><a href="#multiple-annotations-on-a-single-method">単一のメソッドに複数のアノテーションを付与</a></li>
+<li><a href="#clear-all-application-caches">すべてのアプリケーションキャッシュの消去</a></li>
+</ul>
+</li>
+<li><a href="#negative-cache">ネガティブキャッシングとnull</a>
+<ul class="sectlevel2">
+<li><a href="#let-exceptions-bubble-up">例外をバブルアップさせる</a></li>
+</ul>
+</li>
+<li><a href="#going-native">ネイティブ化</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="reference"><a href="/version/main/guides/cache-infinispan-reference">Infinispan Cache</a></li>
+      
+        
+        <li class="reference"><a href="/version/main/guides/cache-redis-reference">Redisキャッシュ</a></li>
+      
+        
+        <li class="reference"><a href="/version/main/guides/datasource">Quarkusでデータソースを設定</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/elasticsearch">Elasticsearchクラスターの実行</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/databases-dev-services">Dev Services for Databases</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/elasticsearch-dev-services">Dev Services for Elasticsearch</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/infinispan-dev-services">Infinispanの開発サービス</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/redis-dev-services">Dev Services for Redis</a></li>
+      
+        
+        <li class="reference"><a href="/version/main/guides/infinispan-client-reference">Infinispanクライアントエクステンションリファレンスガイド</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/lra">Narayana LRA 参加者サポート</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/reactive-sql-clients">リアクティブ SQL クライアント</a></li>
+      
+        
+        <li class="reference"><a href="/version/main/guides/redis-reference">Redis エクステンションのリファレンスガイド</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/hibernate-orm-panache">シンプルになったHibernate ORM with Panache</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/hibernate-orm-panache-kotlin">シンプルになったHibernate ORM with PanacheとKotlin</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/hibernate-reactive-panache">シンプルなHibernate Reactive with Panache</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/mongodb-panache">シンプルになったMongoDB with Panache</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/mongodb-panache-kotlin">シンプルになったMongoDB with PanacheとKotlin</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/hibernate-search-standalone-elasticsearch">Elasticsearch/OpenSearch を使用する Standalone モードでの Hibernate Search の使用</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/hibernate-search-orm-elasticsearch">Hibernate ORMとElasticsearch/OpenSearchでHibernate Searchを使用</a></li>
+      
+        
+        <li class="guide"><a href="/version/main/guides/flyway">Flywayの使用</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

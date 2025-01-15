@@ -1,0 +1,3216 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Mailerリファレンスガイド - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/guides/mailer-reference" />
+  <meta property="og:title" content="Mailerリファレンスガイド" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/mailer-reference">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/guides/mailer-reference">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/guides/mailer-reference" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/guides/mailer-reference">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/guides/mailer-reference">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/guides/mailer-reference">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/guides/mailer-reference">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" selected>3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <a class="editlink" href="https://github.com/quarkusio/quarkus/edit/main/docs/src/main/asciidoc/mailer-reference.adoc">このページを編集</a>
+      
+      <h1 class="text-caps">Mailerリファレンスガイド </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドは、 <a href="mailer.html">Mailer 入門ガイド</a>の続編です。このガイドでは、Quarkus Mailerの設定と使用方法について詳しく説明しています。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="mailer-extension"><a class="anchor" href="#mailer-extension"></a>Mailerエクステンション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Mailerを使用するには、 <code>quarkus-mailer</code> エクステンションを追加する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>次のコマンドでプロジェクトにエクステンションを追加することができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">&gt; ./mvnw quarkus:add-extensions -Dextensions="mailer"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>もしくは、以下の依存関係をプロジェクトに追加します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-mailer&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="accessing-the-mailer"><a class="anchor" href="#accessing-the-mailer"></a>Mailerへのアクセス</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次のようにしてアプリケーションにMailerをインジェクトすることができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject
+Mailer mailer;
+
+@Inject
+ReactiveMailer reactiveMailer;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>APIは2つあります:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>io.quarkus.mailer.Mailer</code> は、命令型(ブロッキング、同期)APIを提供しています。</p>
+</li>
+<li>
+<p><code>io.quarkus.mailer.reactive.ReactiveMailer</code> は、リアクティブ（ノンブロッキング、非同期）なAPIを提供しています。</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+この2つのAPIは機能的には同等です。実際、 <code>Mailer</code> の実装は、 <code>ReactiveMailer</code> の実装の上に構築されています。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">非推奨</div>
+<div class="paragraph">
+<p><code>io.quarkus.mailer.ReactiveMailer</code> は、 <code>io.quarkus.mailer.reactive.ReactiveMailer</code> に置き換えられ非推奨となりました。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>簡単なメールを送信するには、次のようにします:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">// Imperative API:
+mailer.send(Mail.withText("to@acme.org", "A simple email from quarkus", "This is my body.").setFrom("from@acme.org"));
+// Reactive API:
+Uni&lt;Void&gt; stage = reactiveMailer.send(Mail.withText("to@acme.org", "A reactive email from quarkus", "This is my body.").setFrom("from@acme.org"));</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>例えば、 <code>Mailer</code> を HTTP のエンドポイントで使用する場合は次のようになります:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@GET
+@Path("/imperative")
+public void sendASimpleEmail() {
+    mailer.send(Mail.withText("to@acme.org", "A simple email from quarkus", "This is my body").setFrom("from@acme.org"));
+}
+
+@GET
+@Path("/reactive")
+public Uni&lt;Void&gt; sendASimpleEmailAsync() {
+    return reactiveMailer.send(
+            Mail.withText("to@acme.org", "A reactive email from quarkus", "This is my body").setFrom("from@acme.org"));
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-mail-objects"><a class="anchor" href="#creating-mail-objects"></a>メールオブジェクトの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Mailerでは、 <code>io.quarkus.mailer.Mail</code> のオブジェクトを送信することができます。新しい <code>io.quarkus.mailer.Mail</code> インスタンスは、コンストラクタや <code>Mail.withText</code> および <code>Mail.withHtml</code> といったヘルパーメソッドから作成できます。 <code>Mail</code> インスタンスでは、受信者（to、cc、bcc）の追加、件名、ヘッダー、送信者（from）アドレスの設定などができます。</p>
+</div>
+<div class="paragraph">
+<p>Most of these properties are optional, but the sender address is required. It can either be set on an individual <code>Mail</code> instances using</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">.setFrom("from@acme.org");</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or a global default can be configured, using</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.mailer.from=from@acme.org</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>また、1回の呼び出しで複数の <code>Mail</code> オブジェクトを送信することもできます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">mailer.send(mail1, mail2, mail3);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="attachments"><a class="anchor" href="#attachments"></a>添付ファイルの送信</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>添付ファイルを送信するには、 <code>io.quarkus.mailer.Mail</code> インスタンスの <code>addAttachment</code> メソッドを使用するだけです:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@GET
+@Path("/attachment")
+public void sendEmailWithAttachment() {
+        mailer.send(Mail.withText("clement.escoffier@gmail.com", "An email from quarkus with attachment",
+                "This is my body")
+                .addAttachment("my-file-1.txt",
+                        "content of my file".getBytes(), "text/plain")
+                .addAttachment("my-file-2.txt",
+                        new File("my-file.txt"), "text/plain")
+        );
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>添付ファイルは、（スニペットで示したように）生のバイトまたはファイルから作成できます。ファイルは、アプリケーションのワーキングディレクトリを基準に解決されることに注意してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="html"><a class="anchor" href="#html"></a>添付ファイルがインライン化されたHTMLメールの送信</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>HTMLメールを送信する際に、インラインで添付ファイルを追加することができます。例えば、メールに画像を添付して送信すると、その画像がメールの内容に表示されます。画像ファイルを <code>META-INF/resources</code> フォルダーに置く場合は、ファイルのフルパスを指定する必要があります。 <em>例えば</em> 、 <code>META-INF/resources/quarkus-logo.png</code> です。そうしないと、Quarkusはルートディレクトリでファイルを探します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@GET
+@Path("/html")
+public void sendingHTML() {
+    String body = "&lt;strong&gt;Hello!&lt;/strong&gt;" + "\n" +
+        "&lt;p&gt;Here is an image for you: &lt;img src=\"cid:my-image@quarkus.io\"/&gt;&lt;/p&gt;" +
+        "&lt;p&gt;Regards&lt;/p&gt;";
+    mailer.send(Mail.withHtml("to@acme.org", "An email in HTML", body)
+        .addInlineAttachment("quarkus-logo.png",
+            new File("quarkus-logo.png"),
+            "image/png", "&lt;my-image@quarkus.io&gt;"));
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><em>content-id の</em> 形式と参照に注意してください。仕様上、インライン添付ファイルを作成する際には、content-idは以下のように構成する必要があります。 <code>&lt;id@domain&gt;</code> . <code>&lt;&gt;</code> の間に content-id を挟まない場合は、自動的にラップされます。添付ファイルを参照したい場合、例えば <code>src</code> 属性で参照したい場合は <code>cid:id@domain</code> を使用してください( <code>&lt;</code> と <code>&gt;</code> は使用しないでください)。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="templates"><a class="anchor" href="#templates"></a>Quteテンプレートに基づくメッセージ Body</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>また、 <a href="qute">Quteのテンプレート</a> を使って、本文が自動的に作成されるメールを送信することも可能です。</p>
+</div>
+<div class="paragraph">
+<p>Javaコードでタイプセーフ・メール・テンプレートを定義することができます。
+クラスを <code>@io.quarkus.qute.CheckedTemplate</code> でアノテートするだけで、 <code>MailTemplate</code> を返す <code>static native</code> メソッドすべてが、型安全なメール・テンプレートと、それらが必要とするパラメータのリストを定義するために使われます：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.mailer.MailTemplate;
+import io.quarkus.qute.CheckedTemplate;
+
+@Path("")
+public class MailingResource {
+
+    @CheckedTemplate
+    static class Templates {
+        public static native MailTemplateInstance hello(String name); <i class="conum" data-value="1"></i><b>(1)</b>
+    }
+
+    @GET
+    @Path("/mail")
+    public Uni&lt;Void&gt; send() {
+        // the template looks like: Hello {name}! <i class="conum" data-value="2"></i><b>(2)</b>
+        return Templates.hello("John")
+           .to("to@acme.org")  <i class="conum" data-value="3"></i><b>(3)</b>
+           .subject("Hello from Qute template")
+           .send(); <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>規約では、テンプレートの位置を特定するために、囲んでいるクラス名とメソッド名が使用されます。この例では、 <code>src/main/resources/templates/MailingResource/hello.html</code> と <code>src/main/resources/templates/MailingResource/hello.txt</code> のテンプレートを使ってメッセージ本文を作成します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>テンプレートで使用するデータを設定します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>メールテンプレートのインスタンスを作成し、受信者を設定します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>MailTemplate.send()</code> がレンダリングのトリガーとなり、終了すると <code>Mailer</code> のインスタンスを介してメールを送信します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>あるいは、 <code>io.quarkus.mailer.MailTemplate</code> を実装する Java レコードを使用します。
+レコード・コンポーネントはテンプレート・パラメータを表します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.mailer.MailTemplate;
+import io.quarkus.qute.CheckedTemplate;
+
+@Path("")
+public class MailingResource {
+
+    record hello(String name) implements MailTemplateInstance { <i class="conum" data-value="1"></i><b>(1)</b>
+    }
+
+    @GET
+    @Path("/mail")
+    public Uni&lt;Void&gt; send() {
+        // the template looks like: Hello {name}! <i class="conum" data-value="2"></i><b>(2)</b>
+        return new hello("John")
+           .to("to@acme.org")  <i class="conum" data-value="3"></i><b>(3)</b>
+           .subject("Hello from Qute template")
+           .send(); <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>規約では、テンプレートを見つけるために、クラス名とレコード名が使用されます。このケースでは、 
+<code>src/main/resources/templates/MailingResource/hello.html</code> と <code>src/main/resources/templates/MailingResource/hello.txt</code> のテンプレートを使用してメッセージ本文を作成します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>テンプレートで使用するデータを設定します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>メールテンプレートのインスタンスを作成し、受信者を設定します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>MailTemplate.send()</code> がレンダリングのトリガーとなり、終了すると <code>Mailer</code> のインスタンスを介してメールを送信します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>また、タイプセーフのテンプレートを使わずに行うこともできます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.mailer.MailTemplate;
+
+@Inject
+@Location("hello")
+MailTemplate hello; <i class="conum" data-value="1"></i><b>(1)</b>
+
+@GET
+@Path("/mail")
+public Uni&lt;Void&gt; send() {
+    return hello.to("to@acme.org") <i class="conum" data-value="2"></i><b>(2)</b>
+       .subject("Hello from Qute template")
+       .data("name", "John") <i class="conum" data-value="3"></i><b>(3)</b>
+       .send() <i class="conum" data-value="4"></i><b>(4)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@Location</code> 修飾子が指定されていない場合は、フィールド名を使ってテンプレートを探します。それ以外の場合は、指定された場所としてテンプレートを検索します。この例では、 <code>src/main/resources/templates/hello.html</code> と <code>src/main/resources/templates/hello.txt</code> のテンプレートを使ってメッセージ・ボディを作成します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>メールテンプレートのインスタンスを作成し、受信者を設定します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>テンプレートで使用するデータを設定します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>MailTemplate.send()</code> がレンダリングのトリガーとなり、終了すると <code>Mailer</code> のインスタンスを介してメールを送信します。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+挿入されたメールテンプレートはビルド時に検証されます。 <code>src/main/resources/templates</code> に一致するテンプレートがない場合、ビルドは失敗します。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="execution-model"><a class="anchor" href="#execution-model"></a>実行モデル</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>リアクティブ型Mailerはノンブロッキングで、結果はI/Oスレッドで提供されます。このトピックの詳細については、 <a href="quarkus-reactive-architecture.html">Quarkus Reactive Architectureのドキュメント</a>を参照してください。</p>
+</div>
+<div class="paragraph">
+<p>非リアクティブ型Mailerは、メッセージがSMTPサーバーに送信されるまでブロックします。これは、メッセージが配信されたことを意味するのではなく、配信を担当するSMTPサーバに正常に送信されたことを意味することに注意してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing"><a class="anchor" href="#testing"></a>メール送信のテスト</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>開発中やテスト中にメールを送信するのは非常に不便であるため、 <code>quarkus.mailer.mock</code> boolean設定を <code>true</code> に設定することで、
+実際のメール送信は行われず、代わりに標準出力にメールが出力され、 <code>MockMailbox</code> Beanにメールが収集されます。
+これは、Quarkusを開発モードまたはテストモードで実行している場合のデフォルトです。</p>
+</div>
+<div class="paragraph">
+<p>そして、例えばRESTエンドポイントでメールが送信されたことを検証するテストを書くことができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@QuarkusTest
+class MailTest {
+
+    private static final String TO = "foo@quarkus.io";
+
+    @Inject
+    MockMailbox mailbox;
+
+    @BeforeEach
+    void init() {
+        mailbox.clear();
+    }
+
+    @Test
+    void testTextMail() throws MessagingException, IOException {
+        // call a REST endpoint that sends email
+        given()
+        .when()
+        .get("/send-email")
+        .then()
+           .statusCode(202)
+           .body(is("OK"));
+
+        // verify that it was sent
+        List&lt;Mail&gt; sent = mailbox.getMessagesSentTo(TO);
+        assertThat(sent).hasSize(1);
+        Mail actual = sent.get(0);
+        assertThat(actual.getText()).contains("Wake up!");
+        assertThat(actual.getSubject()).isEqualTo("Alarm!");
+
+        assertThat(mailbox.getTotalMessagesSent()).isEqualTo(6);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/quarkiverse/quarkus-mailpit">Quarkus Mailpit</a> エクステンションを使用すると、 <a href="https://github.com/axllent/mailpit">メール</a> 送信のテストやデバッグを行うための優れたUIである <a href="https://github.com/axllent/mailpit">Mailpit</a> 用のDev Servicesが提供されます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-the-underlying-vert-x-mail-client"><a class="anchor" href="#using-the-underlying-vert-x-mail-client"></a>Vert.xのメールクライアントの使用</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus Mailerは、 <a href="https://vertx.io/docs/vertx-mail-client/java/">Vert.xメールクライアント</a> の上に実装されており、非同期でノンブロッキングな方法でメールを送信することができます。メールの送信方法を細かく制御する必要がある場合、例えばメッセージのIDを取得する必要がある場合などの場合は、基礎となるクライアントを注入して直接使用することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject MailClient client;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>3種類のAPIが公開されています:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Mutinyクライアント (<code>io.vertx.mutiny.ext.mail.MailClient</code>)</p>
+</li>
+<li>
+<p>ベアクライアント (<code>io.vertx.ext.mail.MailClient</code>)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>各APIの詳細および最適なAPIの選択方法については、 <a href="vertx">Vert.x のガイド</a> をご参照ください。</p>
+</div>
+<div class="paragraph">
+<p>取得した <code>MailClient</code> は、上で示した設定プロパティを使って設定します。
+独自のインスタンスを作成し、独自の設定を渡すこともできます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-ssl-with-native-executables"><a class="anchor" href="#using-ssl-with-native-executables"></a>ネイティブ実行可能ファイルでのSSLの使用</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>なお、メーラーのSSLを有効にしていて、ネイティブ実行可能ファイルをビルドする場合は、SSLのサポートを有効にする必要があります。詳しくは、 <a href="native-and-ssl.html">ネイティブイメージでのSSLの利用</a>をご参照ください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-the-smtp-credentials"><a class="anchor" href="#configuring-the-smtp-credentials"></a>SMTP認証情報の設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>quarkus.mailer.password</code> のような機密データは暗号化することをお勧めします。一つの方法として、HashiCorp Vaultのような安全なストアに値を保存し、設定からそれを参照することができます。例えば、Vaultがパス <code>myapps/myapp/myconfig</code> にキー <code>mail-password</code> を含んでいるとすると、Mailerエクステンションは次のように簡単に設定できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">...
+# path within the kv secret engine where is located the application sensitive configuration
+# This uses the https://github.com/quarkiverse/quarkus-vault extension.
+quarkus.vault.secret-config-kv-path=myapps/myapp/myconfig
+
+...
+quarkus.mailer.password=${mail-password}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>パスワードの値は、起動時に一度だけ評価されることに注意してください。Vault で <code>mail-password</code> が変更された場合、新しい値を取得するには、アプリケーションを再起動するしかありません。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Do use Vault, you need the <a href="https://github.com/quarkiverse/quarkus-vault">Quarkus Vault</a> extension.
+More details about this extension and its configuration can be found in the <a href="https://docs.quarkiverse.io/quarkus-vault/dev/index.html">extension documentation</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+メーラーの設定の詳細については、 <a href="#configuration-reference">設定リファレンス</a> を参照してください。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-tls"><a class="anchor" href="#configuring-tls"></a>TLS の設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>SMTP provides various way to use TLS:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>StartTLS: The client connects to the server using a plain connection and then upgrades to a secure connection.</p>
+</li>
+<li>
+<p>SSL/TLS: The client connects to the server using a secure connection from the start.</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="configuring-starttls"><a class="anchor" href="#configuring-starttls"></a>Configuring STARTTLS</h3>
+<div class="paragraph">
+<p>To use <code>STARTTLS</code>, you need to configure the <code>start-tls</code> property to <code>REQUIRED</code> or <code>OPTIONAL</code> and set <code>tls</code> to <code>false</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.mailer.tls=false
+quarkus.mailer.start-tls=REQUIRED</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Setting <code>tls</code> to <code>false</code> ensure we connect using a plain connection and then upgrade to a secure connection using <code>STARTTLS</code>.</p>
+</div>
+<div class="paragraph">
+<p>To configure the trust store, you can use a <em>named</em> TLS configuration stored in the <a href="./tls-registry-reference">TLS registry</a>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.mailer.tls=false
+quarkus.mailer.start-tls=REQUIRED
+quarkus.mailer.tls-configuration-name=my-mailer # Reference the named configuration
+
+quarkus.tls.my-mailer.trust-store.pem.certs=server-cert.pem # Configure the trust store</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>While not recommended, you can trust all certificates by setting <code>quarkus.tls.trust-all</code> to <code>true</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.mailer.tls=false
+quarkus.mailer.start-tls=REQUIRED
+quarkus.mailer.tls-configuration-name=my-mailer # Reference the named configuration
+quarkus.tls.my-mailer.trust-all=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Alternatively, you can use the <em>deprecated</em> <code>quarkus.mailer.trust-store.paths</code>  and <code>quarkus.mailer.trust-all</code> properties:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.mailer.tls=false
+quarkus.mailer.start-tls=REQUIRED
+quarkus.mailer.truststore.paths=target/certs/mailpit-ca.crt</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.mailer.tls=false
+quarkus.mailer.start-tls=REQUIRED
+quarkus.mailer.trust-all=true</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+To use <code>START_TLS</code>, make sure you set <code>tls</code> to <code>false</code> and <code>start-tls</code> to <code>REQUIRED</code> or <code>OPTIONAL</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuring-ssltls"><a class="anchor" href="#configuring-ssltls"></a>Configuring SSL/TLS</h3>
+<div class="paragraph">
+<p>To establish a TLS connection, you need to configure a <em>named</em> configuration using the <a href="./tls-registry-reference">TLS registry</a>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.tls.my-mailer.trust-store.p12.path=server-truststore.p12
+quarkus.tls.my-mailer.trust-store.p12.password=secret
+
+quarkus.mailer.tls-configuration-name=my-mailer # Reference the named configuration</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+When using the mailer, using a <em>named</em> configuration is required to avoid conflicts with other TLS configurations.
+The mailer will not use the default TLS configuration.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>When you configure a <em>named</em> TLS configuration, TLS is enabled by default.
+If your SMTP server uses a valid (trusted) certificate, and thus do not require a specific TLS configuration, you need to enable TLS explicitly (as you do not have to configure a trust store):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.mailer.tls=true</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>When <code>quarkus.tls.trust-all</code> is set to <code>true</code>, the trust store configuration is ignored. This is not recommended for production.
+Also, we recommend avoiding using <code>quarkus.tls.trust-all</code>, and use a named configuration instead if <code>trust-all</code> is required:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.tls.my-mailer.trust-all=true
+quarkus.mailer.tls-configuration-name=my-mailer # Reference the named configuration</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can also use the deprecated <code>quarkus.mailer.trust-all=true</code> property.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="multiple-mailer-configurations"><a class="anchor" href="#multiple-mailer-configurations"></a>複数のmailer設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>アプリケーションによっては、異なるSMTPサーバーを経由してメールを送信する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>この使用例は、Quarkusで完全にサポートされており、複数のmailerを設定することができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.mailer.from=your-from-address@gmail.com <i class="conum" data-value="1"></i><b>(1)</b>
+quarkus.mailer.host=smtp.gmail.com
+
+quarkus.mailer.aws.from=your-from-address@gmail.com <i class="conum" data-value="2"></i><b>(2)</b>
+quarkus.mailer.aws.host=${ses.smtp}
+quarkus.mailer.aws.port=587
+
+quarkus.mailer.sendgrid.from=your-from-address@gmail.com <i class="conum" data-value="3"></i><b>(3)</b>
+quarkus.mailer.sendgrid.host=${sendgrid.smtp-host}
+quarkus.mailer.sendgrid.port=465</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>デフォルトのmailerの設定。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>aws</code> という名前のmailerの設定 .</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>sendgrid</code> という名前のmailerの設定。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>そして、 <code>@MailerName</code> CDI修飾子を使用して、名前付きメーラーにアクセスします:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject <i class="conum" data-value="1"></i><b>(1)</b>
+Mailer mailer;
+
+@Inject <i class="conum" data-value="1"></i><b>(1)</b>
+ReactiveMailer reactiveMailer;
+
+@Inject <i class="conum" data-value="1"></i><b>(1)</b>
+@Location("hello")
+MailTemplate mailTemplate;
+
+@Inject
+@MailerName("aws") <i class="conum" data-value="2"></i><b>(2)</b>
+Mailer mailer;
+
+@Inject
+@MailerName("aws") <i class="conum" data-value="2"></i><b>(2)</b>
+ReactiveMailer reactiveMailer;
+
+@Inject
+@MailerName("aws") <i class="conum" data-value="2"></i><b>(2)</b>
+@Location("hello")
+MailTemplate mailTemplate;
+
+@Inject
+@MailerName("sendgrid") <i class="conum" data-value="3"></i><b>(3)</b>
+Mailer mailer;
+
+@Inject
+@MailerName("sendgrid") <i class="conum" data-value="3"></i><b>(3)</b>
+ReactiveMailer reactiveMailer;
+
+@Inject
+@MailerName("sendgrid") <i class="conum" data-value="3"></i><b>(3)</b>
+@Location("hello")
+MailTemplate mailTemplate;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>デフォルトの設定で修飾子なしでインスタンスを注入。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>@MailerName("aws")` の修飾子で`aws` の設定のインスタンスを注入。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>@MailerName("sendgrid")</code> の修飾子で <code>sendgrid</code> の設定のインスタンスを注入。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>@CheckedTemplate</code> を使用したタイプセーフテンプレートは、現在、デフォルトのメーラー設定にのみ対応しています。</p>
+</div>
+<div class="paragraph">
+<p>名前付きメーラーの設定には、 <code>MailTemplate</code> 注入を使用してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="popular"><a class="anchor" href="#popular"></a>一般的なメールサービスに対応したMailer設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ここでは、一般的なメールサービスで使用するための設定について説明します。</p>
+</div>
+<div class="sect2">
+<h3 id="gmail-specific-configuration"><a class="anchor" href="#gmail-specific-configuration"></a>Gmail特有の設定</h3>
+<div class="paragraph">
+<p>GmailのSMTPサーバーを使用する場合は、まず、 <code>Google Account &gt; Security &gt; App passwords</code> で専用のパスワードを作成するか、 <a href="https://myaccount.google.com/apppasswords" class="bare">https://myaccount.google.com/apppasswords</a> にアクセスしてください。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>App passwords ページにアクセスするには、 <a href="https://myaccount.google.com/security" class="bare">https://myaccount.google.com/security</a> 、2段階認証をオンにする必要があります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>完了したら、 <code>application.properties</code> に以下のプロパティを追加して、Quarkusアプリケーションを設定することができます:</p>
+</div>
+<div class="paragraph">
+<p>With <code>STARTTLS</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.mailer.auth-methods=DIGEST-MD5 CRAM-SHA256 CRAM-SHA1 CRAM-MD5 PLAIN LOGIN
+quarkus.mailer.from=YOUREMAIL@gmail.com
+quarkus.mailer.host=smtp.gmail.com
+quarkus.mailer.port=587
+quarkus.mailer.start-tls=REQUIRED
+quarkus.mailer.username=YOUREMAIL@gmail.com
+quarkus.mailer.password=YOURGENERATEDAPPLICATIONPASSWORD
+
+quarkus.mailer.mock=false # In dev mode, prevent from using the mock SMTP server</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Or with TLS/SSL:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.mailer.auth-methods=DIGEST-MD5 CRAM-SHA256 CRAM-SHA1 CRAM-MD5 PLAIN LOGIN
+quarkus.mailer.from=YOUREMAIL@gmail.com
+quarkus.mailer.host=smtp.gmail.com
+quarkus.mailer.port=465
+quarkus.mailer.tls=true
+quarkus.mailer.username=YOUREMAIL@gmail.com
+quarkus.mailer.password=YOURGENERATEDAPPLICATIONPASSWORD
+
+quarkus.mailer.mock=false # In dev mode, prevent from using the mock SMTP server</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Quarkus Mailer が Gmailでのパスワード認証をサポートするには、 <code>quarkus.mailer.auth-methods</code> 設定オプションが必要です。 Mailer と Gmail の両方が <code>XOAUTH2</code> をデフォルトとしており、アプリケーションの登録やトークンの取得などが必要です。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="aws-ses-simple-email-service"><a class="anchor" href="#aws-ses-simple-email-service"></a>AWS SES - Simple Email Service</h3>
+<div class="sect3">
+<h4 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>SES Identity Checkでは、手順に従ってDKIM認証を設定します</p>
+</li>
+<li>
+<p>SMTPエンドポイントを <a href="https://us-east-1.console.aws.amazon.com/ses/home" class="bare">https://us-east-1.console.aws.amazon.com/ses/home</a> から取得します。例: <code>email-smtp.us-east-1.amazonaws.com</code></p>
+</li>
+<li>
+<p>必要に応じてSMTP認証情報を作成します</p>
+</li>
+<li>
+<p>サンドボックスの場合は、受信者の確認も行います（メール認証を使用する）</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="configuration"><a class="anchor" href="#configuration"></a>設定</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">ses.smtp=...
+ses.user=...
+ses.password=...
+ses.from=an email address from the verified domain
+
+quarkus.mailer.host=${ses.smtp}
+quarkus.mailer.port=587
+quarkus.mailer.tls=false
+quarkus.mailer.username=${ses.user}
+quarkus.mailer.password=${ses.password}
+quarkus.mailer.start-tls=REQUIRED
+quarkus.mailer.login=REQUIRED
+quarkus.mailer.from=${ses.from}
+
+quarkus.mailer.mock=false # In dev mode, prevent from using the mock SMTP server</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="mailjet"><a class="anchor" href="#mailjet"></a>MailJet</h3>
+<div class="paragraph">
+<p>MailJetの統合は、SMTPリレーで使用されます。このSMTPサーバーを使ってメールを送信することになります。</p>
+</div>
+<div class="sect3">
+<h4 id="prerequisites-2"><a class="anchor" href="#prerequisites-2"></a>前提条件</h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>MailJetのアカウントとAPIキー/シークレットキーを作成します</p>
+</li>
+<li>
+<p>送信者アドレスの認証（SPF + DKIM）と、認証済みリストへの明示的なメール追加が必要です</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="configuration-2"><a class="anchor" href="#configuration-2"></a>設定</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mailjet.smtp-host=in-v3.mailjet.com
+mailjet.api-key=...
+mailjet.secret-key=...
+mailjet.from=the verified sender address
+
+quarkus.mailer.host=${mailjet.smtp-host}
+quarkus.mailer.port=465
+quarkus.mailer.username=${mailjet.api-key}
+quarkus.mailer.password=${mailjet.secret-key}
+quarkus.mailer.start-tls=OPTIONAL
+quarkus.mailer.tls=true
+quarkus.mailer.login=REQUIRED
+quarkus.mailer.from=${mailjet.from}
+
+quarkus.mailer.mock=false # In dev mode, prevent from using the mock SMTP server</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="sendgrid"><a class="anchor" href="#sendgrid"></a>Sendgrid</h3>
+<div class="sect3">
+<h4 id="prerequisites-3"><a class="anchor" href="#prerequisites-3"></a>前提条件</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>指示に従って、DKIMを使用して送信ドメインを確認します</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="configuration-3"><a class="anchor" href="#configuration-3"></a>設定</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">sendgrid.smtp-host=smtp.sendgrid.net
+sendgrid.username=apikey
+sendgrid.key=...
+
+quarkus.mailer.host=${sendgrid.smtp-host}
+quarkus.mailer.port=465
+quarkus.mailer.username=${sendgrid.username}
+quarkus.mailer.password=${sendgrid.key}
+quarkus.mailer.start-tls=OPTIONAL
+quarkus.mailer.login=REQUIRED
+quarkus.mailer.from=...
+quarkus.mailer.tls=true
+
+quarkus.mailer.mock=false # In dev mode, prevent from using the mock SMTP server</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="office-365"><a class="anchor" href="#office-365"></a>Office 365</h3>
+<div class="sect3">
+<h4 id="prerequisites-4"><a class="anchor" href="#prerequisites-4"></a>前提条件</h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Enable SMTP Access to your Office 365 mailbox, you can do it from the administration console (see <a href="https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/authenticated-client-smtp-submission">this guide</a> for more information)</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="configuration-4"><a class="anchor" href="#configuration-4"></a>設定</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.mailer.from=NAME&lt;YOUREMAIL@YOURDOMAIN.COM&gt;
+quarkus.mailer.host=smtp.office365.com
+quarkus.mailer.port=587
+quarkus.mailer.username=YOUREMAIL@YOURDOMAIN.COM
+quarkus.mailer.password=YOURPASSWORD
+quarkus.mailer.auth-methods=LOGIN
+quarkus.mailer.login=REQUIRED
+
+quarkus.mailer.mock=false # In dev mode, prevent from using the mock SMTP server</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration-reference"><a class="anchor" href="#configuration-reference"></a>Mailer設定リファレンス</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="ビルド時に固定"></i></span>ビルド時に固定される構成プロパティ - 他のすべての構成プロパティは実行時にオーバーライド可能 <input type="search" id="config-search-0" placeholder="FILTER CONFIGURATION" disabled></p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference searchable configuration-reference-all-rows">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><span class="header-title">Configuration property</span></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">型</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-mailer_quarkus-mailer-cache-attachments"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-cache-attachments"><code>quarkus.mailer.cache-attachments</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-1" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Caches data from attachment&#8217;s Stream to a temporary file. It tries to delete it after sending email.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6802">QUARKUS_MAILER_CACHE_ATTACHMENTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6802" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-from"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-from"><code>quarkus.mailer.from</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-2" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the default <code>from</code> attribute when not specified in the <code>io.quarkus.mailer.Mail</code> instance. It&#8217;s the sender email address.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6803">QUARKUS_MAILER_FROM</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6803" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mock"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mock"><code>quarkus.mailer.mock</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-3" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Enables the mock mode. When enabled, mails are not sent, but stored in an in-memory mailbox. The content of the emails is also printed on the console.</p>
+</div>
+<div class="paragraph">
+<p>Disabled by default on PROD, enabled by default on DEV and TEST modes.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6804">QUARKUS_MAILER_MOCK</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6804" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-bounce-address"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-bounce-address"><code>quarkus.mailer.bounce-address</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-4" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the default bounce email address. A bounced email, or bounce, is an email message that gets rejected by a mail server.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6805">QUARKUS_MAILER_BOUNCE_ADDRESS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6805" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-host"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-host"><code>quarkus.mailer.host</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-5" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the SMTP host name.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6806">QUARKUS_MAILER_HOST</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6806" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>localhost</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-port"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-port"><code>quarkus.mailer.port</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-6" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The SMTP port. The default value depends on the configuration. The port 25 is used as default when <code>ssl</code> is disabled. This port continues to be used primarily for SMTP relaying. SMTP relaying is the transmission of email from email server to email server. The port 587 is the default port when <code>ssl</code> is enabled. It ensures that email is submitted securely.</p>
+</div>
+<div class="paragraph">
+<p>Note that the port 465 may be used by SMTP servers, however, IANA has reassigned a new service to this port, and it should no longer be used for SMTP communications.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6807">QUARKUS_MAILER_PORT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6807" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-username"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-username"><code>quarkus.mailer.username</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-7" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the username to connect to the SMTP server.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6808">QUARKUS_MAILER_USERNAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6808" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-password"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-password"><code>quarkus.mailer.password</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-8" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the password to connect to the SMTP server.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6809">QUARKUS_MAILER_PASSWORD</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6809" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-tls-configuration-name"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-tls-configuration-name"><code>quarkus.mailer.tls-configuration-name</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-9" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The name of the TLS configuration to use.</p>
+</div>
+<div class="paragraph">
+<p>If a name is configured, it uses the configuration from <code>quarkus.tls.&lt;name&gt;.*</code> If a name is configured, but no TLS configuration is found with that name then an error will be thrown.</p>
+</div>
+<div class="paragraph">
+<p>If no TLS configuration name is set then, the specific TLS configuration (from <code>quarkus.mailer.*</code>) will be used.</p>
+</div>
+<div class="paragraph">
+<p>The default TLS configuration is <strong>not</strong> used by default.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6810">QUARKUS_MAILER_TLS_CONFIGURATION_NAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6810" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-tls"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-tls"><code>quarkus.mailer.tls</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-10" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Whether the connection should be secured using TLS.</p>
+</div>
+<div class="paragraph">
+<p>SMTP allows establishing connection with or without TLS. When establishing a connection with TLS, the connection is secured and encrypted. When establishing a connection without TLS, it can be secured and encrypted later using the STARTTLS command. In this case, the connection is initially unsecured and unencrypted. To configure this case, set this property to <code>false</code> and <code>start-tls</code> to <code>REQUIRED</code> Note that if a TLS configuration is set, TLS is enabled automatically. So, setting this property to <code>false</code> is required to not establish a connection with TLS.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6811">QUARKUS_MAILER_TLS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6811" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-max-pool-size"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-max-pool-size"><code>quarkus.mailer.max-pool-size</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-11" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the max number of open connections to the mail server.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6812">QUARKUS_MAILER_MAX_POOL_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6812" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>10</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-own-host-name"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-own-host-name"><code>quarkus.mailer.own-host-name</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-12" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the hostname to be used for HELO/EHLO and the Message-ID.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6813">QUARKUS_MAILER_OWN_HOST_NAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6813" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-keep-alive"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-keep-alive"><code>quarkus.mailer.keep-alive</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-13" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets if connection pool is enabled. If the connection pooling is disabled, the max number of sockets is enforced nevertheless.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6814">QUARKUS_MAILER_KEEP_ALIVE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6814" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-disable-esmtp"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-disable-esmtp"><code>quarkus.mailer.disable-esmtp</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-14" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Disable ESMTP.</p>
+</div>
+<div class="paragraph">
+<p>The RFC-1869 states that clients should always attempt <code>EHLO</code> as first command to determine if ESMTP is supported, if this returns an error code, <code>HELO</code> is tried to use the <em>regular</em> SMTP command.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6815">QUARKUS_MAILER_DISABLE_ESMTP</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6815" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-start-tls"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-start-tls"><code>quarkus.mailer.start-tls</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-15" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the TLS security mode for the connection. Either <code>DISABLED</code>, <code>OPTIONAL</code> or <code>REQUIRED</code>.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6816">QUARKUS_MAILER_START_TLS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6816" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>OPTIONAL</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-dkim-enabled"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-dkim-enabled"><code>quarkus.mailer.dkim.enabled</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-16" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Enables DKIM signing.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6817">QUARKUS_MAILER_DKIM_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6817" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-dkim-private-key"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-dkim-private-key"><code>quarkus.mailer.dkim.private-key</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-17" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the PKCS#8 format private key used to sign the email.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6818">QUARKUS_MAILER_DKIM_PRIVATE_KEY</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6818" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-dkim-private-key-path"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-dkim-private-key-path"><code>quarkus.mailer.dkim.private-key-path</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-18" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the PKCS#8 format private key file path.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6819">QUARKUS_MAILER_DKIM_PRIVATE_KEY_PATH</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6819" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-dkim-auid"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-dkim-auid"><code>quarkus.mailer.dkim.auid</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-19" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the Agent or User Identifier (AUID).</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6820">QUARKUS_MAILER_DKIM_AUID</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6820" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-dkim-selector"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-dkim-selector"><code>quarkus.mailer.dkim.selector</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-20" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the selector used to query the public key.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6821">QUARKUS_MAILER_DKIM_SELECTOR</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6821" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-dkim-sdid"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-dkim-sdid"><code>quarkus.mailer.dkim.sdid</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-21" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the Signing Domain Identifier (SDID).</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6822">QUARKUS_MAILER_DKIM_SDID</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6822" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-dkim-header-canon-algo"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-dkim-header-canon-algo"><code>quarkus.mailer.dkim.header-canon-algo</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-22" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the canonicalization algorithm for signed headers.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6823">QUARKUS_MAILER_DKIM_HEADER_CANON_ALGO</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6823" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><code>simple</code>, <code>relaxed</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-dkim-body-canon-algo"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-dkim-body-canon-algo"><code>quarkus.mailer.dkim.body-canon-algo</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-23" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the canonicalization algorithm for mail body.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6824">QUARKUS_MAILER_DKIM_BODY_CANON_ALGO</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6824" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><code>simple</code>, <code>relaxed</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-dkim-body-limit"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-dkim-body-limit"><code>quarkus.mailer.dkim.body-limit</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-24" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the body limit to sign. Must be greater than zero.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6825">QUARKUS_MAILER_DKIM_BODY_LIMIT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6825" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-dkim-signature-timestamp"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-dkim-signature-timestamp"><code>quarkus.mailer.dkim.signature-timestamp</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-25" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures to enable or disable signature sign timestamp.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6826">QUARKUS_MAILER_DKIM_SIGNATURE_TIMESTAMP</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6826" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-dkim-expire-time"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-dkim-expire-time"><code>quarkus.mailer.dkim.expire-time</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-26" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the expire time in seconds when the signature sign will be expired. Must be greater than zero.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6827">QUARKUS_MAILER_DKIM_EXPIRE_TIME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6827" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">長</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-dkim-signed-headers"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-dkim-signed-headers"><code>quarkus.mailer.dkim.signed-headers</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-27" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the signed headers in DKIM, separated by commas. The order in the list matters.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6828">QUARKUS_MAILER_DKIM_SIGNED_HEADERS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6828" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-login"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-login"><code>quarkus.mailer.login</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-28" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the login mode for the connection. Either <code>NONE</code>, @{code DISABLED}, <code>OPTIONAL</code>, <code>REQUIRED</code> or <code>XOAUTH2</code>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>DISABLED means no login will be attempted</p>
+</li>
+<li>
+<p>NONE means a login will be attempted if the server supports in and login credentials are set</p>
+</li>
+<li>
+<p>REQUIRED means that a login will be attempted if the server supports it and the send operation will fail otherwise</p>
+</li>
+<li>
+<p>XOAUTH2 means that a login will be attempted using Google Gmail Oauth2 tokens</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6829">QUARKUS_MAILER_LOGIN</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6829" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>NONE</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-auth-methods"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-auth-methods"><code>quarkus.mailer.auth-methods</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-29" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the allowed authentication methods. These methods will be used only if the server supports them. If not set, all supported methods may be used.</p>
+</div>
+<div class="paragraph">
+<p>The list is given as a space separated list, such as <code>DIGEST-MD5 CRAM-SHA256 CRAM-SHA1 CRAM-MD5 PLAIN LOGIN</code>.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6830">QUARKUS_MAILER_AUTH_METHODS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6830" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-multi-part-only"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-multi-part-only"><code>quarkus.mailer.multi-part-only</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-30" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Whether the mail should always been sent as multipart even if they don&#8217;t have attachments. When sets to true, the mail message will be encoded as multipart even for simple mails without attachments.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6831">QUARKUS_MAILER_MULTI_PART_ONLY</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6831" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-allow-rcpt-errors"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-allow-rcpt-errors"><code>quarkus.mailer.allow-rcpt-errors</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-31" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets if sending allows recipients errors. If set to true, the mail will be sent to the recipients that the server accepted, if any.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6832">QUARKUS_MAILER_ALLOW_RCPT_ERRORS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6832" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-pipelining"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-pipelining"><code>quarkus.mailer.pipelining</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-32" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Enables or disables the pipelining capability if the SMTP server supports it.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6833">QUARKUS_MAILER_PIPELINING</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6833" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-pool-cleaner-period"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-pool-cleaner-period"><code>quarkus.mailer.pool-cleaner-period</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-33" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the connection pool cleaner period. Zero disables expiration checks and connections will remain in the pool until they are closed.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6834">QUARKUS_MAILER_POOL_CLEANER_PERIOD</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6834" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-mailer_quarkus-mailer"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>PT1S</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-keep-alive-timeout"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-keep-alive-timeout"><code>quarkus.mailer.keep-alive-timeout</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-34" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set the keep alive timeout for the SMTP connection. This value determines how long a connection remains unused in the pool before being evicted and closed. A timeout of 0 means there is no timeout.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6835">QUARKUS_MAILER_KEEP_ALIVE_TIMEOUT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6835" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-mailer_quarkus-mailer"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>PT300S</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-ntlm-workstation"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-ntlm-workstation"><code>quarkus.mailer.ntlm.workstation</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-35" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the workstation used on NTLM authentication.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6836">QUARKUS_MAILER_NTLM_WORKSTATION</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6836" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-ntlm-domain"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-ntlm-domain"><code>quarkus.mailer.ntlm.domain</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-36" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the domain used on NTLM authentication.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6837">QUARKUS_MAILER_NTLM_DOMAIN</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6837" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-approved-recipients"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-approved-recipients"><code>quarkus.mailer.approved-recipients</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-37" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Allows sending emails to these recipients only.</p>
+</div>
+<div class="paragraph">
+<p>Approved recipients are compiled to a <code>Pattern</code> and must be a valid regular expression. The created <code>Pattern</code> is case-insensitive as emails are case insensitive. Provided patterns are trimmed before being compiled.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6838">QUARKUS_MAILER_APPROVED_RECIPIENTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6838" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/regex/Pattern.html">Pattern</a></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-log-rejected-recipients"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-log-rejected-recipients"><code>quarkus.mailer.log-rejected-recipients</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-38" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Log rejected recipients as warnings.</p>
+</div>
+<div class="paragraph">
+<p>If false, the rejected recipients will be logged at the DEBUG level.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6839">QUARKUS_MAILER_LOG_REJECTED_RECIPIENTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6839" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-log-invalid-recipients"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-log-invalid-recipients"><code>quarkus.mailer.log-invalid-recipients</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-39" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Log invalid recipients as warnings.</p>
+</div>
+<div class="paragraph">
+<p>If false, the invalid recipients will not be logged and the thrown exception will not contain the invalid email address.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6840">QUARKUS_MAILER_LOG_INVALID_RECIPIENTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6840" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-mailer_section_quarkus-mailer"></a> <span class="section-name section-level0"><a href="#quarkus-mailer_section_quarkus-mailer">Additional named mailers</a></span></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">型</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-from"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-from"><code>quarkus.mailer."mailer-name".from</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-40" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the default <code>from</code> attribute when not specified in the <code>io.quarkus.mailer.Mail</code> instance. It&#8217;s the sender email address.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6841">QUARKUS_MAILER__MAILER_NAME__FROM</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6841" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-mock"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-mock"><code>quarkus.mailer."mailer-name".mock</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-41" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Enables the mock mode. When enabled, mails are not sent, but stored in an in-memory mailbox. The content of the emails is also printed on the console.</p>
+</div>
+<div class="paragraph">
+<p>Disabled by default on PROD, enabled by default on DEV and TEST modes.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6842">QUARKUS_MAILER__MAILER_NAME__MOCK</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6842" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-bounce-address"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-bounce-address"><code>quarkus.mailer."mailer-name".bounce-address</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-42" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the default bounce email address. A bounced email, or bounce, is an email message that gets rejected by a mail server.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6843">QUARKUS_MAILER__MAILER_NAME__BOUNCE_ADDRESS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6843" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-host"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-host"><code>quarkus.mailer."mailer-name".host</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-43" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the SMTP host name.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6844">QUARKUS_MAILER__MAILER_NAME__HOST</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6844" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>localhost</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-port"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-port"><code>quarkus.mailer."mailer-name".port</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-44" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The SMTP port. The default value depends on the configuration. The port 25 is used as default when <code>ssl</code> is disabled. This port continues to be used primarily for SMTP relaying. SMTP relaying is the transmission of email from email server to email server. The port 587 is the default port when <code>ssl</code> is enabled. It ensures that email is submitted securely.</p>
+</div>
+<div class="paragraph">
+<p>Note that the port 465 may be used by SMTP servers, however, IANA has reassigned a new service to this port, and it should no longer be used for SMTP communications.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6845">QUARKUS_MAILER__MAILER_NAME__PORT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6845" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-username"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-username"><code>quarkus.mailer."mailer-name".username</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-45" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the username to connect to the SMTP server.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6846">QUARKUS_MAILER__MAILER_NAME__USERNAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6846" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-password"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-password"><code>quarkus.mailer."mailer-name".password</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-46" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the password to connect to the SMTP server.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6847">QUARKUS_MAILER__MAILER_NAME__PASSWORD</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6847" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-tls-configuration-name"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-tls-configuration-name"><code>quarkus.mailer."mailer-name".tls-configuration-name</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-47" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The name of the TLS configuration to use.</p>
+</div>
+<div class="paragraph">
+<p>If a name is configured, it uses the configuration from <code>quarkus.tls.&lt;name&gt;.*</code> If a name is configured, but no TLS configuration is found with that name then an error will be thrown.</p>
+</div>
+<div class="paragraph">
+<p>If no TLS configuration name is set then, the specific TLS configuration (from <code>quarkus.mailer.*</code>) will be used.</p>
+</div>
+<div class="paragraph">
+<p>The default TLS configuration is <strong>not</strong> used by default.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6848">QUARKUS_MAILER__MAILER_NAME__TLS_CONFIGURATION_NAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6848" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-tls"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-tls"><code>quarkus.mailer."mailer-name".tls</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-48" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Whether the connection should be secured using TLS.</p>
+</div>
+<div class="paragraph">
+<p>SMTP allows establishing connection with or without TLS. When establishing a connection with TLS, the connection is secured and encrypted. When establishing a connection without TLS, it can be secured and encrypted later using the STARTTLS command. In this case, the connection is initially unsecured and unencrypted. To configure this case, set this property to <code>false</code> and <code>start-tls</code> to <code>REQUIRED</code> Note that if a TLS configuration is set, TLS is enabled automatically. So, setting this property to <code>false</code> is required to not establish a connection with TLS.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6849">QUARKUS_MAILER__MAILER_NAME__TLS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6849" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-max-pool-size"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-max-pool-size"><code>quarkus.mailer."mailer-name".max-pool-size</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-49" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the max number of open connections to the mail server.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6850">QUARKUS_MAILER__MAILER_NAME__MAX_POOL_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6850" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>10</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-own-host-name"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-own-host-name"><code>quarkus.mailer."mailer-name".own-host-name</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-50" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the hostname to be used for HELO/EHLO and the Message-ID.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6851">QUARKUS_MAILER__MAILER_NAME__OWN_HOST_NAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6851" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-keep-alive"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-keep-alive"><code>quarkus.mailer."mailer-name".keep-alive</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-51" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets if connection pool is enabled. If the connection pooling is disabled, the max number of sockets is enforced nevertheless.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6852">QUARKUS_MAILER__MAILER_NAME__KEEP_ALIVE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6852" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-disable-esmtp"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-disable-esmtp"><code>quarkus.mailer."mailer-name".disable-esmtp</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-52" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Disable ESMTP.</p>
+</div>
+<div class="paragraph">
+<p>The RFC-1869 states that clients should always attempt <code>EHLO</code> as first command to determine if ESMTP is supported, if this returns an error code, <code>HELO</code> is tried to use the <em>regular</em> SMTP command.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6853">QUARKUS_MAILER__MAILER_NAME__DISABLE_ESMTP</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6853" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-start-tls"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-start-tls"><code>quarkus.mailer."mailer-name".start-tls</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-53" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the TLS security mode for the connection. Either <code>DISABLED</code>, <code>OPTIONAL</code> or <code>REQUIRED</code>.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6854">QUARKUS_MAILER__MAILER_NAME__START_TLS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6854" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>OPTIONAL</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-dkim-enabled"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-dkim-enabled"><code>quarkus.mailer."mailer-name".dkim.enabled</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-54" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Enables DKIM signing.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6855">QUARKUS_MAILER__MAILER_NAME__DKIM_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6855" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-dkim-private-key"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-dkim-private-key"><code>quarkus.mailer."mailer-name".dkim.private-key</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-55" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the PKCS#8 format private key used to sign the email.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6856">QUARKUS_MAILER__MAILER_NAME__DKIM_PRIVATE_KEY</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6856" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-dkim-private-key-path"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-dkim-private-key-path"><code>quarkus.mailer."mailer-name".dkim.private-key-path</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-56" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the PKCS#8 format private key file path.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6857">QUARKUS_MAILER__MAILER_NAME__DKIM_PRIVATE_KEY_PATH</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6857" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-dkim-auid"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-dkim-auid"><code>quarkus.mailer."mailer-name".dkim.auid</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-57" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the Agent or User Identifier (AUID).</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6858">QUARKUS_MAILER__MAILER_NAME__DKIM_AUID</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6858" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-dkim-selector"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-dkim-selector"><code>quarkus.mailer."mailer-name".dkim.selector</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-58" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the selector used to query the public key.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6859">QUARKUS_MAILER__MAILER_NAME__DKIM_SELECTOR</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6859" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-dkim-sdid"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-dkim-sdid"><code>quarkus.mailer."mailer-name".dkim.sdid</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-59" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the Signing Domain Identifier (SDID).</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6860">QUARKUS_MAILER__MAILER_NAME__DKIM_SDID</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6860" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-dkim-header-canon-algo"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-dkim-header-canon-algo"><code>quarkus.mailer."mailer-name".dkim.header-canon-algo</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-60" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the canonicalization algorithm for signed headers.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6861">QUARKUS_MAILER__MAILER_NAME__DKIM_HEADER_CANON_ALGO</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6861" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><code>simple</code>, <code>relaxed</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-dkim-body-canon-algo"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-dkim-body-canon-algo"><code>quarkus.mailer."mailer-name".dkim.body-canon-algo</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-61" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the canonicalization algorithm for mail body.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6862">QUARKUS_MAILER__MAILER_NAME__DKIM_BODY_CANON_ALGO</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6862" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><code>simple</code>, <code>relaxed</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-dkim-body-limit"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-dkim-body-limit"><code>quarkus.mailer."mailer-name".dkim.body-limit</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-62" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the body limit to sign. Must be greater than zero.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6863">QUARKUS_MAILER__MAILER_NAME__DKIM_BODY_LIMIT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6863" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-dkim-signature-timestamp"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-dkim-signature-timestamp"><code>quarkus.mailer."mailer-name".dkim.signature-timestamp</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-63" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures to enable or disable signature sign timestamp.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6864">QUARKUS_MAILER__MAILER_NAME__DKIM_SIGNATURE_TIMESTAMP</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6864" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-dkim-expire-time"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-dkim-expire-time"><code>quarkus.mailer."mailer-name".dkim.expire-time</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-64" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the expire time in seconds when the signature sign will be expired. Must be greater than zero.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6865">QUARKUS_MAILER__MAILER_NAME__DKIM_EXPIRE_TIME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6865" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">長</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-dkim-signed-headers"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-dkim-signed-headers"><code>quarkus.mailer."mailer-name".dkim.signed-headers</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-65" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Configures the signed headers in DKIM, separated by commas. The order in the list matters.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6866">QUARKUS_MAILER__MAILER_NAME__DKIM_SIGNED_HEADERS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6866" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-login"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-login"><code>quarkus.mailer."mailer-name".login</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-66" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the login mode for the connection. Either <code>NONE</code>, @{code DISABLED}, <code>OPTIONAL</code>, <code>REQUIRED</code> or <code>XOAUTH2</code>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>DISABLED means no login will be attempted</p>
+</li>
+<li>
+<p>NONE means a login will be attempted if the server supports in and login credentials are set</p>
+</li>
+<li>
+<p>REQUIRED means that a login will be attempted if the server supports it and the send operation will fail otherwise</p>
+</li>
+<li>
+<p>XOAUTH2 means that a login will be attempted using Google Gmail Oauth2 tokens</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6867">QUARKUS_MAILER__MAILER_NAME__LOGIN</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6867" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>NONE</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-auth-methods"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-auth-methods"><code>quarkus.mailer."mailer-name".auth-methods</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-67" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the allowed authentication methods. These methods will be used only if the server supports them. If not set, all supported methods may be used.</p>
+</div>
+<div class="paragraph">
+<p>The list is given as a space separated list, such as <code>DIGEST-MD5 CRAM-SHA256 CRAM-SHA1 CRAM-MD5 PLAIN LOGIN</code>.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6868">QUARKUS_MAILER__MAILER_NAME__AUTH_METHODS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6868" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-multi-part-only"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-multi-part-only"><code>quarkus.mailer."mailer-name".multi-part-only</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-68" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Whether the mail should always been sent as multipart even if they don&#8217;t have attachments. When sets to true, the mail message will be encoded as multipart even for simple mails without attachments.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6869">QUARKUS_MAILER__MAILER_NAME__MULTI_PART_ONLY</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6869" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-allow-rcpt-errors"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-allow-rcpt-errors"><code>quarkus.mailer."mailer-name".allow-rcpt-errors</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-69" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets if sending allows recipients errors. If set to true, the mail will be sent to the recipients that the server accepted, if any.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6870">QUARKUS_MAILER__MAILER_NAME__ALLOW_RCPT_ERRORS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6870" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-pipelining"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-pipelining"><code>quarkus.mailer."mailer-name".pipelining</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-70" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Enables or disables the pipelining capability if the SMTP server supports it.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6871">QUARKUS_MAILER__MAILER_NAME__PIPELINING</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6871" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-pool-cleaner-period"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-pool-cleaner-period"><code>quarkus.mailer."mailer-name".pool-cleaner-period</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-71" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the connection pool cleaner period. Zero disables expiration checks and connections will remain in the pool until they are closed.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6872">QUARKUS_MAILER__MAILER_NAME__POOL_CLEANER_PERIOD</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6872" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-mailer_quarkus-mailer"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>PT1S</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-keep-alive-timeout"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-keep-alive-timeout"><code>quarkus.mailer."mailer-name".keep-alive-timeout</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-72" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set the keep alive timeout for the SMTP connection. This value determines how long a connection remains unused in the pool before being evicted and closed. A timeout of 0 means there is no timeout.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6873">QUARKUS_MAILER__MAILER_NAME__KEEP_ALIVE_TIMEOUT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6873" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-mailer_quarkus-mailer"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>PT300S</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-ntlm-workstation"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-ntlm-workstation"><code>quarkus.mailer."mailer-name".ntlm.workstation</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-73" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the workstation used on NTLM authentication.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6874">QUARKUS_MAILER__MAILER_NAME__NTLM_WORKSTATION</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6874" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-ntlm-domain"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-ntlm-domain"><code>quarkus.mailer."mailer-name".ntlm.domain</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-74" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Sets the domain used on NTLM authentication.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6875">QUARKUS_MAILER__MAILER_NAME__NTLM_DOMAIN</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6875" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-approved-recipients"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-approved-recipients"><code>quarkus.mailer."mailer-name".approved-recipients</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-75" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Allows sending emails to these recipients only.</p>
+</div>
+<div class="paragraph">
+<p>Approved recipients are compiled to a <code>Pattern</code> and must be a valid regular expression. The created <code>Pattern</code> is case-insensitive as emails are case insensitive. Provided patterns are trimmed before being compiled.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6876">QUARKUS_MAILER__MAILER_NAME__APPROVED_RECIPIENTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6876" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/regex/Pattern.html">Pattern</a></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-log-rejected-recipients"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-log-rejected-recipients"><code>quarkus.mailer."mailer-name".log-rejected-recipients</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-76" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Log rejected recipients as warnings.</p>
+</div>
+<div class="paragraph">
+<p>If false, the rejected recipients will be logged at the DEBUG level.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6877">QUARKUS_MAILER__MAILER_NAME__LOG_REJECTED_RECIPIENTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6877" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-mailer_quarkus-mailer-mailer-name-log-invalid-recipients"></a> <span class="property-path"><a href="#quarkus-mailer_quarkus-mailer-mailer-name-log-invalid-recipients"><code>quarkus.mailer."mailer-name".log-invalid-recipients</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-77" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Log invalid recipients as warnings.</p>
+</div>
+<div class="paragraph">
+<p>If false, the invalid recipients will not be logged and the thrown exception will not contain the invalid email address.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6878">QUARKUS_MAILER__MAILER_NAME__LOG_INVALID_RECIPIENTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6878" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+</tbody>
+</table>
+<div id="duration-note-anchor-quarkus-mailer_quarkus-mailer" class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">期間フォーマットについて</div>
+<div class="paragraph">
+<p>To write duration values, use the standard <code>java.time.Duration</code> format.
+See the <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html#parse(java.lang.CharSequence)">Duration#parse() Java API documentation</a> for more information.</p>
+</div>
+<div class="paragraph">
+<p>数字で始まる簡略化した書式を使うこともできます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値のみの場合は、秒単位の時間を表します。</p>
+</li>
+<li>
+<p>数値の後に <code>ms</code> が続く場合は、ミリ秒単位の時間を表します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>その他の場合は、簡略化されたフォーマットが解析のために <code>java.time.Duration</code> フォーマットに変換されます：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値の後に <code>h</code> 、 <code>m</code> 、 <code>s</code> が続く場合は、その前に <code>PT</code> が付けられます。</p>
+</li>
+<li>
+<p>数値の後に <code>d</code> が続く場合は、その前に <code>P</code> が付けられます。</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#mailer-extension">Mailerエクステンション</a></li>
+<li><a href="#accessing-the-mailer">Mailerへのアクセス</a></li>
+<li><a href="#creating-mail-objects">メールオブジェクトの作成</a></li>
+<li><a href="#attachments">添付ファイルの送信</a></li>
+<li><a href="#html">添付ファイルがインライン化されたHTMLメールの送信</a></li>
+<li><a href="#templates">Quteテンプレートに基づくメッセージ Body</a></li>
+<li><a href="#execution-model">実行モデル</a></li>
+<li><a href="#testing">メール送信のテスト</a></li>
+<li><a href="#using-the-underlying-vert-x-mail-client">Vert.xのメールクライアントの使用</a></li>
+<li><a href="#using-ssl-with-native-executables">ネイティブ実行可能ファイルでのSSLの使用</a></li>
+<li><a href="#configuring-the-smtp-credentials">SMTP認証情報の設定</a></li>
+<li><a href="#configuring-tls">TLS の設定</a>
+<ul class="sectlevel2">
+<li><a href="#configuring-starttls">Configuring STARTTLS</a></li>
+<li><a href="#configuring-ssltls">Configuring SSL/TLS</a></li>
+</ul>
+</li>
+<li><a href="#multiple-mailer-configurations">複数のmailer設定</a></li>
+<li><a href="#popular">一般的なメールサービスに対応したMailer設定</a>
+<ul class="sectlevel2">
+<li><a href="#gmail-specific-configuration">Gmail特有の設定</a></li>
+<li><a href="#aws-ses-simple-email-service">AWS SES - Simple Email Service</a></li>
+<li><a href="#mailjet">MailJet</a></li>
+<li><a href="#sendgrid">Sendgrid</a></li>
+<li><a href="#office-365">Office 365</a></li>
+</ul>
+</li>
+<li><a href="#configuration-reference">Mailer設定リファレンス</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same extensions</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/guides/mailer">SMTPでのメールの送信</a></li>
+      </ul>
+    </div>
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/guides/mailer">SMTPでのメールの送信</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

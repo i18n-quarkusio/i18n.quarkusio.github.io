@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>ネイティブ・アプリケーションを作成するためのヒント - 2.13 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/2.13/guides/writing-native-applications-tips" />
+  <meta property="og:title" content="ネイティブ・アプリケーションを作成するためのヒント - 2.13" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/writing-native-applications-tips">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/2.13/guides/writing-native-applications-tips">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/2.13/guides/writing-native-applications-tips" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/2.13/guides/writing-native-applications-tips">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/2.13/guides/writing-native-applications-tips">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/2.13/guides/writing-native-applications-tips">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/2.13/guides/writing-native-applications-tips">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/2.13/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" selected>2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">ネイティブ・アプリケーションを作成するためのヒント </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドには、Java アプリケーションをネイティブ実行可能ファイルとして実行しようとしたときに発生する可能性のある問題を回避するためのさまざまなヒントやコツが記載されています。</p>
+</div>
+<div class="paragraph">
+<p>適用されるソリューションが異なる可能性のある 2 つの文脈を区別していることに注意してください。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>アプリケーションの文脈では、<code>pom.xml</code> を修正して、 <code>native-image</code> 設定を調整することに依存することになります。</p>
+</li>
+<li>
+<p>エクステンションの文脈では、Quarkus はこれらすべてを簡素化するための多くのインフラストラクチャーを提供しています。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>コンテキストに応じて適切なセクションを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="supporting-native-in-your-application"><a class="anchor" href="#supporting-native-in-your-application"></a>アプリケーションでのネイティブのサポート</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>GraalVM は多くの制約を課しており、アプリケーションをネイティブ実行可能なものにするには、いくつかの調整が必要になるかもしれません。</p>
+</div>
+<div class="sect2">
+<h3 id="including-resources"><a class="anchor" href="#including-resources"></a>リソースのインクルード</h3>
+<div class="paragraph">
+<p>デフォルトでは、ネイティブ実行可能ファイルをビルドする際に、GraalVM はクラスパス上にあるリソースを、作成するネイティブ実行可能ファイルには含めません。ネイティブ実行可能ファイルの一部となるリソースは、明示的に設定する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus では、<code>META-INF/resources</code> (Web リソース) にあるリソースを自動的にインクルードしますが、このディレクトリー以外の場所は自分で設定する必要があります。</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>META-INF/resources</code> にあるものはすべて、静的な Web リソースとして公開されるので、ここでは非常に注意が必要です。このディレクトリーは、「これらのリソースを自動的にネイティブ実行可能ファイルに含める」ためのショートカットではなく、静的な Web リソースのためにのみ使用する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>その他のリソースは明示的に宣言する必要があります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>より多くのリソースをネイティブ実行可能ファイルに含めるには、<code>quarkus.native.resources.includes</code> という設定プロパティーと、<code>quarkus.native.resources.excludes</code> リソースを除外するための <code>quarkus.native.resources.excludes</code> を使用するのが最も簡単です。</p>
+</div>
+<div class="paragraph">
+<p>どちらの設定プロパティーもグロブパターンに対応しています。</p>
+</div>
+<div class="paragraph">
+<p>たとえば、<code>application.properties</code> で以下のプロパティーを設定すると、</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.native.resources.includes=foo/**,bar/**/*.txt
+quarkus.native.resources.excludes=foo/private/**</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>以下が含まれます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>foo/</code> ディレクトリーとそのサブディレクトリーにあるすべてのファイルのうち、<code>foo/private/</code> とそのサブディレクトリーにあるファイルを除く。</p>
+</li>
+<li>
+<p><code>bar/</code> ディレクトリーとそのサブディレクトリーにあるすべてのテキストファイル。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>グロブでは不十分で正規表現に頼る必要があるユースケースや、GraalVM インフラストラクチャーを使用することを好む場合は、どのリソースを含めるべきかを定義する JSON ファイル <code>resources-config.json</code> (最も一般的な場所は <code>src/main/resources</code> 内) を作成します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "resources": [
+    {
+      "pattern": ".*\\.xml$"
+    },
+    {
+      "pattern": ".*\\.json$"
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このパターンは有効な Java 正規表現です。ここでは、すべての XML ファイルと JSONファイル をネイティブ実行可能ファイルに含めています。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>このトピックに関する詳しい情報は、 <a href="https://www.graalvm.org/22.3/reference-manual/native-image/dynamic-features/Resources/">GraalVMのドキュメント</a>に記載されています。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>最後にやるべきことは、<code>application.properties</code> に適切な設定を追加して、設定ファイルを <code>native-image</code> 実行ファイルに知らせることです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.native.additional-build-args =-H:ResourceConfigurationFiles=resources-config.json</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>前のスニペットでは、<code>src/main/resources</code> に追加されたため、ファイルのパス全体を指定するのではなく、単に <code>resources-config.json</code> を使用することができました。ファイルが別のディレクトリーに追加されていた場合は、適切なファイルパスを手動で指定する必要がありました。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>複数のオプションはカンマで区切ることができます。例えば、次のように使用することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.native.additional-build-args =\
+    -H:ResourceConfigurationFiles=resources-config.json,\
+    -H:ReflectionConfigurationFiles=reflection-config.json</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>さまざまなリソースが含まれており、追加のリフレクションの登録を担保するため。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>何らかの理由で <code>application.properties</code> に前述の構成を追加することが望ましくない場合には、ビルドツールで効果的に同様の操作を行うように構成することも可能です。</p>
+</div>
+<div class="paragraph">
+<p>Maven を使用する場合は、以下のような構成にすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;profiles&gt;
+    &lt;profile&gt;
+        &lt;id&gt;native&lt;/id&gt;
+        &lt;properties&gt;
+            &lt;quarkus.package.type&gt;native&lt;/quarkus.package.type&gt;
+            &lt;quarkus.native.additional-build-args&gt;-H:ResourceConfigurationFiles=resources-config.json&lt;/quarkus.native.additional-build-args&gt;
+        &lt;/properties&gt;
+    &lt;/profile&gt;
+&lt;/profiles&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="registering-for-reflection"><a class="anchor" href="#registering-for-reflection"></a>リフレクションのための登録</h3>
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルを構築する際、GraalVM はクローズな環境を想定して動作します。これは、コールツリーを解析し、直接使用しないクラス/メソッド/フィールドをすべて削除します。</p>
+</div>
+<div class="paragraph">
+<p>リフレクションで使用される要素はコールツリーの一部ではないので、デッドコードとして排除されます (他のケースでは直接呼び出されない場合)。ネイティブ実行可能ファイルにこれらの要素を含めるには、リフレクションに明示的に登録する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>これは非常によくあるケースです。JSONライブラリは一般的にリフレクションを使用してオブジェクトをJSONにシリアライズする為です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    public class Person {
+        private String first;
+        private String last;
+
+        public String getFirst() {
+            return first;
+        }
+
+        public void setFirst(String first) {
+            this.first = first;
+        }
+
+        public String getLast() {
+            return last;
+        }
+
+        public void setValue(String last) {
+            this.last = last;
+        }
+    }
+
+    @Path("/person")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public class PersonResource {
+
+        private final Jsonb jsonb;
+
+        public PersonResource() {
+            jsonb = JsonbBuilder.create(new JsonbConfig());
+        }
+
+        @GET
+        public Response list() {
+            return Response.ok(jsonb.fromJson("{\"first\":  \"foo\", \"last\":  \"bar\"}", Person.class)).build();
+        }
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上記のコードを使用した場合、ネイティブ実行可能ファイルを使用すると以下のような例外が発生します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">Exception handling request to /person: org.jboss.resteasy.spi.UnhandledException: javax.json.bind.JsonbException: Can't create instance of a class: class org.acme.jsonb.Person, No default constructor found</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>または Jackson を使用している場合。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">com.fasterxml.jackson.databind.exc.InvalidDefinitionException: No serializer found for class org.acme.jsonb.Person and no properties discovered to create BeanSerializer (to avoid exception, disable SerializationFeature.FAIL_ON_EMPTY_BEANS)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>さらに厄介なのは、例外がスローされずに JSON の結果が完全に空になってしまうことです。</p>
+</div>
+<div class="paragraph">
+<p>このタイプの問題を解決するには、2 つの方法があります。</p>
+</div>
+<div class="sect3">
+<h4 id="registerForReflection"><a class="anchor" href="#registerForReflection"></a>@RegisterForReflection アノテーションの使用</h4>
+<div class="paragraph">
+<p>リフレクション用のクラスを登録する最も簡単な方法は、<code>@RegisterForReflection</code> アノテーションを使用することです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@RegisterForReflection
+public class MyClass {
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>クラスがサードパーティの jar にある場合は、そのクラスの <code>@RegisterForReflection</code> をホストする空のクラスを使用することで行うことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@RegisterForReflection(targets={ MyClassRequiringReflection.class, MySecondClassRequiringReflection.class})
+public class MyReflectionConfiguration {
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>なお、 <code>MyClassRequiringReflection</code> と <code>MySecondClassRequiringReflection</code> はリフレクションに登録されますが、 <code>MyReflectionConfiguration</code> は登録されません。</p>
+</div>
+<div class="paragraph">
+<p>この機能は、オブジェクトマッピング機能を使用するサードパーティのライブラリ（JacksonやGSONなど）を使用する際に便利です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@RegisterForReflection(targets = {User.class, UserImpl.class})
+public class MyReflectionConfiguration {
+
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="using-a-configuration-file"><a class="anchor" href="#using-a-configuration-file"></a>設定ファイルの使用</h4>
+<div class="paragraph">
+<p>設定ファイルを使用してリフレクション用のクラスを登録することも可能です。</p>
+</div>
+<div class="paragraph">
+<p>例えば、クラス <code>com.acme.MyClass</code> のすべてのメソッドをリフレクションのために登録するには、<code>reflection-config.json</code> を作成します (最も一般的な場所は <code>src/main/resources</code> の中です)。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">[
+  {
+    "name" : "com.acme.MyClass",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredFields" : true,
+    "allPublicFields" : true
+  }
+]</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>このファイルのフォーマットの詳細については、 <a href="https://www.graalvm.org/22.3/reference-manual/native-image/dynamic-features/Reflection/">GraalVMのドキュメント</a>を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>最後にやるべきことは、<code>application.properties</code> に適切な設定を追加して、設定ファイルを <code>native-image</code> 実行ファイルに知らせることです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.native.additional-build-args =-H:ReflectionConfigurationFiles=reflection-config.json</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>前のスニペットでは、<code>src/main/resources</code> に追加されたため、ファイルのパス全体を指定するのではなく、単に <code>reflection-config.json</code> を使用することができました。ファイルが別のディレクトリーに追加されていた場合は、適切なファイルパスを手動で指定する必要がありました。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>複数のオプションはカンマで区切ることができます。例えば、次のように使用することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.native.additional-build-args =\
+    -H:ResourceConfigurationFiles=resources-config.json,\
+    -H:ReflectionConfigurationFiles=reflection-config.json</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>さまざまなリソースが含まれており、追加のリフレクションの登録を担保するため。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>何らかの理由で <code>application.properties</code> に前述の構成を追加することが望ましくない場合には、ビルドツールで効果的に同様の操作を行うように構成することも可能です。</p>
+</div>
+<div class="paragraph">
+<p>Maven を使用する場合は、以下のような構成にすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;profiles&gt;
+    &lt;profile&gt;
+        &lt;id&gt;native&lt;/id&gt;
+        &lt;properties&gt;
+            &lt;quarkus.package.type&gt;native&lt;/quarkus.package.type&gt;
+            &lt;quarkus.native.additional-build-args&gt;-H:ReflectionConfigurationFiles=reflection-config.json&lt;/quarkus.native.additional-build-args&gt;
+        &lt;/properties&gt;
+    &lt;/profile&gt;
+&lt;/profiles&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="delay-class-init-in-your-app"><a class="anchor" href="#delay-class-init-in-your-app"></a>クラスの初期化を遅らせる</h3>
+<div class="paragraph">
+<p>デフォルトでは、Quarkus はビルド時にすべてのクラスを初期化します。</p>
+</div>
+<div class="paragraph">
+<p>特定のクラスの初期化が静的ブロックで行われる場合、実行時に延期する必要がある場合があります。通常、このような設定を省略すると、以下のような実行時例外が発生します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">Error: No instances are allowed in the image heap for a class that is initialized or reinitialized at image runtime: sun.security.provider.NativePRNG
+Trace: object java.security.SecureRandom
+method com.amazonaws.services.s3.model.CryptoConfiguration.&lt;init&gt;(CryptoMode)
+Call path from entry point to com.amazonaws.services.s3.model.CryptoConfiguration.&lt;init&gt;(CryptoMode):</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>もう一つのよくあるエラーの原因は、GraalVMによって取得されたイメージヒープが <code>Random</code> / <code>SplittableRandom</code> インスタンスを含んでいる場合です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">Error: com.oracle.graal.pointsto.constraints.UnsupportedFeatureException: Detected an instance of Random/SplittableRandom class in the image heap. Instances created during image generation have cached seed values and don't behave as expected.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これは、Quarkus がビルド時に静的な <code>Random</code>/<code>SplittableRandom</code> フィールドを持つクラスを初期化し、この特定のインスタンスがイメージヒープに一時的に含まれることが原因である場合がほとんどです。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>この <code>Random</code>/<code>SplittableRandom</code> の問題については、 <a href="https://foivos.zakkak.net/tutorials/working-with-randoms-native-images/">このブログ記事</a> に詳細な情報があります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>これらの場合、実行時に違反しているクラスの初期化を遅らせることが解決策になる可能性があり、それを達成するには、 <code>--initialize-at-run-time=&lt;package or class&gt;</code> 設定ノブを使用できます。</p>
+</div>
+<div class="paragraph">
+<p>上記の例のように、<code>quarkus.native.additional-build-args</code> 設定プロパティーを使用して <code>native-image</code> 設定に追加する必要があります。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>これらすべての情報は、 <a href="https://www.graalvm.org/22.3/reference-manual/native-image/optimizations-and-performance/ClassInitialization/">GraalVMのドキュメント</a>に記載されています。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>quarkus.native.additional-build-args</code> 設定プロパティーを介して複数のクラスやパッケージを指定する必要がある場合は、<code>,</code> シンボルをエスケープする必要があります。その例を以下に示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.native.additional-build-args=--initialize-at-run-time=com.example.SomeClass\\,org.acme.SomeOtherClass</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>application.properties</code> の代わりに Maven 設定を使用する場合。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;quarkus.native.additional-build-args&gt;--initialize-at-run-time=com.example.SomeClass\,org.acme.SomeOtherClass&lt;/quarkus.native.additional-build-args&gt;</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="managing-proxy-classes"><a class="anchor" href="#managing-proxy-classes"></a>プロキシークラスの管理</h3>
+<div class="paragraph">
+<p>ネイティブアプリケーションを書く際には、実装するインターフェースのリストを指定して、イメージのビルド時にプロキシークラスを定義する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>このような状況では、以下のようなエラーが発生します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">com.oracle.svm.core.jdk.UnsupportedFeatureError: Proxy class defined by interfaces [interface org.apache.http.conn.HttpClientConnectionManager, interface org.apache.http.pool.ConnPoolControl, interface com.amazonaws.http.conn.Wrapped] not found. Generating proxy classes at runtime is not supported. Proxy classes need to be defined at image build time by specifying the list of interfaces that they implement. To define proxy classes use -H:DynamicProxyConfigurationFiles=&lt;comma-separated-config-files&gt; and -H:DynamicProxyConfigurationResources=&lt;comma-separated-config-resources&gt; options.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この問題を解決するには、<code>-H:DynamicProxyConfigurationResources=&lt;comma-separated-config-resources&gt;</code> オプションを追加し、ダイナミックプロキシ設定ファイルを用意する必要があります。このファイルのフォーマットに関するすべての情報は、 <a href="https://www.graalvm.org/22.3/reference-manual/native-image/guides/configure-dynamic-proxies/">GraalVM ドキュメント</a> に記載されています。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="modularity-benefits"><a class="anchor" href="#modularity-benefits"></a>モジュール化のメリット</h3>
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルのビルド時に、GraalVM はアプリケーションのコールツリーを分析し、必要なすべてのコードを含むコードセットを生成します。モジュラーコードベースを使用することは、アプリケーションの未使用部分またはオプション部分の問題を回避すると同時に、ネイティブ実行可能ファイルのビルド時間とサイズの両方を削減するための鍵となります。このセクションでは、ネイティブアプリケーションのモジュール化の利点の背後にある詳細について学習します。</p>
+</div>
+<div class="paragraph">
+<p>コードが十分にモジュール化されていない場合、生成されたネイティブ実行可能ファイルには、ユーザーが必要とする以上のコードが含まれてしまうことがあります。機能が使用されず、コードがネイティブ実行ファイルにコンパイルされる場合、ネイティブコンパイル時間とメモリ使用量、さらにネイティブ実行ファイルのディスクスペースと起動ヒープサイズの無駄となります。さらに、ネイティブコンパイルやランタイムエラーを引き起こすサードパーティライブラリや特殊なAPIサブシステムが使用され、それらの使用が十分にモジュール化されていない場合には、さらに問題が発生します。最近の問題としては、JavaのAWT APIを使用して画像を含むXMLファイルをデシリアライズできるJAXBライブラリが挙げられます。Quarkus XMLユーザーの大半は画像をデシリアライズする必要がないため、ネイティブの実行ファイルにJAXB AWTコードを追加するようQuarkusを特別に設定しない限り、ユーザーアプリケーションにJava AWTコードを含める必要はないはずです。しかし、AWTを使用するJAXBコードは、残りのXMLパースコードと同じjarにあるため、この分離を達成するのはかなり複雑で、Javaバイトコード置換を使用して回避する必要がありました。このような置換はメンテナンスが難しく、簡単に壊れてしまうので、最後の手段であるべきです。</p>
+</div>
+<div class="paragraph">
+<p>モジュール式のコードベースは、この種の問題を回避するための最良の方法です。上記の JAXB/AWT の問題を考えると、イメージを扱う JAXB コードが別のモジュールまたは jar (例: <code>jaxb-images</code>) にあった場合、Quarkus は、構築時に画像を含むXMLファイルをシリアライズ/デシリアライズする必要があるとユーザーが特に要求しない限り、そのモジュールを含めないように選択することができます。</p>
+</div>
+<div class="paragraph">
+<p>モジュラーアプリケーションのもう 1 つの利点は、ネイティブ実行可能ファイルに組み込む必要があるコードセットを削減できることです。コードセットが小さいほど、ネイティブ実行可能ファイルのビルドが高速になり、生成されるネイティブ実行可能ファイルが小さくなります。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>ここで重要なポイントは次のとおりです。オプションの機能、特に大きなフットプリントを持つサードパーティーのライブラリーや API サブシステムに依存する機能は、別のモジュールに保持することが最善のソリューションです。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>アプリケーションに同様の問題があるかどうかを確認するにはどうすればよいですか? アプリケーションの詳細な調査は別として、 <a href="https://maven.apache.org/guides/introduction/introduction-to-optional-and-excludes-dependencies.htmlMaven" class="bare">https://maven.apache.org/guides/introduction/introduction-to-optional-and-excludes-dependencies.htmlMaven</a> のオプションの依存関係 の使用法を見つけることは、アプリケーションで同様の問題が発生する可能性があります。この種の依存関係は避けるべきであり、代わりに、オプションの依存関係と対話するコードは別のモジュールに移動する必要があります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="enforcing-singletons"><a class="anchor" href="#enforcing-singletons"></a>シングルトンの強制</h3>
+<div class="paragraph">
+<p><a href="#delay-class-init-in-your-app">遅延クラス初期化</a> セクションですでに説明したように、Quarkus はデフォルトでビルド時にすべてのコードを初期化するようマークします。つまり、特に指定がない限り、静的変数はビルド時に代入され、静的ブロックもビルド時に実行されます。</p>
+</div>
+<div class="paragraph">
+<p>これにより、通常は実行ごとに異なるJavaプログラムの値が、常に一定の値として返されるようになります。例えば、 <code>System.currentTimeMillis()</code> という値が割り当てられている静的フィールドは、Quarkus ネイティブ実行ファイルとして実行されると、常に同じ値を返します。</p>
+</div>
+<div class="paragraph">
+<p>静的変数の初期化に依存するシングルトンは、同様の問題に悩まされます。たとえば、クエリーを実行する REST エンドポイントと共に、静的初期化に基づくシングルトンがあるとします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Path("/singletons")
+public class Singletons {
+
+    @GET
+    @Path("/static")
+    public long withStatic() {
+        return StaticSingleton.startTime();
+    }
+}
+
+class StaticSingleton {
+    static final long START_TIME = System.currentTimeMillis();
+
+    static long startTime() {
+        return START_TIME;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p> <code>singletons/static</code> のエンドポイントに問い合わせると、アプリケーションを再起動しても常に同じ値が返されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl http://localhost:8080/singletons/static
+1656509254532%
+
+$ curl http://localhost:8080/singletons/static
+1656509254532%
+
+### Restart the native application ###
+
+$ curl http://localhost:8080/singletons/static
+1656509254532%</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>enum</code> クラスに依存しているシングルトンも同じ問題の影響を受けます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Path("/singletons")
+public class Singletons {
+
+    @GET
+    @Path("/enum")
+    public long withEnum() {
+        return EnumSingleton.INSTANCE.startTime();
+    }
+}
+
+enum EnumSingleton {
+    INSTANCE(System.currentTimeMillis());
+
+    private final long startTime;
+
+    private EnumSingleton(long startTime) {
+        this.startTime = startTime;
+    }
+
+    long startTime() {
+        return startTime;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>singletons/enum</code> エンドポイントがクエリーされると、アプリケーションが再起動された後でも、常に同じ値が返されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl http://localhost:8080/singletons/enum
+1656509254601%
+
+$ curl http://localhost:8080/singletons/enum
+1656509254601%
+
+### Restart the native application ###
+
+$ curl http://localhost:8080/singletons/enum
+1656509254601%</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これを修正する 1 つの方法は、CDI の <code>@Singleton</code> アノテーションを使用してシングルトンを構築することです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Path("/singletons")
+public class Singletons {
+
+    @Inject
+    CdiSingleton cdiSingleton;
+
+    @GET
+    @Path("/cdi")
+    public long withCdi() {
+        return cdiSingleton.startTime();
+    }
+}
+
+@Singleton
+class CdiSingleton {
+    // Note that the field is not static
+    final long startTime = System.currentTimeMillis();
+
+    long startTime() {
+        return startTime;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>再起動するたびに、 <code>singletons/cdi</code> をクエリすると、JVM モードと同じように、異なる値が返却されます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl http://localhost:8080/singletons/cdi
+1656510218554%
+
+$ curl http://localhost:8080/singletons/cdi
+1656510218554%
+
+### Restart the native application ###
+
+$ curl http://localhost:8080/singletons/cdi
+1656510714689%</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>静的フィールドや列挙型に依存しながらシングルトンを強制する別の方法は、<a href="#delay-class-init-in-your-app">実行時までクラス初期化を遅延させる</a> ことです。CDIベースのシングルトンの良い利点は、クラスの初期化が制約されないので、ユースケースに応じて、ビルド時または実行時に初期化されるべきかを自由に決定できることです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="beware-of-common-java-api-overrides"><a class="anchor" href="#beware-of-common-java-api-overrides"></a>よくある Java API オーバーライドの注意点</h3>
+<div class="paragraph">
+<p>特定の一般的に使用される Java メソッドは、<code>toString</code>、<code>equals</code>、<code>hashCode</code> などのユーザークラスによってオーバーライドされます。オーバーライドの大部分は問題を引き起こしませんが、サードパーティーのライブラリー (追加の書式設定など) を使用したり、動的言語機能 (リフレクションやプロキシーなど) を使用したりすると、ネイティブイメージのビルドが失敗する可能性があります。これらの障害の中には、設定によって解決できるものもありますが、処理がより難しいものもあります。</p>
+</div>
+<div class="paragraph">
+<p>GraalVM ポイントツー分析の観点からは、アプリケーションが明示的に呼び出さなくても、これらのメソッドオーバーライドで何が起こるかが問題になります。これは、これらのメソッドが JDK 全体で使用されているためであり、これらの呼び出しの 1 つが制約のない型 (たとえば、<code>java.lang.Object</code>) で実行されるだけで、分析でその特定のすべての実装をプルする必要があるためです。方法。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="native-in-extension"><a class="anchor" href="#native-in-extension"></a>Quarkus エクステンションでネイティブをサポートする</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus のエクステンションでのネイティブのサポートは、Quarkus がこれらすべてを単純化するための多くのツールを提供しているため、さらに簡単になりました。</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>ここで説明したことはすべて、Quarkus エクステンションの文脈でのみ機能し、アプリケーションでは機能しません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="register-reflection"><a class="anchor" href="#register-reflection"></a>リフレクションの登録</h3>
+<div class="paragraph">
+<p>Quarkus では、<code>ReflectiveClassBuildItem</code> を使用することで、エクステンションへのリフレクションの登録が簡単になり、JSON 設定ファイルが不要になります。</p>
+</div>
+<div class="paragraph">
+<p>リフレクション用のクラスを登録するには、Quarkus プロセッサークラスを作成し、リフレクションを登録するビルドステップを追加する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class SaxParserProcessor {
+
+    @BuildStep
+    ReflectiveClassBuildItem reflection() {
+        // since we only need reflection to the constructor of the class, we can specify `false` for both the methods and the fields arguments.
+        return new ReflectiveClassBuildItem(false, false, "com.sun.org.apache.xerces.internal.parsers.SAXParser");
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>GraalVMでのリフレクションについての詳細は <a href="https://www.graalvm.org/22.3/reference-manual/native-image/dynamic-features/Reflection/">こちら</a>をご覧ください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="including-resources-2"><a class="anchor" href="#including-resources-2"></a>リソースのインクルード</h3>
+<div class="paragraph">
+<p>エクステンションのコンテキストでは、Quarkus は、エクステンションの作成者が <code>NativeImageResourceBuildItem</code> を指定できるようにすることで、JSON 設定ファイルの必要性を排除しています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class ResourcesProcessor {
+
+    @BuildStep
+    NativeImageResourceBuildItem nativeImageResourceBuildItem() {
+        return new NativeImageResourceBuildItem("META-INF/extra.properties");
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルにおけるGraalVMのリソース処理についての詳細は、 <a href="https://www.graalvm.org/22.3/reference-manual/native-image/dynamic-features/Resources/">GraalVMのドキュメント</a>を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="delay-class-initialization"><a class="anchor" href="#delay-class-initialization"></a>遅延クラス初期化</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus では、エクステンションの作成者が簡単に <code>RuntimeInitializedClassBuildItem</code> を登録できるようにすることで、物事をシンプルにしています。簡単な例としては、次のようなものが考えられます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class S3Processor {
+
+    @BuildStep
+    RuntimeInitializedClassBuildItem cryptoConfiguration() {
+        return new RuntimeInitializedClassBuildItem(CryptoConfiguration.class.getCanonicalName());
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このような構文を使用すると、 <code>--initialize-at-run-time</code> オプションが自動的に <code>native-image</code> コマンドラインに追加されることを意味します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>--initialize-at-run-time</code> の詳細については、 <a href="https://www.graalvm.org/22.3/reference-manual/native-image/optimizations-and-performance/ClassInitialization/">GraalVMのドキュメント</a>をお読みください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="managing-proxy-classes-2"><a class="anchor" href="#managing-proxy-classes-2"></a>プロキシークラスの管理</h3>
+<div class="paragraph">
+<p>同様に、Quarkus では、エクステンションの作成者が <code>NativeImageProxyDefinitionBuildItem</code> を登録することができます。その例としては、以下のようなものがあります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class S3Processor {
+
+    @BuildStep
+    NativeImageProxyDefinitionBuildItem httpProxies() {
+        return new NativeImageProxyDefinitionBuildItem("org.apache.http.conn.HttpClientConnectionManager",
+                "org.apache.http.pool.ConnPoolControl", "com.amazonaws.http.conn.Wrapped");
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このような構文を使用すると、<code>-H:DynamicProxyConfigurationResources</code> オプションが自動的に <code>native-image</code> コマンドラインに追加されることを意味します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>プロキシクラスの詳細については、 <a href="https://www.graalvm.org/22.3/reference-manual/native-image/guides/configure-dynamic-proxies/">GraalVMのドキュメント</a>をご覧ください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="logging-with-native-image"><a class="anchor" href="#logging-with-native-image"></a>ネイティブイメージでのロギング</h3>
+<div class="paragraph">
+<p>Apache Commons Logging や Log4j などのロギングコンポーネントを必要とする依存関係を使用していて、ネイティブ実行可能ファイルをビルドする際に <code>ClassNotFoundException</code> が発生する場合、ロギングライブラリーを除外し、対応する JBoss Logging アダプターを追加することで解決できます。</p>
+</div>
+<div class="paragraph">
+<p>詳しくは、<a href="logging.html#logging-adapters">Loggingガイド</a> をご覧ください。</p>
+</div>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#supporting-native-in-your-application">アプリケーションでのネイティブのサポート</a>
+<ul class="sectlevel2">
+<li><a href="#including-resources">リソースのインクルード</a></li>
+<li><a href="#registering-for-reflection">リフレクションのための登録</a></li>
+<li><a href="#delay-class-init-in-your-app">クラスの初期化を遅らせる</a></li>
+<li><a href="#managing-proxy-classes">プロキシークラスの管理</a></li>
+<li><a href="#modularity-benefits">モジュール化のメリット</a></li>
+<li><a href="#enforcing-singletons">シングルトンの強制</a></li>
+<li><a href="#beware-of-common-java-api-overrides">よくある Java API オーバーライドの注意点</a></li>
+</ul>
+</li>
+<li><a href="#native-in-extension">Quarkus エクステンションでネイティブをサポートする</a>
+<ul class="sectlevel2">
+<li><a href="#register-reflection">リフレクションの登録</a></li>
+<li><a href="#including-resources-2">リソースのインクルード</a></li>
+</ul>
+</li>
+<li><a href="#delay-class-initialization">遅延クラス初期化</a>
+<ul class="sectlevel2">
+<li><a href="#managing-proxy-classes-2">プロキシークラスの管理</a></li>
+<li><a href="#logging-with-native-image">ネイティブイメージでのロギング</a></li>
+</ul>
+</li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

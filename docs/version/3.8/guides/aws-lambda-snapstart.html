@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>AWS Lambda SnapStartの設定 - 3.8 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.8/guides/aws-lambda-snapstart" />
+  <meta property="og:title" content="AWS Lambda SnapStartの設定 - 3.8" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/aws-lambda-snapstart">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.8/guides/aws-lambda-snapstart">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.8/guides/aws-lambda-snapstart" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.8/guides/aws-lambda-snapstart">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.8/guides/aws-lambda-snapstart">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.8/guides/aws-lambda-snapstart">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.8/guides/aws-lambda-snapstart">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.8/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" selected>3.8</option>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">AWS Lambda SnapStartの設定 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html">SnapStart</a> は、AWS上のJava関数のコールドスタートアップ時間を大幅に短縮するスナップショット・リストアの仕組みです。このドキュメントでは、この機能を活用するためのさまざまな設定について説明します。SnapStartのリファレンスドキュメントではないので、SnapStartの動作の詳細については説明しません。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+本機能はAWS Lambdaでのみ利用可能であり、すべてのリージョンで利用できるわけではありません。AWSのドキュメントをご確認の上、ご利用のAWSリージョンが該当するかご確認ください。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="enabling-disabling-snapstart-optimizations"><a class="anchor" href="#enabling-disabling-snapstart-optimizations"></a>SnapStart最適化の有効化/無効化</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus AWS Lambdaエクステンションを使用すると、SnapStartの最適化が自動的に有効になります。
+ただし、以下を使用して明示的に有効化/無効化することもできます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.snapstart.enable=true|false</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Quarkusの最適化のみで、関数のSnapStartの有効/無効は設定されません。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="class-preloading"><a class="anchor" href="#class-preloading"></a>クラスプリローディング</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>クラスローディングは、関数の実行時間に大きな影響を与えます。この最適化により、SnapStartのスナップショット処理中にクラスをプリロードすることができます。</p>
+</div>
+<div class="paragraph">
+<p>プリロードするクラスは2か所に記載されています。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>エクステンションは、クラスのリストを生成することができます ( <code>io.quarkus.deployment.builditem.PreloadClassBuildItem</code> ビルドアイテムを使用します)。</p>
+</li>
+<li>
+<p>以下のように、プリロードするクラスをリストアップした <code>src/main/resources/META-INF/quarkus-preload-classes.txt</code> ファイルを追加することができます。</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">com.amazonaws.services.lambda.runtime.LambdaRuntimeInternal
+com.fasterxml.jackson.annotation.JsonAlias
+com.fasterxml.jackson.annotation.JsonFormat$Feature
+com.fasterxml.jackson.core.exc.InputCoercionException
+com.fasterxml.jackson.core.exc.StreamWriteException
+com.fasterxml.jackson.core.io.ContentReference
+com.fasterxml.jackson.core.io.IOContext
+com.fasterxml.jackson.core.io.JsonEOFException
+com.fasterxml.jackson.core.io.MergedStream
+com.fasterxml.jackson.core.io.NumberInput
+com.fasterxml.jackson.core.io.NumberOutput
+com.fasterxml.jackson.core.io.UTF32Reader
+com.fasterxml.jackson.core.json.ByteSourceJsonBootstrapper
+com.fasterxml.jackson.core.json.JsonReadContext
+com.fasterxml.jackson.core.json.JsonWriteContext
+com.fasterxml.jackson.core.json.UTF8StreamJsonParser
+com.fasterxml.jackson.core.JsonEncoding
+com.fasterxml.jackson.core.JsonGenerationException
+com.fasterxml.jackson.core.JsonLocation
+com.fasterxml.jackson.core.JsonStreamContext
+com.fasterxml.jackson.core.JsonToken
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>フォーマットはシンプルで、1行に1クラスです。</p>
+</div>
+<div class="sect2">
+<h3 id="computing-the-class-list"><a class="anchor" href="#computing-the-class-list"></a>クラスリストの計算</h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+このステップは特に使い勝手が悪いため、改善を計画しています。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>クラスのリストを計算するには、関数をデプロイして、環境変数 <code>JAVA_TOOL_OPTIONS</code> を <code>-verbose:class</code> に設定することをお勧めします。 その後、関数を実行し、（CloudWatchで）ログを取得します。sed/awkなどのテキストエディタでクラス名を抽出することができるはずです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="application-class-list"><a class="anchor" href="#application-class-list"></a>アプリケーションクラス一覧</h3>
+<div class="paragraph">
+<p>デフォルトでは、（Quarkus で生成されたクラスも含む）アプリケーションに含まれるクラスのクラスリストが生成されま す。そのため、 <code>quarkus-preload-classes.txt</code> ファイルでこれらを繰り返す必要はありません。</p>
+</div>
+<div class="paragraph">
+<p>次の設定により、この機能を無効にすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.snapstart.generate-application-class-list=false</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="disable-preloading"><a class="anchor" href="#disable-preloading"></a>プリローディングの無効化</h3>
+<div class="paragraph">
+<p>次の設定により、クラスのプリローディングを無効にすることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.snapstart.preload-classes=false</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="skipping-class-initialization"><a class="anchor" href="#skipping-class-initialization"></a>クラス初期化のスキップ</h3>
+<div class="paragraph">
+<p>デフォルトでは、クラスがプリロードされるときに、 <em>初期化もされます</em> 。これは、依存するクラスも解決することを意味します。この動作を無効にするには、次のようにします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.snapstart.initialize-classes=false</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="client-priming"><a class="anchor" href="#client-priming"></a>クライアント・プライミング</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>クライアントの <em>プライミング</em> は、スナップショット処理中にクライアントを初期化し、アプリケーションの実行時にすでに完全に機能するようにする技術です。</p>
+</div>
+<div class="paragraph">
+<p><em>プライミング</em> を実現するには、2つの方法があります。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>static</code> ブロックでクライアントを初期化します。これは、クラスのプリロードのおかげで、スナップショットの前に実行されることになります。</p>
+</li>
+<li>
+<p>初期化を行うCRaC Resourceを登録する</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>(1)は以下のように実現できます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+public class HeroRepository {
+    private static final DynamoDbClient client;
+
+    static {
+        client = DynamoDbClient.builder()
+                .region(Region.US_EAST_2)
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .build();
+        client.describeEndpoints();
+    }
+    // ...
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+静的ブロックを使ってプライミングを実装すると、アプリケーションのネイティブコンパイルができなくなる場合があります。ビルド時にクラスを初期化すると、クライアントの初期化でスレッドが起動したり、 ネイティブコンパイルと互換性のないコネクションが開かれたりすることがあります。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>次のセクションで(2)について説明します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="resource-registration"><a class="anchor" href="#resource-registration"></a>リソース登録</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>SnapStartはCRaC APIを使用して、スナップショット前またはリストア中にアプリケーションでカスタムコードを実行できるようにします。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+CRaC APIではありますが、SnapStartはCRaCではないので、他のCRaC実装では動作しないような <em>こと</em> を行うことができます。
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.hello;
+
+import io.quarkus.runtime.Startup;
+import org.crac.Context;
+import org.crac.Core;
+import org.crac.Resource;
+import org.jboss.logging.Logger;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+@Startup
+@ApplicationScoped
+public class HelloPriming implements Resource {
+
+    @Inject
+    Logger logger;
+
+    @PostConstruct
+    void init() {
+        // Important - register the resource
+        Core.getGlobalContext().register(this);
+    }
+
+    @Override
+    public void beforeCheckpoint(Context&lt;? extends Resource&gt; context) throws Exception {
+        logger.info("before checkout hook");
+        // initialize your client here.
+    }
+
+    @Override
+    public void afterRestore(Context&lt;? extends Resource&gt; context) throws Exception {
+        logger.info("after checkout hook");
+        // if there is anything to do during the restoration, do it here.
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+リストアは2秒間に限られます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="tieredcompilation"><a class="anchor" href="#tieredcompilation"></a>TieredCompilation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>また、SnapStartを使用する場合は、 <em>階層型コンパイル</em> を使用することをお勧めします。これを実現するには、 <code>JAVA_TOOL_OPTIONS</code> 環境プロパティを <code>-XX:+TieredCompilation -XX:TieredStopAtLevel=1</code> に設定します。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<code>TieredCompilation</code> は、通常のLambda関数でも興味深いことができます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#enabling-disabling-snapstart-optimizations">SnapStart最適化の有効化/無効化</a></li>
+<li><a href="#class-preloading">クラスプリローディング</a>
+<ul class="sectlevel2">
+<li><a href="#computing-the-class-list">クラスリストの計算</a></li>
+<li><a href="#application-class-list">アプリケーションクラス一覧</a></li>
+<li><a href="#disable-preloading">プリローディングの無効化</a></li>
+<li><a href="#skipping-class-initialization">クラス初期化のスキップ</a></li>
+</ul>
+</li>
+<li><a href="#client-priming">クライアント・プライミング</a></li>
+<li><a href="#resource-registration">リソース登録</a></li>
+<li><a href="#tieredcompilation">TieredCompilation</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/aws-lambda">AWS Lambda</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/aws-lambda-http">RESTEasy Reactive、Undertow、あるいはReactive Routesを使用したAWS Lambda</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/funqy-aws-lambda">Funqy AWS Lambdaバインディング</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/funqy-aws-lambda-http">Funqy HTTPバインディングとAWS Lambda</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/azure-functions">Azure Functions</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/azure-functions-http">RESTEasy Reactive、Undertow、または Reactive Routes を使用した Azure Functions</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/funqy">Funqy</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/funqy-gcp-functions">Funqy Google Cloud Functions</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/funqy-http">Funqy HTTPバインディング (スタンドアロン)</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/funqy-azure-functions-http">Azure Functions と Funqy HTTP バインディング</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/funqy-gcp-functions-http">Google Cloud Functionsを使用した Funqy HTTP バインディング</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/funqy-knative-events">Funqy Knative Events バインディング</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/gcp-functions">Google Cloud Functions (サーバーレス)</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/gcp-functions-http">Google Cloud Functions (Serverless) with RESTEasy, Undertow, or Reactive Routes</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/appcds">AppCDS</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/container-image">コンテナーイメージ</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/deploying-to-openshift">OpenShiftへのデプロイ</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/deploying-to-google-cloud">Google Cloud Platform (GCP)へのデプロイ</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/deploying-to-heroku">Herokuへのデプロイ</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/deploying-to-azure-cloud">Microsoft Azure Cloudへのデプロイ</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

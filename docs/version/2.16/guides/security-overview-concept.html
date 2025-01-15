@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Quarkus Securityの概要 - 2.16 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/2.16/guides/security-overview-concept" />
+  <meta property="og:title" content="Quarkus Securityの概要 - 2.16" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/security-overview-concept">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/2.16/guides/security-overview-concept">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/2.16/guides/security-overview-concept" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/2.16/guides/security-overview-concept">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/2.16/guides/security-overview-concept">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/2.16/guides/security-overview-concept">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/2.16/guides/security-overview-concept">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/2.16/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <option value="2.16" selected>2.16</option>
+        
+        
+        
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">Quarkus Securityの概要 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus Securityでは、開発者がQuarkusアプリケーションの商用品質のセキュリティーを構築するためのアーキテクチャ、複数の認証および認可メカニズム、その他のツールを提供しているフレームワークです。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started-with-quarkus-security"><a class="anchor" href="#getting-started-with-quarkus-security"></a>Quarkus セキュリティー入門</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusアプリケーションにセキュリティを組み込む前に、概要情報を確認し、Quarkusのセキュリティアーキテクチャと、Quarkusがサポートするさまざまな認証および認可メカニズムについて学んでください。</p>
+</div>
+<div class="paragraph">
+<p>To get started with security in Quarkus, we recommend that you first combine the Quarkus built-in <a href="security-basic-authentication-concept">Basic HTTP authentication</a> with the JPA identity provider to enable role-based access control (RBAC).
+Complete the steps in the <a href="security-basic-authentication-tutorial">Secure a Quarkus application with Basic authentication</a> tutorial.
+After you have successfully secured your Quarkus application with basic HTTP authentication, you can increase the security further by adding more advanced authentication mechanisms, for example, OpenID Connect (OIDC) authentication.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="security-architecture"><a class="anchor" href="#security-architecture"></a>セキュリティ・アーキテクチャ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>HttpAuthenticationMechanism</code> インターフェースは、QuarkusでHTTPアプリケーションを保護するための主要なエントリメカニズムです。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus Securityは、 <code>HttpAuthenticationMechanism</code> を使用してHTTPリクエストから認証クレデンシャルを抽出し、 <code>IdentityProvider</code> に委任して、認証クレデンシャルを <code>SecurityIdentity</code> に変換します。たとえば、クレデンシャルは、 <code>Authorization</code> ヘッダー、クライアントの HTTPS 証明書、または Cookie から取得することができます。</p>
+</div>
+<div class="paragraph">
+<p><code>IdentityProvider</code> は、認証クレデンシャルを検証し、ユーザー名、ロール、元の認証クレデンシャル、およびその他の属性を持つ <code>SecurityIdentity</code> にマップします。</p>
+</div>
+<div class="paragraph">
+<p>認証済みリソースごとに、 <code>SecurityIdentity</code>  インスタンスを注入して、認証済みの ID 情報を取得することができます。</p>
+</div>
+<div class="paragraph">
+<p>他の文脈では、例えばJAX-RSの <code>SecurityContext</code> 、JSON Web Tokens（JWT）の <code>JsonWebToken</code> など、同じ情報またはその一部を他の並列表現にすることが可能です。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="authentication-mechanisms"><a class="anchor" href="#authentication-mechanisms"></a>認証メカニズム</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusは複数の認証メカニズムをサポートしています。</p>
+</div>
+<div class="sect2">
+<h3 id="basic-and-form-http-authentication"><a class="anchor" href="#basic-and-form-http-authentication"></a>HTTPのベーシック認証とフォーム認証</h3>
+<div class="paragraph">
+<p><a href="security-basic-authentication-concept">Basic HTTP Authentication</a> and <a href="security-built-in-authentication-support-concept#form-auth">Form HTTP authentication</a> are the core authentication mechanisms supported in Quarkus.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="webauthn-authentication"><a class="anchor" href="#webauthn-authentication"></a>WebAuthn認証</h3>
+<div class="paragraph">
+<p><a href="https://webauthn.guide/">WebAuthn</a> は、パスワードに代わる認証メカニズムです。新しいユーザーを登録したり、ログインしたりするサービスを書くときに、パスワードを要求する代わりに、パスワードを置き換えるWebAuthnを使用することができます。詳しくは、 <a href="security-webauthn">WebAuthn認証メカニズムを使用したQuarkusアプリケーションの保護</a> を参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="mutual-tls-mtls-authentication"><a class="anchor" href="#mutual-tls-mtls-authentication"></a>Mutual TLS (mTLS) 認証</h3>
+<div class="paragraph">
+<p>Quarkus provides mutual TLS (mTLS) authentication so that you can authenticate users based on their X.509 certificates.
+For more information, see <a href="security-built-in-authentication-support-concept#mutual-tls">mutual TLS authentication</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="openid-connect-authentication"><a class="anchor" href="#openid-connect-authentication"></a>OpenID Connect 認証</h3>
+<div class="paragraph">
+<p>OpenID Connect（OIDC）は、OAuth 2.0プロトコルの上で動作するIDレイヤーです。OIDCは、クライアントアプリケーションが、OIDCプロバイダーによって実行された認証に基づいてユーザーの身元を確認し、そのユーザーに関する基本的な情報を取得することを可能にします。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus <code>quarkus-oidc</code> エクステンションは、ベアラートークンと認可コードフロー認証メカニズムをサポートする、リアクティブで相互運用可能なマルチテナント対応OIDCアダプタを提供します。
+Bearer Token メカニズムは、HTTP Authorization ヘッダーからトークンを抽出します。認可コードフローメカニズムは、ユーザーを OIDC プロバイダーにリダイレクトし、ユーザーの ID を認証します。ユーザーがQuarkusにリダイレクトされた後、このメカニズムは、ID、アクセス、リフレッシュトークンに対して付与されたコードを交換することで、認証プロセスを完了します。</p>
+</div>
+<div class="paragraph">
+<p>リフレッシュ可能な JSON Web Key (JWK) セットを使用して ID とアクセス JWT トークンを検証することも、リモートでイントロスペクトすることもできます。
+ただし、不透明な（バイナリの）トークンはリモートでのみイントロスペクトできます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Quarkus OIDCエクステンションを使用することで、ベアラートークンと認可コードフローの両方のメカニズムで <a href="#smallrye-jwt">SmallRye JWT</a> を使用して、JWTトークンをMicroProfile JWT <code>org.eclipse.microprofile.jwt.JsonWebToken</code> として表現できます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="additional-quarkus-resources-for-oidc-authentication"><a class="anchor" href="#additional-quarkus-resources-for-oidc-authentication"></a>OIDC認証のための追加のQuarkusリソース</h4>
+<div class="paragraph">
+<p>Quarkusアプリケーションの保護のために使用できるOIDC認証および認可方法の詳細については、以下の詳細なリソースを参照してください：</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">OIDCトピック</th>
+<th class="tableblock halign-left valign-top">Quarkusの情報リソース</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ベアラートークン認証メカニズム</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="security-openid-connect">OpenID Connect (OIDC) とベアラートークン認可を使用したサービスアプリケーションの保護</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">認可コードフロー認証メカニズム</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="security-openid-connect-web-authentication">OpenID Connect (OIDC)認可コードフローメカニズム</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ベアラートークンまたは認可コード・フロー・メカニズムをサポートする複数のテナント</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="security-openid-connect-multitenancy">OpenID Connect (OIDC)マルチテナントの使用</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Keycloakを使用した認可の一元化</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="security-keycloak-authorization">OpenID Connect (OIDC)とKeycloakを使用して認可を一元化</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Keycloakのプログラムによる設定</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="security-keycloak-admin-client">Keycloak admin クライアントの使用</a></p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="ulist">
+<ul>
+<li>
+<p>Quarkus OIDCエクステンションを実行時に有効にする必要がある場合は、ビルド時に <code>quarkus.oidc.tenant-enabled=false</code> 、システムプロパティを使用して実行時に再有効化します。マルチテナントOIDC展開における個々のテナント構成の管理に関する詳細は、『 <a href="security-openid-connect-multitenancy.html#disable-tenant">Using OpenID Connect（OIDC）』マルチテナンシーガイド</a> の「 _テナント構成の無効 _化」のセクションを参照してください。</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="openid-connect-client-and-filters"><a class="anchor" href="#openid-connect-client-and-filters"></a>OpenID Connectクライアントとフィルター</h3>
+<div class="paragraph">
+<p><code>quarkus-oidc-client</code> エクステンションは、以下のトークングラントをサポートする OpenID Connect および OAuth2 プロバイダからアクセストークンを取得し、リフレッシュするための <code>OidcClient</code> を提供します：
+* <code>client-credentials</code> 
+* <code>password</code> 
+* <code>refresh_token</code></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus-oidc-client-filter</code> エクステンションは、 <code>quarkus-oidc-client</code> エクステンションを必要とし、JAX-RS <code>OidcClientRequestFilter</code> を提供します。これは、 <code>OidcClient</code> で取得したアクセストークンを HTTP <code>Authorization</code> ヘッダの <code>Bearer</code> スキーム値として設定するものです。このフィルタは、現在のQuarkusエンドポイントに注入されるMP RestClient実装に登録できますが、このサービスエンドポイントの認証要件には関係しません。たとえば、公開エンドポイントにすることも、mTLSで保護することもできます。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>このシナリオでは、Quarkus OpenID Connectアダプターを使用してQuarkusエンドポイントを保護する必要はありません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>quarkus-oidc-client-filter</code> エクステンションは、 <code>quarkus-oidc-client</code> エクステンションを必要とし、JAX-RS <code>OidcClientRequestFilter</code> を提供します。これは、OpenID Connect ベアラーまたは 認可コードフローアクセス トークンを HTTP <code>Authorization</code> ヘッダーの <code>Bearer</code> スキーム値として設定します。このフィルターは、現在の Quarkus エンドポイントに挿入された MP RestClient 実装に登録できます。これは、Quarkus OpenID Connect アダプターを使用して保護する必要があります。 このフィルターを使用して、アクセス トークンを下流のサービスに伝搬できます。</p>
+</div>
+<div class="paragraph">
+<p>詳しくは、 <a href="security-openid-connect-client">OpenID Connectクライアントとトークン伝搬クイックスタート</a> 、 <a href="security-openid-connect-client-reference">OpenID Connect (OIDC) とOAuth2クライアントとフィルターのリファレンス</a> ガイドをご覧ください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="smallrye-jwt"><a class="anchor" href="#smallrye-jwt"></a>SmallRye JWT 認証</h3>
+<div class="paragraph">
+<p><code>quarkus-smallrye-jwt</code> エクステンションは、MicroProfile JSON Web Token (JWT) 1.2.1 の実装と、署名および暗号化された <code>JWT</code> トークンを検証する複数のオプションを提供し、それらを <code>org.eclipse.microprofile.jwt.JsonWebToken</code> として表します。</p>
+</div>
+<div class="paragraph">
+<p><code>quarkus-smallrye-jwt</code> は、 <code>quarkus-oidc</code> ベアラートークン認証メカニズムの代替となるもので、PEMキーまたはリフレッシュ可能な <code>JWK</code> キーセットを使用して、 <code>JWT</code> トークンだけを検証します。 <code>quarkus-smallrye-jwt</code> は、JWT生成APIも提供しており、これを使用して、 <code>signed</code> あるいは <code>inner-signed</code> 、 <code>encrypted</code> <code>JWT</code> トークンを簡単に作成できます。</p>
+</div>
+<div class="paragraph">
+<p>詳細については、<a href="security-jwt">SmallRye JWTロールベースアクセスコントロールの使用</a> を参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="oauth2-authentication"><a class="anchor" href="#oauth2-authentication"></a>OAuth2 認証</h3>
+<div class="paragraph">
+<p><code>quarkus-elytron-security-oauth2</code> は`quarkus-oidc` ベアラートークン認証メカニズムに対する別の選択肢を提供するものです。<code>quarkus-elytron-security-oauth2</code> は <code>Elytron</code> をベースにしており、主に不透明なトークンをリモートでイントロスペクトするためのものです。
+詳細は <a href="security-oauth2">OAuth2 の使用</a> を参照ください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="oidc-jwt-oauth2-comparison"><a class="anchor" href="#oidc-jwt-oauth2-comparison"></a>OpenID Connect、SmallRye JWT、OAuth2認証メカニズムからの選択</h3>
+<div class="paragraph">
+<p>Quarkusアプリケーションを保護するためにどの認証メカニズムを使用するかを決定する際に、次の情報を使用してください:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus-oidc</code> は、KeycloakのようなOpenID Connectプロバイダを必要とします。このプロバイダは、ベアラートークンの検証や、認可コードフローによるエンドユーザの認証に使用できます。
+どちらの場合も、 <code>quarkus-oidc</code> は指定されたOpenID Connectプロバイダへの接続が必要です。</p>
+</li>
+<li>
+<p>ユーザー認証に認可コードフローが必要な場合、または複数のテナントをサポートする必要がある場合は、 <code>quarkus-oidc</code> を使用してください。 
+<code>quarkus-oidc</code> は、認可コードフローとベアラアクセストークンの両方を使用してユーザー情報を要求することもできます。</p>
+</li>
+<li>
+<p>ベアラートークンを検証する必要がある場合は、 <code>quarkus-oidc</code> , <code>quarkus-smallrye-jwt</code> , または <code>quarkus-elytron-security-oauth2</code> を使用してください。</p>
+</li>
+<li>
+<p>ベアラートークンがJWT形式の場合、3つのエクステンションのいずれかを使用することができます。 <code>quarkus-oidc</code> と <code>quarkus-smallrye-jwt</code> は、OpenID Connect プロバイダがキーをローテーションする際に JsonWebKey (JWK) セットを更新することをサポートしています。したがって、リモートトークンイントロスペクションを避ける必要がある場合やプロバイダがサポートしていない場合は、JWTトークンの検証に <code>quarkus-oidc</code> または <code>quarkus-smallrye-jwt</code> を使用します。</p>
+</li>
+<li>
+<p>JWT トークンをリモートでイントロスペクションする必要がある場合は、 <code>quarkus-oidc</code> または <code>quarkus-elytron-security-oauth2</code> のいずれかを使用できます。これらはリモート イントロスペクションを使用した不透明なトークンまたはバイナリトークンの検証をサポートしているためです。 
+<code>quarkus-smallrye-jwt</code> は、不透明なトークンまたは JWT トークンの両方のリモートイントロスペクションをサポートしていませんが、その代わりに、通常は OpenID Connect プロバイダーから取得されるローカルで利用可能なキーに依存します。</p>
+</li>
+<li>
+<p><code>quarkus-oidc</code> と <code>quarkus-smallrye-jwt</code> は、エンドポイントのコードに JWT と opaque トークンを注入することをサポートしています。注入されたJWTトークンは、ユーザーに関するより多くの情報を提供します。すべてのエクステンションは、<code>Principal</code> として注入されたトークンを持つことができます。</p>
+</li>
+<li>
+<p><code>quarkus-smallrye-jwt</code> は <code>quarkus-oidc</code> よりも多くの鍵フォーマットをサポートしています。 <code>quarkus-oidc</code> は JWK セットの一部である JWK 形式の鍵のみを使用するのに対し、 <code>quarkus-smallrye-jwt</code> は PEM 鍵をサポートしています。</p>
+</li>
+<li>
+<p><code>quarkus-smallrye-jwt</code> は、ローカルで署名されたトークン、内部で署名および暗号化されたトークン、暗号化されたトークンを扱います。 
+ <code>quarkus-oidc</code> や <code>quarkus-elytron-security-oauth2</code> もこのようなトークンを検証することもできますが、不透明なトークンとして扱い、リモートのイントロスペクションを通じて検証します。</p>
+</li>
+<li>
+<p>不透明トークンやJWTトークンのリモートイントロスペクションのための軽量なライブラリが必要な場合は、 <code>quarkus-elytron-security-oauth2</code> を使用してください。</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>不透明トークンかJWTトークンのどちらを使うかは、アーキテクチャ上の考慮事項によって決定されます。不透明トークンは、JWTトークンよりもはるかに短い傾向がありますが、トークンに関連する状態の大部分をプロバイダ・データベースに保持することが必要です。不透明トークンは、事実上データベース・ポインタです。JWTトークンは不透明トークンよりもかなり長いですが、プロバイダはトークン関連状態のほとんどをトークンクレームとして保存し、署名または暗号化することにより、クライアントに保存を事実上委任しています。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>各認証メカニズムのオプションの概要は、次の表のとおりです:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"></th>
+<th class="tableblock halign-left valign-top">quarkus-oidc</th>
+<th class="tableblock halign-left valign-top">quarkus-smallrye-jwt</th>
+<th class="tableblock halign-left valign-top">quarkus-elytron-security-oauth2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ベアラーJWTの検証が必要</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ローカル検証もしくはイントロスペクション</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ローカル検証</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">イントロスペクション</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ベアラー不透明Tokenの検証が必要</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">イントロスペクション</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">イントロスペクション</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JWTトークンを検証するための <code>JsonWebKey</code> セットのリフレッシュ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">トークンを <code>Principal</code> として表現</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MP JSON Web Token（JWT）としてJWTを注入</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">認可コードフロー</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">マルチテナンシー</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User info サポート</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PEMキーフォーマットサポート</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SecretKey のサポート</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JSON Web Key（JWK）フォーマットで</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">内部署名付き暗号化トークン、または暗号化トークン</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">イントロスペクション</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ローカル検証</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">イントロスペクション</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">カスタムトークン検証</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">注入されたJWTパーサーで</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JWTをCookieとして受入</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="identity-providers"><a class="anchor" href="#identity-providers"></a>アイデンティティ・プロバイダー</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>JPA <code>IdentityProvider</code> は、 <code>SecurityIdentity</code> インスタンスを作成します。このインスタンスは、ユーザー認証時に使用され、アクセス要求の確認と認可を行い、Quarkus アプリケーションを保護します。</p>
+</div>
+<div class="paragraph">
+<p><code>IdentityProvider</code> は、 <code>HttpAuthenticationMechanism</code> から提供された認証クレデンシャルを、 <code>SecurityIdentity</code> インスタンスに変換します。</p>
+</div>
+<div class="paragraph">
+<p>一部のエクステンション、たとえば、 <code>OIDC</code> 、 <code>OAuth2</code> 、 <code>SmallRye JWT</code> は、サポートされる認証フローに固有のインライン <code>IdentityProvider</code> 実装を持ちます。たとえば、 <code>quarkus-oidc</code> は、トークンを <code>SecurityIdentity</code> インスタンスに変換するために、独自の <code>IdentityProvider</code> を使用します。</p>
+</div>
+<div class="paragraph">
+<p><code>Basic</code> または <code>Form</code> HTTPベース認証を使用する場合、ユーザー名とパスワードを <code>SecurityIdentity</code> インスタンスに変換できる <code>IdentityProvider</code> インスタンスを追加する必要があります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Basic</code> または <code>Form</code> HTTPベース認証の詳細については、次のリソースを参照してください:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="security-basic-authentication-tutorial">Secure a Quarkus application with Basic authentication</a></p>
+</li>
+<li>
+<p><a href="security-jdbc">セキュリティをJDBCと一緒に使用</a></p>
+</li>
+<li>
+<p><a href="security-ldap">セキュリティをLDAPレルムと一緒に使用</a></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="authorization"><a class="anchor" href="#authorization"></a>認可</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus also supports role-based access control (RBAC).
+For more information about RBAC and other authorization options in Quarkus, see <a href="security-authorize-web-endpoints-reference">Security authorization</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="quarkus-security-customization"><a class="anchor" href="#quarkus-security-customization"></a>Quarkus Securityのカスタマイズ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus Securityは、高度にカスタマイズ可能です。Quarkusの以下のコアセキュリティコンポーネントをカスタマイズすることができます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>HttpAuthenticationMechanism</code></p>
+</li>
+<li>
+<p><code>IdentityProvider</code></p>
+</li>
+<li>
+<p><code>SecurityidentityAugmentor</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>リアクティブセキュリティを含むQuarkus Securityのカスタマイズ、およびセキュリティプロバイダーの登録方法の詳細については、 <a href="security-customization">セキュリティのカスタマイズ</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="combining-authentication-mechanisms"><a class="anchor" href="#combining-authentication-mechanisms"></a>認証メカニズムの組み合わせ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ユーザ認証情報が異なるソースから提供される場合、認証メカニズムを組み合わせることができます。
+例えば、組み込みの <code>Basic</code> および <code>quarkus-oidc</code> <code>Bearer</code> 認証メカニズムを組み合わせることができます。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>quarkus-oidc</code> <code>Bearer</code> と <code>smallrye-jwt</code> の認証メカニズムは、どちらも HTTP <code>Authorization Bearer</code> スキームから抽出されたトークンを検証しようとするため、組み合わせることはできません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="path-specific-authentication-mechanisms"><a class="anchor" href="#path-specific-authentication-mechanisms"></a>パス固有認証メカニズム</h3>
+<div class="paragraph">
+<p>次の設定例は、あるリクエストパスに対して、選択可能な単一の認証メカニズムを強制する方法を示しています：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.http.auth.permission.basic-or-bearer.paths=/service
+quarkus.http.auth.permission.basic-or-bearer.policy=authenticated
+
+quarkus.http.auth.permission.basic.paths=/basic-only
+quarkus.http.auth.permission.basic.policy=authenticated
+quarkus.http.auth.permission.basic.auth-mechanism=basic
+
+quarkus.http.auth.permission.bearer.paths=/bearer-only
+quarkus.http.auth.permission.bearer.policy=authenticated
+quarkus.http.auth.permission.bearer.auth-mechanism=bearer</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>auth-mechanism</code> プロパティの値が、 <code>HttpAuthenticationMechanism</code> がサポートする認証スキーム（例えば、 <code>basic</code> 、 <code>bearer</code> 、 <code>form</code> ）と一致しているようにして下さい。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="proactive-authentication"><a class="anchor" href="#proactive-authentication"></a>プロアクティブ認証</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By default, Quarkus does proactive authentication, which means that all incoming requests with credentials are authenticated regardless of whether the target page requires authentication.
+For more information, see <a href="security-built-in-authentication-support-concept#proactive-authentication">Proactive authentication</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="secure-connections-with-ssltls"><a class="anchor" href="#secure-connections-with-ssltls"></a>SSL/TLSによるセキュアな接続</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>QuarkusがSSL/TLSを使用してセキュアな接続をサポートする方法の詳細については、 <a href="http-reference#ssl">HTTPリファレンス</a> 情報を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cross-origin-resource-sharing"><a class="anchor" href="#cross-origin-resource-sharing"></a>クロスオリジンリソース共有</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusアプリケーションを別のドメインで実行されている別のアプリケーションからアクセスできるようにするには、CORS（Cross-Origin Resource Sharing）を設定する必要があります。
+Quarkusが提供するCORSフィルターの詳細については、 <a href="http-reference#cors-filter">HTTPリファレンス</a> 情報を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cross-site-request-forgery-csrf-prevention"><a class="anchor" href="#cross-site-request-forgery-csrf-prevention"></a>Cross-site Request Forgery (CSRF) 対策</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus Securityでは、 <a href="https://owasp.org/www-community/attacks/csrf">Cross-Site Request Forgery</a> 攻撃からアプリケーションを保護するRESTEasy Reactiveフィルタを提供しています。
+詳細については、 <a href="security-csrf-prevention">クロスサイトリクエストフォージェリ対策</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="samesite-cookies"><a class="anchor" href="#samesite-cookies"></a>SameSite クッキー</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusのエンドポイントが設定するCookieのいずれにも、 <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite">SameSite</a> Cookieプロパティを追加することができます。詳細については、 <a href="http-reference#same-site-cookie">SameSite cookies</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="secret-engines"><a class="anchor" href="#secret-engines"></a>シークレットエンジン</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>シークレットエンジンは、データを保存、生成、暗号化するコンポーネントです。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusは、HashiCorp Vaultを包括的にサポートしています。詳細については、 <a href="https://quarkiverse.github.io/quarkiverse-docs/quarkus-vault/dev/index.html">QuarkusとHashiCorp Vault</a> のドキュメントを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="secure-serialization"><a class="anchor" href="#secure-serialization"></a>セキュア・シリアライゼーション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus SecurityアーキテクチャにRESTEasy ReactiveとJacksonが含まれている場合、Quarkusでは、設定されたセキュリティに基づいて、JSONシリアライズに含まれるフィールドを制限できます。詳細については、 <a href="resteasy-reactive#secure-serialization">RESTEasy Reactiveを使用したRESTサービスの作成</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="secure-auto-generated-resources-by-rest-data-with-panache"><a class="anchor" href="#secure-auto-generated-resources-by-rest-data-with-panache"></a>自動生成されたリソースをREST Data with Panacheで保護</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>REST Data with Panache エクステンションを使用してリソースを自動生成している場合でも、パッケージ <code>javax.annotation.security</code> 内の Security アノテーションを使用することができます。詳しくは、 <a href="rest-data-panache.html#securing-endpoints">自動生成されたリソースの保護</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="national-vulnerability-database"><a class="anchor" href="#national-vulnerability-database"></a>National Vulnerability Database</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusのタグのほとんどは、米国の <a href="https://nvd.nist.gov">National Vulnerability Database</a> （NVD）にCommon Platform Enumeration（CPE）名フォーマットで登録されています。登録されたQuarkusのCPE名を表示するには、 <a href="https://nvd.nist.gov/products/cpe/search/results?namingFormat=2.3&amp;keyword=quarkus">この検索クエリ</a> を使用します。</p>
+</div>
+<div class="paragraph">
+<p>NVEデータベースがQuarkusタグに対してCVEフラグを立てた場合、CVEの詳細を提供するリンクが所定のCPE名エントリに追加されます。</p>
+</div>
+<div class="paragraph">
+<p>NVD CPEチームは定期的にリストを更新していますが、誤検出が発生した場合は、 <a href="https://github.com/quarkusio/quarkus/issues/2611">quarkusio</a> リポジトリにissueを作成して詳細を報告してください。</p>
+</div>
+<div class="paragraph">
+<p>Maven <a href="https://jeremylong.github.io/DependencyCheck/dependency-check-maven/">OWASP Dependency checkプラグイン</a> を使用することで、NVDフィードを使用してアプリケーションビルド時に脆弱性を検出することができます。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus MavenプロジェクトにOWASP Dependency checkプラグインを追加するには、 <code>pom.xml</code> ファイルに次のXML設定を追加します：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;plugin&gt;
+    &lt;groupId&gt;org.owasp&lt;/groupId&gt;
+    &lt;artifactId&gt;dependency-check-maven&lt;/artifactId&gt;
+    &lt;version&gt;${owasp-dependency-check-plugin.version}&lt;/version&gt;
+&lt;/plugin&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Set the <code>owasp-dependency-check-plugin.version</code> value to <code>7.4.4</code> or later.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>次に、以下のようにプラグインを設定します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;plugin&gt;
+    &lt;groupId&gt;org.owasp&lt;/groupId&gt;
+    &lt;artifactId&gt;dependency-check-maven&lt;/artifactId&gt;
+    &lt;version&gt;${owasp-dependency-check-plugin.version}&lt;/version&gt;
+    &lt;configuration&gt;
+        &lt;!-- Fail only when detecting High Vulnerability issues --&gt;
+        &lt;failBuildOnCVSS&gt;7&lt;/failBuildOnCVSS&gt;
+        &lt;suppressionFiles&gt;
+            &lt;suppressionFile&gt;${project.basedir}/dependency-cpe-suppression.xml&lt;/suppressionFile&gt;
+        &lt;/suppressionFiles&gt;
+    &lt;/configuration&gt;
+&lt;/plugin&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>比較的深刻でない問題を検出するには、次のコードサンプルで示すように、 <code>failBuildOnCVSS</code> の値を調整して誤検出を抑制してください：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.2.xsd"&gt;
+    &lt;!--
+        This is a CPE suppression file for the maven dependency check plugin.
+        Each CPE that is found by error (false positive) needs to be suppressed for a specific jar using its' GAV.
+        See https://jeremylong.github.io/DependencyCheck/general/suppression.html
+     --&gt;
+    &lt;suppress&gt;
+        &lt;notes&gt;
+            &lt;![CDATA[
+                Suppress the false positive CPE for netty-tcnative-classes to netty
+            ]]&gt;
+        &lt;/notes&gt;
+        &lt;gav regex="true"&gt;^io\.netty:netty-tcnative-classes.*:.*$&lt;/gav&gt;
+        &lt;cpe&gt;cpe:/a:netty:netty&lt;/cpe&gt;
+    &lt;/suppress&gt;
+    &lt;suppress&gt;
+        &lt;notes&gt;
+            &lt;![CDATA[
+                Suppress the false positive CPE for Quarkus Mutiny to mutiny:mutiny
+            ]]&gt;
+        &lt;/notes&gt;
+        &lt;gav regex="true"&gt;^io\.quarkus:quarkus-mutiny.*:.*$&lt;/gav&gt;
+        &lt;cpe&gt;cpe:/a:mutiny:mutiny&lt;/cpe&gt;
+    &lt;/suppress&gt;
+    &lt;suppress&gt;
+        &lt;notes&gt;
+            &lt;![CDATA[
+                Suppress the false positive CPE for Smallrye Mutiny to mutiny:mutiny
+            ]]&gt;
+        &lt;/notes&gt;
+        &lt;gav regex="true"&gt;^io\.smallrye.reactive:mutiny.*:.*$&lt;/gav&gt;
+        &lt;cpe&gt;cpe:/a:mutiny:mutiny&lt;/cpe&gt;
+    &lt;/suppress&gt;
+    &lt;suppress&gt;
+        &lt;notes&gt;
+            &lt;![CDATA[
+                Suppress the false positive CPE for Smallrye Mutiny to mutiny:mutiny
+            ]]&gt;
+        &lt;/notes&gt;
+        &lt;gav regex="true"&gt;^io\.smallrye.reactive:smallrye-mutiny.*:.*$&lt;/gav&gt;
+        &lt;cpe&gt;cpe:/a:mutiny:mutiny&lt;/cpe&gt;
+    &lt;/suppress&gt;
+    &lt;suppress&gt;
+        &lt;notes&gt;
+            &lt;![CDATA[
+                Suppress the false positive CPE for Smallrye Mutiny to mutiny:mutiny
+            ]]&gt;
+        &lt;/notes&gt;
+        &lt;gav regex="true"&gt;^io\.smallrye.reactive:vertx-mutiny.*:.*$&lt;/gav&gt;
+        &lt;cpe&gt;cpe:/a:mutiny:mutiny&lt;/cpe&gt;
+    &lt;/suppress&gt;
+    &lt;suppress&gt;
+        &lt;notes&gt;
+            &lt;![CDATA[
+                Suppress the false positive CPE for graal-sdk to GraalVM (the JVM distribution)
+            ]]&gt;
+        &lt;/notes&gt;
+        &lt;gav regex="true"&gt;^org\.graalvm\.sdk:g like this
+    &lt;/suppress&gt;
+&lt;/suppressions&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>抑制リストを定期的に見直し、更新して、結果が最新であるようにして下さい。次の例に示すように、expiry属性を追加することで、個々の抑制に時間制限を適用することも可能です:</p>
+</div>
+<div class="paragraph">
+<p><code>&lt;suppress until="2022-01-01Z"&gt;…​&lt;/suppress&gt;</code> 必要であれば有効期限を調整することもできます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="quarkus-security-testing"><a class="anchor" href="#quarkus-security-testing"></a>Quarkus Securityのテスト</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusのセキュリティをテストする場合は、 <code>IdentityProvider</code> が、ユーザー名、パスワード、ロールが <code>application.properties</code> に設定されていることを確認してください。
+Quarkusセキュリティのテストの詳細については、 <a href="security-testing#configuring-user-information">ユーザー情報の設定</a> を参照してください。</p>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#getting-started-with-quarkus-security">Quarkus セキュリティー入門</a></li>
+<li><a href="#security-architecture">セキュリティ・アーキテクチャ</a></li>
+<li><a href="#authentication-mechanisms">認証メカニズム</a>
+<ul class="sectlevel2">
+<li><a href="#basic-and-form-http-authentication">HTTPのベーシック認証とフォーム認証</a></li>
+<li><a href="#webauthn-authentication">WebAuthn認証</a></li>
+<li><a href="#mutual-tls-mtls-authentication">Mutual TLS (mTLS) 認証</a></li>
+<li><a href="#openid-connect-authentication">OpenID Connect 認証</a></li>
+<li><a href="#openid-connect-client-and-filters">OpenID Connectクライアントとフィルター</a></li>
+<li><a href="#smallrye-jwt">SmallRye JWT 認証</a></li>
+<li><a href="#oauth2-authentication">OAuth2 認証</a></li>
+<li><a href="#oidc-jwt-oauth2-comparison">OpenID Connect、SmallRye JWT、OAuth2認証メカニズムからの選択</a></li>
+</ul>
+</li>
+<li><a href="#identity-providers">アイデンティティ・プロバイダー</a></li>
+<li><a href="#authorization">認可</a></li>
+<li><a href="#quarkus-security-customization">Quarkus Securityのカスタマイズ</a></li>
+<li><a href="#combining-authentication-mechanisms">認証メカニズムの組み合わせ</a>
+<ul class="sectlevel2">
+<li><a href="#path-specific-authentication-mechanisms">パス固有認証メカニズム</a></li>
+</ul>
+</li>
+<li><a href="#proactive-authentication">プロアクティブ認証</a></li>
+<li><a href="#secure-connections-with-ssltls">SSL/TLSによるセキュアな接続</a></li>
+<li><a href="#cross-origin-resource-sharing">クロスオリジンリソース共有</a></li>
+<li><a href="#cross-site-request-forgery-csrf-prevention">Cross-site Request Forgery (CSRF) 対策</a></li>
+<li><a href="#samesite-cookies">SameSite クッキー</a></li>
+<li><a href="#secret-engines">シークレットエンジン</a></li>
+<li><a href="#secure-serialization">セキュア・シリアライゼーション</a></li>
+<li><a href="#secure-auto-generated-resources-by-rest-data-with-panache">自動生成されたリソースをREST Data with Panacheで保護</a></li>
+<li><a href="#national-vulnerability-database">National Vulnerability Database</a></li>
+<li><a href="#quarkus-security-testing">Quarkus Securityのテスト</a></li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Funqy Knative Events バインディング - 3.8 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.8/guides/funqy-knative-events" />
+  <meta property="og:title" content="Funqy Knative Events バインディング - 3.8" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/funqy-knative-events">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.8/guides/funqy-knative-events">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.8/guides/funqy-knative-events" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.8/guides/funqy-knative-events">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.8/guides/funqy-knative-events">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.8/guides/funqy-knative-events">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.8/guides/funqy-knative-events">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.8/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" selected>3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">Funqy Knative Events バインディング </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus Funqy <a href="https://knative.dev/docs/eventing">Knative Events</a>は、 <a href="funqy-http.html">Funqy HTTP</a>エクステンションをベースに構築されており、Funqy関数内でKnativeイベントをルーティングして処理することができます。</p>
+</div>
+<div class="paragraph">
+<p>このガイドでは、クイックスタートコードを使って、Knative Events を使って Funqy 関数をデプロイして呼び出す方法を説明します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ざっと 1 hour</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 17+がインストールされ、 <code>JAVA_HOME</code> が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.9.6</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+<li>
+<p><a href="funqy">Funqy の基礎</a> を読んで下さい。 これは短い読み物です！</p>
+</li>
+<li>
+<p><a href="https://redhat-developer-demos.github.io/knative-tutorial/knative-tutorial/index.html">Knative チュートリアル</a> 、具体的には <a href="https://redhat-developer-demos.github.io/knative-tutorial/knative-tutorial/eventing/eventing-trigger-broker.html">ブローカーとトリガー</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="setting-up-knative"><a class="anchor" href="#setting-up-knative"></a>Knative の設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Minikube 環境で Knative をローカルに設定することは、このガイドの範囲を超えています。<a href="https://redhat-developer-demos.github.io/knative-tutorial/knative-tutorial/index.html">Red HatがまとめたKnativeチュートリアル</a> に従うことをお勧めします。このチュートリアルでは、ローカル環境でMinikubeやOpenShift上でKnativeをセットアップする方法を説明しています。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+このガイドでは、クイックスタートコードをトリガーするためにブローカーを呼び出す必要があるため、特に <a href="https://redhat-developer-demos.github.io/knative-tutorial/knative-tutorial-eventing/eventing-trigger-broker.html">ブローカーとトリガー</a> のチュートリアルを実行する必要があります。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="read-about-cloud-events"><a class="anchor" href="#read-about-cloud-events"></a>Cloud Events についての記事を読む</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Knative Events をより深く理解するために、Cloud Events の <a href="https://cloudevents.io/">仕様</a> を読んでおくと良いでしょう。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-quickstart"><a class="anchor" href="#the-quickstart"></a>クイックスタート</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Gitレポジトリをクローンするか <code>git clone -b 3.8 <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code> 、 <a href="https://github.com/quarkusio/quarkus-quickstarts/archive/3.8.zip">アーカイブ</a> をダウンロードします。</p>
+</div>
+<div class="paragraph">
+<p>The solution is located in the <code>funqy-knative-events-quickstart</code> <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/3.8/funqy-quickstarts/funqy-knative-events-quickstart">directory</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-quickstart-flow"><a class="anchor" href="#the-quickstart-flow"></a>クイックスタートの流れ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>クイックスタートは、Cloud Eventを含む HTTP リクエストを <code>curl</code> を使用して Knative Broker に手動で送信することで動作します。Knative Broker はリクエストを受信し、クイックスタートによって構築された Funqy コンテナの起動をトリガーします。イベントは、一連の Funqy 関数の呼び出しをトリガーします。1 つの関数の出力は、別の Funqy 関数の呼び出しをトリガーします。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="funqy-and-cloud-events"><a class="anchor" href="#funqy-and-cloud-events"></a>Funqy と Cloud Events</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Knative Events環境内で稼働する場合、Funqy関数は特定のタイプの Cloud Event によってトリガーされます。1つのアプリケーション/デプロイメント内に複数のFunqy関数を持つことができますが、それらは特定のタイプの Cloud Event によってトリガーされなければなりません。このルールの例外は、アプリケーション内にFunqy関数が1つしかない場合です。この場合、イベントは Cloud Event タイプに関係なく、その関数にプッシュされます。</p>
+</div>
+<div class="paragraph">
+<p>現在、FunqyはJSONベースのデータしか消費できません。それ自体はバイナリモードと構造化モードの両方をサポートしていますが、Cloud EventメッセージのデータコンポーネントはJSONでなければなりません。このJSONは、関数のJavaパラメータやリターンタイプとの間でマーシャル可能でなければなりません。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-code"><a class="anchor" href="#the-code"></a>コード</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let&#8217;s start looking at our quickstart code so that you can understand how Knative Events map to Funqy.
+Open up <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/3.8/funqy-quickstarts/funqy-knative-events-quickstart/src/main/java/org/acme/funqy/SimpleFunctionChain.java">SimpleFunctionChain.java</a></p>
+</div>
+<div class="paragraph">
+<p>最初に見る関数は <code>defaultChain</code> です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.funqy.Funq;
+
+public class SimpleFunctionChain {
+    @Funq
+    public String defaultChain(String input) {
+        log.info("*** defaultChain ***");
+        return input + "::" + "defaultChain";
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この状態で、Funqy関数はデフォルトの Cloud Event マッピングを持っています。デフォルトでは、 Cloud Event のタイプは、トリガする関数の関数名と一致していなければなりません。関数が出力を返す場合、レスポンスは Cloud Event に変換され、ブローカに返されて他のトリガーにルーティングされます。このレスポンスのデフォルトの Cloud Event  タイプは、関数名 + <code>.output</code> です。デフォルトの Cloud Event のソースは、関数名です。</p>
+</div>
+<div class="paragraph">
+<p>したがって、 <code>defaultChain</code> 関数の場合、この関数をトリガーする Cloud Event のタイプは <code>defaultChain</code> です。これは、タイプが <code>defaultChain.output</code> でイベントソースが <code>defaultChain</code> である新しい Cloud Event をトリガーするレスポンスを生成します。</p>
+</div>
+<div class="paragraph">
+<p>デフォルトのマッピングはシンプルですが、必ずしもうまくいくとは限りません。このデフォルトのマッピングは設定で変更することができます。次の関数を見てみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.funqy.Funq;
+
+public class SimpleFunctionChain {
+    @Funq
+    public String configChain(String input) {
+        log.info("*** configChain ***");
+        return input + "::" + "configChain";
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>configChain</code> function has its Cloud Event mapping changed by configuration within <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/3.8/funqy-quickstarts/funqy-knative-events-quickstart/src/main/resources/application.properties">application.properties</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.funqy.knative-events.mapping.configChain.trigger=defaultChain.output
+quarkus.funqy.knative-events.mapping.configChain.response-type=annotated
+quarkus.funqy.knative-events.mapping.configChain.response-source=configChain</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この場合、この構成では、受信するCloud Eventのタイプ <code>defaultChain.output</code> を <code>configChain</code> 関数にマッピングします。 <code>configChain</code> 関数は、そのレスポンスを <code>annotated</code> Cloud Event タイプに、Cloud Event ソース <code>configChain</code> にマッピングします。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>quarkus.funqy.knative-events.mapping.{function name}.trigger</code> は、特定の関数をトリガーする Cloud Event タイプを設定します。特別な値 <code>*</code> をキャッチオール値として使用することができます。 この場合、この関数はすべてのイベントタイプに使用されます。</p>
+</li>
+<li>
+<p><code>quarkus.funqy.knative-events.mapping.{function name}.response-type</code> は、レスポンスの Cloud Event タイプを設定します。</p>
+</li>
+<li>
+<p><code>quarkus.funqy.knative-events.mapping.{function name}.resource-source</code> は、レスポンスの Cloud Event のソースを設定します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Funqy Knative Events エクステンションには、この Cloud Event の関数へのマッピングを行うためのアノテーションも用意されています。 <code>annotatedChain</code> メソッドを見てみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.funqy.Funq;
+import io.quarkus.funqy.knative.events.CloudEventMapping;
+
+public class SimpleFunctionChain {
+    @Funq
+    @CloudEventMapping(trigger = "annotated", responseSource = "annotated", responseType = "lastChainLink")
+    public String annotatedChain(String input) {
+        log.info("*** annotatedChain ***");
+        return input + "::" + "annotatedChain";
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>関数に <code>@CloudEventMapping</code> アノテーションを使用すると、Cloud Event タイプのトリガーとCloud Event レスポンスをマッピングできます。この例では、 <code>annotatedChain</code> 関数は <code>annotated</code> Cloud Event タイプによってトリガされ、レスポンスは <code>lastChainLink</code> タイプと <code>annotated</code> Cloud Eventソースにマッピングされます。</p>
+</div>
+<div class="paragraph">
+<p>つまり、 <code>SimpleFunctionChain</code> 内で定義されているすべての関数を見てみると、ある関数が次の関数を引き金にしていることに気づくでしょう。最後にトリガーされる関数は <code>lastChainLink</code> です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.funqy.Context;
+import io.quarkus.funqy.Funq;
+
+public class SimpleFunctionChain {
+    @Funq
+    public void lastChainLink(String input, @Context CloudEvent event) {
+        log.info("*** lastChainLink ***");
+        log.info(input + "::" + "lastChainLink");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この機能には2つの注意点があります。一つは、この関数には出力がありません。あなたの関数は出力を返す必要はありません。第二に、この関数には追加の <code>event</code> パラメータがあります。</p>
+</div>
+<div class="paragraph">
+<p>受信したcloud eventに関する追加情報を知りたい場合は、Funqy <code>@Context</code> アノテーションを使用して <code>io.quarkus.funqy.knative.events.CloudEvent</code> インターフェースを注入することができます。 <code>CloudEvent</code> インターフェースは、トリガーとなるイベントに関する情報を公開します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public interface CloudEvent {
+    String id();
+    String specVersion();
+    String source();
+    String subject();
+    OffsetDateTime time();
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="maven"><a class="anchor" href="#maven"></a>Maven</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you look at the <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/3.8/funqy-quickstarts/funqy-knative-events-quickstart/pom.xml">POM</a>,
+you&#8217;ll see that it is a typical Quarkus POM that pulls in one Funqy dependency:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-funqy-knative-events&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dev-mode-and-testing"><a class="anchor" href="#dev-mode-and-testing"></a>開発モードとテスト</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Funqy Knative Eventsは、RestAssuredを使った開発モードとユニットテストをサポートしています。Funqy Knative Eventsの関数は、通常のHTTPリクエストを使った <a href="funqy-http.html">Funqy HTTP</a>と同じ呼び出しモデル、またはCloud Event Binaryモード、Structuredモードを使って呼び出すことができます。すべての呼び出しモードが同時にサポートされています。</p>
+</div>
+<div class="paragraph">
+<p>So, if you open up the unit test code in <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/3.8/funqy-quickstarts/funqy-knative-events-quickstart/src/test/java/org/acme/funqy/FunqyTest.java">FunqyTest.java</a>
+you&#8217;ll see that its simply using RestAssured to make HTTP invocations to test the functions.</p>
+</div>
+<div class="paragraph">
+<p>FunqyはQuarkus 開発モードにも対応しています!</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="build-the-project"><a class="anchor" href="#build-the-project"></a>プロジェクトのビルド</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、Javaアーティファクトをビルドします。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、Knativeではdockerイメージが必要なので、続いてそれをビルドする必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker build -f src/main/docker/Dockerfile.jvm -t yourAccountName/funqy-knative-events-quickstart .</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>docker build</code> を実行する際には、必ず <code>yourAccountName</code> を docker または quay のアカウント名に置き換えてください。Dockerfileは標準のQuarkusのdockerfileです。特別なKnativeマジックはありません。</p>
+</div>
+<div class="paragraph">
+<p>イメージをDocker HubやQuayにプッシュする</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker push yourAccountName/funqy-knative-events-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>繰り返しになりますが、 <code>docker push</code> を実行する際には、 <code>yourAccountName</code> を docker または quay のアカウント名に置き換えてください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="deploy-to-kubernetesopenshift"><a class="anchor" href="#deploy-to-kubernetesopenshift"></a>Kubernetes/OpenShiftへのデプロイ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>最初のステップは、私たちの名前空間にブローカーを設定することです。以下は、Knative cliのコマンド例です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">kn broker create default \
+  --namespace knativetutorial</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>作成したブローカーは <code>default</code> といい、このブローカーはクラウドのイベントを受け取ります。このブローカは関数のYAMLファイルでも参照されています。</p>
+</div>
+<div class="paragraph">
+<p>The second step is to define a Kubernetes/OpenShift service to point to the Docker image you created and pushed
+during build. Take a look at <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/3.8/funqy-quickstarts/funqy-knative-events-quickstart/src/main/k8s/funqy-service.yaml">funqy-service.yaml</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: funqy-knative-events-quickstart
+spec:
+  template:
+    metadata:
+      name: funqy-knative-events-quickstart-v1
+      annotations:
+        autoscaling.knative.dev/target: "1"
+    spec:
+      containers:
+        - image: docker.io/yourAccountName/funqy-knative-events-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これはKubernetesの標準的なサービス定義YAMLファイルです。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+イメージのURLを、先に作成してプッシュしたイメージを指すように変更してください。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>今回のクイックスタートでは、1つのKubernetesサービスにすべての関数を格納します。このクイックスタートを複数の異なるプロジェクトに分割し、各関数にサービスをデプロイできない理由はありません。簡単にするために、また関数ごとにデプロイメントを行う必要がないことを示すために、クイックスタートはすべてを1つのプロジェクト、イメージ、サービスにまとめます。</p>
+</div>
+<div class="paragraph">
+<p>サービスyamlをデプロイします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">kubectl apply -n knativetutorial -f src/main/k8s/funqy-service.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次のステップは、それぞれのイベントタイプにKnative Eventトリガーを展開することです。コードセクションで述べたように、Funqyの各関数は特定のCloud Eventタイプにマッピングされています。Cloud Eventをマッピングし、特定のKubernetesサービスにルーティングするKnative Event Triggersを作成する必要があります。トリガーは4種類あります。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/quarkusio/quarkus-quickstarts/tree/3.8/funqy-quickstarts/funqy-knative-events-quickstart/src/main/k8s/defaultChain-trigger.yaml">defaultChain-trigger.yaml</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: eventing.knative.dev/v1alpha1
+kind: Trigger
+metadata:
+  name: defaultchain
+spec:
+  broker: default
+  filter:
+    attributes:
+      type: defaultChain
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: funqy-knative-events-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>spec:filter:attributes:type</code> は、 <code>spec:subscriber:ref</code> で定義されている Kubernetes サービスにCloud Eventのタイプをマッピングします。Cloud EventがBrokerにプッシュされると、そのイベントにマッピングされたサービスのスピンアップがトリガーされます。</p>
+</div>
+<div class="paragraph">
+<p>4つのFunqy関数ごとにTrigger YAMLファイルが用意されています。これらをすべてデプロイします:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">kubectl apply -n knativetutorial -f src/main/k8s/defaultChain-trigger.yaml
+kubectl apply -n knativetutorial -f src/main/k8s/configChain-trigger.yaml
+kubectl apply -n knativetutorial -f src/main/k8s/annotatedChain-trigger.yaml
+kubectl apply -n knativetutorial -f src/main/k8s/lastChainLink-trigger.yaml</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="run-the-demo"><a class="anchor" href="#run-the-demo"></a>デモの実行</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>2つの異なるターミナルウィンドウが必要です。一つは Broker への curl リクエストを行うためのもので、もう一つはポッドのログファイルを見るためのもので、Funqy 関数のイベントチェーンを流れるメッセージを見ることができます。</p>
+</div>
+<div class="paragraph">
+<p><code>stern</code> ツールがインストールされていることを確認してください。それについての情報は Knative チュートリアルのセットアップを参照してください。Funqy デプロイメントが出力したログを探すために stern を実行します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">stern funq user-container</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>別の端末を開きます。まずブローカーのURLを知る必要があります。このコマンドを実行して探します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">kubectl get broker default -o jsonpath='{.status.address.url}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、例えば以下のようなURLが表示されます:  <code><a href="http://broker-ingress.knative-eventing.svc.cluster.local/knativetutorial/default" class="bare">http://broker-ingress.knative-eventing.svc.cluster.local/knativetutorial/default</a></code> 。このURLを覚えておいてください。</p>
+</div>
+<div class="paragraph">
+<p>次にやるべきことは、Kubernetesクラスタにsshして、ブローカーにcurlリクエストを送ることです。以下のコマンドでシンプルなOSポッドを作成し、関数にcurlできるようにします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">kubectl -n knativetutorial apply -f src/main/k8s/curler.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>curler ポッドが立ち上がるまで、数秒待つ必要があるかもしれません。以下を実行して、curler pod への bash アクセスを取得します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">kubectl -n knativetutorial exec -it curler -- /bin/bash</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これで、Kubernetesクラスタ内のシェルに入ります。シェル内で次のcurlコマンドを実行します。ブローカーのアドレスは一例であり、プロジェクトやブローカー名によって異なる場合があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -v "http://default-broker.knativetutorial.svc.cluster.local" \
+-X POST \
+-H "Ce-Id: 1234" \
+-H "Ce-Specversion: 1.0" \
+-H "Ce-Type: defaultChain" \
+-H "Ce-Source: curl" \
+-H "Content-Type: application/json" \
+-d '"Start"'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これは、ブローカーに Knative イベントをポストし、 <code>defaultChain</code> 関数をトリガーします。前述したように、 <code>defaultChain</code> の出力は、 <code>configChain</code> に投稿されたイベントをトリガーにして、 <code>annotatedChain</code> に投稿されたイベントをトリガーにして、最後に <code>lastChainLink</code> 関数をトリガーにします。この流れは <code>stern</code> ウィンドウで見ることができます。以下のようなものが出力されるはずです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">funqy-knative-events-quickstart-v1-deployment-59bb88bcf4-9jwdx user-container 2020-05-12 13:44:02,256 INFO  [org.acm.fun.SimpleFunctionChain] (executor-thread-1) *** defaultChain ***
+funqy-knative-events-quickstart-v1-deployment-59bb88bcf4-9jwdx user-container 2020-05-12 13:44:02,365 INFO  [org.acm.fun.SimpleFunctionChain] (executor-thread-2) *** configChain ***
+funqy-knative-events-quickstart-v1-deployment-59bb88bcf4-9jwdx user-container 2020-05-12 13:44:02,394 INFO  [org.acm.fun.SimpleFunctionChain] (executor-thread-1) *** annotatedChain ***
+funqy-knative-events-quickstart-v1-deployment-59bb88bcf4-9jwdx user-container 2020-05-12 13:44:02,466 INFO  [org.acm.fun.SimpleFunctionChain] (executor-thread-2) *** lastChainLink ***
+funqy-knative-events-quickstart-v1-deployment-59bb88bcf4-9jwdx user-container 2020-05-12 13:44:02,467 INFO  [org.acm.fun.SimpleFunctionChain] (executor-thread-2) Start::defaultChain::configChain::annotatedChain::lastChainLink</code></pre>
+</div>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#setting-up-knative">Knative の設定</a></li>
+<li><a href="#read-about-cloud-events">Cloud Events についての記事を読む</a></li>
+<li><a href="#the-quickstart">クイックスタート</a></li>
+<li><a href="#the-quickstart-flow">クイックスタートの流れ</a></li>
+<li><a href="#funqy-and-cloud-events">Funqy と Cloud Events</a></li>
+<li><a href="#the-code">コード</a></li>
+<li><a href="#maven">Maven</a></li>
+<li><a href="#dev-mode-and-testing">開発モードとテスト</a></li>
+<li><a href="#build-the-project">プロジェクトのビルド</a></li>
+<li><a href="#deploy-to-kubernetesopenshift">Kubernetes/OpenShiftへのデプロイ</a></li>
+<li><a href="#run-the-demo">デモの実行</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/funqy">Funqy</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/funqy-aws-lambda">Funqy AWS Lambdaバインディング</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/funqy-gcp-functions">Funqy Google Cloud Functions</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/funqy-http">Funqy HTTPバインディング (スタンドアロン)</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/funqy-aws-lambda-http">Funqy HTTPバインディングとAWS Lambda</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/funqy-azure-functions-http">Azure Functions と Funqy HTTP バインディング</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/funqy-gcp-functions-http">Google Cloud Functionsを使用した Funqy HTTP バインディング</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/aws-lambda">AWS Lambda</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/aws-lambda-snapstart">AWS Lambda SnapStartの設定</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/aws-lambda-http">RESTEasy Reactive、Undertow、あるいはReactive Routesを使用したAWS Lambda</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/azure-functions">Azure Functions</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/azure-functions-http">RESTEasy Reactive、Undertow、または Reactive Routes を使用した Azure Functions</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/gcp-functions">Google Cloud Functions (サーバーレス)</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/gcp-functions-http">Google Cloud Functions (Serverless) with RESTEasy, Undertow, or Reactive Routes</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/appcds">AppCDS</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/container-image">コンテナーイメージ</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/deploying-to-openshift">OpenShiftへのデプロイ</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/deploying-to-google-cloud">Google Cloud Platform (GCP)へのデプロイ</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/deploying-to-heroku">Herokuへのデプロイ</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.8/guides/deploying-to-azure-cloud">Microsoft Azure Cloudへのデプロイ</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>クロスサイトリクエストフォージェリー対策 - 3.15 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.15/guides/security-csrf-prevention" />
+  <meta property="og:title" content="クロスサイトリクエストフォージェリー対策 - 3.15" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/security-csrf-prevention">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.15/guides/security-csrf-prevention">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.15/guides/security-csrf-prevention" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.15/guides/security-csrf-prevention">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.15/guides/security-csrf-prevention">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.15/guides/security-csrf-prevention">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.15/guides/security-csrf-prevention">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.15/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" selected>3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">クロスサイトリクエストフォージェリー対策 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://owasp.org/www-community/attacks/csrf">クロスサイトリクエストフォージェリ（CSRF）</a> とは、エンドユーザーが現在認証されているウェブアプリケーション上で意図しないアクションを実行させる攻撃です。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus Security は、 <a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie">Double Submit Cookie</a> と <a href="#csrf-request-header">CSRFリクエスト・ヘッダー</a> テクニックを実装したCSRF防止機能を提供しています。</p>
+</div>
+<div class="paragraph">
+<p><code>Double Submit Cookie</code> テクニックを使うには、CSRF トークンを (オプションで署名された) <code>HTTPOnly</code> クッキーとしてクライアントに送り、サーバサイドでレンダリングされた HTML フォームの隠されたフォーム入力に直接埋め込むか、リクエストヘッダ値として送信する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>このエクステンションは、 <a href="rest">Quarkus REST（旧RESTEasy Reactive）</a> サーバーフィルターで構成され、 <code>application/x-www-form-urlencoded</code> および <code>multipart/form-data</code> フォームで CSRF トークンの作成と検証を行います。また、Qute HTML フォームパラメータープロバイダーで、 <a href="qute-reference#injecting-beans-directly-in-templates">Qute テンプレートへの CSRF トークンの注入</a> をサポートします。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-project"><a class="anchor" href="#creating-the-project"></a>プロジェクトの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、新しいプロジェクトが必要です。以下のコマンドで新規プロジェクトを作成します。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:security-csrf-prevention \
+    --extension='rest-csrf' \
+    --no-code
+cd security-csrf-prevention</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:3.15.2:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=security-csrf-prevention \
+    -Dextensions='rest-csrf' \
+    -DnoCode
+cd security-csrf-prevention</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Windowsユーザーの場合:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>cmdを使用する場合、（バックスラッシュ <code>\</code> を使用せず、すべてを同じ行に書かないでください）。</p>
+</li>
+<li>
+<p>Powershellを使用する場合は、 <code>-D</code> パラメータを二重引用符で囲んでください。例: <code>"-DprojectArtifactId=security-csrf-prevention"</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This command generates a project which imports the <code>rest-csrf</code> extension.</p>
+</div>
+<div class="paragraph">
+<p>If you already have your Quarkus project configured, you can add the <code>rest-csrf</code> extension
+to your project by running the following command in your project base directory:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus extension add rest-csrf</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:add-extension -Dextensions='rest-csrf'</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew addExtension --extensions='rest-csrf'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、 <code>pom.xml</code> に以下が追加されます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-rest-csrf&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-rest-csrf")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、このテンプレートを含むファイルを <code>csrfToken.html</code> と名付け、 <code>src/main/resources/templates</code> フォルダに置いてください:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;title&gt;User Name Input&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;User Name Input&lt;/h1&gt;
+
+    &lt;form action="/service/csrfTokenForm" method="post"&gt;
+    	&lt;input type="hidden" name="{inject:csrf.parameterName}" value="{inject:csrf.token}" /&gt;  <i class="conum" data-value="1"></i><b>(1)</b>
+
+    	&lt;p&gt;Your Name: &lt;input type="text" name="name" /&gt;&lt;/p&gt;
+    	&lt;p&gt;&lt;input type="submit" name="submit"/&gt;&lt;/p&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>この書式は、CSRF トークンを隠しフォームフィールドに注入するために使用されます。このトークンは CSRF フィルタによって CSRF クッキーと照合され検証されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>では、HTMLフォームを返し、フォームのPOSTリクエストを処理するリソースクラスを作成しましょう:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.it.csrf;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+import io.quarkus.qute.Template;
+import io.quarkus.qute.TemplateInstance;
+
+@Path("/service")
+public class UserNameResource {
+
+    @Inject
+    Template csrfToken; <i class="conum" data-value="1"></i><b>(1)</b>
+
+    @GET
+    @Path("/csrfTokenForm")
+    @Produces(MediaType.TEXT_HTML)
+    public TemplateInstance getCsrfTokenForm() {
+        return csrfToken.instance(); <i class="conum" data-value="2"></i><b>(2)</b>
+    }
+
+    @POST
+    @Path("/csrfTokenForm")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.TEXT_PLAIN)
+    public String postCsrfTokenForm(@FormParam("name") String userName) {
+        return userName; <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td> <code>csrfToken.html</code> を <code>Template</code> として注入してください。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>CSRFフィルターによって作成されたCSRFトークンを含むhiddenフォームフィールドを持つHTMLフォームを返します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>フォームの POST リクエストを処理します。このメソッドは、CSRF フィルターがトークンの確認に成功した場合にのみ呼び出すことができます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>フィルタが、隠された CSRF フォームフィールドがない、CSRF クッキーがない、あるいは CSRF フォームフィールドと CSRF クッキーの値が一致しないことを発見した場合、フォーム POST リクエストは HTTP ステータス <code>400</code> で失敗します。</p>
+</div>
+<div class="paragraph">
+<p>この段階では、追加の設定は必要ありません。デフォルトでは、CSRFフォームフィールドとクッキー名は <code>csrf-token</code> に設定され、フィルタはトークンを検証します。しかし、必要であれば、これらの名前を変更することができます：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.rest-csrf.form-field-name=csrftoken
+quarkus.rest-csrf.cookie-name=csrftoken</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sign-csrf-token"><a class="anchor" href="#sign-csrf-token"></a>CSRFトークンに署名</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>生成された CSRF トークンに <code>HMAC</code> 署名を作成し、これらの <code>HMAC</code> 値を CSRF トークン・クッキーとして保存することで、攻撃者が CSRF クッキー・トークンを再作成するリスクを回避することができます。必要なのは、少なくとも 32 文字の長さのトークン署名シークレットを設定することだけです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.rest-csrf.token-signature-key=AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="csrf-request-header"><a class="anchor" href="#csrf-request-header"></a>CSRFリクエスト・ヘッダー</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>HTML <code>form</code> タグを使用せず、CSRFトークンをヘッダーとして渡す必要がある場合、例えばHTMXにヘッダー名とトークンを注入します：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-html hljs" data-lang="html">&lt;body hx-headers='{"{inject:csrf.headerName}":"{inject:csrf.token}"}'&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+&lt;/body&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>この式は CSRF トークン・ヘッダーとトークンを注入するために使われます。このトークンは CSRF フィルターによって CSRF クッキーと照合されます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Default header name is <code>X-CSRF-TOKEN</code>, you can customize it with <code>quarkus.rest-csrf.token-header-name</code>, for example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.rest-csrf.token-header-name=CUSTOM-X-CSRF-TOKEN</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>CSRF クッキーの値をヘッダとして渡すために、JavaScript から CSRF クッキーにアクセスする必要がある場合、 <code>{inject:csrf.cookieName}</code> と <code>{inject:csrf.headerName}</code> を使って、CSRF ヘッダ値として読まれなければならないクッキー名を注入し、このクッキーへのアクセスを許可してください：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.rest-csrf.cookie-http-only=false</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cross-origin-resource-sharing"><a class="anchor" href="#cross-origin-resource-sharing"></a>クロスオリジンリソース共有</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>クロスオリジン環境でCSRF防止を実施したい場合は、すべてのオリジンをサポートするのは避けてください。</p>
+</div>
+<div class="paragraph">
+<p>サポートされるOriginを信頼できるOriginのみに制限してください。詳細については、「Cross-originリソース共有」ガイドの <a href="security-cors#cors-filter">CORSフィルター</a> のセクションを参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="restrict-csrf-token-verification"><a class="anchor" href="#restrict-csrf-token-verification"></a>CSRFトークンの検証を制限</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Jakarta REST エンドポイントは、 <code>application/x-www-form-urlencoded</code> または <code>multipart/form-data</code> のペイロードを持つ HTTP POST リクエストだけでなく、他のメディアタイプを持つペイロードも、同じ URL パスまたは異なる URL パスで受け入れることがあります。したがって、そのような場合は CSRF トークンの検証を回避したいでしょう。例:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.it.csrf;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+import io.quarkus.qute.Template;
+import io.quarkus.qute.TemplateInstance;
+
+@Path("/service")
+public class UserNameResource {
+
+    @Inject
+    Template csrfToken;
+
+    @GET
+    @Path("/user")
+    @Produces(MediaType.TEXT_HTML)
+    public TemplateInstance getCsrfTokenForm() {
+        return csrfToken.instance();
+    }
+
+    <i class="conum" data-value="1"></i><b>(1)</b>
+    @POST
+    @Path("/user")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.TEXT_PLAIN)
+    public String postCsrfTokenForm(@FormParam("name") String userName) {
+        return userName;
+    }
+
+    <i class="conum" data-value="2"></i><b>(2)</b>
+    @POST
+    @Path("/user")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public String postJson(User user) {
+        return user.name;
+    }
+
+    <i class="conum" data-value="3"></i><b>(3)</b>
+    @POST
+    @Path("/users")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public String postJson(User user) {
+        return user.name;
+    }
+
+    public static class User {
+        private String name;
+        public String getName() {
+            return this.name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>/user</code> へのPOSTフォームのリクエスト、CSRFフィルターによりCSRFトークンの検証が行われます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>/user</code> への POST json リクエスト , CSRF トークン検証は不要です。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>/users</code> への POST json リクエスト , CSRF トークン検証は不要です。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>ご覧のように、<code>service/user</code> パスで <code>application/x-www-form-urlencoded</code> ペイロードを受け取る際に CSRF トークン検証が必要になりますが、 <code>service/user</code> と <code>service/users</code> の両方のメソッドにPOSTされた <code>User</code> JSON表現はCSRFトークンを持たないため、これらのケースではトークン検証をスキップする必要があります。この場合、特定の`service/user`リクエストパスに限定し、このパスでは`application/x-www-form-urlencoded`だけを許可しないようにします:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># Verify CSRF token only for the `/service/user` path, ignore other paths such as `/service/users`
+quarkus.rest-csrf.create-token-path=/service/user
+
+# If `/service/user` path accepts not only `application/x-www-form-urlencoded` payloads but also other ones such as JSON then allow them
+# Setting this property is not necessary when the token is submitted as a header value
+quarkus.rest-csrf.require-form-url-encoded=false</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="verify-csrf-token-in-the-application-code"><a class="anchor" href="#verify-csrf-token-in-the-application-code"></a>アプリケーションコード内のCSRFトークンの検証</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>もし、CSRFのフォームフィールドとクッキーの値をアプリケーションのコードで比較したい場合は、次のようにします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.quarkus.it.csrf;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.CookieParam;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.MediaType;
+
+import io.quarkus.qute.Template;
+import io.quarkus.qute.TemplateInstance;
+
+@Path("/service")
+public class UserNameResource {
+
+    @Inject
+    Template csrfToken;
+
+    @GET
+    @Path("/csrfTokenForm")
+    @Produces(MediaType.TEXT_HTML)
+    public TemplateInstance getCsrfTokenForm() {
+        return csrfToken.instance();
+    }
+
+    @POST
+    @Path("/csrfTokenForm")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.TEXT_PLAIN)
+    public String postCsrfTokenForm(@CookieParam("csrf-token") Cookie csrfCookie, @FormParam("csrf-token") String formCsrfToken, @FormParam("name") String userName) {
+        if (!csrfCookie.getValue().equals(formCsrfToken)) { <i class="conum" data-value="1"></i><b>(1)</b>
+            throw new BadRequestException();
+        }
+        return userName;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>CSRFのフォームフィールドとクッキーの値を比較し、一致しない場合はHTTPステータス <code>400</code> で失敗します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>また、フィルターのトークン検証を無効にします:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.rest-csrf.verify-token=false</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="csrf-reactive-configuration-reference"><a class="anchor" href="#csrf-reactive-configuration-reference"></a>設定リファレンス</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="ビルド時に固定"></i></span>ビルド時に固定される構成プロパティ - 他のすべての構成プロパティは実行時にオーバーライド可能 <input type="search" id="config-search-0" placeholder="FILTER CONFIGURATION" disabled></p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference searchable configuration-reference-all-rows">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><span class="header-title">Configuration property</span></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-rest-csrf_quarkus-rest-csrf-enabled"></a> <span class="property-path"><a href="#quarkus-rest-csrf_quarkus-rest-csrf-enabled"><code>quarkus.rest-csrf.enabled</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-1" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If filter is enabled.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30356">QUARKUS_REST_CSRF_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30356" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-csrf_quarkus-rest-csrf-form-field-name"></a> <span class="property-path"><a href="#quarkus-rest-csrf_quarkus-rest-csrf-form-field-name"><code>quarkus.rest-csrf.form-field-name</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-2" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Form field name which keeps a CSRF token.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30357">QUARKUS_REST_CSRF_FORM_FIELD_NAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30357" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>csrf-token</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-csrf_quarkus-rest-csrf-token-header-name"></a> <span class="property-path"><a href="#quarkus-rest-csrf_quarkus-rest-csrf-token-header-name"><code>quarkus.rest-csrf.token-header-name</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-3" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Token header which can provide a CSRF token.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30358">QUARKUS_REST_CSRF_TOKEN_HEADER_NAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30358" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>X-CSRF-TOKEN</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-csrf_quarkus-rest-csrf-cookie-name"></a> <span class="property-path"><a href="#quarkus-rest-csrf_quarkus-rest-csrf-cookie-name"><code>quarkus.rest-csrf.cookie-name</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-4" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>CSRF cookie name.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30359">QUARKUS_REST_CSRF_COOKIE_NAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30359" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>csrf-token</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-csrf_quarkus-rest-csrf-cookie-max-age"></a> <span class="property-path"><a href="#quarkus-rest-csrf_quarkus-rest-csrf-cookie-max-age"><code>quarkus.rest-csrf.cookie-max-age</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-5" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>CSRF cookie max age.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30360">QUARKUS_REST_CSRF_COOKIE_MAX_AGE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30360" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-{summaryTableId}"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>2H</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-csrf_quarkus-rest-csrf-cookie-path"></a> <span class="property-path"><a href="#quarkus-rest-csrf_quarkus-rest-csrf-cookie-path"><code>quarkus.rest-csrf.cookie-path</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-6" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>CSRF cookie path.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30361">QUARKUS_REST_CSRF_COOKIE_PATH</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30361" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>/</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-csrf_quarkus-rest-csrf-cookie-domain"></a> <span class="property-path"><a href="#quarkus-rest-csrf_quarkus-rest-csrf-cookie-domain"><code>quarkus.rest-csrf.cookie-domain</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-7" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>CSRF cookie domain.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30362">QUARKUS_REST_CSRF_COOKIE_DOMAIN</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30362" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-csrf_quarkus-rest-csrf-cookie-force-secure"></a> <span class="property-path"><a href="#quarkus-rest-csrf_quarkus-rest-csrf-cookie-force-secure"><code>quarkus.rest-csrf.cookie-force-secure</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-8" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If enabled the CSRF cookie will have its 'secure' parameter set to 'true' when HTTP is used. It may be necessary when running behind an SSL terminating reverse proxy. The cookie will always be secure if HTTPS is used even if this property is set to false.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30363">QUARKUS_REST_CSRF_COOKIE_FORCE_SECURE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30363" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-csrf_quarkus-rest-csrf-cookie-http-only"></a> <span class="property-path"><a href="#quarkus-rest-csrf_quarkus-rest-csrf-cookie-http-only"><code>quarkus.rest-csrf.cookie-http-only</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-9" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Set the HttpOnly attribute to prevent access to the cookie via JavaScript.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30364">QUARKUS_REST_CSRF_COOKIE_HTTP_ONLY</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30364" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-csrf_quarkus-rest-csrf-create-token-path"></a> <span class="property-path"><a href="#quarkus-rest-csrf_quarkus-rest-csrf-create-token-path"><code>quarkus.rest-csrf.create-token-path</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-10" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Create CSRF token only if the HTTP GET relative request path matches one of the paths configured with this property. Use a comma to separate multiple path values.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30365">QUARKUS_REST_CSRF_CREATE_TOKEN_PATH</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30365" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-csrf_quarkus-rest-csrf-token-size"></a> <span class="property-path"><a href="#quarkus-rest-csrf_quarkus-rest-csrf-token-size"><code>quarkus.rest-csrf.token-size</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-11" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Random CSRF token size in bytes.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30366">QUARKUS_REST_CSRF_TOKEN_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30366" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>16</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-csrf_quarkus-rest-csrf-token-signature-key"></a> <span class="property-path"><a href="#quarkus-rest-csrf_quarkus-rest-csrf-token-signature-key"><code>quarkus.rest-csrf.token-signature-key</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-12" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>CSRF token HMAC signature key, if this key is set then it must be at least 32 characters long.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30367">QUARKUS_REST_CSRF_TOKEN_SIGNATURE_KEY</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30367" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-csrf_quarkus-rest-csrf-verify-token"></a> <span class="property-path"><a href="#quarkus-rest-csrf_quarkus-rest-csrf-verify-token"><code>quarkus.rest-csrf.verify-token</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-13" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Verify CSRF token in the CSRF filter. If you prefer then you can disable this property and compare CSRF form and cookie parameters in the application code using JAX-RS jakarta.ws.rs.FormParam which refers to the <code>form-field-name</code> form property and jakarta.ws.rs.CookieParam which refers to the <code>RestCsrfConfig#cookieName</code> cookie. Note that even if the CSRF token verification in the CSRF filter is disabled, the filter will still perform checks to ensure the token is available, has the correct <code>token-size</code> in bytes and that the Content-Type HTTP header is either 'application/x-www-form-urlencoded' or 'multipart/form-data'.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30368">QUARKUS_REST_CSRF_VERIFY_TOKEN</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30368" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-rest-csrf_quarkus-rest-csrf-require-form-url-encoded"></a> <span class="property-path"><a href="#quarkus-rest-csrf_quarkus-rest-csrf-require-form-url-encoded"><code>quarkus.rest-csrf.require-form-url-encoded</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-14" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Require that only 'application/x-www-form-urlencoded' or 'multipart/form-data' body is accepted for the token verification to proceed. Disable this property for the CSRF filter to avoid verifying the token for POST requests with other content types. This property is only effective if <code>verify-token</code> property is enabled and <code>token-header-name</code> is not configured.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-30369">QUARKUS_REST_CSRF_REQUIRE_FORM_URL_ENCODED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-30369" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+</tbody>
+</table>
+<div id="duration-note-anchor-quarkus-rest-csrf_quarkus-rest-csrf" class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">期間フォーマットについて</div>
+<div class="paragraph">
+<p>To write duration values, use the standard <code>java.time.Duration</code> format.
+See the <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html#parse(java.lang.CharSequence)">Duration#parse() Java API documentation</a> for more information.</p>
+</div>
+<div class="paragraph">
+<p>数字で始まる簡略化した書式を使うこともできます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値のみの場合は、秒単位の時間を表します。</p>
+</li>
+<li>
+<p>数値の後に <code>ms</code> が続く場合は、ミリ秒単位の時間を表します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>その他の場合は、簡略化されたフォーマットが解析のために <code>java.time.Duration</code> フォーマットに変換されます：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値の後に <code>h</code> 、 <code>m</code> 、 <code>s</code> が続く場合は、その前に <code>PT</code> が付けられます。</p>
+</li>
+<li>
+<p>数値の後に <code>d</code> が続く場合は、その前に <code>P</code> が付けられます。</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="references"><a class="anchor" href="#references"></a>リファレンス</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://owasp.org/www-community/attacks/csrf">OWASP クロスサイトリクエストフォージェリ</a></p>
+</li>
+<li>
+<p><a href="rest">Quarkus REST</a></p>
+</li>
+<li>
+<p><a href="qute-reference">Qute リファレンス</a></p>
+</li>
+<li>
+<p><a href="security-cors#cors-filter">クロスオリジン・リソース共有</a></p>
+</li>
+<li>
+<p><a href="security-overview">Quarkus Securityの概要</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#creating-the-project">プロジェクトの作成</a></li>
+<li><a href="#sign-csrf-token">CSRFトークンに署名</a></li>
+<li><a href="#csrf-request-header">CSRFリクエスト・ヘッダー</a></li>
+<li><a href="#cross-origin-resource-sharing">クロスオリジンリソース共有</a></li>
+<li><a href="#restrict-csrf-token-verification">CSRFトークンの検証を制限</a></li>
+<li><a href="#verify-csrf-token-in-the-application-code">アプリケーションコード内のCSRFトークンの検証</a></li>
+<li><a href="#csrf-reactive-configuration-reference">設定リファレンス</a></li>
+<li><a href="#references">リファレンス</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/security-authorize-web-endpoints-reference">ウェブエンドポイントの認可</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.15/guides/security-basic-authentication">Basic認証</a></li>
+      
+        
+        <li class="howto"><a href="/version/3.15/guides/security-basic-authentication-howto">ベーシック認証の有効化</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.15/guides/security-getting-started-tutorial">Basic認証とJakarta Persistenceを使ったセキュリティ入門</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/tls-registry-reference">TLS レジストリーリファレンス</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.15/guides/security-authentication-mechanisms">Quarkusの認証メカニズム</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/security-jwt-build">JSONウェブトークン (JWT) のビルド、署名、暗号化</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.15/guides/security-openid-connect-providers">よく知られたOpenID Connect プロバイダーの設定</a></li>
+      
+        
+        <li class="howto"><a href="/version/3.15/guides/security-openid-connect-dev-services">OpenID Connect (OIDC)のDev ServicesとDev UI</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/http-reference">HTTPリファレンス</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.15/guides/security-identity-providers">アイデンティティ・プロバイダー</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/security-openid-connect-client-reference">OpenID Connect (OIDC) と OAuth2 クライアントおよびフィルター</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.15/guides/security-oidc-bearer-token-authentication">OpenID Connect (OIDC) ベアラートークン認証</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/security-oidc-configuration-properties-reference">OpenID Connect (OIDC) 設定プロパティ</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.15/guides/security-oidc-code-flow-authentication">Web アプリケーションを保護するための OpenID Connect 認可コードフローメカニズム</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.15/guides/security-openid-connect-client">OpenID Connectクライアントとトークン伝搬クイックスタート</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.15/guides/security-proactive-authentication">プロアクティブ認証</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.15/guides/security-oidc-bearer-token-authentication-tutorial">OpenID Connect（OIDC）ベアラートークン認証によるサービスアプリケーションの保護</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.15/guides/security-oidc-code-flow-authentication-tutorial">Quarkus - 認可コードフローのOpenID Connectを使用してWebアプリケーションを保護</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/web">Web 向け Quarkus</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

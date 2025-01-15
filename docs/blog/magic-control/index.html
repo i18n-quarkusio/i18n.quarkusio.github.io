@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>手品に飽きた？ - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/blog/magic-control/" />
+  <meta property="og:title" content="手品に飽きた？" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/blog/magic-control/">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="post">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/blog/magic-control/">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="active">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/blog/magic-control/" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/blog/magic-control/">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/blog/magic-control/">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/blog/magic-control/">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/blog/magic-control/">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    <div class="full-width-breadcrumb-bg align-self">
+  <div class="width-12-12">
+      <p class="returnlink"><a href="/blog">Blog</a> <i class="fas fa-chevron-right"></i> 手品に飽きた？</p>
+  </div>
+</div>
+
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+    <div class="grid-wrapper">
+      <div class="width-12-12">
+        <div class="post-date">
+          January 12, 2021 
+          
+            <span class="tags"><a href="/blog/tag/vert-x">#vert.x</a></span>
+          
+        </div>
+        <h1 class="post-title">手品に飽きた？</h1>
+        <div class="grid-wrapper">
+          <div class="width-8-12 width-12-12-m byline-wrapper">
+            
+            
+              <img class="headshot" src="https://www.gravatar.com/avatar/ab937f7df990a673446f1e30fd9ccfba">
+            
+            <p class="byline">By <a href="/author/cescoffier">Clement Escoffier</a></p>
+          </div>
+          <div class="width-12-12">
+              <div class="paragraph">
+<p>有休の直前に 誰かに言われました <em>"私はマジックが好きじゃない"</em> って。この文脈では、 <em>マジック</em> とは、シンプルにするためにQuarkusが裏側で行っている隠れた <em>作業</em> のことを指します。これには依存性注入やアノテーションなどが含まれます。</p>
+</div>
+<div class="paragraph">
+<p>このようなコメントを受けるのは初めてではないし、Vert.xプロジェクトから来ているので、それは理にかなっています。Vert.x には(ほとんど)マジックがありませんが、それには正当な理由があります: マジックが多すぎるとひどいことになり、プロダクションチューニングが全く大変になります。時には、より多くの制御をして予期せぬ動作を避けたい場合があります: ただ書いたコードだけが実行され、それ以外は何もしないで欲しい、ということです。</p>
+</div>
+<div class="paragraph">
+<p>しかし、マジックは本質的に悪いものではありません。マジックは良いことにも悪いことにも使えるパワーなのです。結局のところ、あなたのアプリケーションは、マイクロコードで力を与えられた半導体上で実行される、抽象化のマジックで力を与えられたオペレーティングシステム上の、JITのマジックで力を与えられたJava仮想マシンで動いています。マジックはありますが、それはあなたが十分な知識を持っている(または信頼している)マジックと、そうでないマジックのことです。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusにはたくさんのマジックのトリックがあると思うかもしれません。ある意味ではそうなのですが、簡単に理解でき、メモリーの最適化、起動時間の最適化、または開発者の経験の向上のいずれかにおいて強力なメリットがあります。あなたが望むマジックの量と、あなたが快適に感じるコントロールの量を決めることができます。もし自分でやりたいのであれば、依存性注入や管理クライアントを使う必要はありません。</p>
+</div>
+<div class="paragraph">
+<p>今回の記事では、マジックの量を減らすための3つの異なるアプローチを取り上げます。マジックをほとんど使わない状態から、良い開発者体験を得るために必要なだけの状態にしていきます。このブログ記事の例は <a href="https://github.com/cescoffier/quarkus-magic-control">GitHub</a>で公開されています。</p>
+</div>
+<div class="sect1">
+<h2 id="the-almost-no-magic-approach"><a class="anchor" href="#the-almost-no-magic-approach"></a><em>ほとんどマジックがない</em> アプローチ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>QuarkusのアプリケーションはJavaアプリケーションです。そのため、どこかに <code>public static void main(String…​ args)</code> が存在します。Quarkusを使用する際にそのメソッドを記述する必要はありませんが、それでも便利で、アプリケーションの起動についてより多くのコントロールが可能になります。また、IDEから直接Quarkusアプリケーションを起動するのも良いでしょう。</p>
+</div>
+<div class="paragraph">
+<p>例として、簡単な HTTP アプリケーションを実装します。派手なものは何もありません:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package me.escoffier.quarkus.nomagic;
+
+import io.quarkus.runtime.Quarkus;
+import io.quarkus.runtime.QuarkusApplication;
+import io.quarkus.runtime.annotations.QuarkusMain;
+import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServer;
+import io.vertx.ext.web.Router;
+import org.eclipse.microprofile.config.ConfigProvider;
+
+@QuarkusMain
+public class Main implements QuarkusApplication {
+
+    public static void main(String... args) {
+        Quarkus.run(Main.class, args);
+    }
+
+    @Override
+    public int run(String... args) {
+        Vertx vertx = Vertx.vertx();
+        Router router = Router.router(vertx);
+
+        String message = ConfigProvider.getConfig().getValue("message", String.class);
+
+        router.get("/").handler(rc -&gt; rc.response().end(message));
+        router.get("/bye").handler(rc -&gt; {
+            rc.response().end("bye");
+            Quarkus.asyncExit();
+        });
+
+        HttpServer server = vertx.createHttpServer()
+                .requestHandler(router)
+                .listen(8080);
+
+        Quarkus.waitForExit();
+
+        server.close();
+        return 0;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>完全なソースコードは <a href="https://github.com/cescoffier/quarkus-magic-control/tree/main/no-magic-example">ここ</a>にあります。アプリケーションにはJavaクラスが1つしかありませんが、それを調べてみましょう。</p>
+</div>
+<div class="paragraph">
+<p><code>@QuarkusMain</code> は、Quarkusがこのクラスをアプリケーションの <em>メインエントリーポイント</em> として使用することを示しています。 <code>run</code> メソッドには、アプリケーションのロジックが含まれています。このロジックについては後ほど説明します。まず、 <code>public static void main(String…​ args)</code> メソッドを見てください。これはアプリケーションを起動するだけです。このエントリーポイントは、IDE から直接使用できます。そう、 <code>Quarkus.run</code> の背後にはまだちょっとしたマジックがあります。エクステンションの初期化が行われるのは、 Vert.x を含む <em>どの</em> フレームワークの初期化とも異なります。</p>
+</div>
+<div class="paragraph">
+<p>このアプリケーションは Vert.x Web と Vert.x Core に直接 <a href="https://github.com/cescoffier/quarkus-magic-control/blob/main/no-magic-example/pom.xml#L17-L26">依存します</a>。Quarkusの依存関係はArcだけです(直接は使用しませんが必須です):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+        &lt;artifactId&gt;quarkus-arc&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+
+    &lt;dependency&gt;
+        &lt;groupId&gt;io.vertx&lt;/groupId&gt;
+        &lt;artifactId&gt;vertx-web&lt;/artifactId&gt;
+        &lt;version&gt;3.9.5&lt;/version&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>run</code> メソッドに戻りましょう。これにはアプリケーション・ロジックが含まれており、ここではダミーの Vert.x アプリケーションを使用しています。 <code>Vertx</code> インスタンス、 <code>Router</code> を作成し、いくつかのルートを登録し、HTTP サーバーを起動します。アプリケーションをすぐに停止させたくないので、 <em>終了を待ちます</em>。 <code>/bye</code> リクエスト・ハンドラーは、アプリケーションのシャットダウンをプログラムでトリガーする方法を示しています。</p>
+</div>
+<div class="paragraph">
+<p>このアプリケーションにはマジックはほとんどなく、ただのアノテーション1つと、普通のJavaのエントリーポイントがあるだけです。なぜむき出しのJavaプログラムを使わないのかと疑問に思うかもしれません。そのように使用しても、Quarkusには利点があります。例えば、スニペットに示されているように、組み込みの設定サポートにアクセスすることができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">String message = ConfigProvider.getConfig().getValue("message", String.class);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>設定は、 <code>application.properties</code> ファイルにあります。</p>
+</div>
+<div class="paragraph">
+<p>この最初のアプローチには、いくつかの欠点があります。これはQuarkusのビルド時処理の恩恵を受けていません。ビルド時に実行されるロジックはエクステンションの中にパッケージ化されており、この場合はエクステンションは使用されません(Arcを除く)。もう一つの問題は、このアプリケーションをネイティブにコンパイルすると、ネイティブのコンパイル時にエクステンションも絡んでくるので失敗するということです。最後に、ホットリロードはうまくいきませんが、IDEから直接アプリケーションを再起動することができます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-the-managed-vert-x-instance"><a class="anchor" href="#using-the-managed-vert-x-instance"></a>管理された Vert.x インスタンスの使用</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>QuarkusはVert.xを多用しています。 <code>quarkus-vertx-core</code> エクステンションは、Quarkusが使用するVert.xインスタンスを管理します。そのインスタンスを直接使用することができ、Vert.xインスタンスを作成する必要はありません。インスタンスを設定する必要がある場合は、 <a href="https://quarkus.io/guides/all-config#quarkus-vertx-core_quarkus-vertx-core-eclipse-vert.x-core"><code>application.properties</code></a> から設定することができます。また、ネイティブパッケージングも可能になります(このエクステンションには Vert.x アプリケーションをネイティブにコンパイルするためのディレクティブが含まれているため)。</p>
+</div>
+<div class="paragraph">
+<p>pom.xmlファイルに以下の依存関係を追加します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-vertx-core&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、 <em>run</em> メソッドは以下のようになります:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Override
+public int run(String... args) {
+    Vertx vertx = CDI.current().select(Vertx.class).get();
+    Router router = Router.router(vertx);
+
+    String message = ConfigProvider.getConfig().getValue("message", String.class);
+
+    router.get("/").handler(rc -&gt; rc.response().end(message + " world!"));
+    router.get("/stop").handler(rc -&gt; {
+        rc.response().end("bye");
+        Quarkus.asyncExit();
+    });
+
+    HttpServer server = vertx.createHttpServer()
+            .requestHandler(router)
+            .listen(8080);
+
+    Quarkus.waitForExit();
+
+    server.close();
+    return 0;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>管理されている Vert.x インスタンスを取得する方法に注目してください。 <code>@Inject</code> を使用することができますが、プログラムで取得することも出来、残りのコードは変更しません。ご覧になりましたか?魔法はありません! <em>メイン</em> メソッドを使用して、IDE から起動することができます。</p>
+</div>
+<div class="paragraph">
+<p><code>quarkus-vertx-core</code> エクステンション(またはそれに依存するエクステンション)を含まない場合、QuarkusはVert.xインスタンスを作成しません。</p>
+</div>
+<div class="paragraph">
+<p>エクステンションを使用すると、プロパティーの設定や、ビルド時間の最適化、ネイティブイメージのコンパイルも行うことができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell script hljs" data-lang="shell script">&gt; mvn package -Dnative
+...
+&gt; ./target/managed-vertx-example-1.0-SNAPSHOT-runner</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>しかし、やはりホットリロードはダメですね😿。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-the-managed-http-server"><a class="anchor" href="#using-the-managed-http-server"></a>管理されたHTTPサーバーの使用</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>quarkus-vertx-core</code> のエクステンションだけを使用するのではなく、HTTPサーバーをQuarkusに委任することもできます。 これは制御できないと思われるかもしれませんが、実際には、そのようなことは滅多にしませんが、必要なら、 <code>application.properties</code> ファイルから設定することが可能です。</p>
+</div>
+<div class="paragraph">
+<p><code>`quarkus-vertx-core</code> の代わりに、 <code>quarkus-vertx-http</code> を使用してください:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+        &lt;artifactId&gt;quarkus-vertx-http&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Vert.x Webに直接依存する必要はなく、含まれています。</p>
+</div>
+<div class="paragraph">
+<p>ルートの登録は引き続き行いますが、管理されている <code>Router</code> を使用します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Override
+public int run(String... args) {
+    Router router = CDI.current().select(Router.class).get();
+
+    String message = ConfigProvider.getConfig().getValue("message", String.class);
+
+    router.get("/").handler(rc -&gt; rc.response().end(message));
+    router.get("/bye").handler(rc -&gt; {
+        rc.response().end("bye");
+        Quarkus.asyncExit();
+    });
+
+    Quarkus.waitForExit();
+    return 0;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このアプローチでは、HTTPリクエストをインターセプトするため、Quarkusのホットリロードが可能になります。アプリケーションロジックに関連するすべてのことを制御することができます。</p>
+</div>
+<div class="paragraph">
+<p>次を使ってホットリロードを開始することができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell script hljs" data-lang="shell script">&gt; mvn quarkus:dev</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-final-magic-touch"><a class="anchor" href="#the-final-magic-touch"></a>最後の <em>マジックタッチ</em></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>問題は、Quarkusの _通常の_アプリケーションからどれくらい離れているかということです。実際には、かなり近いです。RESTEasy Reactiveを使った同等のアプリケーションは、次のようなものです:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Path("/")
+public class MyResource {
+
+    @Inject @ConfigProperty("message") String message;
+
+    @GET
+    public String hello() {
+        return message;
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これまでのアプローチとは異なり、このアプローチは宣言的な(アノテーションベースの)モデルを活用しています。内部では、前のアプローチとそれほど違いはありません。Quarkusは(ルーター上で)ルートを登録し、一致するリクエストを受信すると <code>hello</code> メソッドを呼び出します。ルータは、 <code>Quarkus.run</code> メソッドの間に初期化されます。 <em>メインエンドポイント</em> は必要ありませんが、1つのエンドポイントを使用することができ、IDEでは便利なことが多いです。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="summary"><a class="anchor" href="#summary"></a>まとめ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>私たちのマジックとの関係は、私たちのバックグラウンドや経験によって異なります。Quarkusでは、どの程度のマジックを受け入れるかを決めることができます。この記事では、ほとんど魔法を使わない状態から <em>通常の</em> Quarkusコードまで、4つの設定を紹介しました。それぞれのアプローチには長所と短所があります:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"></th>
+<th class="tableblock halign-left valign-top">コントロール</th>
+<th class="tableblock halign-left valign-top">ビルド時最適化</th>
+<th class="tableblock halign-left valign-top">ネイティブ実行可能ファイル</th>
+<th class="tableblock halign-left valign-top">ホットリロード</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>殆どマジックなし</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">完全</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">🥵</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">🥵</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">🥵</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">管理された Vert.x インスタンスの使用</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Vert.x以外はすべて</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">😀、Vert.xの場合</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">😀</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">🥵</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">管理されたHTTPサーバーの使用</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Vert.xとHTTPサーバー以外はすべて</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">😀、Vert.x と HTTP の場合</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">😀</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">😀</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>通常の</em> Quarkus</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Quarkusが管理するエンドポイント</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">😀</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">😀</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">😀</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>ニーズに合ったアプローチを選びましょう。また、設定について見てきたように、Quarkusのサービスのほとんどは、プログラム的なアプローチを使用して利用することもできます。管理されたオブジェクトを避けたい場合は、利用可能なAPIを使用してください。</p>
+</div>
+</div>
+</div>
+              
+          </div>
+          <div class="width-12-12"><div class="share-page">
+  <a class="share-linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=https://quarkus.io/blog/magic-control/&title=手品に飽きた？" rel="nofollow" target="_blank" title="Share on LinkedIn">
+    <i class="fa-brands fa-linkedin fa-xl"></i>
+  </a>
+  <a class="share-x" href="https://x.com/intent/tweet?text=手品に飽きた？&url=https://quarkus.io/blog/magic-control/&via=quarkusio&related=quarkusio" rel="nofollow" target="_blank" title="Share on X">
+    <i class="fa-brands fa-square-x-twitter fa-xl"></i>
+  </a>
+  <a class="share-facebook" href="https://facebook.com/sharer.php?u=https://quarkus.io/blog/magic-control/" rel="nofollow" target="_blank" title="Share on Facebook">
+    <i class="fa-brands fa-square-facebook fa-xl"></i>
+  </a>
+  <a class="share-reddit" href="http://www.reddit.com/submit?url=https://quarkus.io/blog/magic-control/" onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;" title="Share on Reddit" >
+    <i class="fa-brands fa-square-reddit fa-xl"></i>
+  </a>
+  <a class="share-email" href="mailto:?subject=手品に飽きた？&amp;body=手品に飽きた？ https://quarkus.io/blog/magic-control/" title="Share via Email" >
+    <i class="fa-solid fa-envelope fa-xl"></i>
+  </a>
+</div>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+  <script src="https://giscus.app/client.js"
+        data-repo="quarkusio/quarkus"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkxMzk5MTQ5MzI="
+        data-category="Quarkus Blog/Website"
+        data-category-id="DIC_kwDOCFbutM4CAFFV"
+        data-mapping="og:title"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+  </script>
+  </div>
+</div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

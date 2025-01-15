@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>リアクティブメッセージング RabbitMQ コネクターのリファレンスドキュメント - 2.13 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/2.13/guides/rabbitmq-reference" />
+  <meta property="og:title" content="リアクティブメッセージング RabbitMQ コネクターのリファレンスドキュメント - 2.13" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/rabbitmq-reference">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/2.13/guides/rabbitmq-reference">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/2.13/guides/rabbitmq-reference" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/2.13/guides/rabbitmq-reference">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/2.13/guides/rabbitmq-reference">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/2.13/guides/rabbitmq-reference">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/2.13/guides/rabbitmq-reference">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/2.13/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" selected>2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">リアクティブメッセージング RabbitMQ コネクターのリファレンスドキュメント </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドは、 <a href="rabbitmq">RabbitMQ スタートガイド</a> のドキュメントです。リアクティブメッセージング用 RabbitMQ コネクターの設定と使い方について詳しく説明します。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+このドキュメントは、コネクターのすべての詳細を網羅しているわけではありません。詳細については、 <a href="https://smallrye.io/smallrye-reactive-messaging">SmallRye Reactive Messaging website</a> サイトを参照してください。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>RabbitMQ コネクターを使用すると、Quarkus アプリケーションは AMQP 0.9.1 プロトコルを使用してメッセージを送受信できます。プロトコルの詳細については、 <a href="https://www.rabbitmq.com/amqp-0-9-1-reference.html#queue.bind.routing-key">AMQP 0.9.1 の仕様書</a> を参照してください。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+RabbitMQ コネクターは AMQP 0-9-1 をサポートします。これは、AMQP 1.0 コネクターで使用される AMQP 1.0 プロトコルとは大きく異なります。<a href="amqp-reference">AMQP 1.0 コネクターのリファレンス</a> で説明されているように、 <strong>機能は縮小</strong> されていますが、AMQP 1.0 コネクターを RabbitMQ で使用できます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="rabbitmq-connector-extension"><a class="anchor" href="#rabbitmq-connector-extension"></a>RabbitMQ コネクターのエクステンション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>コネクターを使用するには、<code>quarkus-smallrye-reactive-messaging-rabbitmq</code> エクステンションを追加する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>次のコマンドでプロジェクトにエクステンションを追加することができます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">&gt; ./mvnw quarkus:add-extensions -Dextensions="quarkus-smallrye-reactive-messaging-rabbitmq"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>あるいは、以下の依存関係をプロジェクトに追加するだけです:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-smallrye-reactive-messaging-rabbitmq&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>プロジェクトに追加したら、<code>connector</code> 属性を設定することで、<em>チャネル</em> を RabbitMQ エクスチェンジまたはキューにマップできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties"># Inbound
+mp.messaging.incoming.[channel-name].connector=smallrye-rabbitmq
+
+# Outbound
+mp.messaging.outgoing.[channel-name].connector=smallrye-rabbitmq</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ブローカーの要求に応じて、<code>outgoing</code> チャネルは RabbitMQ エクスチェンジにマップされ、<code>incoming</code> チャネルは RabbitMQ キューにマップされます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-the-rabbitmq-broker-access"><a class="anchor" href="#configuring-the-rabbitmq-broker-access"></a>RabbitMQ ブローカーアクセスの設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>RabbitMQ コネクターは RabbitMQ ブローカーに接続します。ブローカーの場所とクレデンシャルを設定するには、<code>application.properties</code> に次のプロパティーを追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">rabbitmq-host=amqp <i class="conum" data-value="1"></i><b>(1)</b>
+rabbitmq-port=5672 <i class="conum" data-value="2"></i><b>(2)</b>
+rabbitmq-username=my-username <i class="conum" data-value="3"></i><b>(3)</b>
+rabbitmq-password=my-password <i class="conum" data-value="4"></i><b>(4)</b>
+
+mp.messaging.incoming.prices.connector=smallrye-rabbitmq <i class="conum" data-value="5"></i><b>(5)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>ブローカーのホスト名を設定します。チャネルごとに (<code>host</code> 属性を使用して) 設定するか、<code>rabbitmq-host</code> を使用してグローバルに設定できます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>ブローカーポートを設定します。チャネルごとに (<code>port</code> 属性を使用して) 設定するか、<code>rabbitmq-port</code> を使用してグローバルに設定できます。デフォルトは <code>5672</code> です。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>必要に応じてブローカーのユーザー名を設定します。チャネルごとに (<code>username</code> 属性を使用して) 設定するか、<code>rabbitmq-username</code> を使用してグローバルに設定できます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>必要に応じてブローカーのパスワードを設定します。チャネルごとに (<code>password</code> 属性を使用して) 設定するか、<code>rabbitmq-password</code> を使用してグローバルに設定できます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>価格チャネルに RabbitMQ コネクターでの管理を指示</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>開発モードでテストを実行すると、<a href="rabbitmq-dev-services">Dev Services for RabbitMQ</a> が自動的に RabbitMQ ブローカーを起動します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="receiving-rabbitmq-messages"><a class="anchor" href="#receiving-rabbitmq-messages"></a>RabbitMQ メッセージの受信</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>アプリケーションが <code>メッセージ &lt;Double&gt;</code> を受信すると想像してみましょう。ペイロードを直接消費できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package inbound;
+
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+
+import javax.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+public class RabbitMQPriceConsumer {
+
+    @Incoming("prices")
+    public void consume(double price) {
+        // process your price.
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>または、Message&lt;Double&gt; を取得できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package inbound;
+
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Message;
+
+import javax.enterprise.context.ApplicationScoped;
+import java.util.concurrent.CompletionStage;
+
+@ApplicationScoped
+public class RabbitMQPriceMessageConsumer {
+
+    @Incoming("prices")
+    public CompletionStage&lt;Void&gt; consume(Message&lt;Double&gt; price) {
+        // process your price.
+
+        // Acknowledge the incoming message, marking the RabbitMQ message as `accepted`.
+        return price.ack();
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="inbound-metadata"><a class="anchor" href="#inbound-metadata"></a>インバウンドメタデータ</h3>
+<div class="paragraph">
+<p>RabbitMQ からのメッセージには、メタデータに <code>IncomingRabbitMQMetadata</code> のインスタンスが含まれています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Optional&lt;IncomingRabbitMQMetadata&gt; metadata = incoming.getMetadata(IncomingRabbitMQMetadata.class);
+metadata.ifPresent(meta -&gt; {
+    final Optional&lt;String&gt; contentEncoding = meta.getContentEncoding();
+    final Optional&lt;String&gt; contentType = meta.getContentType();
+    final Optional&lt;String&gt; correlationId = meta.getCorrelationId();
+    final Optional&lt;ZonedDateTime&gt; creationTime = meta.getCreationTime(ZoneId.systemDefault());
+    final Optional&lt;Integer&gt; priority = meta.getPriority();
+    final Optional&lt;String&gt; replyTo = meta.getReplyTo();
+    final Optional&lt;String&gt; userId = meta.getUserId();
+
+    // Access a single String-valued header
+    final Optional&lt;String&gt; stringHeader = meta.getHeader("my-header", String.class);
+
+    // Access all headers
+    final Map&lt;String,Object&gt; headers = meta.getHeaders();
+    // ...
+});</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="deserialization"><a class="anchor" href="#deserialization"></a>デシリアライズ</h3>
+<div class="paragraph">
+<p>コネクターは、受信 RabbitMQ メッセージをリアクティブメッセージング <code>Message&lt;T&gt;</code> インスタンスに変換します。ペイロードタイプ <code>T</code> は、RabbitMQ 受信メッセージエンベロープ <code>content_type</code> および <code>content_encoding</code> プロパティーの値によって異なります。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">content_encoding</th>
+<th class="tableblock halign-left valign-top">content_type</th>
+<th class="tableblock halign-left valign-top">T</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>現在の値</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>n/a</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>byte[]</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>値なし</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>text/plain</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>値なし</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>application/json</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">バッファーに配列、オブジェクト、文字列などが含まれる場合に <a href="https://vertx.io/docs/apidocs/io/vertx/core/json/JsonArray.html"><code>JsonArray</code></a>、 <a href="https://vertx.io/docs/apidocs/io/vertx/core/json/JsonObject.html"><code>JsonObject</code></a> 、<code>String</code> などにできる JSON 要素</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>値なし</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>その他</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>byte[]</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>この RabbitMQ コネクター (アウトバウンドコネクター) を使用してオブジェクトを送信する場合、オブジェクトは JSON としてエンコードされ、<code>content_type</code> を <code>application/json</code> に設定されて送信されます。このペイロードは、(Vert.x) JSON オブジェクトを使用して受け取り、任意のオブジェクトクラスにマップできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ApplicationScoped
+public static class Generator {
+
+    @Outgoing("to-rabbitmq")
+    public Multi&lt;Price&gt; prices() { <i class="conum" data-value="1"></i><b>(1)</b>
+        AtomicInteger count = new AtomicInteger();
+        return Multi.createFrom().ticks().every(Duration.ofMillis(1000))
+                .map(l -&gt; new Price().setPrice(count.incrementAndGet()))
+                .onOverflow().drop();
+    }
+
+}
+
+@ApplicationScoped
+public static class Consumer {
+
+    List&lt;Price&gt; prices = new CopyOnWriteArrayList&lt;&gt;();
+
+    @Incoming("from-rabbitmq")
+    public void consume(JsonObject p) { <i class="conum" data-value="2"></i><b>(2)</b>
+        Price price = p.mapTo(Price.class); <i class="conum" data-value="3"></i><b>(3)</b>
+        prices.add(price);
+    }
+
+    public List&lt;Price&gt; list() {
+        return prices;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>Price</code> インスタンスはコネクターによって自動的に JSON にエンコードされます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>それを、<code>JsonObject</code> を使用して受け取ることができます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>その後、<code>mapTo</code> メソッドを使用してインスタンスを再構築できます。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>mapTo</code> メソッドは Quarkus Jackson マッパーを使用します。マッパーの設定について、詳しくは <a href="rest-json#json">このガイド</a> を参照してください。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="acknowledgement"><a class="anchor" href="#acknowledgement"></a>確認</h3>
+<div class="paragraph">
+<p>RabbitMQ メッセージに関連付けられたリアクティブメッセージングメッセージが確認されると、メッセージが <em>受け入れられた</em> ことをブローカーに通知します。</p>
+</div>
+<div class="paragraph">
+<p>メッセージを明示的に確認する必要があるかどうかは、チャネルの <code>auto-acknowledgement</code> により異なります。これが true に設定されている場合、メッセージは受信時に自動的に確認されます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="failure-management"><a class="anchor" href="#failure-management"></a>失敗の管理</h3>
+<div class="paragraph">
+<p>RabbitMQ メッセージから生成されたメッセージがnackされた場合、失敗戦略が適用されます。RabbitMQ コネクターは、失敗戦略チャネルの設定により制御される 3 つの戦略をサポートします。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>fail</code> - アプリケーションは失敗し、これ以上 RabbitMQ メッセージは処理されません。RabbitMQ メッセージは拒否済みとしてマークされます。</p>
+</li>
+<li>
+<p><code>accept</code> - この戦略は、RabbitMQ メッセージを <em>承認済み</em> としてマークします。処理は失敗を無視して続行します。</p>
+</li>
+<li>
+<p><code>reject</code> - この戦略は、RabbitMQ メッセージを拒否済み (デフォルト) としてマークします。処理は次のメッセージに進みます。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sending-rabbitmq-messages"><a class="anchor" href="#sending-rabbitmq-messages"></a>RabbitMQ メッセージの送信</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="serialization"><a class="anchor" href="#serialization"></a>シリアル化</h3>
+<div class="paragraph">
+<p><code>Message&lt;T&gt;</code> 送信時、コネクターはメッセージを RabbitMQ メッセージに変換します。ペイロードは RabbitMQ メッセージの本文に変換されます。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">T</th>
+<th class="tableblock halign-left valign-top">RabbitMQ メッセージの本文</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">プリミティブ型または <code>UUID</code>/<code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>content_type</code> が <code>text/plain</code> に設定された文字列の値</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://vertx.io/docs/apidocs/io/vertx/core/json/JsonObject.html"><code>JsonObject</code></a> または <a href="https://vertx.io/docs/apidocs/io/vertx/core/json/JsonArray.html"><code>JsonArray</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>content_type</code> が <code>application/json</code> に設定されたシリアライズされた文字列ペイロード</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.vertx.mutiny.core.buffer.Buffer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>content_type</code> が <code>application/octet-stream</code> に設定されたバイナリーコンテンツ</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>byte[]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>content_type</code> が <code>application/octet-stream</code> に設定されたバイナリーコンテンツ</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">その他のクラス</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ペイロードは (Json Mapper を使用して) JSON に変換され、その後 <code>content_type</code> が <code>application/json json</code> に設定されてシリアライズされます。</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>メッセージペイロードを JSON にシリアライズできない場合、メッセージは <em>nack</em> されます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="outbound-metadata"><a class="anchor" href="#outbound-metadata"></a>アウトバウンドメタデータ</h3>
+<div class="paragraph">
+<p><code>Messages</code> を送信するときに、<code>OutgoingRabbitMQMetadata</code> のインスタンスを追加して、RabbitMQ によるメッセージの処理方法に影響を与えることができます。たとえば、ルーティングキー、タイムスタンプ、およびヘッダーを設定できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">final OutgoingRabbitMQMetadata metadata = new OutgoingRabbitMQMetadata.Builder()
+        .withHeader("my-header", "xyzzy")
+        .withRoutingKey("urgent")
+        .withTimestamp(ZonedDateTime.now())
+        .build();
+
+// Add `metadata` to the metadata of the outgoing message.
+return Message.of("Hello", Metadata.of(metadata));</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="acknowledgement-2"><a class="anchor" href="#acknowledgement-2"></a>確認</h3>
+<div class="paragraph">
+<p>デフォルトでは、ブローカーがメッセージを確認すると、リアクティブメッセージングの <code>Message</code> が確認されます。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-the-rabbitmq-exchangequeue"><a class="anchor" href="#configuring-the-rabbitmq-exchangequeue"></a>RabbitMQ エクスチェンジ/キューの設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>チャネル設定のプロパティーを使用して、チャネルに関連付けられた RabbitMQ エクスチェンジまたはキューを設定できます。<code>incoming</code> チャネルは RabbitMQ <code>queues</code> にマップされ、<code>outgoing</code> チャネルは <code>RabbitMQ</code> エクスチェンジにマップされます。以下はその例です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.incoming.prices.connector=smallrye-rabbitmq
+mp.messaging.incoming.prices.queue.name=my-queue
+
+mp.messaging.outgoing.orders.connector=smallrye-rabbitmq
+mp.messaging.outgoing.orders.exchange.name=my-order-queue</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>exchange.name</code> または <code>queue.name</code> 属性が設定されていない場合、コネクターはチャネル名を使用します。</p>
+</div>
+<div class="paragraph">
+<p>既存のキューを使用するには、<code>name</code> を設定し、エクスチェンジまたはキュー の <code>declare</code> プロパティーを <code>false</code> に設定する必要があります。たとえば、<code>people</code> エクスチェンジとキューで設定された RabbitMQ ブローカーがある場合、次の設定が必要です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.incoming.people.connector=smallrye-rabbitmq
+mp.messaging.incoming.people.queue.name=people
+mp.messaging.incoming.people.queue.declare=false
+
+mp.messaging.outgoing.people.connector=smallrye-rabbitmq
+mp.messaging.outgoing.people.exchange.name=people
+mp.messaging.outgoing.people.exchange.declare=false</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="blocking-processing"><a class="anchor" href="#blocking-processing"></a>実行モデルとブロッキング処理</h3>
+<div class="paragraph">
+<p>リアクティブメッセージングは、I/O スレッドでメソッドを呼び出します。このトピックの詳細については、x<a href="quarkus-reactive-architecture">Quarkus リアクティブアーキテクチャーのドキュメント</a> を参照してください。ただし、多くの場合、リアクティブメッセージングとデータベースインタラクションなどのブロック処理を組み合わせる必要があります。このためには、処理が <em>ブロッキング</em> であり、呼び出し元のスレッドで実行するべきではないことを示す <code>@Blocking</code> アノテーションを使用する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>例えば、以下のコードは、Hibernate with Panacheを 使用してデータベースに受信ペイロードを格納する方法を示しています。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.smallrye.reactive.messaging.annotations.Blocking;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.transaction.Transactional;
+
+@ApplicationScoped
+public class PriceStorage {
+
+    @Incoming("prices")
+    @Blocking
+    @Transactional
+    public void store(int priceInUsd) {
+        Price price = new Price();
+        price.value = priceInUsd;
+        price.persist();
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>@Blocking</code> アノテーションは 2 つあります。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>io.smallrye.reactive.messaging.annotations.Blocking</code></p>
+</li>
+<li>
+<p><code>io.smallrye.common.annotation.Blocking</code></p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>効果はどちらも同じです。したがって、両方を使うことができます。最初のものは、使用するワーカープールや順序を保持するかどうかなど、より細かい調整が可能です。2 番目のものは、Quarkus の他のリアクティブ機能でも使用され、デフォルトのワーカープールを使用し、順序を保持します。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="customizing-the-underlying-rabbitmq-client"><a class="anchor" href="#customizing-the-underlying-rabbitmq-client"></a>基盤となる RabbitMQ クライアントのカスタマイズ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>コネクターは、その下にある Vert.x RabbitMQ クライアントを使用します。このクライアントの詳細については、 <a href="https://vertx.io/docs/vertx-rabbitmq-client/java/">Vert.x Web サイト</a> を参照してください。</p>
+</div>
+<div class="paragraph">
+<p>次のように <code>RabbitMQOptions</code> のインスタンスを生成することにより、基盤となるクライアント設定をカスタマイズできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Produces
+@Identifier("my-named-options")
+public RabbitMQOptions getNamedOptions() {
+  PemKeyCertOptions keycert = new PemKeyCertOptions()
+        .addCertPath("./tls/tls.crt")
+        .addKeyPath("./tls/tls.key");
+  PemTrustOptions trust = new PemTrustOptions().addCertPath("./tlc/ca.crt");
+  // You can use the produced options to configure the TLS connection
+  return new RabbitMQOptions()
+        .setSsl(true)
+        .setPemKeyCertOptions(keycert)
+        .setPemTrustOptions(trust)
+        .setUser("user1")
+        .setPassword("password1")
+        .setHost("localhost")
+        .setPort(5672)
+        .setVirtualHost("vhost1")
+        .setConnectionTimeout(6000) // in milliseconds
+        .setRequestedHeartbeat(60) // in seconds
+        .setHandshakeTimeout(6000) // in milliseconds
+        .setRequestedChannelMax(5)
+        .setNetworkRecoveryInterval(500) // in milliseconds
+        .setAutomaticRecoveryEnabled(true);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このインスタンスが取得され、コネクターが使用するクライアントを設定するために使用されます。<code>client-options-name</code> 属性を使用してクライアントの名前を指定する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">mp.messaging.incoming.prices.client-options-name=my-named-options</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="health-reporting"><a class="anchor" href="#health-reporting"></a>ヘルスレポート</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>quarkus-smallrye-health</code> エクステンション を備えた RabbitMQ コネクターを使用すると、readinessと liveness の確認に役立ちます。RabbitMQ コネクターは、コネクターによって管理される各チャネルの readubess と liveness を報告します。</p>
+</div>
+<div class="paragraph">
+<p>ヘルスレポートを無効にするには、チャネルの <code>health-enabled</code> 属性を false に設定します。</p>
+</div>
+<div class="paragraph">
+<p>インバウンド側 (RabbitMQ からのメッセージを受信) では、チェックにより受信者がブローカーに接続されていることを確認します。</p>
+</div>
+<div class="paragraph">
+<p>アウトバウンド側 (RabbitMQ にレコードを送信) では、チェックにより、送信者がブローカーから切断されていないことを確認します。送信者は初期化された状態 (接続は未試行) の_可能性_がありますが、これはlive/ready と見なされます。</p>
+</div>
+<div class="paragraph">
+<p>メッセージ処理の失敗はメッセージをnackし、<code>failure-strategy</code> で処理されることに注意してください。失敗を報告し、チェックの結果に影響を与えるのは <code>failure-strategy</code> です。失敗戦略の <code>fail</code> は失敗を報告し、チェックも失敗を報告します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dynamic-credentials"><a class="anchor" href="#dynamic-credentials"></a>動的クレデンシャル</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus と RabbitMQ コネクターは、短期間の動的クレデンシャルを生成するために <a href="https://www.vaultproject.io/docs/secrets/rabbitmq">Vault の RabbitMQ シークレットエンジン</a> をサポートしています。これにより、Vault は定期的に RabbitMQ クレデンシャルを作成および廃止できます。</p>
+</div>
+<div class="paragraph">
+<p>まず、Vault の <code>rabbitmq</code> シークレットエンジンを有効にし、RabbitMQ の接続と認証情報を使用して設定し、Vault ロール <code>my-role</code> を作成する必要があります ( <code>10.0.0.3</code> を RabbitMQ コンテナーを実行している実際のホストに置き換えます)。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">vault secrets enable rabbitmq
+
+vault write rabbitmq/config/connection \
+    connection_uri=http://10.0.0.3:15672 \
+    username=guest \
+    password=guest
+
+vault write rabbitmq/roles/my-role \
+    vhosts='{"/":{"write": ".*", "read": ".*"}}'</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>このユースケースでは、上記で設定されたユーザー <code>guest</code> は、クレデンシャルの作成機能を持つ RabbitMQ 管理者ユーザーである必要があります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>次に、パス <code>rabbitmq/creds/my-role</code> で Quarkus アプリケーションに読み取り機能を与える必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">cat &lt;&lt;EOF | vault policy write vault-rabbitmq-policy -
+path "secret/data/myapps/vault-rabbitmq-test/*" {
+  capabilities = ["read"]
+}
+path "rabbitmq/creds/my-role" {
+  capabilities = [ "read" ]
+}
+EOF</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これで Vault は RabbitMQ でユーザーを作成する方法を把握したため、RabbitMQ のクレデンシャルプロバイダーを使用するように Quarkus を設定する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>まず、Quarkus に、<code>rabbitmq</code> という名前のクレデンシャルプロバイダーを使用して動的クレデンシャルを要求するように指示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>quarkus.rabbitmq.credentials-provider = rabbitmq</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、<code>rabbitmq</code> クレデンシャルプロバイダーを設定します。<code>credentials-role</code> オプションは、Vault で作成したロールの名前 (この場合は <code>my-role</code>) に設定する必要があります。<code>credentials-mount</code> オプションは <code>rabbitmq</code> に設定する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.vault.credentials-provider.rabbitmq.credentials-role=my-role
+quarkus.vault.credentials-provider.rabbitmq.credentials-mount=rabbitmq</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>credentials-mount</code> は、Vault のシークレットエンジンのマウントとして直接使用されます。ここでは、デフォルトのマウントパスである <code>rabbitmq</code> を使用しています。RabbitMQ シークレットエンジンがカスタムパスにマウントされている場合は、代わりに`credentials-mount` オプションをそのパスに設定する必要があります。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration-reference"><a class="anchor" href="#configuration-reference"></a>RabbitMQ コネクター設定のリファレンス</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="incoming-channel-configuration"><a class="anchor" href="#incoming-channel-configuration"></a>受信チャネルの設定</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 27.7777%;">
+<col style="width: 33.3333%;">
+<col style="width: 16.6666%;">
+<col style="width: 22.2224%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">属性 (<em>alias</em>)</th>
+<th class="tableblock halign-left valign-top">説明</th>
+<th class="tableblock halign-left valign-top">必須</th>
+<th class="tableblock halign-left valign-top">デフォルト</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>username</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-username)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ブローカーへの認証に使用されるユーザー名</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>password</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-password)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ブローカーへの認証に使用されるパスワード</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>host</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-host)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ブローカーのホスト名</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>localhost</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>port</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-port)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ブローカーポート</p>
+<p class="tableblock">Type: <em>int</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>5672</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>ssl</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-ssl)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">接続で SSL を使用するかどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>trust-all</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-trust-all)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">信頼証明書の検証を省略するかどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>trust-store-path</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-trust-store-path)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JKS トラストストアへのパス</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>trust-store-password</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-trust-store-password)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JKS トラストストアのパスワード</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>credentials-provider-name</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-credentials-provider-name)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RabbitMQ クライアントに動的クレデンシャルを提供するために使用される RabbitMQ クレデンシャルプロバイダー Bean の名前</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>connection-timeout</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TCP 接続タイムアウト (ミリ秒)。0 はタイムアウトなしとして解釈されます。</p>
+<p class="tableblock">Type: <em>int</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>60000</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>handshake-timeout</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AMQP 0-9-1 プロトコルハンドシェイクタイムアウト (ミリ秒)</p>
+<p class="tableblock">Type: <em>int</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10000</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>automatic-recovery-enabled</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">自動接続回復が有効にかどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>automatic-recovery-on-initial-connection</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">初期接続での自動回復が有効かどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>reconnect-attempts</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-reconnect-attempts)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">再接続の試行回数</p>
+<p class="tableblock">Type: <em>int</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>100</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>reconnect-interval</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-reconnect-interval)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2 回の再接続試行の間隔 (秒)</p>
+<p class="tableblock">Type: <em>int</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>network-recovery-interval</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">再接続を試行する前に自動回復が待機する時間 (ミリ秒)</p>
+<p class="tableblock">Type: <em>int</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>5000</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>user</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ブローカーに接続するときに使用する AMQP ユーザー名</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>guest</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>include-properties</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ブローカーメッセージがイベントバスで渡されるときにプロパティーを含めるかどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>requested-channel-max</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">最初に要求された最大チャネル数</p>
+<p class="tableblock">Type: <em>int</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>2047</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>requested-heartbeat</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">最初に要求されたハートビート間隔 (秒)、ゼロの場合はなし</p>
+<p class="tableblock">Type: <em>int</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>60</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>use-nio</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NIO ソケットの使用が有効かどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>virtual-host</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-virtual-host)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ブローカーに接続するときに使用する仮想ホスト</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>exchange.name</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">メッセージが公開または消費されるエクスチェンジ。設定されていない場合、チャネル名が使用されます。</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>exchange.durable</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">エクスチェンジが耐久性があるかどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>exchange.auto-delete</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">使用後にエクスチェンジを削除する必要があるかどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>exchange.type</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">エクスチェンジのType: 直接、ファンアウト、ヘッダー、またはトピック (デフォルト)</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>topic</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>exchange.declare</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">エクスチェンジを宣言するかどうか。エクスチェンジが独立して設定されることが予想される場合は、false に設定します。</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>tracing.enabled</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">トレースを有効（デフォルト）にするか、無効にするか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>tracing.attribute-headers</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">スパン属性として記録する必要があるヘッダーのコンマ区切りリスト。trace.enabled=true の場合にのみ関連します。</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">``</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>queue.name</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">メッセージが消費されるキュー。</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>queue.durable</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">キューに耐久性があるかどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>queue.exclusive</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">キューが専用かどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>queue.auto-delete</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">使用後にキューを削除する必要があるかどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>queue.declare</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">キューとバインディングを宣言するかどうか。これらが独立して設定されることが予想される場合は、false に設定します</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>queue.ttl</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">指定されている場合、メッセージがデッドになる前に配信されないままキューに残る時間 (ms)</p>
+<p class="tableblock">Type: <em>long</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>max-incoming-internal-queue-size</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">受信内部キューの最大サイズ</p>
+<p class="tableblock">Type: <em>int</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>auto-bind-dlq</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DLQ を自動的に宣言し、それをバインダー DLX にバインドするかどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>dead-letter-queue-name</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DLQ の名前。指定しない場合、デフォルトは キューの名前に .dlq を追加したものになります。</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>dead-letter-exchange</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">キューに割り当てる DLX。auto-bind-dlq が true の場合にのみ関連します。</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DLX</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>dead-letter-exchange-type</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">キューに割り当てる DLX のタイプ。auto-bind-dlq が true の場合にのみ関連します。</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>direct</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>dead-letter-routing-key</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">キューに割り当てるデッドレタールーティングキー。指定しない場合、デフォルトでキュー名になります。</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>dlx.declare</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">デッドレターエクスチェンジバインディングを宣言するかどうか。auto-bind-dlq が true の場合にのみ関連します。これらが独立して設定されることが予想される場合は、false に設定します。</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>failure-strategy</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RabbitMQ メッセージがnackされた場合に適用する失敗戦略。承認される値は、<code>fail</code>、<code>accept</code>、<code>reject</code> (デフォルト) です。</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>reject</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>broadcast</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">受信した RabbitMQ メッセージを複数の <em>サブスクライバー</em> にディスパッチする必要があるかどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>auto-acknowledgement</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">受信した RabbitMQ メッセージを受信時に確認する必要があるかどうか。true の場合、配信は確認されます。</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>keep-most-recent</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">最近のメッセージではなく古いメッセージを破棄するかどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>routing-keys</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">キューをエクスチェンジにバインドするためのルーティングキーのコンマ区切りリスト</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="outgoing-channel-configuration"><a class="anchor" href="#outgoing-channel-configuration"></a>発信チャネル設定</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 27.7777%;">
+<col style="width: 33.3333%;">
+<col style="width: 16.6666%;">
+<col style="width: 22.2224%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">属性 (<em>alias</em>)</th>
+<th class="tableblock halign-left valign-top">説明</th>
+<th class="tableblock halign-left valign-top">必須</th>
+<th class="tableblock halign-left valign-top">デフォルト</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>automatic-recovery-enabled</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">自動接続回復が有効にかどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>automatic-recovery-on-initial-connection</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">初期接続での自動回復が有効かどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>connection-timeout</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TCP 接続タイムアウト (ミリ秒)。0 はタイムアウトなしとして解釈されます。</p>
+<p class="tableblock">Type: <em>int</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>60000</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>default-routing-key</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">エクスチェンジにメッセージを送信するときに使用するデフォルトのルーティングキー</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">``</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>default-ttl</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">指定されている場合、送信されたメッセージが未配信のままキューに残る時間 (ミリ秒)</p>
+<p class="tableblock">Type: <em>long</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>exchange.auto-delete</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">使用後にエクスチェンジを削除する必要があるかどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>exchange.declare</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">エクスチェンジを宣言するかどうか。エクスチェンジが独立して設定されることが予想される場合は、false に設定します。</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>exchange.durable</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">エクスチェンジが耐久性があるかどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>exchange.name</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">メッセージが公開または消費されるエクスチェンジ。設定されていない場合、チャネル名が使用されます。</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>exchange.type</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">エクスチェンジのType: 直接、ファンアウト、ヘッダー、またはトピック (デフォルト)</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>topic</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>handshake-timeout</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AMQP 0-9-1 プロトコルハンドシェイクタイムアウト (ミリ秒)</p>
+<p class="tableblock">Type: <em>int</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10000</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>host</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-host)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ブローカーのホスト名</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>localhost</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>include-properties</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ブローカーメッセージがイベントバスで渡されるときにプロパティーを含めるかどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>max-inflight-messages</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RabbitMQ に同時に書き込まれるメッセージの最大数。正の数でなければなりません。</p>
+<p class="tableblock">Type: <em>long</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>1024</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>max-outgoing-internal-queue-size</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">発信内部キューの最大サイズ</p>
+<p class="tableblock">Type: <em>int</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>network-recovery-interval</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">再接続を試行する前に自動回復が待機する時間 (ミリ秒)</p>
+<p class="tableblock">Type: <em>int</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>5000</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>password</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-password)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ブローカーへの認証に使用されるパスワード</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>port</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-port)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ブローカーポート</p>
+<p class="tableblock">Type: <em>int</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>5672</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>reconnect-attempts</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-reconnect-attempts)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">再接続の試行回数</p>
+<p class="tableblock">Type: <em>int</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>100</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>reconnect-interval</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-reconnect-interval)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2 回の再接続試行の間隔 (秒)</p>
+<p class="tableblock">Type: <em>int</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>requested-channel-max</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">最初に要求された最大チャネル数</p>
+<p class="tableblock">Type: <em>int</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>2047</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>requested-heartbeat</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">最初に要求されたハートビート間隔 (秒)、ゼロの場合はなし</p>
+<p class="tableblock">Type: <em>int</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>60</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>ssl</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-ssl)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">接続で SSL を使用するかどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>tracing.attribute-headers</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">スパン属性として記録する必要があるヘッダーのコンマ区切りリスト。trace.enabled=true の場合にのみ関連します。</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">``</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>tracing.enabled</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">トレースを有効（デフォルト）にするか、無効にするか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>trust-all</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-trust-all)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">信頼証明書の検証を省略するかどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>trust-store-password</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-trust-store-password)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JKS トラストストアのパスワード</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>trust-store-path</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-trust-store-path)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JKS トラストストアへのパス</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>credentials-provider-name</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-credentials-provider-name)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RabbitMQ クライアントに動的クレデンシャルを提供するために使用される RabbitMQ クレデンシャルプロバイダー Bean の名前</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>use-nio</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NIO ソケットの使用が有効かどうか</p>
+<p class="tableblock">Type: <em>boolean</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>user</strong></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ブローカーに接続するときに使用する AMQP ユーザー名</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>guest</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>username</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-username)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ブローカーへの認証に使用されるユーザー名</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="no-hyphens"><strong>virtual-host</strong></span></p>
+<p class="tableblock"><span class="no-hyphens"><em>(rabbitmq-virtual-host)</em></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ブローカーに接続するときに使用する仮想ホスト</p>
+<p class="tableblock">Type: <em>string</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#rabbitmq-connector-extension">RabbitMQ コネクターのエクステンション</a></li>
+<li><a href="#configuring-the-rabbitmq-broker-access">RabbitMQ ブローカーアクセスの設定</a></li>
+<li><a href="#receiving-rabbitmq-messages">RabbitMQ メッセージの受信</a>
+<ul class="sectlevel2">
+<li><a href="#inbound-metadata">インバウンドメタデータ</a></li>
+<li><a href="#deserialization">デシリアライズ</a></li>
+<li><a href="#acknowledgement">確認</a></li>
+<li><a href="#failure-management">失敗の管理</a></li>
+</ul>
+</li>
+<li><a href="#sending-rabbitmq-messages">RabbitMQ メッセージの送信</a>
+<ul class="sectlevel2">
+<li><a href="#serialization">シリアル化</a></li>
+<li><a href="#outbound-metadata">アウトバウンドメタデータ</a></li>
+<li><a href="#acknowledgement-2">確認</a></li>
+</ul>
+</li>
+<li><a href="#configuring-the-rabbitmq-exchangequeue">RabbitMQ エクスチェンジ/キューの設定</a>
+<ul class="sectlevel2">
+<li><a href="#blocking-processing">実行モデルとブロッキング処理</a></li>
+</ul>
+</li>
+<li><a href="#customizing-the-underlying-rabbitmq-client">基盤となる RabbitMQ クライアントのカスタマイズ</a></li>
+<li><a href="#health-reporting">ヘルスレポート</a></li>
+<li><a href="#dynamic-credentials">動的クレデンシャル</a></li>
+<li><a href="#configuration-reference">RabbitMQ コネクター設定のリファレンス</a>
+<ul class="sectlevel2">
+<li><a href="#incoming-channel-configuration">受信チャネルの設定</a></li>
+<li><a href="#outgoing-channel-configuration">発信チャネル設定</a></li>
+</ul>
+</li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

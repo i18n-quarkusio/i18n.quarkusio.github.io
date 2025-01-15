@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Google Cloud Functions (サーバーレス) - 3.2 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.2/guides/gcp-functions" />
+  <meta property="og:title" content="Google Cloud Functions (サーバーレス) - 3.2" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/gcp-functions">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.2/guides/gcp-functions">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.2/guides/gcp-functions" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.2/guides/gcp-functions">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.2/guides/gcp-functions">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.2/guides/gcp-functions">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.2/guides/gcp-functions">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.2/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" selected>3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">Google Cloud Functions (サーバーレス) </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>quarkus-google-cloud-functions</code> エクステンションを使用すると、Quarkusを使用してGoogle Cloud Functionsを構築することができます。関数では、CDIやSpringからのインジェクションアノテーションや、必要に応じて他のQuarkusの機能を使用できます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>この技術は、previewと考えられています。</p>
+</div>
+<div class="paragraph">
+<p><em>preview</em> では、下位互換性やエコシステムでの存在は保証されていません。具体的な改善には設定や API の変更が必要になるかもしれませんが、 <em>stable</em> になるための計画は現在進行中です。フィードバックは <a href="https://groups.google.com/d/forum/quarkus-dev">メーリングリスト</a> や <a href="https://github.com/quarkusio/quarkus/issues">GitHub の課題管理</a> で受け付けています。</p>
+</div>
+<div class="paragraph">
+<p>とりうるステータスの完全なリストについては、 <a href="https://quarkus.io/faq/#extension-status">FAQの項目</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>前提条件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>約15分</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 11+ がインストールされ、 <code>JAVA_HOME</code>  が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.9.3</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+<li>
+<p><a href="https://cloud.google.com/">Googleクラウドのアカウント</a> 。無料アカウントでも大丈夫です。</p>
+</li>
+<li>
+<p><a href="https://cloud.google.com/sdk">Cloud SDK CLIがインストールされていること</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution"><a class="anchor" href="#solution"></a>ソリューション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは、サンプルプロジェクトを生成し、Quarkusで <code>HttpFunction</code> 、 <code>BackgroundFunction</code> 、 <code>RawBackgroundFunction</code> を実装する方法を説明します。ビルド後は、プロジェクトをGoogle Cloudにデプロイすることができます。</p>
+</div>
+<div class="paragraph">
+<p>これらの手順を順にすべて実行しない場合、完成したサンプルを以下で確認できます。</p>
+</div>
+<div class="paragraph">
+<p>Gitレポジトリをクローンするか <code>git clone -b 3.2 <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code> 、 <a href="https://github.com/quarkusio/quarkus-quickstarts/archive/3.2.zip">アーカイブ</a> をダウンロードします。</p>
+</div>
+<div class="paragraph">
+<p>ソリューションは <code>google-cloud-functions-quickstart</code> <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/3.2/google-cloud-functions-quickstart">ディレクトリ</a> にあります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-maven-deployment-project"><a class="anchor" href="#creating-the-maven-deployment-project"></a>デプロイ用のMavenプロジェクトを作成する</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>quarkus-google-cloud-functions</code> のエクステンションを持つアプリケーションを作成します。以下のMavenコマンドを使って作成します。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:google-cloud-functions \
+    --extension='google-cloud-functions' \
+    --no-code
+cd google-cloud-functions</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:3.2.12.Final:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=google-cloud-functions \
+    -Dextensions='google-cloud-functions' \
+    -DnoCode
+cd google-cloud-functions</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="login-to-google-cloud"><a class="anchor" href="#login-to-google-cloud"></a>Google Cloudにログイン</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>アプリケーションのデプロイにはGoogle Cloudへのログインが必要となるため、以下のコマンドでログインします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">gcloud auth login</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-functions"><a class="anchor" href="#creating-the-functions"></a>Cloud Functions の関数を作成する</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このプロジェクトの例では、 <code>HttpFunction</code> 、 <code>BackgroundFunction</code> （ストレージイベント）、 <code>RawBackgroundFunction</code> （PubSubイベント）、 <code>CloudEventsFunction</code> （Cloud Events 仕様を使用したストレージイベント）の4つの関数を作成します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Quarkusは、Cloud Functionsの第1世代と第2世代をサポートしています。第2世代Cloud Functionsの概要については、Google Cloud Functionsドキュメントの <a href="https://cloud.google.com/functions/docs/2nd-gen/overview">こちらのページ</a>を参照してください。第２世代を使用するには、 <code>--gen2</code> パラメータを追加する必要があります。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="choose-your-function"><a class="anchor" href="#choose-your-function"></a>functionの選択</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>quarkus-google-cloud-functions</code> エクステンションは、プロジェクト内からGoogle Cloud <code>HttpFunction</code> 、 <code>BackgroundFunction</code> 、または <code>RawBackgroundFunction</code> 、 <code>CloudEventsFunction</code> インターフェイスを直接実装しているクラスをプロジェクト内でスキャンします。プロジェクト内でこれらのインターフェイスを実装しているクラスが見つからなければ、ビルド時にエラーがスローされます。 複数の関数クラスが見つかった場合は、ビルド時の例外がスローされます。</p>
+</div>
+<div class="paragraph">
+<p>しかし、同じコードを利用するCloud Functionの関数クラスが複数あるような場合に、個別maven モジュールを作成することは手間となります。このQuarkusエクステンションを使うと、複数のCloud Function関数を一つのプロジェクトにバンドルし、設定や環境変数を使ってデプロイしたい関数を選択することができます。</p>
+</div>
+<div class="paragraph">
+<p>Cloud Functions の関数に名前を設定するには、以下の設定プロパティーを使用します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.google-cloud-functions.function=test</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>quarkus.google-cloud-functions.function</code> プロパティーは、デプロイする関数をQuarkusに伝えます。これは環境変数でオーバーライドすることもできます。</p>
+</div>
+<div class="paragraph">
+<p>Cloud Functions の関数となるクラスの CDI 名は、 <code>quarkus.google-cloud-functions.function</code> プロパティー内で指定された値と一致している必要があります。これは <code>@Named</code> アノテーションを使用して行う必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Named("test")
+public class TestHttpFunction implements HttpFunction {
+}</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-httpfunction"><a class="anchor" href="#the-httpfunction"></a>HttpFunction</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.io.Writer;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import com.google.cloud.functions.HttpFunction;
+import com.google.cloud.functions.HttpRequest;
+import com.google.cloud.functions.HttpResponse;
+import io.quarkus.gcp.function.test.service.GreetingService;
+
+@Named("httpFunction") <i class="conum" data-value="1"></i><b>(1)</b>
+@ApplicationScoped <i class="conum" data-value="2"></i><b>(2)</b>
+public class HttpFunctionTest implements HttpFunction { <i class="conum" data-value="3"></i><b>(3)</b>
+    @Inject GreetingService greetingService; <i class="conum" data-value="4"></i><b>(4)</b>
+
+    @Override
+    public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws Exception { <i class="conum" data-value="5"></i><b>(5)</b>
+        Writer writer = httpResponse.getWriter();
+        writer.write(greetingService.hello());
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@Named</code> アノテーションでは、 <code>quarkus.google-cloud-functions.function</code> プロパティーで使用する CDI Beanに名前を付けることができますが、これはオプションです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>関数はCDI Beanでなければなりません。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Google Cloud Functionで実行するためには、実行する対象のクラスは`com.google.cloud.functions.HttpFunction`インターフェースをImplementsする必要があります .</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>インジェクションはCloud Function関数クラスの中で動作します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>これは標準的な Google Cloud Function の実装であり、ここでは何も派手なことはしていません。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-backgroundfunction"><a class="anchor" href="#the-backgroundfunction"></a>BackgroundFunction</h3>
+<div class="paragraph">
+<p>この <code>BackgroundFunction</code> はストレージイベントによってトリガーされる以外にも、Google Cloud でサポートされているトリガーイベントを使用できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import com.google.cloud.functions.BackgroundFunction;
+import com.google.cloud.functions.Context;
+import io.quarkus.gcp.function.test.service.GreetingService;
+
+
+@Named("storageTest") <i class="conum" data-value="1"></i><b>(1)</b>
+@ApplicationScoped <i class="conum" data-value="2"></i><b>(2)</b>
+public class BackgroundFunctionStorageTest implements BackgroundFunction&lt;BackgroundFunctionStorageTest.StorageEvent&gt; { <i class="conum" data-value="3"></i><b>(3)</b>
+    @Inject GreetingService greetingService;  <i class="conum" data-value="4"></i><b>(4)</b>
+
+    @Override
+    public void accept(StorageEvent event, Context context) throws Exception { <i class="conum" data-value="5"></i><b>(5)</b>
+        System.out.println("Receive event: " + event);
+        System.out.println("Be polite, say " + greetingService.hello());
+    }
+
+    //
+    public static class StorageEvent { <i class="conum" data-value="6"></i><b>(6)</b>
+        public String name;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@Named</code> アノテーションでは、 <code>quarkus.google-cloud-functions.function</code> プロパティーで使用する CDI Beanに名前を付けることができますが、これはオプションです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>関数はCDI Beanでなければなりません。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Google Cloud Functionで実行するためには、実行する対象のクラスは <code>com.google.cloud.functions.BackgroundFunction</code> インターフェースをImplementsする必要があります。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>インジェクションはCloud Function関数クラスの中で動作します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>これは標準的な Google Cloud Function の実装であり、ここでは何も派手なことはしていません。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>これはトリガーのイベントデータがデシリアライズされるクラスです。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-rawbackgroundfunction"><a class="anchor" href="#the-rawbackgroundfunction"></a>RawBackgroundFunction</h3>
+<div class="paragraph">
+<p>この <code>RawBackgroundFunction</code> は PubSub イベントでトリガーされる以外にも、Google Cloud でサポートされているトリガーイベントを使用することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import com.google.cloud.functions.Context;
+import com.google.cloud.functions.RawBackgroundFunction;
+import io.quarkus.gcp.function.test.service.GreetingService;
+
+@Named("rawPubSubTest") <i class="conum" data-value="1"></i><b>(1)</b>
+@ApplicationScoped <i class="conum" data-value="2"></i><b>(2)</b>
+public class RawBackgroundFunctionPubSubTest implements RawBackgroundFunction { <i class="conum" data-value="3"></i><b>(3)</b>
+    @Inject GreetingService greetingService; <i class="conum" data-value="4"></i><b>(4)</b>
+
+    @Override
+    public void accept(String event, Context context) throws Exception { <i class="conum" data-value="5"></i><b>(5)</b>
+        System.out.println("PubSub event: " + event);
+        System.out.println("Be polite, say " + greetingService.hello());
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@Named</code> アノテーションでは、 <code>quarkus.google-cloud-functions.function</code> プロパティーで使用する CDI Beanに名前を付けることができますが、これはオプションです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>関数はCDI Beanでなければなりません。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Google Cloud Functionで実行するためには、実行する対象のクラスは  <code>com.google.cloud.functions.RawBackgroundFunction</code> インターフェースをImplementsする必要があります。.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>インジェクションはCloud Function関数クラスの中で動作します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>これは標準的な Google Cloud Function の実装であり、ここでは何も派手なことはしていません。</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-cloudeventsfunction"><a class="anchor" href="#the-cloudeventsfunction"></a>CloudEventsFunction</h3>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<code>CloudEventsFunction</code> は、第２世代のCloud Functionsのみの機能です。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>この <code>CloudEventsFunction</code> は Cloud Events Storage イベントによってトリガーされる以外にも、Google Cloud でサポートされている任意のCloud Eventsを使用できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
+import com.google.cloud.functions.CloudEventsFunction;
+
+import io.cloudevents.CloudEvent;
+import io.quarkus.gcp.function.test.service.GreetingService;
+
+@Named("cloudEventTest") <i class="conum" data-value="1"></i><b>(1)</b>
+@ApplicationScoped <i class="conum" data-value="2"></i><b>(2)</b>
+public class CloudEventStorageTest implements CloudEventsFunction { <i class="conum" data-value="3"></i><b>(3)</b>
+    @Inject
+    GreetingService greetingService;  <i class="conum" data-value="4"></i><b>(4)</b>
+
+    @Override
+    public void accept(CloudEvent cloudEvent) throws Exception { <i class="conum" data-value="5"></i><b>(5)</b>
+        System.out.println("Receive event Id: " + cloudEvent.getId());
+        System.out.println("Receive event Subject: " + cloudEvent.getSubject());
+        System.out.println("Receive event Type: " + cloudEvent.getType());
+        System.out.println("Receive event Data: " + new String(cloudEvent.getData().toBytes())); <i class="conum" data-value="6"></i><b>(6)</b>
+        System.out.println("Be polite, say " + greetingService.hello());
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@Named</code> アノテーションでは、 <code>quarkus.google-cloud-functions.function</code> プロパティーで使用する CDI Beanに名前を付けることができますが、これはオプションです。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>関数はCDI Beanでなければなりません。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>これは通常のGoogle Cloud Functionの実装なので、<code>com.google.cloud.functions.CloudEventsFunction</code> を実装する必要があります。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>インジェクションはCloud Function関数クラスの中で動作します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>これは標準的な Google Cloud Function の実装であり、<code>io.cloudevents.CloudEvent</code> を受け取る以外は何も派手なことはしていません。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Cloud Eventsの中のストレージイベントです。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="build-and-deploy-to-google-cloud"><a class="anchor" href="#build-and-deploy-to-google-cloud"></a>アプリケーションのビルドとGoogle Cloudへのデプロイ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>アプリケーションを構築するには、標準コマンドを使ってパッケージ化します。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>前のコマンドの結果、 <code>target/deployment</code> リポジトリ内に単一の JAR ファイルが生成されます。このJARファイルにはプロジェクト内のクラスと、依存関係のクラスが含まれています</p>
+</div>
+<div class="paragraph">
+<p>これで、 <code>gcloud</code> を使って関数を Google Cloud にデプロイすることができるようになります。 <code>gcloud</code> コマンドは、どのイベントが関数のトリガーになるかによって異なります。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+ここではJava 17ランタイムを使用しますが、デプロイコマンドで <code>--runtime=java17</code> の代わりに <code>--runtime=java11</code> を使用することで、Java 11ランタイムに切り替えることが可能です。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>このコマンドを初めて起動したときには、以下のようなエラーメッセージが表示されることがあります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">ERROR: (gcloud.functions.deploy) OperationError: code=7, message=Build Failed: Cloud Build has not been used in project &lt;project_name&gt; before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudbuild.googleapis.com/overview?project=&lt;my-project&gt; then retry.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これは、Cloud Buildがまだ有効化されていないことを意味します。このエラーを解決するには、エラーに表示されているURLを開き指示に従った後、数分待ってからコマンドを再試行してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="the-httpfunction-2"><a class="anchor" href="#the-httpfunction-2"></a>HttpFunction</h3>
+<div class="paragraph">
+<p>これは <code>HttpFunction</code> を Google Cloud にデプロイするためのコマンドの例です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">gcloud functions deploy quarkus-example-http \
+  --entry-point=io.quarkus.gcp.functions.QuarkusHttpFunction \
+  --runtime=java17 --trigger-http --allow-unauthenticated --source=target/deployment</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>エントリーポイントは常に <code>io.quarkus.gcp.functions.QuarkusHttpFunction</code> に設定する必要があります。このクラスはQuarkusとCloud Functionsを統合するクラスです。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>このコマンドは、作成したCloud Functions 関数をトリガーするための <code>httpsTrigger.url</code> を出力します。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-backgroundfunction-2"><a class="anchor" href="#the-backgroundfunction-2"></a>BackgroundFunction</h3>
+<div class="paragraph">
+<p>関数をデプロイする前に、バケットを作成する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">gsutil mb gs://quarkus-hello</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これは <code>BackgroundFunction</code> を Google Cloud にデプロイするためのコマンドの例です。この関数は Storage イベントによってトリガーされるため、 <code>--trigger-event google.storage.object.finalize</code> と <code>--trigger-resource</code> パラメーターに先の手順で作成したバケットの名前を指定する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">gcloud functions deploy quarkus-example-storage \
+    --entry-point=io.quarkus.gcp.functions.QuarkusBackgroundFunction \
+    --trigger-resource quarkus-hello --trigger-event google.storage.object.finalize \
+    --runtime=java17 --source=target/deployment</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>エントリーポイントは常に <code>io.quarkus.gcp.functions.QuarkusBackgroundFunction</code> に設定する必要があります。このクラスはQuarkusとCloud Functionsを統合するクラスです。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>イベントをトリガーするには、GCS <code>quarkus-hello</code> バケットにファイルを送るか、gcloudコマンドを使ってシミュレートします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">gcloud functions call quarkus-example-storage  --data '{"name":"test.txt"}'</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>--data</code> には GCS イベントを指定します。これは、バケットに追加されたファイル名を含む JSON形式のフォーマットです。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-rawbackgroundfunction-2"><a class="anchor" href="#the-rawbackgroundfunction-2"></a>RawBackgroundFunction</h3>
+<div class="paragraph">
+<p>これは <code>RawBackgroundFunction</code> を Google Cloud にデプロイするコマンドの例です。この関数は PubSub イベントによってトリガーされるので、 <code>--trigger-event google.pubsub.topic.publish</code> と <code>--trigger-resource</code> パラメーターに、先の手順で作成したトピックの名前を指定する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">gcloud functions deploy quarkus-example-pubsub \
+  --entry-point=io.quarkus.gcp.functions.QuarkusBackgroundFunction \
+  --runtime=java17 --trigger-resource hello_topic --trigger-event google.pubsub.topic.publish --source=target/deployment</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>エントリーポイントは常に <code>io.quarkus.gcp.functions.QuarkusBackgroundFunction</code> に設定する必要があります。このクラスはQuarkusとCloud Functionsを統合するクラスです。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>イベントをトリガーするには、 <code>hello_topic</code> トピックにファイルを送信するか、gcloudコマンドを使用してシミュレートします。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">gcloud functions call quarkus-example-pubsub --data '{"data":{"greeting":"world"}}'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-cloudeventsfunction-2"><a class="anchor" href="#the-cloudeventsfunction-2"></a>CloudEventsFunction</h3>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<code>CloudEventsFunction</code> は、第２世代のCloud Functionsのみの機能です。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>これは <code>CloudEventsFunction</code> を Google Cloud にデプロイするコマンドの例です。この関数は Storage イベントをトリガーとしているので、<code>--trigger-bucket</code> パラメータにあらかじめ作成した Bucket 名を指定しておく必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">gcloud functions deploy quarkus-example-cloud-event --gen2 \
+  --entry-point=io.quarkus.gcp.functions.QuarkusCloudEventsFunction \
+  --runtime=java17 --trigger-bucket=example-cloud-event --source=target/deployment</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>エントリーポイントは常に <code>io.quarkus.gcp.functions.QuarkusCloudEventsFunction</code> に設定する必要があります。これは、Cloud Functions と Quarkus を統合するクラスです。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>イベントをトリガーするには、GCS <code>example-cloud-event</code> バケットにファイルを送ります。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-locally"><a class="anchor" href="#running-locally"></a>ローカルでの実行</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>関数をローカルで実行する最も簡単な方法は、Cloud Function invoker JAR を使用することです。</p>
+</div>
+<div class="paragraph">
+<p>以下のコマンドでMaven経由でダウンロードできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn dependency:copy \
+  -Dartifact='com.google.cloud.functions.invoker:java-function-invoker:1.3.0' \
+  -DoutputDirectory=.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>インボーカーを使用する前に、まずは関数をビルドする必要があります。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-httpfunction-3"><a class="anchor" href="#the-httpfunction-3"></a>HttpFunction</h3>
+<div class="paragraph">
+<p><code>HttpFunction</code> の場合、以下のコマンドを使用しローカルで関数を起動することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">java -jar java-function-invoker-1.3.0.jar \
+  --classpath target/google-cloud-functions-1.0.0-SNAPSHOT-runner.jar \
+  --target io.quarkus.gcp.functions.QuarkusHttpFunction</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<code>--classpath</code> パラメーターには、関数クラスとQuarkus関連のすべてのクラスを含む、先の手順でパッケージ化されたJARを指定する必要があります。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>エンドポイントは <a href="http://localhost:8080" class="bare">http://localhost:8080</a> で利用できます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-backgroundfunction-3"><a class="anchor" href="#the-backgroundfunction-3"></a>BackgroundFunction</h3>
+<div class="paragraph">
+<p>BackgroundFunction関数の場合は、 <code>io.quarkus.gcp.functions.BackgroundFunction</code> のターゲットクラスでinvokerを起動します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">java -jar java-function-invoker-1.3.0.jar \
+  --classpath target/google-cloud-functions-1.0.0-SNAPSHOT-runner.jar \
+  --target io.quarkus.gcp.functions.QuarkusBackgroundFunction</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<code>--classpath</code> パラメーターには、関数クラスとQuarkus関連のすべてのクラスを含む、先の手順でパッケージ化されたJARを指定する必要があります。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>起動後、HTTP 呼び出しにイベントを含むペイロードを付与することでバックグラウンド関数を呼び出すことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl localhost:8080 -d '{"data":{"name":"hello.txt"}}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このコマンドにより、イベント <code>{"name":"hello.txt"}</code> でBackgroundFunctionを呼び出します。これは、`hello.txt`をCloud Storageに保存した際のイベントをテストするのと同じです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-rawbackgroundfunction-3"><a class="anchor" href="#the-rawbackgroundfunction-3"></a>RawBackgroundFunction</h3>
+<div class="paragraph">
+<p>BackgroundFunction関数の場合は、 <code>io.quarkus.gcp.functions.BackgroundFunction</code> のターゲットクラスでinvokerを起動します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">java -jar java-function-invoker-1.3.0.jar \
+  --classpath target/google-cloud-functions-1.0.0-SNAPSHOT-runner.jar \
+  --target io.quarkus.gcp.functions.QuarkusBackgroundFunction</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<code>--classpath</code> パラメーターには、関数クラスとQuarkus関連のすべてのクラスを含む、先の手順でパッケージ化されたJARを指定する必要があります。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>起動後、HTTP 呼び出しにイベントを含むペイロードを付与することでバックグラウンド関数を呼び出すことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl localhost:8080 -d '{"data":{"greeting":"world"}}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このコマンドは、PubSubのBackgroundFunctionを次のPubSubMessageで呼び出します <code>{"greeting":"world"}</code> .</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-cloudeventsfunction-3"><a class="anchor" href="#the-cloudeventsfunction-3"></a>CloudEventsFunction</h3>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<code>CloudEventsFunction</code> は、第2世代のCloud Functionのみの機能です。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>CloudEventsFunctionの場合は、 <code>io.quarkus.gcp.functions.QuarkusCloudEventsFunction</code> のターゲットクラスでinvokerを起動します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">java -jar java-function-invoker-1.3.0.jar \
+  --classpath target/google-cloud-functions-1.0.0-SNAPSHOT-runner.jar \
+  --target io.quarkus.gcp.functions.QuarkusCloudEventsFunction</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<code>--classpath</code> パラメーターには、関数クラスとQuarkus関連のすべてのクラスを含む、先の手順でパッケージ化されたJARを指定する必要があります。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>イベントを含むペイロードを持つHTTPコールを介して、CloudEventsFunctionを呼び出すことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl localhost:8080 \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -H "ce-id: 123451234512345" \
+  -H "ce-specversion: 1.0" \
+  -H "ce-time: 2020-01-02T12:34:56.789Z" \
+  -H "ce-type: google.cloud.storage.object.v1.finalized" \
+  -H "ce-source: //storage.googleapis.com/projects/_/buckets/MY-BUCKET-NAME" \
+  -H "ce-subject: objects/MY_FILE.txt" \
+  -d '{
+        "bucket": "MY_BUCKET",
+        "contentType": "text/plain",
+        "kind": "storage#object",
+        "md5Hash": "...",
+        "metageneration": "1",
+        "name": "MY_FILE.txt",
+        "size": "352",
+        "storageClass": "MULTI_REGIONAL",
+        "timeCreated": "2020-04-23T07:38:57.230Z",
+        "timeStorageClassUpdated": "2020-04-23T07:38:57.230Z",
+        "updated": "2020-04-23T07:38:57.230Z"
+      }'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>”MY_FILE.txt</code> ファイルに対するイベントで、CloudEventsFunctionを呼び出します。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-your-function"><a class="anchor" href="#testing-your-function"></a>関数のテスト</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusは、 <code>quarkus-test-google-cloud-functions</code> の依存関係を介して、Google Cloud functionsをテストするためのサポートを提供しています。</p>
+</div>
+<div class="paragraph">
+<p>これを使うには、次のようなテストの依存関係を <code>pom.xml</code> に追加する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-test-google-cloud-functions&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このエクステンションは、 <code>@QuarkusTest</code> のテストケースに、テストケースの前に Cloud Function invoker を起動し、終了時に停止するためのアノテーションとして使用できる <code>@WithFunction</code> アノテーションを提供します。このアノテーションは、起動したい関数のタイプと、アプリケーション内に複数の関数がある場合は関数の名前をオプションで設定する必要があります。</p>
+</div>
+<div class="sect2">
+<h3 id="the-httpfunction-4"><a class="anchor" href="#the-httpfunction-4"></a>HttpFunction</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import static io.restassured.RestAssured.when;
+import static org.hamcrest.Matchers.is;
+
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.google.cloud.functions.test.FunctionType;
+import io.quarkus.google.cloud.functions.test.WithFunction;
+import io.quarkus.test.junit.QuarkusTest;
+
+@QuarkusTest <i class="conum" data-value="1"></i><b>(1)</b>
+@WithFunction(FunctionType.HTTP) <i class="conum" data-value="2"></i><b>(2)</b>
+class HttpFunctionTestCase {
+    @Test
+    public void test() {
+        when()
+                .get()
+                .then()
+                .statusCode(200)
+                .body(is("Hello World!")); <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>これは標準的なQuarkusのテストであり、 <code>@QuarkusTest</code> によってアノテーションを付ける必要があります。</p>
+</li>
+<li>
+<p><code>@WithFunction(FunctionType.HTTP)</code> は、その関数を HTTP 関数として起動することを示します。同じアプリケーション内に複数の関数が存在する場合は、 <code>functionName</code> 属性でどの関数を起動するかを指定する必要があります。</p>
+</li>
+<li>
+<p>REST-assuredは関数のテストに使用されます。 <code>Hello World!</code> はinvokerを介して送られます。</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-backgroundfunction-4"><a class="anchor" href="#the-backgroundfunction-4"></a>BackgroundFunction</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import static io.restassured.RestAssured.given;
+
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.google.cloud.functions.test.FunctionType;
+import io.quarkus.google.cloud.functions.test.WithFunction;
+import io.quarkus.test.junit.QuarkusTest;
+
+@QuarkusTest <i class="conum" data-value="1"></i><b>(1)</b>
+@WithFunction(FunctionType.BACKGROUND) <i class="conum" data-value="2"></i><b>(2)</b>
+class BackgroundFunctionStorageTestCase {
+    @Test
+    public void test() {
+        given()
+                .body("{\"data\":{\"name\":\"hello.txt\"}}") <i class="conum" data-value="3"></i><b>(3)</b>
+                .when()
+                .post()
+                .then()
+                .statusCode(200);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>これは標準的なQuarkusのテストであり、 <code>@QuarkusTest</code> によってアノテーションを付ける必要があります。</p>
+</li>
+<li>
+<p><code>@WithFunction(FunctionType.BACKGROUND)</code> は、その関数をバックグラウンド関数として起動することを示します。同一アプリケーション内に複数の機能が存在する場合は、 <code>functionName</code> 属性で起動する機能を指定する必要があります。</p>
+</li>
+<li>
+<p>REST-assuredは関数のテストに使用されます。 <code>{"name":"hello.txt"}</code> はinvokerを介して送られます。</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-rawbackgroundfunction-4"><a class="anchor" href="#the-rawbackgroundfunction-4"></a>RawBackgroundFunction</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import static io.restassured.RestAssured.given;
+
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.google.cloud.functions.test.FunctionType;
+import io.quarkus.google.cloud.functions.test.WithFunction;
+import io.quarkus.test.junit.QuarkusTest;
+
+@QuarkusTest <i class="conum" data-value="1"></i><b>(1)</b>
+@WithFunction(FunctionType.RAW_BACKGROUND) <i class="conum" data-value="2"></i><b>(2)</b>
+class RawBackgroundFunctionPubSubTestCase {
+    @Test
+    public void test() {
+        given()
+                .body("{\"data\":{\"name\":\"hello.txt\"}}") <i class="conum" data-value="3"></i><b>(3)</b>
+                .when()
+                .post()
+                .then()
+                .statusCode(200);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>これは標準的なQuarkusのテストであり、 <code>@QuarkusTest</code> によってアノテーションを付ける必要があります。</p>
+</li>
+<li>
+<p><code>@WithFunction(FunctionType.RAW_BACKGROUND)</code> は、その関数を生のバックグラウンド関数として起動することを示します。同じアプリケーションに複数の関数が存在する場合、 <code>functionName</code> 属性を使用して、どの関数を起動するかを指定する必要があります。</p>
+</li>
+<li>
+<p>REST-assuredは関数のテストに使用されます。 <code>{"name":"hello.txt"}</code> はinvokerを介して送られます。</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-cloudeventsfunction-4"><a class="anchor" href="#the-cloudeventsfunction-4"></a>CloudEventsFunction</h3>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Cloud Events Function は、Cloud Functions gen 2のみの機能です。
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import static io.restassured.RestAssured.given;
+
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.google.cloud.functions.test.FunctionType;
+import io.quarkus.google.cloud.functions.test.WithFunction;
+import io.quarkus.test.junit.QuarkusTest;
+
+@QuarkusTest <i class="conum" data-value="1"></i><b>(1)</b>
+@WithFunction(FunctionType.CLOUD_EVENTS) <i class="conum" data-value="2"></i><b>(2)</b>
+class CloudEventStorageTestCase {
+    @Test
+    public void test() {
+        // test the function using RestAssured
+        given()
+                .body("{\n" + <i class="conum" data-value="3"></i><b>(3)</b>
+                        "        \"bucket\": \"MY_BUCKET\",\n" +
+                        "        \"contentType\": \"text/plain\",\n" +
+                        "        \"kind\": \"storage#object\",\n" +
+                        "        \"md5Hash\": \"...\",\n" +
+                        "        \"metageneration\": \"1\",\n" +
+                        "        \"name\": \"MY_FILE.txt\",\n" +
+                        "        \"size\": \"352\",\n" +
+                        "        \"storageClass\": \"MULTI_REGIONAL\",\n" +
+                        "        \"timeCreated\": \"2020-04-23T07:38:57.230Z\",\n" +
+                        "        \"timeStorageClassUpdated\": \"2020-04-23T07:38:57.230Z\",\n" +
+                        "        \"updated\": \"2020-04-23T07:38:57.230Z\"\n" +
+                        "      }")
+                .header("ce-specversion", "1.0") <i class="conum" data-value="4"></i><b>(4)</b>
+                .header("ce-id", "1234567890")
+                .header("ce-type", "google.cloud.storage.object.v1.finalized")
+                .header("ce-source", "//storage.googleapis.com/projects/_/buckets/MY-BUCKET-NAME")
+                .header("ce-subject", "objects/MY_FILE.txt")
+                .when()
+                .post()
+                .then()
+                .statusCode(200);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>これは標準的なQuarkusのテストであり、 <code>@QuarkusTest</code> によってアノテーションを付ける必要があります。</p>
+</li>
+<li>
+<p><code>@WithFunction(FunctionType.CLOUD_EVENTS)</code> は、その関数をcloud events functionとして起動することを示します。同じアプリケーションに複数の関数が存在する場合、 <code>functionName</code> 属性を使用して、どの機能を起動するかを指定する必要があります。</p>
+</li>
+<li>
+<p>REST-assuredは関数のテストに使用され、ストレージイベントを記述したこのペイロードがinvokerを介して送信されます。</p>
+</li>
+<li>
+<p>クラウドイベントヘッダーは、HTTPヘッダで送信する必要があります。</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="whats-next"><a class="anchor" href="#whats-next"></a>次のステップ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Google Cloud Functionsの Jakarta REST、Servlet、Vert.xのサポートを探しているなら、 <a href="gcp-functions-http">Google Cloud Functions HTTP binding</a> が存在します。</p>
+</div>
+<div class="paragraph">
+<p>プロバイダーに依存しないGoogle Cloud Functionsの実装をお探しでしたら、 <a href="funqy-gcp-functions.html">Funqy Google Cloud Functionsエクステンション</a> をご利用ください。</p>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">前提条件</a></li>
+<li><a href="#solution">ソリューション</a></li>
+<li><a href="#creating-the-maven-deployment-project">デプロイ用のMavenプロジェクトを作成する</a></li>
+<li><a href="#login-to-google-cloud">Google Cloudにログイン</a></li>
+<li><a href="#creating-the-functions">Cloud Functions の関数を作成する</a></li>
+<li><a href="#choose-your-function">functionの選択</a>
+<ul class="sectlevel2">
+<li><a href="#the-httpfunction">HttpFunction</a></li>
+<li><a href="#the-backgroundfunction">BackgroundFunction</a></li>
+<li><a href="#the-rawbackgroundfunction">RawBackgroundFunction</a></li>
+<li><a href="#the-cloudeventsfunction">CloudEventsFunction</a></li>
+</ul>
+</li>
+<li><a href="#build-and-deploy-to-google-cloud">アプリケーションのビルドとGoogle Cloudへのデプロイ</a>
+<ul class="sectlevel2">
+<li><a href="#the-httpfunction-2">HttpFunction</a></li>
+<li><a href="#the-backgroundfunction-2">BackgroundFunction</a></li>
+<li><a href="#the-rawbackgroundfunction-2">RawBackgroundFunction</a></li>
+<li><a href="#the-cloudeventsfunction-2">CloudEventsFunction</a></li>
+</ul>
+</li>
+<li><a href="#running-locally">ローカルでの実行</a>
+<ul class="sectlevel2">
+<li><a href="#the-httpfunction-3">HttpFunction</a></li>
+<li><a href="#the-backgroundfunction-3">BackgroundFunction</a></li>
+<li><a href="#the-rawbackgroundfunction-3">RawBackgroundFunction</a></li>
+<li><a href="#the-cloudeventsfunction-3">CloudEventsFunction</a></li>
+</ul>
+</li>
+<li><a href="#testing-your-function">関数のテスト</a>
+<ul class="sectlevel2">
+<li><a href="#the-httpfunction-4">HttpFunction</a></li>
+<li><a href="#the-backgroundfunction-4">BackgroundFunction</a></li>
+<li><a href="#the-rawbackgroundfunction-4">RawBackgroundFunction</a></li>
+<li><a href="#the-cloudeventsfunction-4">CloudEventsFunction</a></li>
+</ul>
+</li>
+<li><a href="#whats-next">次のステップ</a></li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

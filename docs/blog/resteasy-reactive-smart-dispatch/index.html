@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>RESTEasy Reactive - ブロックするか、しないべきか、それが問題だ - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/blog/resteasy-reactive-smart-dispatch/" />
+  <meta property="og:title" content="RESTEasy Reactive - ブロックするか、しないべきか、それが問題だ" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/blog/resteasy-reactive-smart-dispatch/">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="post">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/blog/resteasy-reactive-smart-dispatch/">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="active">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/blog/resteasy-reactive-smart-dispatch/" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/blog/resteasy-reactive-smart-dispatch/">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/blog/resteasy-reactive-smart-dispatch/">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/blog/resteasy-reactive-smart-dispatch/">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/blog/resteasy-reactive-smart-dispatch/">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    <div class="full-width-breadcrumb-bg align-self">
+  <div class="width-12-12">
+      <p class="returnlink"><a href="/blog">Blog</a> <i class="fas fa-chevron-right"></i> RESTEasy Reactive - ブロックするか、しないべきか、それが問題だ</p>
+  </div>
+</div>
+
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+    <div class="grid-wrapper">
+      <div class="width-12-12">
+        <div class="post-date">
+          August 25, 2021 
+          
+            <span class="tags"><a href="/blog/tag/reactive">#reactive</a><a href="/blog/tag/rest">#rest</a></span>
+          
+        </div>
+        <h1 class="post-title">RESTEasy Reactive - ブロックするか、しないべきか、それが問題だ</h1>
+        <div class="grid-wrapper">
+          <div class="width-8-12 width-12-12-m byline-wrapper">
+            
+            
+              <img class="headshot" src="https://www.gravatar.com/avatar/ab937f7df990a673446f1e30fd9ccfba">
+            
+            <p class="byline">By <a href="/author/cescoffier">Clement Escoffier</a></p>
+          </div>
+          <div class="width-12-12">
+              <div class="paragraph">
+<p>2021年1月、Quarkusチームは、QuarkusでHTTP APIを提供するための斬新な方法であるRESTEasy Reactiveを発表しました。この発表以来、RESTEasy Reactiveの採用は非常に好調で、まもなくHTTP APIを実装するデフォルトの方法にする予定です。</p>
+</div>
+<div class="paragraph">
+<p>しかし、ちょっと待ってください。私が使っている命令型APIはどうなるのでしょうか？今のQuarkusを使うにはリアクティブプログラミングを学ぶ必要があるのでしょうか？はっきりさせておきましょう： <strong>いいえ</strong>。このブログ記事では、スムーズで透明性の高い移行を実現するためにRESTEasy reactiveに加えたいくつかの変更点をご紹介します。</p>
+</div>
+<div class="sect1">
+<h2 id="a-brief-history-of-http-apis-in-quarkus"><a class="anchor" href="#a-brief-history-of-http-apis-in-quarkus"></a>QuarkusにおけるHTTP APIの簡単な歴史</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusは、その誕生以来、HTTP APIを提供することができました。 <a href="https://resteasy.github.io/">RESTEasy</a>の搭載は、Quarkusの最初のベータリリースの主要なマイルストーンでした。RESTEasy <em>classic</em> では、 <code>@GET</code>, <code>@Path</code>, <code>@POST</code>&#8230;&#8203;のようなよく知られたJAX-RSアノテーションを使用してHTTP APIを開発します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+@Path("/hello")
+public class GreetingResource {
+
+   @GET
+   public String hello() {
+       return "Hello";
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>RESTEasy <em>classic</em> は、HTTP リクエストに関連付けられたワーカースレッド上で、HTTP エンドポイント（前のスニペットの <code>hello</code> メソッド）を呼び出します。これはよく理解されているモデルで、簡単に理解できます。しかし、ワーカースレッドに依存することで、同時実行の制限が発生します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusの中核にリアクティブを導入しても、RESTEasy _classic_はこのディスパッチ戦略を維持していました。このことが、Quarkusのエコシステムを分断していました。一方では、RESTEasy _classic_やHibernate ORMを使用する命令型の陣営があり、もう一方では、Reactive Routes、Vert.x API、その他のリアクティブなエクステンションを使用するリアクティブ型の陣営がありました。どちらもフードの下ではQuarkusのリアクティブエンジンを使用していましたが、リアクティブ派はより効率的な方法で使用していました。</p>
+</div>
+<div class="paragraph">
+<p>命令型と反応型の考え方の統一を受けて、Quarkus 1.11では、RESTEasy <em>reactive</em> を導入しました。これは、Quarkusのリアクティブアーキテクチャの上にJAX-RSモデルを実装した新しいものです。これは、同様の開発モデルとはるかに優れたスループットを提供します。RESTEasy _reactive_のアーキテクチャと利点については、ここでは詳しく説明しません。Georgiosは2つの投稿でそれらをカバーしています。 <a href="https://quarkus.io/blog/resteasy-reactive/">RESTEasy Reactive introduction</a>と <a href="https://quarkus.io/blog/resteasy-reactive-faq/">Massive performance without headaches</a>です。</p>
+</div>
+<div class="paragraph">
+<p>ユーザーの視点から見ると、RESTEasyの <em>classic_と _reactive</em> の主な違いは、HTTPエンドポイントのメソッドの呼び出し方です。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>classic</em>- 常にワーカースレッドで動作します。</p>
+</li>
+<li>
+<p><em>reactive</em> - I/Oスレッドまたはワーカースレッド（そして開発者であるあなたが選択可能）</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>何故そんなに重要なのかと思われるかもしれません。スレッドは高価です。特にコンテナやクラウド上ではリソースが限られています。I/O スレッドを使用すると、追加のスレッドを作成せずに済み（メモリ消費量の改善）、コンテキストスイッチを回避できます（応答時間の改善）。Emmanuelは、 <a href="https://quarkus.io/blog/io-thread-benchmark/">A IO thread and a worker thread walk into a bar: a microbenchmark story</a>のブログ記事でそのメリットを説明しています。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="to-block-or-not-to-block-that-is-the-question"><a class="anchor" href="#to-block-or-not-to-block-that-is-the-question"></a>ブロックするかしないか、それが問題だ。</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>RESTEasy <em>reactive</em> を導入したとき、デフォルトでノンブロッキングのアプローチを使用することにしました。特に明記されていない場合は、I/OスレッドでHTTPエンドポイント・メソッドを呼び出します。このモデルは優れたパフォーマンスをもたらし、 <code>@Blocking</code> アノテーションの使用により十分にシンプルなものとなりました。</p>
+</div>
+<div class="paragraph">
+<p>ここ数ヶ月、RESTEasy _reactive_の採用は信じられないほど進んでいます。多くの質問や、当然ながらバグレポートも寄せられています。中心となる質問は、Hibernate ORMの使い方についてです。</p>
+</div>
+<div class="paragraph">
+<p>Hibernate ORM <em>classic</em>（Hibernate <em>reactive</em> もあります）はブロッキングなので、 <code>@Blocking</code> アノテーションを使用せずにRESTEasy _reactive_で使用することはできません。このアノテーションは、（I/Oスレッドの代わりに）ワーカースレッドを使用するようにディスパッチ戦略を変更します。</p>
+</div>
+<div class="paragraph">
+<p>結果として得られたモデルは、我々にとっては効率的でわかりやすいものに見えましたが、意識していないユーザーは多くのものを目にしています:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">You have attempted to perform a blocking operation on a IO thread. This is not allowed, as blocking the IO thread will cause major performance issues with your application. If you want to perform blocking EntityManager operations make sure you are doing it from a worker thread.: java.lang.IllegalStateException: You have attempted to perform a blocking operation on a IO thread. This is not allowed, as blocking the IO thread will cause major performance issues with your application. If you want to perform blocking EntityManager operations make sure you are doing it from a worker thread.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>エラーメッセージは明示的です。しかし、このような壁のようなテキストがターミナルに印刷されていても、私たちが満足することはほとんどありません。</p>
+</div>
+<div class="paragraph">
+<p>"じゃあ、デフォルトでブロッキングをしよう" と言われるかもしれませんが、そんな単純な話ではありません。I/Oスレッドで呼び出されることが期待されるリアクティブAPIをワーカースレッドで呼び出すことは、I/OスレッドでブロッキングAPIを呼び出すことと同じくらい危険です。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="new-world-new-rules"><a class="anchor" href="#new-world-new-rules"></a>新しい世界、新しいルール!</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus 2.2.0では、メソッドのシグネチャに基づいた新しいディスパッチ戦略を導入しました。Quarkusのビルドタイムアプローチでは、ビルド時にメソッドがI/Oスレッドとワーカースレッドのどちらで呼び出されるべきかを賢く推測し、ランタイムのオーバーヘッドを削減することができます。</p>
+</div>
+<div class="paragraph">
+<p>以下の表は、新しいルールをまとめたものです。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">メソッドシグネチャ</th>
+<th class="tableblock halign-left valign-top">ディスパッチ戦略</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>T method(&#8230;&#8203;)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ワーカースレッド</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Uni&lt;T&gt; method(&#8230;&#8203;)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">I/Oスレッド</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CompletionStage&lt;T&gt; method(&#8230;&#8203;)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">I/Oスレッド</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Multi&lt;T&gt; method(&#8230;&#8203;)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">I/Oスレッド</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Publisher&lt;T&gt; method(&#8230;&#8203;)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">I/Oスレッド</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Transactional CompletionStage&lt;T&gt;  method(&#8230;&#8203;)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ワーカースレッド</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>基本的に、 <em>同期メソッドはワーカースレッドがデフォルトとなり、非同期メソッドはI/Oスレッドがデフォルトとなります（ただし、明示的に別の方法が指定されている場合を除く）</em>。もちろん、 <code>@Blocking</code> や <code>@NonBlocking</code> のアノテーションを使って、この動作をオーバーライドすることができます。 <code>@Transactional</code> アノテーションは、デフォルトのルールの例外であり、しばしばブロッキングリソース（エンティティマネージャなど）にアクセスしていることを意味します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-does-that-change-for-you"><a class="anchor" href="#what-does-that-change-for-you"></a>それによって何が変わるのでしょうか？</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>この新しい戦略が、効率性や柔軟性を損なうことなく、ユーザーエクスペリエンスを向上させることができるか、いくつかの例を挙げて説明します。</p>
+</div>
+<div class="sect2">
+<h3 id="hello-resteasy-reactive"><a class="anchor" href="#hello-resteasy-reactive"></a>Hello RESTEasy Reactive</h3>
+<div class="paragraph">
+<p>RESTEasy <em>reactive</em> を使用しても、上記の <em>hello</em> の例は変わりません。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+@Path("/hello")
+public class GreetingResource {
+
+   @GET
+   public String hello() {
+       return "Hello";
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そのメソッドは、同期シグネチャを持っているため、ワーカースレッドで呼び出されます。以前（Quarkus 2.2以前）のRESTEasyの _reactive_では、I/Oスレッドで呼び出されていました。この動作に戻すには、 <code>@NonBlocking</code> を追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import io.smallrye.common.annotation.NonBlocking;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+@Path("/hello")
+public class GreetingResource {
+
+   @GET
+   @NonBlocking
+   public String hello() {
+       return "Hello";
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Alternatively, you can return a <code>Uni</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import io.smallrye.mutiny.Uni;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+@Path("/hello")
+public class GreetingResource {
+
+   @GET
+   public Uni&lt;String&gt; hello() {
+       return Uni.createFrom().item("Hello");
+   }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="integrating-with-hibernate-orm"><a class="anchor" href="#integrating-with-hibernate-orm"></a>Hibernate ORMとの連携</h3>
+<div class="paragraph">
+<p>ユーザーからのフィードバックを受けて、RESTEasy <em>reactive</em> でHibernate <em>classic</em> を使用する場合を考えてみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import org.jboss.resteasy.reactive.RestQuery;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+@Path("/fruit")
+public class FruitResource {
+
+   @GET
+   public Fruit getFruit(@RestQuery String name) {
+       return Fruit.find("name", name).firstResult();
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>シグネチャが同期であるため、 <code>@Blocking</code> を使用する必要はありません。もう壁のようなテキストは必要ありません。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="integrating-with-hibernate-reactive"><a class="anchor" href="#integrating-with-hibernate-reactive"></a>Hibernate Reactiveとの統合</h3>
+<div class="paragraph">
+<p>Hibernate <em>reactive</em> を使用する場合、Mutiny APIを使用することになるので、コードは次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import io.smallrye.mutiny.Uni;
+import org.jboss.resteasy.reactive.RestQuery;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+@Path("/fruit")
+public class FruitResource {
+
+   @GET
+   public Uni&lt;Fruit&gt; getFruit(@RestQuery String name) {
+       return Fruit.find("name", name).firstResult();
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このメソッドはI/Oスレッドで実行されます。これはHibernate <em>reactive</em> が期待していることです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="integrating-with-kafka"><a class="anchor" href="#integrating-with-kafka"></a>Kafkaとの連携</h3>
+<div class="paragraph">
+<p>HTTPとKafkaを組み合わせる場合（リアクティブメッセージングを使用する場合）は、エミッターを使用します。エミッターのタイプ（ <code>Emitter</code> または <code>MutinyEmitter</code> ）に応じて、 <code>send</code> メソッドは <code>CompletionStage</code> または <code>Uni</code> を返します。そのため、以下のHTTPメソッドはI/Oスレッドで実行されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import io.smallrye.mutiny.Uni;
+import io.smallrye.reactive.messaging.MutinyEmitter;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+
+@Path("/fruit")
+public class FruitResource {
+
+   @Channel("kafka")
+   MutinyEmitter&lt;Fruit&gt; emitter;
+
+   @POST
+   public Uni&lt;Void&gt; writeToKafka(Fruit fruit) {
+       return emitter.send(fruit);
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これを同期シグネチャに変更すると、ワーカースレッドで実行されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import io.smallrye.reactive.messaging.MutinyEmitter;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import java.time.Duration;
+
+@Path("/fruit")
+public class FruitResource {
+
+   @Channel("kafka")
+   MutinyEmitter&lt;Fruit&gt; emitter;
+
+   @POST
+   public void writeToKafka(Fruit fruit) {
+       System.out.println(Thread.currentThread().getName());
+       emitter.send(fruit).await().atMost(Duration.ofSeconds(5));
+   }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="combining-resteasy-reactive-hibernate-orm-and-kafka"><a class="anchor" href="#combining-resteasy-reactive-hibernate-orm-and-kafka"></a>RESTEasy Reactive、Hibernate ORM、Kafkaの組み合わせ</h3>
+<div class="paragraph">
+<p>それでは、Resteasy <em>reactive</em>、Hibernate ORM <em>classic</em>、Kafkaを組み合わせて、エンティティを永続化し、それをKafkaトピックに書き込んでみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme;
+
+import io.smallrye.mutiny.Uni;
+import io.smallrye.reactive.messaging.MutinyEmitter;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+
+import javax.transaction.Transactional;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+
+@Path("/fruit")
+public class FruitResource {
+
+   @Channel("kafka")
+   MutinyEmitter&lt;Fruit&gt; emitter;
+
+   @POST
+   @Transactional
+   public Uni&lt;Void&gt; persistAndWriteToKafka(Fruit fruit) {
+       System.out.println(Thread.currentThread().getName());
+       fruit.persist();
+       return emitter.send(fruit);
+   }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このメソッドは、シグネチャにもかかわらず、ワーカースレッドで実行されます。 <code>@Transactional</code> アノテーションにより、ワーカースレッドを使用するディスパッチ戦略が設定されています。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="summary"><a class="anchor" href="#summary"></a>まとめ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus 2.2では、RESTEasy <em>reactive</em> のディスパッチ戦略がよりスマートになり、開発者のエクスペリエンスが向上しました。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>リアクティブな方法を学ぶ必要はなく、命令型のコードを使い続けることができます。</p>
+</li>
+<li>
+<p>スレッドについて考える必要はありません。Quarkusがあなたのためにそれを行います。</p>
+</li>
+<li>
+<p>柔軟性が失われるわけではなく、決定を覆すことができます。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Quarkus 2.3から、QuarkusチームはRESTEasy <em>reactive</em> をHTTP APIを実装するためのデフォルトの方法にすることを考えています。これは、RESTEasy <em>classic</em> エクステンションが廃止されることを意味するものではなく、RESTEasy <em>reactive</em> が負担なくより多くのことを提供できる段階に到達することを意味しています。</p>
+</div>
+</div>
+</div>
+              
+          </div>
+          <div class="width-12-12"><div class="share-page">
+  <a class="share-linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=https://quarkus.io/blog/resteasy-reactive-smart-dispatch/&title=RESTEasy Reactive - ブロックするか、しないべきか、それが問題だ" rel="nofollow" target="_blank" title="Share on LinkedIn">
+    <i class="fa-brands fa-linkedin fa-xl"></i>
+  </a>
+  <a class="share-x" href="https://x.com/intent/tweet?text=RESTEasy Reactive - ブロックするか、しないべきか、それが問題だ&url=https://quarkus.io/blog/resteasy-reactive-smart-dispatch/&via=quarkusio&related=quarkusio" rel="nofollow" target="_blank" title="Share on X">
+    <i class="fa-brands fa-square-x-twitter fa-xl"></i>
+  </a>
+  <a class="share-facebook" href="https://facebook.com/sharer.php?u=https://quarkus.io/blog/resteasy-reactive-smart-dispatch/" rel="nofollow" target="_blank" title="Share on Facebook">
+    <i class="fa-brands fa-square-facebook fa-xl"></i>
+  </a>
+  <a class="share-reddit" href="http://www.reddit.com/submit?url=https://quarkus.io/blog/resteasy-reactive-smart-dispatch/" onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;" title="Share on Reddit" >
+    <i class="fa-brands fa-square-reddit fa-xl"></i>
+  </a>
+  <a class="share-email" href="mailto:?subject=RESTEasy Reactive - ブロックするか、しないべきか、それが問題だ&amp;body=RESTEasy Reactive - ブロックするか、しないべきか、それが問題だ https://quarkus.io/blog/resteasy-reactive-smart-dispatch/" title="Share via Email" >
+    <i class="fa-solid fa-envelope fa-xl"></i>
+  </a>
+</div>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+  <script src="https://giscus.app/client.js"
+        data-repo="quarkusio/quarkus"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkxMzk5MTQ5MzI="
+        data-category="Quarkus Blog/Website"
+        data-category-id="DIC_kwDOCFbutM4CAFFV"
+        data-mapping="og:title"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+  </script>
+  </div>
+</div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>MicrometerとPrometheusでOpenShiftにおけるQuarkusアプリのモニタリング - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/blog/micrometer-prometheus-openshift/" />
+  <meta property="og:title" content="MicrometerとPrometheusでOpenShiftにおけるQuarkusアプリのモニタリング" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/blog/micrometer-prometheus-openshift/">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="post">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/blog/micrometer-prometheus-openshift/">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="active">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/blog/micrometer-prometheus-openshift/" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/blog/micrometer-prometheus-openshift/">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/blog/micrometer-prometheus-openshift/">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/blog/micrometer-prometheus-openshift/">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/blog/micrometer-prometheus-openshift/">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    <div class="full-width-breadcrumb-bg align-self">
+  <div class="width-12-12">
+      <p class="returnlink"><a href="/blog">Blog</a> <i class="fas fa-chevron-right"></i> MicrometerとPrometheusでOpenShiftにおけるQuarkusアプリのモニタリング</p>
+  </div>
+</div>
+
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+    <div class="grid-wrapper">
+      <div class="width-12-12">
+        <div class="post-date">
+          March 15, 2021 
+          
+            <span class="tags"><a href="/blog/tag/extension">#extension</a></span>
+          
+        </div>
+        <h1 class="post-title">MicrometerとPrometheusでOpenShiftにおけるQuarkusアプリのモニタリング</h1>
+        <div class="grid-wrapper">
+          <div class="width-8-12 width-12-12-m byline-wrapper">
+            
+            
+              <img class="headshot" src="https://www.gravatar.com/avatar/c36dc2ca5ea73cbbd6cf8eae3c54d0e1">
+            
+            <p class="byline">By <a href="/author/jcarvaja">Jose Carvajal</a></p>
+          </div>
+          <div class="width-12-12">
+              <div class="paragraph">
+<p>メトリクスは、リソースの使用状況や動作など、アプリケーションのあらゆる側面の測定値です。Quarkusのアプリケーションからこれらのメトリクスを公開するには、 <code>/q/metrics</code> エンドポイント経由で <a href="https://quarkus.io/guides/micrometer">Micrometer</a>エクステンションを使用します。</p>
+</div>
+<div class="paragraph">
+<p>どのようなメトリクスが公開されますか?Micrometerエクステンションを追加するだけで、多くのメトリクスがデフォルトで公開されます。例えば、現在のライブスレッド数のようなJVMエンジンに関するメトリクス <code>jvm_threads_live_threads</code> や、現在のCPU使用率のようなシステム自体に関するメトリクス <code>system_cpu_usage</code> などがあります。さらに、使用している他のQuarkusエクステンションに応じて、より多くのメトリクスが自動的に公開されます。例えば、ResteasyのようなQuarkusのRESTエクステンションを使用している場合、実行中のサービスに関するメトリクスが自動的に公開されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">http_server_requests_seconds_count{method="GET",outcome="SUCCESS",status="200",uri="/hello",} 1.0
+http_server_requests_seconds_sum{method="GET",outcome="SUCCESS",status="200",uri="/hello",} 0.018198043</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Kafkaエクステンションを使用している場合も同様です。これらの設定については、 <a href="https://quarkus.io/guides/micrometer">Quarkus Micrometerガイド</a>によく書かれています。</p>
+</div>
+<div class="paragraph">
+<p><em>これらのメトリクスはどのように消費されるのですか？</em> 前述の通り、Micrometer は <a href="https://prometheus.io/">Prometheus</a> のようなサードパーティが利用できるように <code>/q/metrics</code> エンドポイントでメトリクスを公開しています。OpenShiftにはPrometheusのインスタンスが埋め込まれているので、それを利用することができます。それでは、Quarkus Applicationsのメトリクスと、OpenShiftで提供されているPrometheusの埋め込みインスタンスを統合するために必要なことを見ていきましょう。</p>
+</div>
+<div class="paragraph">
+<p>基本的には、次のようなステップを踏む必要があります。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>OpenShiftでユーザー定義のプロジェクトのモニタリングの有効化</p>
+</li>
+<li>
+<p>Quarkusアプリケーションのデプロイ</p>
+</li>
+<li>
+<p>プロジェクトにサービスモニターを作成</p>
+</li>
+</ol>
+</div>
+<div class="sect1">
+<h2 id="requirements"><a class="anchor" href="#requirements"></a>要件</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://docs.openshift.com/container-platform/4.7/cli_reference/openshift_cli/getting-started-cli.html">Openshift CLI</a></p>
+</li>
+<li>
+<p>Openshiftインスタンス</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="step-1-enable-monitoring-for-user-defined-projects-in-openshift"><a class="anchor" href="#step-1-enable-monitoring-for-user-defined-projects-in-openshift"></a>ステップ1 - OpenShiftでユーザー定義のプロジェクトのモニタリングを有効化</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ユーザー定義のプロジェクトのモニタリングを有効にするためには、 <a href="https://docs.openshift.com/container-platform/4.7/monitoring/enabling-monitoring-for-user-defined-projects.html">OpenShiftのドキュメント</a>の指示に従う必要があります。</p>
+</div>
+<div class="paragraph">
+<p>突きつめると、名前空間 <code>openshift-monitoring</code> に ConfigMap を作成する必要があります。</p>
+</div>
+<div class="paragraph">
+<p><code>cluster-monitoring-config.yaml</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: cluster-monitoring-config
+    namespace: openshift-monitoring
+data:
+    config.yaml: |
+    enableUserWorkload: true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、それを以下のように適用します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f cluster-monitoring-config.yaml</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+OpenShiftの4.5以前のバージョンでは、代わりに以下を実行する必要があります:
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: cluster-monitoring-config
+    namespace: openshift-monitoring
+data:
+    config.yaml: |
+    techPreviewUserWorkload:
+        enabled: true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Openshiftは自動的に <code>openshift-user-workload-monitoring</code> 名前空間を作成し、そこにPrometheusに必要なリソースをデプロイします。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="2-deploy-our-quarkus-application"><a class="anchor" href="#2-deploy-our-quarkus-application"></a>2. Quarkusアプリケーションのデプロイ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>OpenShiftで必要なインフラの準備ができたら、次にQuarkusアプリケーションを進めていきましょう。REST APIを実装し、prometheusでmicrometerを有効にします。そのためには、 <code>pom.xml</code> ファイルに2つのQuarkusエクステンションを追加する必要があります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-resteasy&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-micrometer-registry-prometheus&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、Greetingリソースを追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
+
+@Path("/hello")
+public class GreetingsResource {
+
+    @Inject
+    MeterRegistry registry;
+
+    @GET
+    @Path("/{name}")
+    public String sayHello(@PathParam(value = "name") String name) {
+        registry.counter("greeting_counter", Tags.of("name", name)).increment();
+
+        return "Hello!";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ご覧のように、micrometer レジストリファサードを使用して、タグ名を持つカウンタを作成し、起動するたびにインクリメントしています。</p>
+</div>
+<div class="paragraph">
+<p>このアプリケーションを実行して試してみましょう:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn compile quarkus:dev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これで、私たちのサービスを呼び出すことができるはずです:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:8080/hello/quarkus</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、 <code>Hello!</code> を返すはずです。ここまではいいとして、 <code><a href="http://localhost:8080/q/metrics" class="bare">http://localhost:8080/q/metrics</a></code> でメトリクスを見ることもできます。ここでは、 <code>greeting_counter</code> のカウンターを確認できます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-plain hljs" data-lang="plain"># HELP greeting_counter_total
+# TYPE greeting_counter_total counter
+greeting_counter_total{name="quarkus",} 1.0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>次に、QuarkusアプリケーションをOpenShiftにデプロイする必要があります。このステップを簡単にするために、Quarkusは <code>quarkus-openshift</code> という非常に便利なエクステンションを提供していますので、これを <code>pom.xml</code> ファイルに追加しましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-openshift&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>それでは、OpenShiftで新たに作成したプロジェクト <code>my-project</code> にアプリケーションをデプロイしてみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc new-project my-project
+mvn clean package -Dquarkus.kubernetes.deploy=true -Dquarkus.openshift.expose=true -Dquarkus.openshift.labels.app-with-metrics=quarkus-app</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ラベル <code>app-with-metrics</code> は、後のステップで OpenShift が監視するアプリケーションを選択するために使用されます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="3-create-a-service-monitor-in-our-project"><a class="anchor" href="#3-create-a-service-monitor-in-our-project"></a>3. プロジェクトにサービスモニターを作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>先に進む前に、まずPrometheusの仕組みを説明しましょう。Prometheus は、アプリケーションからメトリクスを取得するためにプル・モデルを使用します。つまり、Prometheus はメトリクスを取得するためにエンドポイントをスクレイピングしたり、ウォッチしたりします。</p>
+</div>
+<div class="paragraph">
+<p>前のステップから、サービスは OpenShift で実行されていますが、Prometheus でサービスをスクレイプするための設定はまだ何もしていません。これは Service Monitor リソースで行います。</p>
+</div>
+<div class="paragraph">
+<p><code>service-monitor.yaml</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    k8s-app: prometheus-app-monitor
+  name: prometheus-app-monitor
+  namespace: my-project
+spec:
+  endpoints:
+  - interval: 30s
+    targetPort: 8080
+    path: /q/metrics
+    scheme: http
+  selector:
+    matchLabels:
+      app-with-metrics: 'quarkus-app'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The path <code>/q/metrics</code> is the default metrics endpoint in Quarkus.</p>
+</div>
+<div class="paragraph">
+<p>We could configure the <code>/metrics</code> endpoint Prometheus expects in <code>application.properties</code> instead of adding the path attribute above using the following property: <code>quarkus.micrometer.export.prometheus.path=/metrics</code>.</p>
+</div>
+<div class="paragraph">
+<p>そして、それを以下のように適用します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f service-monitor.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>今行ったのは、前のステップで追加した <code>app-with-metrics: quarkus-app</code> というラベルのついたアプリを選択する <code>prometheus-app-monitor</code> という名前の Service Monitor を作成することです。すると、OpenShiftは30秒ごとに、 <code>app-with-metrics: quarkus-app</code> というラベルのついたサービスすべてについて、エンドポイント <code>/q/metrics</code> を呼び出します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="finally-lets-start-using-it"><a class="anchor" href="#finally-lets-start-using-it"></a>いよいよ、使ってみましょう。</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、グリーティングサービスを呼び出す必要があります: <code><a href="http://quarkus-micrometer-my-project.ocp.host/hello/quarkus" class="bare">http://quarkus-micrometer-my-project.ocp.host/hello/quarkus</a></code> 。これで <code>greeting_counter_total</code> カウンターが増加します。しかし、このメトリクスはどこで見ることができるでしょうか？OpenShift Console の <code>Developer &gt; Monitoring</code> view, select <code>Metrics</code> を開き、 <code>Metrics</code> を選択し、次に <code>Custom Query</code> を選択し、 <code>greeting_counter_total{name = "quarkus"}</code> と入力してみましょう。これで次のように表示されます:</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="/assets/images/posts/micrometer-openshift/micrometer-quarkus-io.png" alt="micrometer quarkus io">
+</div>
+</div>
+<div class="paragraph">
+<p>素晴らしい!OpenShiftにQuarkus Applicationのメトリクスを公開出来ています!</p>
+</div>
+</div>
+</div>
+              
+          </div>
+          <div class="width-12-12"><div class="share-page">
+  <a class="share-linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=https://quarkus.io/blog/micrometer-prometheus-openshift/&title=MicrometerとPrometheusでOpenShiftにおけるQuarkusアプリのモニタリング" rel="nofollow" target="_blank" title="Share on LinkedIn">
+    <i class="fa-brands fa-linkedin fa-xl"></i>
+  </a>
+  <a class="share-x" href="https://x.com/intent/tweet?text=MicrometerとPrometheusでOpenShiftにおけるQuarkusアプリのモニタリング&url=https://quarkus.io/blog/micrometer-prometheus-openshift/&via=quarkusio&related=quarkusio" rel="nofollow" target="_blank" title="Share on X">
+    <i class="fa-brands fa-square-x-twitter fa-xl"></i>
+  </a>
+  <a class="share-facebook" href="https://facebook.com/sharer.php?u=https://quarkus.io/blog/micrometer-prometheus-openshift/" rel="nofollow" target="_blank" title="Share on Facebook">
+    <i class="fa-brands fa-square-facebook fa-xl"></i>
+  </a>
+  <a class="share-reddit" href="http://www.reddit.com/submit?url=https://quarkus.io/blog/micrometer-prometheus-openshift/" onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;" title="Share on Reddit" >
+    <i class="fa-brands fa-square-reddit fa-xl"></i>
+  </a>
+  <a class="share-email" href="mailto:?subject=MicrometerとPrometheusでOpenShiftにおけるQuarkusアプリのモニタリング&amp;body=MicrometerとPrometheusでOpenShiftにおけるQuarkusアプリのモニタリング https://quarkus.io/blog/micrometer-prometheus-openshift/" title="Share via Email" >
+    <i class="fa-solid fa-envelope fa-xl"></i>
+  </a>
+</div>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="post-page grid-wrapper">
+  <div class="width-8-12 width-12-12-m doc-content">
+  <script src="https://giscus.app/client.js"
+        data-repo="quarkusio/quarkus"
+        data-repo-id="MDEwOlJlcG9zaXRvcnkxMzk5MTQ5MzI="
+        data-category="Quarkus Blog/Website"
+        data-category-id="DIC_kwDOCFbutM4CAFFV"
+        data-mapping="og:title"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+  </script>
+  </div>
+</div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

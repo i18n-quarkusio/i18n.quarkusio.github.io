@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>RESTEasy Classic - 3.2 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.2/guides/resteasy" />
+  <meta property="og:title" content="RESTEasy Classic - 3.2" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/resteasy">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.2/guides/resteasy">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.2/guides/resteasy" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.2/guides/resteasy">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.2/guides/resteasy">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.2/guides/resteasy">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.2/guides/resteasy">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.2/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" selected>3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">RESTEasy Classic </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>このガイドは、Quarkus 2.8までデフォルトのJakarta REST（旧称JAX-RS）実装であった <a href="https://resteasy.dev">RESTEasy Classic</a> についてのものです。</p>
+</div>
+<div class="paragraph">
+<p>従来のブロック型ワークロードとリアクティブ型ワークロードの両方を同等にサポートするRESTEasy Reactiveを使用することが推奨されるようになりました。RESTEasy Reactiveの詳細については、 <a href="rest-json">REST JSON入門ガイド</a> または <a href="resteasy-reactive">RESTEasy Reactiveのリファレンスドキュメント</a> をご覧ください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+RESTEasy Classic をベースにした REST クライアント（ JSON のサポートを含む）が必要な場合は、<a href="rest-client">別のガイド</a>を参照してください。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="architecture"><a class="anchor" href="#architecture"></a>アーキテクチャ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドで開発するアプリケーションは非常にシンプルです: ユーザーはフォームを使用してリストに要素を追加することができ、リストが更新されます。</p>
+</div>
+<div class="paragraph">
+<p>ブラウザとサーバー間の情報はすべて JSON 形式になっています。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-maven-project"><a class="anchor" href="#creating-the-maven-project"></a>Mavenプロジェクトの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、新しいプロジェクトが必要です。以下のコマンドで新規プロジェクトを作成します。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:rest-json-quickstart \
+    --extension='resteasy-jackson' \
+    --no-code
+cd rest-json-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:3.2.12.Final:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=rest-json-quickstart \
+    -Dextensions='resteasy-jackson' \
+    -DnoCode
+cd rest-json-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>このコマンドは、RESTEasy/Jakarta RESTおよび <a href="https://github.com/FasterXML/jackson">Jackson</a> エクステンションをインポートする新しいプロジェクトを生成し、特に次の依存関係を追加します：</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-resteasy-jackson&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-resteasy-jackson")</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>ユーザーエクスペリエンスを向上させるために、Quarkusは3つのJackson <a href="https://github.com/FasterXML/jackson-modules-java8">Java 8モジュール</a> を登録しているので、手動で登録する必要はありません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Quarkus は <a href="https://eclipse-ee4j.github.io/jsonb-api/">JSON-B</a> もサポートしているため、 Jackson よりも JSON-B を利用したい場合は、代わりに RESTEasy JSON-B エクステンションを依存関係に持つプロジェクトを作成することができます。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:rest-json-quickstart \
+    --extension='resteasy-jsonb' \
+    --no-code
+cd rest-json-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:3.2.12.Final:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=rest-json-quickstart \
+    -Dextensions='resteasy-jsonb' \
+    -DnoCode
+cd rest-json-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>このコマンドは、RESTEasy/Jakarta RESTおよび <a href="https://eclipse-ee4j.github.io/jsonb-api/">JSON-B</a> エクステンションをインポートする新しいプロジェクトを生成し、特に次の依存関係を追加します：</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-resteasy-jsonb&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-resteasy-jsonb")</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-your-first-json-rest-service"><a class="anchor" href="#creating-your-first-json-rest-service"></a>初めてのJSON RESTサービスの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>この例では、果物のリストを管理するアプリケーションを作成します。</p>
+</div>
+<div class="paragraph">
+<p>まず、以下のように <code>Fruit</code> Bean を作成してみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.json;
+
+public class Fruit {
+
+    public String name;
+    public String description;
+
+    public Fruit() {
+    }
+
+    public Fruit(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>派手なことは何もありません。注意すべき重要なことは、デフォルトのコンストラクタを持つことはJSONシリアライズレイヤーで必須であるということです。</p>
+</div>
+<div class="paragraph">
+<p>次に、 <code>org.acme.rest.json.FruitResource</code> クラスを以下のように作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.json;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Set;
+
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+
+@Path("/fruits")
+public class FruitResource {
+
+    private Set&lt;Fruit&gt; fruits = Collections.newSetFromMap(Collections.synchronizedMap(new LinkedHashMap&lt;&gt;()));
+
+    public FruitResource() {
+        fruits.add(new Fruit("Apple", "Winter fruit"));
+        fruits.add(new Fruit("Pineapple", "Tropical fruit"));
+    }
+
+    @GET
+    public Set&lt;Fruit&gt; list() {
+        return fruits;
+    }
+
+    @POST
+    public Set&lt;Fruit&gt; add(Fruit fruit) {
+        fruits.add(fruit);
+        return fruits;
+    }
+
+    @DELETE
+    public Set&lt;Fruit&gt; delete(Fruit fruit) {
+        fruits.removeIf(existingFruit -&gt; existingFruit.name.contentEquals(fruit.name));
+        return fruits;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>実装は非常に簡単で、Jakarta RESTアノテーションを使用してエンドポイントを定義するだけです。</p>
+</div>
+<div class="paragraph">
+<p><code>Fruit</code> オブジェクトは、プロジェクトの初期化時に選択したエクステンションに応じて、 <a href="https://eclipse-ee4j.github.io/jsonb-api/">JSON-B</a> または <a href="https://github.com/FasterXML/jackson">Jackson</a> によって自動的にシリアライズ/デシリアライズされます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>quarkus-resteasy-jackson</code> や <code>quarkus-resteasy-jsonb</code> などの JSON エクステンションがインストールされている場合、メディアタイプが <code>@Produces</code> や <code>@Consumes</code> アノテーションで明示的に設定されていない限り、Quarkus はほとんどの戻り値に <code>application/json</code> メディアタイプをデフォルトで使用します( <code>String</code> や <code>File</code> などのよく知られたタイプには例外があり、それぞれ <code>text/plain</code> と <code>application/octet-stream</code> がデフォルトとなっています)。</p>
+</div>
+<div class="paragraph">
+<p>デフォルトでJSONを使用したくない場合は、 <code>quarkus.resteasy-json.default-json=false</code> を設定すると、デフォルトは自動ネゴシエーションに戻ります。これを設定した場合、JSON を使用するためには <code>@Produces(MediaType.APPLICATION_JSON)</code> と <code>@Consumes(MediaType.APPLICATION_JSON)</code> をエンドポイントに追加する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>JSONのデフォルトに依存しない場合は、エンドポイントに <code>@Produces</code> と <code>@Consumes</code> のアノテーションを付けて、期待されるcontent-typesを正確に定義することが強く推奨されています。これにより、ネイティブ実行可能ファイルに含まれる Jakarta REST プロバイダー（コンバーターと見なすことができます）の数を減らすことができます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="json"><a class="anchor" href="#json"></a>JSON サポートの設定</h3>
+<div class="sect3">
+<h4 id="jackson"><a class="anchor" href="#jackson"></a>Jackson</h4>
+<div class="paragraph">
+<p>Quarkusでは、CDI経由で取得した(そしてQuarkusのエクステンションによって消費される)デフォルトのJackson <code>ObjectMapper</code> は、未知のプロパティーを無視するように設定されています( <code>DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES</code> 機能を無効にすることで)。</p>
+</div>
+<div class="paragraph">
+<p><code>application.properties</code> で <code>quarkus.jackson.fail-on-unknown-properties=true</code> を設定するか、 クラスごとに <code>@JsonIgnoreProperties(ignoreUnknown = false)</code> を設定することで、Jackson のデフォルトの動作を復元することができます。</p>
+</div>
+<div class="paragraph">
+<p>さらに、 <code>ObjectMapper</code> 、日付と時刻をISO-8601でフォーマットするように設定されています（ <code>SerializationFeature.WRITE_DATES_AS_TIMESTAMPS</code> の機能を無効にすることで）。</p>
+</div>
+<div class="paragraph">
+<p><code>application.properties</code> で <code>quarkus.jackson.fail-on-unknown-properties=true</code> を設定するか、 <code>@JsonIgnoreProperties(ignoreUnknown = false)</code> を経由してクラスごとに設定することで、Jackson のデフォルトの動作を復元することができます。</p>
+</div>
+<div class="paragraph">
+<p>また、Quarkusは、CDI Bean を介して、様々なJackson設定を非常に簡単に設定することができます。最も単純な(そして推奨される)アプローチは、 <code>io.quarkus.jackson.ObjectMapperCustomizer</code> 型の CDI Bean を定義し、その中で、Jackson の設定を適用することです。</p>
+</div>
+<div class="paragraph">
+<p>カスタムモジュールを登録する必要がある場合の例は次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import com.fasterxml.jackson.databind.ObjectMapper;
+import io.quarkus.jackson.ObjectMapperCustomizer;
+import jakarta.inject.Singleton;
+
+@Singleton
+public class RegisterCustomModuleCustomizer implements ObjectMapperCustomizer {
+
+    public void customize(ObjectMapper mapper) {
+        mapper.registerModule(new CustomModule());
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ユーザーは、選択すれば自分の <code>ObjectMapper</code> Beanを提供することもできます。この場合、 <code>ObjectMapper</code> を生成する CDI プロデューサの中で、すべての <code>io.quarkus.jackson.ObjectMapperCustomizer</code> Bean を手動で注入して適用することが非常に重要です。これを怠ると、様々なエクステンションによって提供される Jackson 固有のカスタマイズが適用されなくなります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import com.fasterxml.jackson.databind.ObjectMapper;
+import io.quarkus.arc.All;
+import io.quarkus.jackson.ObjectMapperCustomizer;
+import java.util.List;
+import jakarta.inject.Singleton;
+
+public class CustomObjectMapper {
+
+    // Replaces the CDI producer for ObjectMapper built into Quarkus
+    @Singleton
+    ObjectMapper objectMapper(@All List&lt;ObjectMapperCustomizer&gt; customizers) {
+        ObjectMapper mapper = myObjectMapper(); // Custom `ObjectMapper`
+
+        // Apply all ObjectMapperCustomizer beans (incl. Quarkus)
+        for (ObjectMapperCustomizer customizer : customizers) {
+            customizer.customize(mapper);
+        }
+
+        return mapper;
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="json-b"><a class="anchor" href="#json-b"></a>JSON-B</h4>
+<div class="paragraph">
+<p>上記のように、 Quarkus では、 <code>quarkus-resteasy-jsonb</code> エクステンションを使用することで、 Jackson の代わりに JSON-B を使用するオプションを提供しています。</p>
+</div>
+<div class="paragraph">
+<p>前項と同様のアプローチで、 <code>io.quarkus.jsonb.JsonbConfigCustomizer</code> bean を使用して JSON-B を設定することができます。</p>
+</div>
+<div class="paragraph">
+<p>例えば、 <code>FooSerializer</code> という名前のカスタムシリアライザを <code>com.example.Foo</code> タイプで JSON-B で登録する必要がある場合、以下のような Bean を追加すれば十分です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.jsonb.JsonbConfigCustomizer;
+import jakarta.inject.Singleton;
+import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.serializer.JsonbSerializer;
+
+@Singleton
+public class FooSerializerRegistrationCustomizer implements JsonbConfigCustomizer {
+
+    public void customize(JsonbConfig config) {
+        config.withSerializers(new FooSerializer());
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>より高度なオプションは， <code>jakarta.json.bind.JsonbConfig</code> の Bean を( <code>Dependent</code> スコープで)直接提供するか，極端な場合， <code>jakarta.json.bind.Jsonb</code> タイプの Bean を( <code>Singleton</code> スコープで)提供することでしょう。後者の方法を利用する場合、 <code>jakarta.json.bind.Jsonb</code> を生成するCDIプロデューサーにおいて、すべての <code>io.quarkus.jsonb.JsonbConfigCustomizer</code> Beanを手動で注入し適用することが非常に重要です。これを怠ると、さまざまなエクステンションが提供するJSON-B固有のカスタマイズが適用されなくなります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.quarkus.jsonb.JsonbConfigCustomizer;
+
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.Instance;
+import jakarta.json.bind.JsonbConfig;
+
+public class CustomJsonbConfig {
+
+    // Replaces the CDI producer for JsonbConfig built into Quarkus
+    @Dependent
+    JsonbConfig jsonConfig(Instance&lt;JsonbConfigCustomizer&gt; customizers) {
+        JsonbConfig config = myJsonbConfig(); // Custom `JsonbConfig`
+
+        // Apply all JsonbConfigCustomizer beans (incl. Quarkus)
+        for (JsonbConfigCustomizer customizer : customizers) {
+            customizer.customize(config);
+        }
+
+        return config;
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="links"><a class="anchor" href="#links"></a>JSON Hypertext Application Language ( HAL ) のサポート</h3>
+<div class="paragraph">
+<p><a href="https://tools.ietf.org/id/draft-kelly-json-hal-01.html">HAL</a> 標準は、ウェブリンクを表現するためのシンプルなフォーマットです。</p>
+</div>
+<div class="paragraph">
+<p>HAL のサポートを有効にするには、 <code>quarkus-hal</code> エクステンションをプロジェクトに追加します。また、 HAL は JSON サポートを必要とするため、 <code>quarkus-resteasy-jsonb</code> または <code>quarkus-resteasy-jackson</code> のいずれかのエクステンションモジュールを追加する必要があります。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. テーブルコンテキストオブジェクト</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">GAV</th>
+<th class="tableblock halign-left valign-top">使用方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>io.quarkus:quarkus-hal</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://tools.ietf.org/id/draft-kelly-json-hal-01.html">HAL</a></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>エクステンションを追加したら、次は REST リソースにアノテーションを付け、メディアタイプ <code>application/hal+json</code> (または RestMediaType.APPLICATION_HAL_JSON を使用) を生成できるようにします。例えば、以下のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Path("/records")
+public class RecordsResource {
+
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON, "application/hal+json" })
+    @LinkResource(entityClassName = "org.acme.Record", rel = "list")
+    public List&lt;TestRecord&gt; getAll() {
+        // ...
+    }
+
+    @GET
+    @Path("/first")
+    @Produces({ MediaType.APPLICATION_JSON, "application/hal+json" })
+    @LinkResource(rel = "first")
+    public TestRecord getFirst() {
+        // ...
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これで、エンドポイント <code>/records</code> と <code>/records/first</code> は、メディアタイプ <code>json</code> と <code>hal+json</code> の両方を受け入れ、HAL 形式のレコードを表示します。</p>
+</div>
+<div class="paragraph">
+<p>例えば、 curl を使用して <code>/records</code> エンドポイントを呼び出してレコードのリストを返す場合、HAL 形式は次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">&amp; curl -H "Accept:application/hal+json" -i localhost:8080/records
+{
+    "_embedded": {
+        "items": [
+            {
+                "id": 1,
+                "slug": "first",
+                "value": "First value",
+                "_links": {
+                    "list": {
+                        "href": "http://localhost:8081/records"
+                    },
+                    "first": {
+                        "href": "http://localhost:8081/records/first"
+                    }
+                }
+            },
+            {
+                "id": 2,
+                "slug": "second",
+                "value": "Second value",
+                "_links": {
+                    "list": {
+                        "href": "http://localhost:8081/records"
+                    },
+                    "first": {
+                        "href": "http://localhost:8081/records/first"
+                    }
+                }
+            }
+        ]
+    },
+    "_links": {
+        "list": {
+            "href": "http://localhost:8081/records"
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When we call a resource <code>/records/first</code> that returns only one instance, then the output is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">&amp; curl -H "Accept:application/hal+json" -i localhost:8080/records/first
+{
+    "id": 1,
+    "slug": "first",
+    "value": "First value",
+    "_links": {
+        "list": {
+            "href": "http://localhost:8081/records"
+        },
+        "first": {
+            "href": "http://localhost:8081/records/first"
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-a-frontend"><a class="anchor" href="#creating-a-frontend"></a>フロントエンドの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>それでは、 <code>FruitResource</code> とやり取りするための簡単なウェブページを追加してみましょう。
+Quarkusは自動的に、 <code>META-INF/resources</code> ディレクトリの下にある静的リソースを提供します。 
+<code>src/main/resources/META-INF/resources</code> ディレクトリに、この <a href="https://github.com/quarkusio/quarkus-quickstarts/blob/3.2/rest-json-quickstart/src/main/resources/META-INF/resources/fruits.html">fruits.html</a> ファイルのコンテンツを含む <code>fruits.html</code> ファイルを追加します。</p>
+</div>
+<div class="paragraph">
+<p>これで、REST サービスと対話できるようになりました。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Quarkusを起動します。</p>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>ブラウザで <code><a href="http://localhost:8080/fruits.html" class="bare">http://localhost:8080/fruits.html</a></code> を開きます。</p>
+</li>
+<li>
+<p>フォームを使って新しいフルーツをリストに追加します。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="building-a-native-executable"><a class="anchor" href="#building-a-native-executable"></a>ネイティブ実行可能ファイルの構築</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>通常のコマンドでネイティブ実行可能ファイルをビルドすることができます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build --native</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install -Dnative</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build -Dquarkus.package.type=native</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>実行は簡単で、 <code>./target/rest-json-quickstart-1.0-SNAPSHOT-runner</code> を実行するだけです。</p>
+</div>
+<div class="paragraph">
+<p>その後、ブラウザで <code><a href="http://localhost:8080/fruits.html" class="bare">http://localhost:8080/fruits.html</a></code> を開いてアプリケーションを使用します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="about-serialization"><a class="anchor" href="#about-serialization"></a>シリアライゼーションについて</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>JSONシリアライズライブラリは、Javaのリフレクションを使用してオブジェクトのプロパティーを取得してシリアライズします。</p>
+</div>
+<div class="paragraph">
+<p>GraalVMでネイティブ実行可能ファイルを使用する場合、リフレクションで使用されるすべてのクラスを登録する必要があります。良いニュースは、Quarkusがほとんどの場合、その作業を代行してくれるということです。これまでのところ、 <code>Fruit</code> でさえ、リフレクトを使用するためのクラスを登録しておらず、すべてが正常に動作しています。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusは、RESTメソッドからシリアライズされた型を推論することができる場合に、何らかのマジックを実行します。以下のようなRESTメソッドがある場合、Quarkusは、 <code>Fruit</code> がシリアライズされると判断します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-JAVA hljs" data-lang="JAVA">@GET
+public List&lt;Fruit&gt; list() {
+    // ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Quarkusは、ビルド時にRESTメソッドを分析することで、自動的にそのような処理を行ってくれます。</p>
+</div>
+<div class="paragraph">
+<p>Jakarta RESTの世界でよく見られるもう一つのパターンは、 <code>Response</code> オブジェクトを使うことです。 <code>Response</code> には、いくつかの良い特典があります:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>メソッドで何が起こるかによって異なるエンティティータイプを返すことができます (例えば <code>Legume</code> や <code>Error</code> )。</p>
+</li>
+<li>
+<p> <code>Response</code> の属性を設定することができます (エラーが発生した時にステータスを知ることができます)。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>RESTメソッドは次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-JAVA hljs" data-lang="JAVA">@GET
+public Response list() {
+    // ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Response</code> に含まれるタイプは情報がないため、Quarkusがビルド時に判断することはできません。この場合、Quarkusは必要なクラスを自動的に反映登録することができません。</p>
+</div>
+<div class="paragraph">
+<p>これが次のセクションにつながります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-response"><a class="anchor" href="#using-response"></a>レスポンスの利用</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>Fruit</code> クラスと同じモデルに従って、JSON としてシリアライズされる <code>Legume</code> クラスを作成してみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-JAVA hljs" data-lang="JAVA">package org.acme.rest.json;
+
+public class Legume {
+
+    public String name;
+    public String description;
+
+    public Legume() {
+    }
+
+    public Legume(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>それでは、マメ科植物のリストを返すメソッドを一つだけ持つ <code>LegumeResource</code> REST サービスを作成してみましょう。</p>
+</div>
+<div class="paragraph">
+<p>このメソッドは <code>Response</code> を返し、 <code>Legume</code> のリストではありません。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-JAVA hljs" data-lang="JAVA">package org.acme.rest.json;
+
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+@Path("/legumes")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public class LegumeResource {
+
+    private Set&lt;Legume&gt; legumes = Collections.synchronizedSet(new LinkedHashSet&lt;&gt;());
+
+    public LegumeResource() {
+        legumes.add(new Legume("Carrot", "Root vegetable, usually orange"));
+        legumes.add(new Legume("Zucchini", "Summer squash"));
+    }
+
+    @GET
+    public Response list() {
+        return Response.ok(legumes).build();
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>ここで、マメ科植物のリストを表示するための簡単なウェブページを追加してみましょう。 <code>src/main/resources/META-INF/resources</code> ディレクトリーに、この <a href="https://github.com/quarkusio/quarkus-quickstarts/blob/3.2/rest-json-quickstart/src/main/resources/META-INF/resources/legumes.html">legumes.html</a> ファイルの内容を含む <code>legumes.html</code> ファイルを追加します。</p>
+</div>
+<div class="paragraph">
+<p>ブラウザーを開いて <a href="http://localhost:8080/legumes.html" class="bare">http://localhost:8080/legumes.html</a> にアクセスすると、マメ科植物のリストが表示されます。</p>
+</div>
+<div class="paragraph">
+<p>興味深い部分は、アプリケーションをネイティブ実行可能ファイルとして実行するときに始まります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>以下でネイティブの実行ファイルを作成します。</p>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build --native</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install -Dnative</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build -Dquarkus.package.type=native</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p><code>./target/rest-json-quickstart-1.0-SNAPSHOT-runner</code> で実行します。</p>
+</li>
+<li>
+<p>ブラウザーを起動し、 <a href="http://localhost:8080/legumes.html" class="bare">http://localhost:8080/legumes.html</a> にアクセスします。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>そこには豆類はありません。</p>
+</div>
+<div class="paragraph">
+<p>上記のように、問題は Quarkus が、 REST エンドポイントを分析することで <code>Legume</code> クラスが何らかのリフレクションを必要とすることを判断できなかったことです。 JSON シリアライズライブラリーは、 <code>Legume</code> のフィールドのリストを取得しようとすると空のリストを取得するため、フィールドのデータをシリアライズしません。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>現時点では、JSON-BやJacksonがクラスのフィールドのリストを取得しようとしたときに、そのクラスがリフレクションに登録されていない場合、例外はスローされません。GraalVMは単に空のフィールドのリストを返します。</p>
+</div>
+<div class="paragraph">
+<p>うまくいけば、将来的にはこれが変化して、エラーがより明白になるでしょう。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>Legume</code> クラスに <code>@RegisterForReflection</code> アノテーションを追加することで、手動で <code>Legume</code> を リフレクション用に登録することができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-JAVA hljs" data-lang="JAVA">import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
+public class Legume {
+    // ...
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<code>@RegisterForReflection</code> アノテーションは、ネイティブコンパイル時にクラスとそのメンバーを保持するよう Quarkus に指示します。 <code>@RegisterForReflection</code> アノテーションの詳細については、 <a href="writing-native-applications-tips#registerForReflection">ネイティブアプリケーションのヒント</a>のページを参照してください。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>それを実行して、今までと同じ手順を踏んでみましょう。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Ctrl+C</code> を叩いてアプリケーションを停止させる</p>
+</li>
+<li>
+<p>以下でネイティブの実行ファイルを作成します。</p>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build --native</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install -Dnative</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build -Dquarkus.package.type=native</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p><code>./target/rest-json-quickstart-1.0-SNAPSHOT-runner</code> で実行します。</p>
+</li>
+<li>
+<p>ブラウザーを起動し、 <a href="http://localhost:8080/legumes.html" class="bare">http://localhost:8080/legumes.html</a> にアクセスします。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>今回はマメ科の一覧が表示されました。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="reactive"><a class="anchor" href="#reactive"></a>リアクティブであること</h2>
+<div class="sectionbody">
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>リアクティブなワークロードには、常に <a href="resteasy-reactive">RESTEasy Reactive</a> を使用してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>非同期処理を処理するために <em>リアクティブ型</em> を返すことができます。Quarkusでは、リアクティブで非同期なコードを書くために <a href="https://smallrye.io/smallrye-mutiny">Mutiny</a> の使用を推奨しています。</p>
+</div>
+<div class="paragraph">
+<p>Mutiny と RESTEasy を統合するには、 <code>quarkus-resteasy-mutiny</code> 依存関係をプロジェクトに追加する必要があります。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-resteasy-mutiny&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-resteasy-mutiny")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>そして、エンドポイントは <code>Uni</code> や <code>Multi</code> のインスタンスを返すことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@GET
+@Path("/{name}")
+public Uni&lt;Fruit&gt; getOne(@PathParam String name) {
+    return findByName(name);
+}
+
+@GET
+public Multi&lt;Fruit&gt; getAll() {
+    return findAll();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>単一の結果がある場合は <code>Uni</code> を使用します。 <code>Multi</code> は、非同期的に放出される可能性のある複数の項目がある場合に使用します。</p>
+</div>
+<div class="paragraph">
+<p><code>Uni</code> と <code>Response</code> を使用して、非同期 HTTP レスポンスを返すことができます: <code>Uni&lt;Response&gt;</code> .</p>
+</div>
+<div class="paragraph">
+<p>Mutiny についての詳細は、 <a href="mutiny-primer">Mutiny - 直感的なリアクティブプログラミングライブラリー</a> に記載されています。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="http-filters-and-interceptors"><a class="anchor" href="#http-filters-and-interceptors"></a>HTTP フィルターとインターセプター</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>HTTP リクエストとレスポンスの両方とも、それぞれ <code>ContainerRequestFilter</code> または <code>ContainerResponseFilter</code> の実装を提供することで、 インターセプトすることができます。これらのフィルタは、メッセージに関連付けられたメタデータを処理するのに適しています。HTTP ヘッダ、クエリパラメーター、メディアタイプ、その他のメタデータです。また、ユーザーがエンドポイントにアクセスする権限を持っていない場合など、リクエスト処理を中止する機能も持っています。</p>
+</div>
+<div class="paragraph">
+<p><code>ContainerRequestFilter</code> を使用して、サービスにロギング機能を追加してみましょう。 <code>ContainerRequestFilter</code> を実装して、 <code>@Provider</code> アノテーションをつけることで実現できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.rest.json;
+
+import io.vertx.core.http.HttpServerRequest;
+import org.jboss.logging.Logger;
+
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.ext.Provider;
+
+@Provider
+public class LoggingFilter implements ContainerRequestFilter {
+
+    private static final Logger LOG = Logger.getLogger(LoggingFilter.class);
+
+    @Context
+    UriInfo info;
+
+    @Context
+    HttpServerRequest request;
+
+    @Override
+    public void filter(ContainerRequestContext context) {
+
+        final String method = context.getMethod();
+        final String path = info.getPath();
+        final String address = request.remoteAddress().toString();
+
+        LOG.infof("Request %s %s from IP %s", method, path, address);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これで、RESTメソッドが呼び出されるたびに、リクエストがコンソールにログとして記録されるようになりました。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">2019-06-05 12:44:26,526 INFO  [org.acm.res.jso.LoggingFilter] (executor-thread-1) Request GET /legumes from IP 127.0.0.1
+2019-06-05 12:49:19,623 INFO  [org.acm.res.jso.LoggingFilter] (executor-thread-1) Request GET /fruits from IP 0:0:0:0:0:0:0:1
+2019-06-05 12:50:44,019 INFO  [org.acm.res.jso.LoggingFilter] (executor-thread-1) Request POST /fruits from IP 0:0:0:0:0:0:0:1
+2019-06-05 12:51:04,485 INFO  [org.acm.res.jso.LoggingFilter] (executor-thread-1) Request GET /fruits from IP 127.0.0.1</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cors-filter"><a class="anchor" href="#cors-filter"></a>CORS フィルター</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">クロスオリジンリソース共有</a> (CORS)は、ウェブページ上の制限されたリソースを、最初のリソースが提供されたドメイン以外の別のドメインから要求できるようにするメカニズムです。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus には、 CORS フィルターが付属しています。使用方法については、 <a href="http-reference#cors-filter">HTTP リファレンスドキュメント</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="gzip-support"><a class="anchor" href="#gzip-support"></a>GZipのサポート</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>QuarkusにはGZipサポートが搭載されています(デフォルトでは有効になっていませんが)。以下の設定ノブを使用して、GZipサポートを設定できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.resteasy.gzip.enabled=true <i class="conum" data-value="1"></i><b>(1)</b>
+quarkus.resteasy.gzip.max-input=10M <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Gzipサポートを有効にします。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>デフレーションされたリクエストボディの上限を設定します。これは、リーチを制限することで潜在的な攻撃を緩和するのに便利です。既定値は <code>10M</code> です。この設定オプションは、以下の形式の文字列を認識します(正規表現で表示されます): <code>[0-9]+[KkMmGgTtPpEeZzYy]?</code> .サフィックスが指定されていない場合は、バイトとみなします。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>GZip サポートが有効になったら、エンドポイントメソッドに <code>@org.jboss.resteasy.annotations.GZIP</code> アノテーションを追加することで、エンドポイントで使用することができます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+また、HTTPレスポンスの圧縮をグローバルに有効にする設定プロパティ（ <code>quarkus.http.enable-compression</code> ）もあります。有効な場合、 <code>Content-Type</code> HTTPヘッダが設定され、その値が <code>quarkus.http.compress-media-types</code> 設定プロパティで設定された圧縮メディアタイプである場合、レスポンスボディが圧縮されます。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="multipart-support"><a class="anchor" href="#multipart-support"></a>マルチパートのサポート</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>RESTEasy は <a href="https://docs.jboss.org/resteasy/docs/4.5.6.Final/userguide/html/Multipart.html">RESTEasy Multipart Provider</a> を介してマルチパートをサポートしています。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusは 、 <code>quarkus-resteasy-multipart</code> というエクステンションを提供しています。</p>
+</div>
+<div class="paragraph">
+<p>このエクステンションは RESTEasy のデフォルトの動作とは若干異なり、リクエストで何も指定されていない場合のデフォルトの文字セットは US-ASCII ではなく UTF-8 となります。</p>
+</div>
+<div class="paragraph">
+<p>この動作は、以下のプロパティーで設定できます。</p>
+</div>
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="ビルド時に固定"></i></span>ビルド時に固定される構成プロパティ - 他のすべての構成プロパティは実行時にオーバーライド可能 <input type="search" id="config-search-0" placeholder="FILTER CONFIGURATION" disabled></p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference searchable configuration-reference-all-rows">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-resteasy-multipart_configuration"></a><a href="#quarkus-resteasy-multipart_configuration">Configuration property</a></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">型</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-resteasy-multipart_quarkus-resteasy-multipart-input-part-default-charset"></a><code><a href="#quarkus-resteasy-multipart_quarkus-resteasy-multipart-input-part-default-charset">quarkus.resteasy.multipart.input-part.default-charset</a></code></p>
+</div>
+<div id="conf-collapsible-desc-1" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Default charset.</p>
+</div>
+<div class="paragraph">
+<p>Note that the default value is UTF-8 which is different from RESTEasy&#8217;s default value US-ASCII.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38714">QUARKUS_RESTEASY_MULTIPART_INPUT_PART_DEFAULT_CHARSET</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38714" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/javase/8/docs/api/java/nio/charset/Charset.html">Charset</a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>UTF-8</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-resteasy-multipart_quarkus-resteasy-multipart-input-part-default-content-type"></a><code><a href="#quarkus-resteasy-multipart_quarkus-resteasy-multipart-input-part-default-content-type">quarkus.resteasy.multipart.input-part.default-content-type</a></code></p>
+</div>
+<div id="conf-collapsible-desc-2" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The default content-type.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-38715">QUARKUS_RESTEASY_MULTIPART_INPUT_PART_DEFAULT_CONTENT_TYPE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-38715" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>text/plain</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="servlet-compatibility"><a class="anchor" href="#servlet-compatibility"></a>サーブレットとの互換性</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusでは、RESTEasyはVert.x HTTPサーバーの上で直接実行するか、サーブレットに依存している場合はUndertowの上で実行することができます。</p>
+</div>
+<div class="paragraph">
+<p>その結果、 <code>HttpServletRequest</code> のような特定のクラスは、常に注入可能ではありません。この特定のクラスのほとんどのユースケースは、リモートクライアントのIPを取得することを除いて、Jakarta RESTの同等のものでカバーされています。RESTEasyには、注入可能な代替APIが付属しています： <a href="https://docs.jboss.org/resteasy/docs/4.5.6.Final/javadocs/org/jboss/resteasy/spi/HttpRequest.html">HttpRequest</a> これは、<a href="https://docs.jboss.org/resteasy/docs/4.5.6.Final/javadocs/org/jboss/resteasy/spi/HttpRequest.html#getRemoteAddress--">getRemoteAddress()</a> メソッドと <a href="https://docs.jboss.org/resteasy/docs/4.5.6.Final/javadocs/org/jboss/resteasy/spi/HttpRequest.html#getRemoteHost--">getRemoteHost()</a> メソッドを持っており、この問題を解決することができます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="resteasy-and-rest-client-interactions"><a class="anchor" href="#resteasy-and-rest-client-interactions"></a>RESTEasy と RESTクライアントのやりとり</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusでは、RESTEasyエクステンションと <a href="rest-client">REST Clientエクステンション</a> は、同じインフラストラクチャを共有しています。この考慮の重要な結果の1つは、（Jakarta RESTの意味での）プロバイダーのリストを共有することです。</p>
+</div>
+<div class="paragraph">
+<p>例えば、 <code>WriterInterceptor</code> を宣言した場合、デフォルトではサーバーの呼び出しとクライアントの呼び出しの両方をインターセプトしますが、これは望ましい動作ではないかもしれません。</p>
+</div>
+<div class="paragraph">
+<p>しかし、このデフォルトの動作を変更してプロバイダーに制約を設けることができます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>プロバイダーに <code>@ConstrainedTo(RuntimeType.SERVER)</code> アノテーションを追加することで、 <strong>サーバー</strong> の呼び出しのみを考慮します。</p>
+</li>
+<li>
+<p>プロバイダーに <code>@ConstrainedTo(RuntimeType.CLIENT)</code> アノテーションを追加することで、 <strong>クライアント</strong> の呼び出しのみを考慮します。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="whats-different-from-jakarta-ee-development"><a class="anchor" href="#whats-different-from-jakarta-ee-development"></a>Jakarta EE 開発との違い</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="no-need-for-application-class"><a class="anchor" href="#no-need-for-application-class"></a><code>Application</code> クラスは不要</h3>
+<div class="paragraph">
+<p><code>Application</code> のアプリケーションが提供するサブクラスによる設定もサポートされていますが、必須ではありません。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="only-a-single-jakarta-rest-application"><a class="anchor" href="#only-a-single-jakarta-rest-application"></a>単一のJakarta RESTアプリケーション限定</h3>
+<div class="paragraph">
+<p>標準的なサーブレットコンテナで動作するJakarta REST（およびRESTeasy）とは対照的に、Quarkusは単一のJakarta RESTアプリケーションのデプロイメントのみをサポートしています。複数のJakarta REST <code>Application</code> クラスが定義されている場合、ビルドは <code>Multiple classes have been annotated with @ApplicationPath which is currently not supported</code> というメッセージで失敗します。</p>
+</div>
+<div class="paragraph">
+<p>複数の Jakarta REST アプリケーションが定義されている場合、プロパティ <code>quarkus.resteasy.ignore-application-classes=true</code> を使用すると、すべての明示的な <code>Application</code> クラスを無視することができます。これにより、すべてのリソース・クラスは、 <code>quarkus.resteasy.path</code> （デフォルト： <code>/</code> ）で定義されるapplication-pathを介して利用可能になります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="support-limitations-of-jakarta-rest-application"><a class="anchor" href="#support-limitations-of-jakarta-rest-application"></a>Jakarta RESTアプリケーションのサポートの制限</h3>
+<div class="paragraph">
+<p>RESTEasyエクステンションは、クラス <code>jakarta.ws.rs.core.Application</code> のメソッド <code>getProperties()</code> をサポートしていません。さらに、アノテーションされたリソース、プロバイダ、フィーチャークラスをフィルタリングするために、 <code>getClasses()</code> と <code>getSingletons()</code> のメソッドにのみ依存しています。組み込みのリソース、プロバイダ、機能クラスや、他のエクステンションで登録されたリソース、プロバイダ、機能クラスは除外されません。最後に、メソッド <code>getSingletons()</code> が返すオブジェクトは無視され、リソース、プロバイダ、機能クラスをフィルタリングするためにクラスのみが考慮されます。言い換えれば、メソッド <code>getSingletons()</code> は実際には <code>getClasses()</code> と同じように管理されます。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="lifecycle-of-resources"><a class="anchor" href="#lifecycle-of-resources"></a>リソースのライフサイクル</h3>
+<div class="paragraph">
+<p>Quarkusでは、すべてのJakarta RESTリソースはCDI Beanとして扱われます。 <code>@Inject</code> を使って他の Bean を注入したり、 <code>@Transactional</code> などのバインディングを使ってインターセプターをバインドしたり、 <code>@PostConstruct</code> コールバックを定義したりすることが可能です。</p>
+</div>
+<div class="paragraph">
+<p>リソースクラスでスコープアノテーションが宣言されていない場合、スコープはデフォルトとなります。デフォルトのスコープは、 <code>quarkus.resteasy.singleton-resources</code> プロパティで制御することができます。 <code>true</code> （デフォルト）に設定すると、すべてのリクエストに対応するために、リソースクラスの <strong>単一のインスタンス</strong> が作成されます（ <code>@jakarta.inject.Singleton</code> で定義されています）。 <code>false</code> に設定された場合、各リクエストごとにリソースクラスの <strong>新しいインスタンス</strong> が作成されます。明示的なCDIスコープアノテーション（ <code>@RequestScoped</code> , <code>@ApplicationScoped</code> など）は、常にデフォルトの動作を上書きし、リソースインスタンスのライフサイクルを指定します。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="includeexclude-jakarta-rest-classes-with-build-time-conditions"><a class="anchor" href="#includeexclude-jakarta-rest-classes-with-build-time-conditions"></a>ビルド時条件でのJakarta RESTのクラスのインクルード/エクスクルード</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusでは、CDI Beanと同様に、ビルド時の条件によって、Jakarta RESTリソース、プロバイダ、フィーチャーを直接取り込んだり除外したりすることができます。したがって、さまざまなJakarta RESTクラスにプロファイル条件（ <code>@io.quarkus.arc.profile.IfBuildProfile</code> または <code>@io.quarkus.arc.profile.UnlessBuildProfile</code> ）やプロパティ条件（ <code>io.quarkus.arc.properties.IfBuildProperty</code> または <code>io.quarkus.arc.properties.UnlessBuildProperty</code> ）をアノテーションして、ビルド時にQuarkusに対して、どのような条件の下でJakarta RESTクラスを含めるべきかを示すことができます。</p>
+</div>
+<div class="paragraph">
+<p>次の例では、 Quarkus は、ビルドプロファイル <code>app1</code> が有効になっている場合に限り、エンドポイント <code>sayHello</code> を含めます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@IfBuildProfile("app1")
+public class ResourceForApp1Only {
+
+    @GET
+    @Path("sayHello")
+    public String sayHello() {
+        return "hello";
+     }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Jakarta REST Applicationが検出され、メソッド <code>getClasses()</code> 、 <code>getSingletons()</code> がオーバーライドされている場合、Quarkusはビルド時の条件を無視し、Jakarta REST Applicationで定義されているもののみを考慮することに注意してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="conclusion"><a class="anchor" href="#conclusion"></a>まとめ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusを使用したJSON RESTサービスの作成は、実績のあるよく知られたテクノロジーに依存しているため、簡単に行えます。</p>
+</div>
+<div class="paragraph">
+<p>いつものように、Quarkusは、アプリケーションをネイティブ実行可能ファイルとして実行する際に、水面下の作業をさらに簡略化しています。</p>
+</div>
+<div class="paragraph">
+<p>覚えておくべきことは一つだけあります。 <code>Response</code> を使用していて、Quarkus がシリアライズされているBeanを特定できない場合は、 <code>@RegisterForReflection</code> を使ってアノテーションを付ける必要があります。</p>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#architecture">アーキテクチャ</a></li>
+<li><a href="#creating-the-maven-project">Mavenプロジェクトの作成</a></li>
+<li><a href="#creating-your-first-json-rest-service">初めてのJSON RESTサービスの作成</a>
+<ul class="sectlevel2">
+<li><a href="#json">JSON サポートの設定</a></li>
+<li><a href="#links">JSON Hypertext Application Language ( HAL ) のサポート</a></li>
+</ul>
+</li>
+<li><a href="#creating-a-frontend">フロントエンドの作成</a></li>
+<li><a href="#building-a-native-executable">ネイティブ実行可能ファイルの構築</a></li>
+<li><a href="#about-serialization">シリアライゼーションについて</a></li>
+<li><a href="#using-response">レスポンスの利用</a></li>
+<li><a href="#reactive">リアクティブであること</a></li>
+<li><a href="#http-filters-and-interceptors">HTTP フィルターとインターセプター</a></li>
+<li><a href="#cors-filter">CORS フィルター</a></li>
+<li><a href="#gzip-support">GZipのサポート</a></li>
+<li><a href="#multipart-support">マルチパートのサポート</a></li>
+<li><a href="#servlet-compatibility">サーブレットとの互換性</a></li>
+<li><a href="#resteasy-and-rest-client-interactions">RESTEasy と RESTクライアントのやりとり</a></li>
+<li><a href="#whats-different-from-jakarta-ee-development">Jakarta EE 開発との違い</a>
+<ul class="sectlevel2">
+<li><a href="#no-need-for-application-class"><code>Application</code> クラスは不要</a></li>
+<li><a href="#only-a-single-jakarta-rest-application">単一のJakarta RESTアプリケーション限定</a></li>
+<li><a href="#support-limitations-of-jakarta-rest-application">Jakarta RESTアプリケーションのサポートの制限</a></li>
+<li><a href="#lifecycle-of-resources">リソースのライフサイクル</a></li>
+</ul>
+</li>
+<li><a href="#includeexclude-jakarta-rest-classes-with-build-time-conditions">ビルド時条件でのJakarta RESTのクラスのインクルード/エクスクルード</a></li>
+<li><a href="#conclusion">まとめ</a></li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

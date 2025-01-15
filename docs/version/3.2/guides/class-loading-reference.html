@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>クラスローディングリファレンス - 3.2 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.2/guides/class-loading-reference" />
+  <meta property="og:title" content="クラスローディングリファレンス - 3.2" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/class-loading-reference">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.2/guides/class-loading-reference">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.2/guides/class-loading-reference" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.2/guides/class-loading-reference">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.2/guides/class-loading-reference">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.2/guides/class-loading-reference">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.2/guides/class-loading-reference">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.2/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" selected>3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">クラスローディングリファレンス </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このドキュメントでは、Quarkus のクラスロードアーキテクチャについて説明します。このドキュメントは、Quarkus がどのように動作するかを正確に理解したいエクステンションの作者や上級ユーザーを対象としています。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusのクラスローディングアーキテクチャは、アプリケーションを実行するモードによって若干異なります。</p>
+</div>
+<div class="paragraph">
+<p><code>fast-jar</code> パッケージタイプ (デフォルト) を使って本番アプリケーションを実行する場合、ほとんどすべての依存関係は、ビルド時にクラスをインデックスする <code>io.quarkus.bootstrap.runner.RunnerClassLoader</code> を介してロードされ、依存関係の小さなセットは、システムの ClassLoader からロードされます。</p>
+</div>
+<div class="paragraph">
+<p><code>legacy-jar</code> パッケージタイプを使用して本番アプリケーションを実行すると、すべてがシステム ClassLoader で読み込まれるため、完全にフラットなクラスパスとなります。</p>
+</div>
+<div class="paragraph">
+<p>GraalVMは複数のClassLoaderを実際にサポートしていないため、フラットクラスパス戦略はGraalVMネイティブイメージにも使用されます。</p>
+</div>
+<div class="paragraph">
+<p>その他のすべてのユースケース(テスト、開発モード、アプリケーションのビルドなど)では、Quarkus はここで説明したクラスロードアーキテクチャを使用します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="bootstrapping-quarkus"><a class="anchor" href="#bootstrapping-quarkus"></a>Quarkus のブートストラップ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>すべての Quarkus アプリケーションは、 <code>independent-projects/bootstrap</code> モジュールの QuarkusBootstrap クラスによって作成されます。このクラスは、Quarkus アプリケーションに必要なすべての関連する依存関係(デプロイメントとランタイムの両方)を解決するために使用されます。このプロセスの最終結果は、 <code>CuratedApplication</code> であり、これにはアプリケーションのすべてのクラスロード情報が含まれています。</p>
+</div>
+<div class="paragraph">
+<p>次に、 <code>CuratedApplication</code> を使用して <code>AugmentAction</code> インスタンスを作成し、本番アプリケーションを作成したり、ランタイムのものを起動/再起動したりすることができます。このアプリケーションインスタンスは、分離された ClassLoader 内に存在しています。収集処理によって解決されるため、クラスパスに Quarkus デプロイメントクラスを配置する必要はありません。</p>
+</div>
+<div class="paragraph">
+<p>このブートストラッププロセスは、Quarkus がどのように起動されても、異なるパラメーターが渡されているだけで、同じであるべきです。</p>
+</div>
+<div class="sect2">
+<h3 id="current-run-modes"><a class="anchor" href="#current-run-modes"></a>現在の実行モード</h3>
+<div class="paragraph">
+<p>現在のところ、Quarkus のブートストラップには以下のようなユースケースがあります。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Maven による本番アプリケーションの作成</p>
+</li>
+<li>
+<p>Maven の開発モード</p>
+</li>
+<li>
+<p>Gradle による本番アプリケーションの作成</p>
+</li>
+<li>
+<p>Gradle の開発モード</p>
+</li>
+<li>
+<p>QuarkusTest (Maven、Gradle、IDE)</p>
+</li>
+<li>
+<p>QuarkusUnitTest (Maven、Gradle、IDE)</p>
+</li>
+<li>
+<p>QuarkusDevModeTest(Maven、Gradle、IDE)</p>
+</li>
+<li>
+<p>Arquillian アダプター</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>このリファクタの目的の一つは、これらの異なる実行モードのすべてが基本的に同じ方法で Quarkus を起動できるようにすることです。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="notes-on-transformer-safety"><a class="anchor" href="#notes-on-transformer-safety"></a>Transformer の安全性に関する注意事項</h3>
+<div class="paragraph">
+<p>ClassLoader は、Transformer が準備される前にクラスをロードしても安全であれば、「Transformerセーフ」と言われます。一度ロードされたクラスは変更することができないので、もし Transformer の準備が整う前にロードされた場合、変換が機能しなくなります。Transformer セーフな ClassLoader でクラスをロードした場合は、ロードされたクラスは実行時には使用されないので、変換を妨げることはありません。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="classloader-implementations"><a class="anchor" href="#classloader-implementations"></a>クラスローダーの実装</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus には以下のClassLoadersがあります:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">ベース ClassLoader</dt>
+<dd>
+<p>これは通常、通常の JVM System ClassLoader です。Maven のような環境では異なる場合があります。この ClassLoader はブートストラップクラスをロードするために使用され、他の ClassLoader インスタンスは JDK クラスのロードをこれに委譲します。</p>
+</dd>
+<dt class="hdlist1">拡張 ClassLoader</dt>
+<dd>
+<p>これは、すべての <code>-deployment</code> アーティファクトとその依存関係、および他のユーザー依存関係をロードします。アプリケーションのルートやホットデプロイされたコードはロードしません。この ClassLoader は永続的に動作し、アプリケーションが再起動してもそれは残ります (ホットデプロイされている可能性のあるアプリケーションクラスをロードできないのはそのためです)。親はベースの ClassLoader であり、Transformerセーフです。</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>現在のところ、これはベース ClassLoader に委譲するように設定することができますが、計画ではこのオプションは廃止され、常に分離された ClassLoader として使用することになっています。これを分離型 ClassLoader にすることは、すべてのビルダクラスが分離されていることを意味するので複雑です。</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">デプロイメント ClassLoader</dt>
+<dd>
+<p>これはすべてのアプリケーションクラスをロードすることができます。その親は 拡張 ClassLoader なので、すべてのデプロイメントクラスをロードすることもできます。</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>この ClassLoader は永続的ではなく、アプリケーションの起動時に再作成され、分離されています。この ClassLoader は、ビルドステップを実行する際に使用されるコンテキスト ClassLoader です。また、Transformerセーフでもあります。</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">ベースランタイム ClassLoader</dt>
+<dd>
+<p>これは、他のユーザー依存関係と同様に、すべてのランタイムエクステンション依存関係をロードします(これには 拡張 ClassLoader によってロードされたクラスの重複コピーも含まれる可能性があることに注意してください)。アプリケーションのルートやホットデプロイされたコードはロードされません。この ClassLoader は永続的なもので、アプリケーションが再起動しても残ります (ホットデプロイされている可能性のあるアプリケーションクラスをロードできないのはそのためです)。親はベース ClassLoader です。</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>これはホットリロードできないコードをロードしますが、変換をサポートしています (ただし、クラスがロードされるとこの変換はできなくなります)。これは、最初のアプリケーション起動時に登録された Transformer のみが有効になることを意味しますが、これらの Transformer は冪等であることが期待されているため、これは問題を引き起こすことはないはずです。ここで必要となる可能性のある変換の例として、外部 jar にパッケージ化された Panache エンティティーがあります。このクラスは静的メソッドを実装するために変換する必要がありますが、この変換は一度しか行われないため、再起動時には最初の起動時に作成されたクラスのコピーを使用します。</p>
+</div>
+<div class="paragraph">
+<p>この ClassLoader は、拡張 ClassLoader とデプロイメント ClassLoader から分離されています。つまり、デプロイメント側の静的フィールドに値を設定して、実行時に読み込まれることを期待することはできません。これにより、開発アプリケーションやテストアプリケーションが本番アプリケーションのように振る舞うことができます(本番アプリケーションは全く新しい JVM で実行されるという点で分離されています)。</p>
+</div>
+<div class="paragraph">
+<p>これは、実行時のバージョンは別の依存関係のセットに対してリンクされる可能性があることを意味します。例えば、デプロイ時に使用する Hibernate バージョンには ByteBuddy が含まれていても、実行時に使用するバージョンには含まれていない場合があります。</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">ランタイムクラス ローダー</dt>
+<dd>
+<p>この ClassLoader は、アプリケーションクラスやその他のホットデプロイ可能なリソースをロードするために使用されます。親はベースランタイム ClassLoader で、アプリケーションの再起動時に再作成されます。</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="isolated-classloaders"><a class="anchor" href="#isolated-classloaders"></a>分離型クラスローダー</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ランタイムの ClassLoader は常に分離されています。これは、解決された依存関係リストのほとんどすべてのクラスの独自のコピーを持つことを意味します。これには例外があります:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>JDK クラス</p>
+</li>
+<li>
+<p>エクステンションが親優先とマークしたアーティファクトからのクラス (これについては後述します)。</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="parent-first-dependencies"><a class="anchor" href="#parent-first-dependencies"></a>親優先の依存関係</h3>
+<div class="paragraph">
+<p>分離された方法でロードされるべきではないクラスがいくつかありますが、それは常にシステムの ClassLoader(または Quarkus のブートストラップを担当している ClassLoader )によってロードされなければなりません。ほとんどのエクステンションはこのことを気にする必要はありませんが、必要な場合もあります:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ロギングはシステム ClassLoader によってロードされなければならないので、いくつかのロギング関連のクラス</p>
+</li>
+<li>
+<p>Quarkus のブートストラップ自体</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>必要であれば、<code>quarkus-extension-maven-plugin</code> で設定することができます。ある依存関係を親優先としてマークした場合、その依存関係もすべて親優先でなければならないことに注意してください。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;plugin&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-extension-maven-plugin&lt;/artifactId&gt;
+    &lt;configuration&gt;
+        &lt;parentFirstArtifacts&gt;
+            &lt;parentFirstArtifact&gt;io.quarkus:quarkus-bootstrap-core&lt;/parentFirstArtifact&gt;
+            &lt;parentFirstArtifact&gt;io.quarkus:quarkus-development-mode-spi&lt;/parentFirstArtifact&gt;
+            &lt;parentFirstArtifact&gt;org.jboss.logmanager:jboss-logmanager-embedded&lt;/parentFirstArtifact&gt;
+            &lt;parentFirstArtifact&gt;org.jboss.logging:jboss-logging&lt;/parentFirstArtifact&gt;
+            &lt;parentFirstArtifact&gt;org.ow2.asm:asm&lt;/parentFirstArtifact&gt;
+        &lt;/parentFirstArtifacts&gt;
+    &lt;/configuration&gt;
+&lt;/plugin&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="banned-dependencies"><a class="anchor" href="#banned-dependencies"></a>禁止された依存関係</h3>
+<div class="paragraph">
+<p>依存関係の中には、確実に不要なものがあります。これは通常、依存関係の名前が変更されたときに起こります（例えば、smallrye-config が <code>org.smallrye</code> から <code>org.smallrye.config</code> にグループを変更したとき、<code>javax</code> から <code>jakarta</code> に名前を変更したときなどです）。  このようなアーティファクトが依存関係ツリーに残ってしまうと、Quarkusと互換性のない古いクラスがロードされる可能性があり、問題を引き起こす可能性があります。この問題に対処するために、エクステンションでは、決してロードされないアーティファクトを指定することができます。これは、pomの`quarkus-extension-maven-plugin`を変更することで行います（これにより、`quarkus-extension.properties`ファイルが生成されます）。以下のように、`excludedArtifacts`セクションを追加するだけです:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;plugin&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-extension-maven-plugin&lt;/artifactId&gt;
+    &lt;configuration&gt;
+        &lt;excludedArtifacts&gt;
+            &lt;excludedArtifact&gt;io.smallrye:smallrye-config&lt;/excludedArtifact&gt;
+            &lt;excludedArtifact&gt;javax.enterprise:cdi-api&lt;/excludedArtifact&gt;
+        &lt;/excludedArtifacts&gt;
+    &lt;/configuration&gt;
+&lt;/plugin&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これは、エクステンションがこれらのアーティファクトの新しいバージョンに依存している場合にのみ行うべきです。もしエクステンションが代替アーティファクトを依存関係として持ち込まなかった場合、 アプリケーションが必要とするクラスが見つからなくなってしまうかもしれません。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-class-loading"><a class="anchor" href="#configuring-class-loading"></a>クラスローディングの設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>開発モードとテストモードでクラスローディングのいくつかの側面を設定することができます。これは、 <code>application.properties</code> を使用して行うことができます。クラスローディングの設定は通常の設定とは異なり、標準のQuarkusの設定メカニズムを使用していないため（必要な時期が早すぎるため）、 <code>application.properties</code> のみをサポートしていることに注意してください。以下のオプションがサポートされています。</p>
+</div>
+<div class="paragraph configuration-legend">
+<p><span class="icon"><i class="fa fa-lock" title="ビルド時に固定"></i></span> ビルド時に固定される設定プロパティ - その他の設定プロパティは実行時にオーバーライド可能です。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference configuration-reference-all-rows">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-class-loading-configuration-class-loading-config_configuration"></a><a href="#quarkus-class-loading-configuration-class-loading-config_configuration">Configuration property</a></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">型</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-class-loading-configuration-class-loading-config_quarkus-class-loading-parent-first-artifacts"></a><code><a href="#quarkus-class-loading-configuration-class-loading-config_quarkus-class-loading-parent-first-artifacts">quarkus.class-loading.parent-first-artifacts</a></code></p>
+</div>
+<div id="conf-collapsible-desc-1" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Artifacts that are loaded in a parent first manner. This can be used to work around issues where a given class needs to be loaded by the system ClassLoader. Note that if you make a library parent first all its dependencies should generally also be parent first.</p>
+</div>
+<div class="paragraph">
+<p>Artifacts should be configured as a comma separated list of artifact ids, with the group, artifact-id and optional classifier separated by a colon.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+This config property can only be set in application.properties
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-35346">QUARKUS_CLASS_LOADING_PARENT_FIRST_ARTIFACTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-35346" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-class-loading-configuration-class-loading-config_quarkus-class-loading-reloadable-artifacts"></a><code><a href="#quarkus-class-loading-configuration-class-loading-config_quarkus-class-loading-reloadable-artifacts">quarkus.class-loading.reloadable-artifacts</a></code></p>
+</div>
+<div id="conf-collapsible-desc-2" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Artifacts that are loaded in the runtime ClassLoader in dev mode, so they will be dropped and recreated on change.</p>
+</div>
+<div class="paragraph">
+<p>This is an advanced option, it should only be used if you have a problem with libraries holding stale state between reloads. Note that if you use this any library that depends on the listed libraries will also need to be reloadable.</p>
+</div>
+<div class="paragraph">
+<p>This setting has no impact on production builds.</p>
+</div>
+<div class="paragraph">
+<p>Artifacts should be configured as a comma separated list of artifact ids, with the group, artifact-id and optional classifier separated by a colon.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+This config property can only be set in application.properties
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-35347">QUARKUS_CLASS_LOADING_RELOADABLE_ARTIFACTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-35347" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-class-loading-configuration-class-loading-config_quarkus-class-loading-removed-artifacts"></a><code><a href="#quarkus-class-loading-configuration-class-loading-config_quarkus-class-loading-removed-artifacts">quarkus.class-loading.removed-artifacts</a></code></p>
+</div>
+<div id="conf-collapsible-desc-3" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Artifacts that will never be loaded by the class loader, and will not be packed into the final application. This allows you to explicitly remove artifacts from your application even though they may be present on the class path.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-35348">QUARKUS_CLASS_LOADING_REMOVED_ARTIFACTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-35348" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-class-loading-configuration-class-loading-config_quarkus-class-loading-removed-resources-removed-resources"></a><code><a href="#quarkus-class-loading-configuration-class-loading-config_quarkus-class-loading-removed-resources-removed-resources">quarkus.class-loading.removed-resources</a></code></p>
+</div>
+<div id="conf-collapsible-desc-4" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Resources that should be removed/hidden from dependencies.</p>
+</div>
+<div class="paragraph">
+<p>This allows for classes and other resources to be removed from dependencies, so they are not accessible to the application. This is a map of artifact id (in the form group:artifact) to a list of resources to be removed.</p>
+</div>
+<div class="paragraph">
+<p>When running in dev and test mode these resources are hidden from the ClassLoader, when running in production mode these files are removed from the jars that contain them.</p>
+</div>
+<div class="paragraph">
+<p>Note that if you want to remove a class you need to specify the class file name. e.g. to remove <code>com.acme.Foo</code> you would specify <code>com/acme/Foo.class</code>.</p>
+</div>
+<div class="paragraph">
+<p>Note that for technical reasons this is not supported when running with JBang.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-35349">QUARKUS_CLASS_LOADING_REMOVED_RESOURCES</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-35349" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>Map&lt;String,Set&lt;String&gt;&gt;</code></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="hidingremoving-classes-and-resources-from-dependencies"><a class="anchor" href="#hidingremoving-classes-and-resources-from-dependencies"></a>クラスやリソースを依存関係から隠す/取り除く</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>クラスやリソースを依存関係から隠したり、削除したりすることができます。これは上級者向けのオプションですが、ときには便利なこともあります。これは、 <code>quarkus.class-loading.removed-resources</code> 設定キーで行うことが可能です。例:</p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.class-loading.removed-resources."io.quarkus\:quarkus-integration-test-shared-library"=io/quarkus/it/shared/RemovedResource.class</code></p>
+</div>
+<div class="paragraph">
+<p>これにより、 <code>io.quarkus:quarkus-integration-test-shared-library</code> のアーティファクトから <code>RemovedResource.class</code> のファイルが削除されます。</p>
+</div>
+<div class="paragraph">
+<p>このオプションはクラスローディングオプションですが、生成されたアプリケーションにも影響するため、アプリケーションが作成されると、削除されたリソースにはアクセスできなくなります。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="reading-class-bytecode"><a class="anchor" href="#reading-class-bytecode"></a>クラスバイトコードの読み取り</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>正しい <code>ClassLoader</code> を使用することが重要です。推奨される方法は、 <code>Thread.currentThread().getContextClassLoader()</code> メソッドを呼び出して取得することです。</p>
+</div>
+<div class="paragraph">
+<p>例:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@BuildStep
+GeneratedClassBuildItem instrument(final CombinedIndexBuildItem index) {
+    final String classname = "com.example.SomeClass";
+    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    final byte[] originalBytecode = IoUtil.readClassAsBytes(cl, classname);
+    final byte[] enhancedBytecode = ... // class instrumentation from originalBytecode
+    return new GeneratedClassBuildItem(true, classname, enhancedBytecode));
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#bootstrapping-quarkus">Quarkus のブートストラップ</a>
+<ul class="sectlevel2">
+<li><a href="#current-run-modes">現在の実行モード</a></li>
+<li><a href="#notes-on-transformer-safety">Transformer の安全性に関する注意事項</a></li>
+</ul>
+</li>
+<li><a href="#classloader-implementations">クラスローダーの実装</a></li>
+<li><a href="#isolated-classloaders">分離型クラスローダー</a>
+<ul class="sectlevel2">
+<li><a href="#parent-first-dependencies">親優先の依存関係</a></li>
+<li><a href="#banned-dependencies">禁止された依存関係</a></li>
+</ul>
+</li>
+<li><a href="#configuring-class-loading">クラスローディングの設定</a></li>
+<li><a href="#hidingremoving-classes-and-resources-from-dependencies">クラスやリソースを依存関係から隠す/取り除く</a></li>
+<li><a href="#reading-class-bytecode">クラスバイトコードの読み取り</a></li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

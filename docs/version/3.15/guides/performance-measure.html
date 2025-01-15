@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>パフォーマンスの測定 - 3.15 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/3.15/guides/performance-measure" />
+  <meta property="og:title" content="パフォーマンスの測定 - 3.15" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/performance-measure">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/3.15/guides/performance-measure">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/3.15/guides/performance-measure" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/3.15/guides/performance-measure">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/3.15/guides/performance-measure">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/3.15/guides/performance-measure">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/3.15/guides/performance-measure">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/3.15/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" selected>3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" >2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">パフォーマンスの測定 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドでは以下をカバーしています:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>メモリ使用量の測定方法</p>
+</li>
+<li>
+<p>起動時間の測定方法</p>
+</li>
+<li>
+<p>Quarkusがデフォルトでネイティブイメージに適用する追加フラグ</p>
+</li>
+<li>
+<p>ツールにおける協調的省略（Coordinated omission）問題</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>すべてのテストは、バッチに対して同じハードウェアで実行しています。言うまでもないことですが、言うべきことです。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="how-do-we-measure-memory-usage"><a class="anchor" href="#how-do-we-measure-memory-usage"></a>メモリー使用量の測定方法</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusアプリケーションのフットプリントを測定する際には、 <a href="https://en.wikipedia.org/wiki/Resident_set_size">Resident Set Size(RSS)</a> を測定します。JVMのヒープサイズではありません。JVMヒープサイズは全体的な問題のほんの一部です。JVMは、ヒープ用のネイティブメモリー( <code>-Xms</code> , <code>-Xmx</code> )を割り当てるだけでなく、アプリケーションを実行するためにjvmが必要とする構造体も割り当てます。JVMの実装に応じて、アプリケーションに割り当てられる総メモリーは、以下のものを含みますが、これに限りません。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ヒープ空間</p>
+</li>
+<li>
+<p>クラスメタデータ</p>
+</li>
+<li>
+<p>スレッドスタック</p>
+</li>
+<li>
+<p>コンパイルされたコード</p>
+</li>
+<li>
+<p>ガベージコレクション</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="native-memory-tracking"><a class="anchor" href="#native-memory-tracking"></a>ネイティブメモリーのトラッキング</h3>
+<div class="paragraph">
+<p>JVMで使用されているネイティブメモリーを表示するには、hotspotでNMT( <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/vm/nmt-8.html">Native Memory Tracking</a> )機能を有効にします。</p>
+</div>
+<div class="paragraph">
+<p>コマンドラインでNMTを有効に設定;</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>-XX:NativeMemoryTracking=[off | summary | detail] <i class="conum" data-value="1"></i><b>(1)</b></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>注意: この機能は、約 5-10% のパフォーマンスオーバーヘッドを発生させます。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>そして、jcmdを使ってアプリケーションを実行しているHotspot JVMのネイティブメモリー使用量のレポートをダンプすることができます。</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>jcmd &lt;pid&gt; VM.native_memory [summary | detail | baseline | summary.diff | detail.diff | shutdown] [scale= KB | MB | GB]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cloud-native-memory-limits"><a class="anchor" href="#cloud-native-memory-limits"></a>クラウドネイティブのメモリー制限</h3>
+<div class="paragraph">
+<p>Cloud Nativeアプリケーションの影響を見るためには、メモリー全体を測定することが重要です。特にRSSメモリーの全使用量に基づいてプロセスを強制終了させてしまうことがあるコンテナー環境では特にそうです。</p>
+</div>
+<div class="paragraph">
+<p>同様に、プロセスが使用している、他のプロセスと共有されないプライベートメモリだけを測定するという罠には陥らないようにしましょう。プライベートメモリは、多くの異なるアプリケーションをデプロイする環境(メモリを多く共有する)では有用かもしれませんが、Kubernetes/OpenShiftのような環境では非常に誤解を招く可能性があります。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="measuring-memory-correctly-on-docker"><a class="anchor" href="#measuring-memory-correctly-on-docker"></a>Docker上でメモリを正しく測定する</h3>
+<div class="paragraph">
+<p>メモリを正しく測定するためには、 <strong>docker statやそれに由来するもの（ctopなど）を使用しないでください</strong> 。この方法では、使用中のレジデントページのサブセットしか測定できません。一方、Linuxカーネル、cgroups、およびクラウドオーケストレーションプロバイダは、アカウンティング（プロセスが制限を超えているかどうか、強制終了すべきかどうかの判断）に完全なレジデントセットを利用します。</p>
+</div>
+<div class="paragraph">
+<p>正確に測定するためには、Linux上でRSSを測定するのと同様の手順を実行する必要があります。docker <code>top</code> コマンドは、コンテナインスタンス内のプロセスに対して、コンテナホストマシン上で  <code>ps</code> コマンドを実行することができます。これを出力パラメータのフォーマットと組み合わせて利用することで、RSSの値を返すことができます:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>docker top &lt;CONTAINER ID&gt; -o pid,rss,args</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>例えば、以下のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell"> $ docker top $(docker ps -q --filter ancestor=quarkus/myapp) -o pid,rss,args
+
+PID                 RSS                 COMMAND
+2531                27m                 ./application -Dquarkus.http.host=0.0.0.0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>また、特権シェル（ホスト上のroot）に直接ジャンプして、 <code>ps</code> コマンドを直接実行することもできます:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell"> $ docker run -it --rm --privileged --pid=host justincormack/nsenter1 /bin/ps -e -o pid,rss,args | grep application
+ 2531  27m ./application -Dquarkus.http.host=0.0.0.0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Linuxを使用している場合は、シェルがコンテナホストと同じであるため、 <code>ps</code> コマンドを直接実行することができます:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>ps -e -o pid,rss,args | grep application</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="platform-specific-memory-reporting"><a class="anchor" href="#platform-specific-memory-reporting"></a>プラットフォーム固有のメモリーレポート</h3>
+<div class="paragraph">
+<p>NVMを有効にして実行することによるパフォーマンスオーバーヘッドを発生させないために、各プラットフォームに特化したツールを使用して、JVMアプリケーションの総RSSを測定します。</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Linux</dt>
+<dd>
+<p>Linux の <a href="https://linux.die.net/man/1/pmap">pmap</a> と <a href="https://linux.die.net/man/1/ps">ps</a> ツールはプロセスのネイティブメモリーマップのレポートを提供します。</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell"> $ ps -o pid,rss,command -p &lt;pid&gt;
+
+   PID   RSS COMMAND
+ 11229 12628 ./target/getting-started-1.0.0-SNAPSHOT-runner</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell"> $ pmap -x &lt;pid&gt;
+
+ 13150:   /data/quarkus-application -Xmx100m -Xmn70m
+ Address           Kbytes     RSS   Dirty Mode  Mapping
+ 0000000000400000   55652   30592       0 r-x-- quarkus-application
+ 0000000003c58000       4       4       4 r-x-- quarkus-application
+ 0000000003c59000    5192    4628     748 rwx-- quarkus-application
+ 00000000054c0000     912     156     156 rwx--   [ anon ]
+ ...
+ 00007fcd13400000    1024    1024    1024 rwx--   [ anon ]
+ ...
+ 00007fcd13952000       8       4       0 r-x-- libfreebl3.so
+ ...
+ ---------------- ------- ------- -------
+ total kB         9726508  256092  220900</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>プロセスに割り当てられた各メモリー領域が一覧表示されます。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Address: 仮想アドレス空間の開始アドレス</p>
+</li>
+<li>
+<p>Kbytes(キロバイト): リージョン用に予約された仮想アドレス空間のサイズ (キロバイト)</p>
+</li>
+<li>
+<p>RSS:     Resident set size (kilobytes).  This is the measure of how much memory space is actually being used</p>
+</li>
+<li>
+<p>Dirty:   dirty pages (both shared and private) in kilobytes</p>
+</li>
+<li>
+<p>Mode:    Access mode for memory region</p>
+</li>
+<li>
+<p>マッピング: プロセス用のアプリケーション領域と共有オブジェクト(.so)のマッピングを含む
+</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Total RSS (kB)行は、プロセスが使用しているネイティブメモリーの合計を報告します。</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">macOS</dt>
+<dd>
+<p>macOSでは、特定のプロセスのRSSをKB(1024バイト)単位で一覧表示する <code>ps x -o pid,rss,command -p &lt;PID&gt;</code> を使用することができます。</p>
+</dd>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ ps x -o pid,rss,command -p 57160
+
+  PID    RSS COMMAND
+57160 288548 /Applications/IntelliJ IDEA CE.app/Contents/jdk/Contents/Home/jre/bin/java</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>つまり、IntelliJ IDEAは281,8MBのRSSを消費していることになります。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="how-do-we-measure-startup-time"><a class="anchor" href="#how-do-we-measure-startup-time"></a>起動時間の測定方法</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>フレームワークの中には、アグレッシブな遅延初期化技術を使用しているものがあります。フレームワークを開始するために必要な時間を最も正確に反映させるために、最初のリクエストまでの起動時間を測定することが重要です。そうしないと、フレームワークが <em>実際に</em> 初期化にかかる時間を見逃してしまいます。</p>
+</div>
+<div class="paragraph">
+<p>ここでは、テストでの起動時間の測定方法を説明します。</p>
+</div>
+<div class="paragraph">
+<p>アプリケーションのライフサイクルの特定のポイントのタイムスタンプをログに記録するサンプルアプリケーションを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Path("/")
+public class GreetingEndpoint {
+
+    private static final String template = "Hello, %s!";
+
+    @GET
+    @Path("/greeting")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Greeting greeting(@QueryParam("name") String name) {
+        System.out.println(new SimpleDateFormat("HH:mm:ss.SSS").format(new java.util.Date(System.currentTimeMillis())));
+        String suffix = name != null ? name : "World";
+        return new Greeting(String.format(template, suffix));
+    }
+
+    void onStart(@Observes StartupEvent startup) {
+        System.out.println(new SimpleDateFormat("HH:mm:ss.SSS").format(new Date()));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>私たちはシェル内でループを開始し、テストしているサンプルアプリケーションのRESTエンドポイントにリクエストを送信します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/api/greeting)" != "200" ]]; do sleep .00001; done</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>別のターミナルで、テストしているタイミングアプリケーションを起動し、アプリケーションが起動した時刻を印刷します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">$ date +"%T.%3N" &amp;&amp;  ./target/quarkus-timing-runner
+
+10:57:32.508
+10:57:32.512
+2019-04-05 10:57:32,512 INFO  [io.quarkus] (main) Quarkus 0.11.0 started in 0.002s. Listening on: http://127.0.0.1:8080
+2019-04-05 10:57:32,512 INFO  [io.quarkus] (main) Installed features: [cdi, rest, rest-jackson]
+10:57:32.537</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>最終タイムスタンプと最初のタイムスタンプの差は、アプリケーションが最初のリクエストにサービスを提供するまでの総起動時間です。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="additional-flags-applied-by-quarkus"><a class="anchor" href="#additional-flags-applied-by-quarkus"></a>Quarkusで適用される追加フラグ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>QuarkusがGraalVM <code>native-image</code> を起動すると、 デフォルトでいくつかの追加フラグが適用されます。</p>
+</div>
+<div class="paragraph">
+<p>他のビルドと性能特性を比較する場合には、以下のようなものを知っておいた方が良いでしょう。</p>
+</div>
+<div class="sect2">
+<h3 id="disable-fallback-images"><a class="anchor" href="#disable-fallback-images"></a>フォールバックイメージの無効化</h3>
+<div class="paragraph">
+<p>フォールバックネイティブイメージは、何らかの理由でネイティブコードへのコンパイルに失敗した場合に、アプリケーションを通常のJVMで実行するために「フォールバック」するためのGraalVMの機能です。</p>
+</div>
+<div class="paragraph">
+<p>Quarkusは、 <code>-H:FallbackThreshold=0</code> を設定することでこの機能を無効にします。これにより、アプリケーションが本当にネイティブモードで実行できないことに気づかないリスクの代わりに、コンパイルに失敗するように出来ます。</p>
+</div>
+<div class="paragraph">
+<p>代わりに Java モードで実行したい場合は、ネイティブイメージのビルドをスキップして jar として実行することも可能です。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="disable-isolates"><a class="anchor" href="#disable-isolates"></a>分離の無効化</h3>
+<div class="paragraph">
+<p>分離はGraalVMの優れた機能ですが、Quarkusは現段階では使用していません。</p>
+</div>
+<div class="paragraph">
+<p><code>-H:-SpawnIsolates</code> で無効化する。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="disable-auto-registration-of-all-service-loader-implementations"><a class="anchor" href="#disable-auto-registration-of-all-service-loader-implementations"></a>すべてのサービスローダー実装の自動登録の無効化</h3>
+<div class="paragraph">
+<p>Quarkusのエクステンションでは、必要なサービスを自動的に選択することができますが、GraalVMのネイティブイメージのデフォルトでは、クラスパス上で見つけることができるすべてのサービスが含まれています。</p>
+</div>
+<div class="paragraph">
+<p>サービスを明示的にリストアップした方が最適化されたバイナリーが生成されるので好ましいです。 <code>-H:-UseServiceLoaderFeature</code> により、無効化することが可能です。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="others"><a class="anchor" href="#others"></a>その他&#8230;&#8203;</h3>
+<div class="paragraph">
+<p>このセクションは、高レベルのガイダンスとして提供されています。フラグの中には、エクステンションや構築しているプラットフォーム、設定の詳細、あなたのコード、そして場合によってはこれらの組み合わせによって動的に制御されものがあるため、このセクションは包括的なものではありません。</p>
+</div>
+<div class="paragraph">
+<p>一般的に言えば、ここに挙げたものはパフォーマンス・メトリクスに影響を与える可能性が高いものですが、適切な状況下では、他のフラグによる影響も無視できないものになるでしょう。</p>
+</div>
+<div class="paragraph">
+<p>いくつかの差異を詳細に調査する場合は、Quarkusが呼び出しているものを正確にチェックしてください。ビルドプラグインがネイティブイメージを生成しているときには、コマンドライン全体がログに記録されます。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="coordinated-omission-problem-in-tools"><a class="anchor" href="#coordinated-omission-problem-in-tools"></a>ツールにおける協調的省略（Coordinated omission）問題</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkusのようなフレームワークのパフォーマンスを測定する場合、ユーザーが経験するレイテンシーは特に注目の対象で、そのためにさまざまなツールがあります。残念なことに、多くのツールはレイテンシを正しく測定することができず、協調的省略問題を引き起こしています。つまり、ツールは、システムが負荷下にあるときに新しいリクエストを送信する遅延に適応することに失敗し、これらの数値を集計するため、待ち時間とスループットの数値が非常に誤解を招きやすくなります。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://www.youtube.com/watch?v=lJ8ydIuPFeU">このビデオ</a> で、wrk2 の作者である Gil Tene がこの問題について説明しています。 <a href="https://www.youtube.com/watch?v=xdG8b9iDYbE">Quarkus Insights #22</a> では、Quarkus パフォーマンス チームの John O&#8217;Hara が、それがどのように現れるか説明しています。</p>
+</div>
+<div class="paragraph">
+<p>そのビデオと関連する論文や記事の日付はすべて2015年にさかのぼりますが、現在でも、協調的省略の問題で不十分なツールを見つけることができます。</p>
+</div>
+<div class="paragraph">
+<p>現時点では、この問題を引き起こすことが知られているツールは、レイテンシ/スループットの測定には使用しないでください（他のことには使用できるかもしれません）：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>JMeter</p>
+</li>
+<li>
+<p>wrk</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>影響を受けないことが確認されているツールは以下の通りです：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/giltene/wrk2">wrk2</a></p>
+</li>
+<li>
+<p><a href="https://hyperfoil.io">HyperFoil</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>したがって、 <code>wrk2</code> や <code>hyperfoil</code> を使う場合でも、その数値が何を意味するのかを理解するようにしてください。</p>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#how-do-we-measure-memory-usage">メモリー使用量の測定方法</a>
+<ul class="sectlevel2">
+<li><a href="#native-memory-tracking">ネイティブメモリーのトラッキング</a></li>
+<li><a href="#cloud-native-memory-limits">クラウドネイティブのメモリー制限</a></li>
+<li><a href="#measuring-memory-correctly-on-docker">Docker上でメモリを正しく測定する</a></li>
+<li><a href="#platform-specific-memory-reporting">プラットフォーム固有のメモリーレポート</a></li>
+</ul>
+</li>
+<li><a href="#how-do-we-measure-startup-time">起動時間の測定方法</a></li>
+<li><a href="#additional-flags-applied-by-quarkus">Quarkusで適用される追加フラグ</a>
+<ul class="sectlevel2">
+<li><a href="#disable-fallback-images">フォールバックイメージの無効化</a></li>
+<li><a href="#disable-isolates">分離の無効化</a></li>
+<li><a href="#disable-auto-registration-of-all-service-loader-implementations">すべてのサービスローダー実装の自動登録の無効化</a></li>
+<li><a href="#others">その他&#8230;&#8203;</a></li>
+</ul>
+</li>
+<li><a href="#coordinated-omission-problem-in-tools">ツールにおける協調的省略（Coordinated omission）問題</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/class-loading-reference">クラスローディングリファレンス</a></li>
+      
+        
+        <li class="howto"><a href="/version/3.15/guides/doc-contribute-docs-howto">Quarkusドキュメントの寄稿方法</a></li>
+      
+        
+        <li class="tutorial"><a href="/version/3.15/guides/doc-create-tutorial">チュートリアルの作成</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.15/guides/duplicated-context">コンテキストの重複、コンテキストローカル、非同期処理と伝播</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/dev-mode-differences">開発モードと本番アプリケーションの差異</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/platform">Platform</a></li>
+      
+        
+        <li class="concepts"><a href="/version/3.15/guides/doc-concept">Quarkusドキュメントのコンテンツタイプ</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/extension-registry-user">Quarkus Extension Registry</a></li>
+      
+        
+        <li class="guide"><a href="/version/3.15/guides/quarkus-reactive-architecture">Quarkus リアクティブアーキテクチャ</a></li>
+      
+        
+        <li class="reference"><a href="/version/3.15/guides/doc-reference">Quarkusスタイル・コンテンツガイドライン</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

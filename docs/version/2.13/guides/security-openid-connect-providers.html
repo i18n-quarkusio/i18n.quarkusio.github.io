@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>よく知られたOpenID Connect プロバイダーの設定 - 2.13 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/version/2.13/guides/security-openid-connect-providers" />
+  <meta property="og:title" content="よく知られたOpenID Connect プロバイダーの設定 - 2.13" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/security-openid-connect-providers">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/version/2.13/guides/security-openid-connect-providers">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/version/2.13/guides/security-openid-connect-providers" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/version/2.13/guides/security-openid-connect-providers">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/version/2.13/guides/security-openid-connect-providers">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/version/2.13/guides/security-openid-connect-providers">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/version/2.13/guides/security-openid-connect-providers">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/version/2.13/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" >3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        <option value="3.8" >3.8</option>
+        
+        
+        
+        <option value="3.2" >3.2</option>
+        
+        
+        
+        <option value="2.16" >2.16</option>
+        
+        
+        
+        <option value="2.13" selected>2.13</option>
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <h1 class="text-caps">よく知られたOpenID Connect プロバイダーの設定 </h1>
+      <div class="sect1">
+<h2 id="introduction"><a class="anchor" href="#introduction"></a>はじめに</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="security-openid-connect-web-authentication">OpenID Connect Authorization Code Flow</a> を使用して Quarkus エンドポイントを保護する場合は、OpenID Connect プロバイダーへの接続方法、そのようなプロバイダーへの認証方法、使用するスコープなどを指示するように Quarkus を設定する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>一部のプロバイダーは OpenID Connect を完全に実装していなかったり、実際は <a href="security-openid-connect-web-authentication#oauth2">OAuth2 providers only</a> だったりするため、これらを回避するために設定を使用しなければならない場合があります。</p>
+</div>
+<div class="paragraph">
+<p>このようなプロバイダーの設定は、複雑で非常に技術的になり、理解が困難になる可能性があります。</p>
+</div>
+<div class="paragraph">
+<p>よく知られた OpenID Connect および OAuth2 プロバイダーを参照するために、<code>quarkus.oidc.provider</code> 設定プロパティーが導入されました。このプロパティーを使用して、最小限のカスタマイズのみが必要な <code>github</code> などのプロバイダーを参照することができます。通常、アカウント固有の <code>client id</code>、<code>client secret</code> およびいくつかのプロパティーを設定して設定を完了する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>このプロパティーは、<code>application.properties</code>、複数のプロバイダーを設定する必要がある場合は <a href="security-openid-connect-multitenancy">multi-tenant</a> セットアップ (たとえば、https://quarkiverse.github.io/quarkiverse-docs/quarkus-renarde/dev/security.html#_using_oidc_for_login[Quarkus Renarde security documentation]) を参照)、テナント設定が動的に作成される場合はカスタムの <a href="security-openid-connect-web-multitenancy#tenant-config-resolver">TenantConfigResolvers</a> で使用することができます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="well-known-providers"><a class="anchor" href="#well-known-providers"></a>よく知られたプロバイダー</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="github"><a class="anchor" href="#github"></a>GitHub</h3>
+<div class="paragraph">
+<p>GitHub の OIDC を設定するには、 <a href="https://github.com/settings/applications/new">GitHub developer settings</a> で新しい OAuth アプリケーションを作成する必要があります。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-github-1.png" alt="oidc github 1">
+</div>
+</div>
+<div class="paragraph">
+<p>詳細を適切に入力する必要がありますが、さらに重要なのは、Authorization Callback URL を <code><a href="http://localhost:8080/_renarde/security/github-success" class="bare">http://localhost:8080/_renarde/security/github-success</a></code> に設定することです (Quarkus DEV モードを使用してテストする場合)。</p>
+</div>
+<div class="paragraph">
+<p>次に、<code>Register application</code> をクリックすると、アプリケーションページが表示されます。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-github-2.png" alt="oidc github 2">
+</div>
+</div>
+<div class="paragraph">
+<p><code>Generate a new client secret</code> をクリックし、クレデンシャルを確認して、Client ID と Client Secret を書き留める必要があります (特に Client Secret は、後でこのページで再度見ることができないため、書き留めてください。ただし、いつでも再作成できますので、心配しすぎる必要はありません)。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-github-3.png" alt="oidc github 3">
+</div>
+</div>
+<div class="paragraph">
+<p>次に、以下の設定を <code>application.properties</code> に追加します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.provider=github
+quarkus.oidc.client-id=&lt;Client ID&gt;
+quarkus.oidc.credentials.secret=&lt;Secret&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="google"><a class="anchor" href="#google"></a>Google</h3>
+<div class="paragraph">
+<p>OIDC for Google を設定するには、 <a href="https://console.cloud.google.com/projectcreate">Google Cloud Platform console</a> で新しいプロジェクトを作成する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>プロジェクト名を選択し、<code>CREATE</code> をクリックします。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-google-1.png" alt="oidc google 1">
+</div>
+</div>
+<div class="paragraph">
+<p>次に、トップセレクターでプロジェクトを選択し、左側のメニューバーから <code>APIs and Services &gt; OAuth consent screen</code> をクリックします。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-google-2.png" alt="oidc google 2">
+</div>
+</div>
+<div class="paragraph">
+<p><code>External</code> を選択して、Google ユーザーがアプリケーションにログインすることを許可し、<code>CREATE</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-google-3.png" alt="oidc google 3">
+</div>
+</div>
+<div class="paragraph">
+<p>これで、アプリケーション名、サポートメール、開発者の連絡先情報を入力して、<code>SAVE AND CONTINUE</code> を押すことができます。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-google-4.png" alt="oidc google 4">
+</div>
+</div>
+<div class="paragraph">
+<p>次のページにスコープを追加せずに、<code>SAVE AND CONTINUE</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-google-5.png" alt="oidc google 5">
+</div>
+</div>
+<div class="paragraph">
+<p>次のページにテストユーザーを追加せずに、<code>SAVE AND CONTINUE</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-google-6.png" alt="oidc google 6">
+</div>
+</div>
+<div class="paragraph">
+<p>トップメニューの <code>CREATE CREDENTIALS</code> &gt; <code>OAuth client ID</code> をクリックします。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-google-7.png" alt="oidc google 7">
+</div>
+</div>
+<div class="paragraph">
+<p><code>Application type</code> として <code>Web application</code> を選択し、<code>Authorised redirect URIs</code> リストに <code><a href="http://localhost:8080/_renarde/security/oidc-success" class="bare">http://localhost:8080/_renarde/security/oidc-success</a></code> を追加して、<code>CREATE</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-google-8.png" alt="oidc google 8">
+</div>
+</div>
+<div class="paragraph">
+<p>Client ID と Client Secret をコピーします。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-google-9.png" alt="oidc google 9">
+</div>
+</div>
+<div class="paragraph">
+<p>これで、<code>application.properties</code> を設定できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.provider=google
+quarkus.oidc.client-id=&lt;Client ID&gt;
+quarkus.oidc.credentials.secret=&lt;Secret&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="microsoft"><a class="anchor" href="#microsoft"></a>Microsoft</h3>
+<div class="paragraph">
+<p>Microsoft 用の OIDC をセットアップするには、 <a href="https://portal.azure.com">Microsoft Azure Portal</a> にアクセスし、<code>Azure Active Directory</code> を検索してクリックする必要があります。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-microsoft-1.png" alt="oidc microsoft 1">
+</div>
+</div>
+<div class="paragraph">
+<p>そこで、左側の <code>Manage</code> の下にある <code>App registrations</code> をクリックしてから、<code>New registration</code> をクリックします。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-microsoft-2.png" alt="oidc microsoft 2">
+</div>
+</div>
+<div class="paragraph">
+<p>アプリケーション名を入力し、<code>Accounts in any organizational directory (Any Azure AD directory - Multitenant) and personal Microsoft accounts (e.g. Skype, Xbox)</code> を選択して誰でもログインできるようにし、 <code>Web</code> Redirect URI を <code><a href="http://localhost:8080/_renarde/security/oidc-success" class="bare">http://localhost:8080/_renarde/security/oidc-success</a></code> として追加してから `Register`をクリックします。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-microsoft-3.png" alt="oidc microsoft 3">
+</div>
+</div>
+<div class="paragraph">
+<p>その結果のページで、<code>Client Id</code> (<code>Application (client) ID</code> の下) をコピーしてから、<code>Add a certificate or secret</code> をクリックします。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-microsoft-4.png" alt="oidc microsoft 4">
+</div>
+</div>
+<div class="paragraph">
+<p>次に、<code>Client secrets (0)</code> の下にある <code>New client secret</code> をクリックします。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-microsoft-5.png" alt="oidc microsoft 5">
+</div>
+</div>
+<div class="paragraph">
+<p>何も変更せずに、そのダイアログで <code>Add</code> をクリックします。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-microsoft-6.png" alt="oidc microsoft 6">
+</div>
+</div>
+<div class="paragraph">
+<p>結果のページで、<code>Secret ID</code> をコピーします。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-microsoft-7.png" alt="oidc microsoft 7">
+</div>
+</div>
+<div class="paragraph">
+<p>これで、<code>application.properties</code> を設定できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.provider=microsoft
+quarkus.oidc.client-id=&lt;Client ID&gt;
+quarkus.oidc.credentials.secret=&lt;Secret&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="apple"><a class="anchor" href="#apple"></a>Apple</h3>
+<div class="paragraph">
+<p>Apple 用の OIDC を設定するには、開発者アカウントを作成し、99 ユーロ/年のプログラムにサインアップする必要がありますが、他のほとんどの OIDC プロバイダーのように <code>localhost</code> でアプリケーションをテストすることはできません。<code>https</code> で実行して公開する必要があるため、開発目的では <a href="https://ngrok.com" class="bare">https://ngrok.com</a> などのサービスを使用することをお勧めします。</p>
+</div>
+<div class="paragraph">
+<p><a href="https://developer.apple.com/account/resources/identifiers/list">Create a new identifier</a> にアクセスして <code>+</code> を押します</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-1.png" alt="oidc apple 1">
+</div>
+</div>
+<div class="paragraph">
+<p>何も触れないで、<code>App IDs</code> を選択したまま <code>Continue</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-2.png" alt="oidc apple 2">
+</div>
+</div>
+<div class="paragraph">
+<p>何も触れないで、<code>App</code> を選択したまま <code>Continue</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-3.png" alt="oidc apple 3">
+</div>
+</div>
+<div class="paragraph">
+<p>説明とバンドル ID を入力します (アプリケーションパッケージ名を使用します)。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-4.png" alt="oidc apple 4">
+</div>
+</div>
+<div class="paragraph">
+<p>次に、下にスクロールして <code>Sign in with Apple</code> 機能を見つけ、それを選択して、<code>Continue</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-5.png" alt="oidc apple 5">
+</div>
+</div>
+<div class="paragraph">
+<p>アプリ ID 接頭辞を書き留めてから、<code>Register</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-6.png" alt="oidc apple 6">
+</div>
+</div>
+<div class="paragraph">
+<p><code>Identifiers</code> ページに戻り、 <code>+</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-7.png" alt="oidc apple 7">
+</div>
+</div>
+<div class="paragraph">
+<p><code>Service IDs</code> を選択し、<code>Continue</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-8.png" alt="oidc apple 8">
+</div>
+</div>
+<div class="paragraph">
+<p>説明とバンドル ID を入力 (アプリケーションパッケージ名を使用) し、<code>Continue</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-9.png" alt="oidc apple 9">
+</div>
+</div>
+<div class="paragraph">
+<p>次に、<code>Register</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-10.png" alt="oidc apple 10">
+</div>
+</div>
+<div class="paragraph">
+<p>サービスリストに戻り、新しく作成したサービスをクリックします。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-11.png" alt="oidc apple 11">
+</div>
+</div>
+<div class="paragraph">
+<p><code>Sign in with Apple</code> を有効にして、<code>Configure</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-12.png" alt="oidc apple 12">
+</div>
+</div>
+<div class="paragraph">
+<p>ドメインを追加して URL (<code>&lt;host&gt;/_renarde/security/oidc-success</code> に設定) を返し、<code>Next</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-13.png" alt="oidc apple 13">
+</div>
+</div>
+<div class="paragraph">
+<p>次に <code>Done</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-14.png" alt="oidc apple 14">
+</div>
+</div>
+<div class="paragraph">
+<p>続いて <code>Continue</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-15.png" alt="oidc apple 15">
+</div>
+</div>
+<div class="paragraph">
+<p>そして、<code>Save</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-16.png" alt="oidc apple 16">
+</div>
+</div>
+<div class="paragraph">
+<p>左側のメニューの <a href="https://developer.apple.com/account/resources/authkeys/list">Keys</a> ページに移動し、<code>+</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-17.png" alt="oidc apple 17">
+</div>
+</div>
+<div class="paragraph">
+<p>キー名を入力し、<code>Sign in with Apple</code> を有効にして、<code>Configure</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-18.png" alt="oidc apple 18">
+</div>
+</div>
+<div class="paragraph">
+<p>Primary App ID を選択し、<code>Save</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-19.png" alt="oidc apple 19">
+</div>
+</div>
+<div class="paragraph">
+<p>キーページに戻り、<code>Continue</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-20.png" alt="oidc apple 20">
+</div>
+</div>
+<div class="paragraph">
+<p>次に、<code>Register</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-21.png" alt="oidc apple 21">
+</div>
+</div>
+<div class="paragraph">
+<p><code>Key ID</code> を書き留めてキーをダウンロードし、<code>src/main/resources/AuthKey_&lt;KEYID&gt;.p8</code> の Quarkus アプリケーションに保存します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-apple-22.png" alt="oidc apple 22">
+</div>
+</div>
+<div class="paragraph">
+<p>これで、<code>application.properties</code> を設定できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.provider=apple
+quarkus.oidc.client-id=&lt;Bundle ID&gt;
+quarkus.oidc.credentials.jwt.key-file=AuthKey_&lt;Key ID&gt;.p8
+quarkus.oidc.credentials.jwt.token-key-id=&lt;Key ID&gt;
+quarkus.oidc.credentials.jwt.issuer=&lt;App ID Prefix&gt;
+quarkus.oidc.credentials.jwt.subject=&lt;Bundle ID}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="facebook"><a class="anchor" href="#facebook"></a>Facebook</h3>
+<div class="paragraph">
+<p>Facebook では、他のほとんどの OIDC プロバイダーのように <code>localhost</code> でアプリケーションをテストすることはできません。<code>https</code> で実行して公開する必要があるため、開発目的では <a href="https://ngrok.com" class="bare">https://ngrok.com</a> などのサービスを使用することをお勧めします。</p>
+</div>
+<div class="paragraph">
+<p>Facebook 用の OIDC を設定するには、 <a href="https://developers.facebook.com/apps/create/">Creating an application</a> から開始し、アプリのタイプとして <code>None</code> を選択して <code>Next</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-facebook-1.png" alt="oidc facebook 1">
+</div>
+</div>
+<div class="paragraph">
+<p>次に、アプリケーション名と連絡先のメールアドレスを入力し、<code>Create app</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-facebook-2.png" alt="oidc facebook 2">
+</div>
+</div>
+<div class="paragraph">
+<p>アプリページで、<code>Facebook login</code> 製品の <code>Set up</code> をクリックします。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-facebook-3.png" alt="oidc facebook 3">
+</div>
+</div>
+<div class="paragraph">
+<p><code>Quickstarts</code> ページをクイックし、左側のメニューの <code>Facebook login &gt; Settings</code> をクリックします。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-facebook-4.png" alt="oidc facebook 4">
+</div>
+</div>
+<div class="paragraph">
+<p><code>Redirect URIs</code> を入力 (<code>&lt;host&gt;/_renarde/security/oidc-success</code> に設定) し、<code>Save changes</code> を押します:</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-facebook-5.png" alt="oidc facebook 5">
+</div>
+</div>
+<div class="paragraph">
+<p>次に、左側のメニューの <code>Settings &gt; Basic</code> に移動し、<code>App ID</code> と <code>App secret</code> を書き留めます。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-facebook-6.png" alt="oidc facebook 6">
+</div>
+</div>
+<div class="paragraph">
+<p>これで、<code>application.properties</code> を設定できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.provider=facebook
+quarkus.oidc.client-id=&lt;App ID&gt;
+quarkus.oidc.credentials.secret=&lt;App secret&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="twitter"><a class="anchor" href="#twitter"></a>Twitter</h3>
+<div class="paragraph">
+<p>OIDC ログインには Twitter を使用できますが、現時点では、ユーザーのメールへのアクセスが制限されているため、ご自身で Twitter を取得して確認する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>Twitter 用の OIDC を設定するには、 <a href="https://developer.twitter.com/en/portal/projects/new">Creating a project</a> で開始し、プロジェクト名を入力して、<code>Next</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-twitter-1.png" alt="oidc twitter 1">
+</div>
+</div>
+<div class="paragraph">
+<p>ユースケースを入力し、<code>Next</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-twitter-2.png" alt="oidc twitter 2">
+</div>
+</div>
+<div class="paragraph">
+<p>プロジェクトの説明を入力し、<code>Next</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-twitter-3.png" alt="oidc twitter 3">
+</div>
+</div>
+<div class="paragraph">
+<p>次に、アプリケーション名を入力して、<code>Next</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-twitter-4.png" alt="oidc twitter 4">
+</div>
+</div>
+<div class="paragraph">
+<p>キーは再び表示されないので書き留めて、<code>App Settings</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-twitter-5.png" alt="oidc twitter 5">
+</div>
+</div>
+<div class="paragraph">
+<p><code>User authentication settings</code> セクションに移動し、<code>Set up</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-twitter-6.png" alt="oidc twitter 6">
+</div>
+</div>
+<div class="paragraph">
+<p><code>OAuth 2.0</code> チェックボックスをオンにします。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-twitter-7.png" alt="oidc twitter 7">
+</div>
+</div>
+<div class="paragraph">
+<p>アプリケーションタイプとして <code>Web App</code> を選択し、アプリケーションの詳細を入力します (<code>Callback URI</code> の場合は <code>&lt;host&gt;/_renarde/security/twitter-success</code> を使用)。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Twitter は実際には https を使用する必要はありませんが、https がないと <code>Website URL</code> を受け入れないため、ngrok を引き続き使用できます。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>次に、<code>Save</code> を押します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-twitter-8.png" alt="oidc twitter 8">
+</div>
+</div>
+<div class="paragraph">
+<p>これで、<code>Client ID</code> および <code>Client Secret</code> をコピーして <code>Done</code> を押すことができます。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-twitter-9.png" alt="oidc twitter 9">
+</div>
+</div>
+<div class="paragraph">
+<p>これで、<code>application.properties</code> を設定できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.provider=twitter
+quarkus.oidc.client-id=&lt;Client ID&gt;
+quarkus.oidc.credentials.secret=&lt;Client Secret&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="spotify"><a class="anchor" href="#spotify"></a>Spotify</h3>
+<div class="paragraph">
+<p><a href="https://developer.spotify.com/documentation/general/guides/authorization/app-settings/">Spotify application</a> を作成します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-spotify-1.png" alt="oidc spotify 1">
+</div>
+</div>
+<div class="paragraph">
+<p>開発目的のテスト用に、リダイレクト URI として <code><a href="http://localhost:8080" class="bare">http://localhost:8080</a></code> を追加することを忘れないでください。Spotify アプリケーションのセットアップが完了すると、クライアント ID とシークレットが生成されます。以下に例を示します。</p>
+</div>
+<div class="imageblock thumb">
+<div class="content">
+<img src="./images/oidc-spotify-2.png" alt="oidc spotify 2">
+</div>
+</div>
+<div class="paragraph">
+<p>これで、<code>application.properties</code> を設定できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.oidc.provider=spotify
+quarkus.oidc.client-id=&lt;Client ID&gt;
+quarkus.oidc.credentials.secret=&lt;Client Secret&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="references"><a class="anchor" href="#references"></a>参照</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="security-openid-connect-web-authentication">Using OpenID Connect to Protect Web Applications</a></p>
+</li>
+<li>
+<p><a href="security">Quarkus Security</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#introduction">はじめに</a></li>
+<li><a href="#well-known-providers">よく知られたプロバイダー</a>
+<ul class="sectlevel2">
+<li><a href="#github">GitHub</a></li>
+<li><a href="#google">Google</a></li>
+<li><a href="#microsoft">Microsoft</a></li>
+<li><a href="#apple">Apple</a></li>
+<li><a href="#facebook">Facebook</a></li>
+<li><a href="#twitter">Twitter</a></li>
+<li><a href="#spotify">Spotify</a></li>
+</ul>
+</li>
+<li><a href="#references">参照</a></li>
+</ul></div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>

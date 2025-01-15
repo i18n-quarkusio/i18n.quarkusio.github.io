@@ -1,0 +1,3833 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+
+
+
+
+
+
+<head>
+  <title>Elasticsearch/OpenSearch を使用する Standalone モードでの Hibernate Search の使用 - Quarkus</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="
+  connect-src 'self' https://dpm.demdex.net https://adobedc.demdex.net https://analytics.ossupstream.org/ https://search.quarkus.io https://smetrics.redhat.com; 
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      
+      https://assets.adobedtm.com
+      js.bizographics.com
+      https://www.redhat.com
+      https://static.redhat.com
+      https://app.requestly.io/
+      jsonip.com
+      https://ajax.googleapis.com
+      https://use.fontawesome.com
+      http://www.youtube.com
+      http://www.googleadservices.com
+      https://googleads.g.doubleclick.net
+      https://giscus.app
+      https://analytics.ossupstream.org/
+      https://app.mailjet.com;
+
+  style-src 'self' https://fonts.googleapis.com https://use.fontawesome.com; 
+  img-src 'self' * data:; 
+  media-src 'self'; 
+  frame-src https://redhat.demdex.net https://www.youtube.com https://embed.restream.io https://app.mailjet.com http://xy0p2.mjt.lu https://mj.quarkus.io https://giscus.app; 
+  base-uri 'none'; 
+  object-src 'none'; 
+  form-action 'none'; 
+  font-src 'self' https://use.fontawesome.com https://fonts.gstatic.com;" />
+  <script id="adobe_dtm" src="https://www.redhat.com/dtm.js" type="text/javascript"></script>
+  <script src="/assets/javascript/highlight.pack.js" type="text/javascript"></script>
+  <META HTTP-EQUIV='X-XSS-Protection' CONTENT="1; mode=block">
+  <META HTTP-EQUIV='X-Content-Type-Options' CONTENT="nosniff">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Quarkus: Supersonic Subatomic Java">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@QuarkusIO"> 
+  <meta name="twitter:creator" content="@QuarkusIO">
+  <meta property="og:url" content="https://quarkus.io/guides/hibernate-search-standalone-elasticsearch" />
+  <meta property="og:title" content="Elasticsearch/OpenSearch を使用する Standalone モードでの Hibernate Search の使用" />
+  <meta property="og:description" content="Quarkus: Supersonic Subatomic Java" />
+  <meta property="og:image" content="https://quarkus.io/assets/images/quarkus_card.png" />
+  
+  <link rel="canonical" href="https://quarkus.io/guides/hibernate-search-standalone-elasticsearch">
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" >
+  <link rel="stylesheet" href="/guides/stylesheet/config.css" />
+  <link rel="stylesheet" href="/assets/css/main.css?2021-07-29" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" crossorigin="anonymous">
+  <link rel="alternate" type="application/rss+xml"  href="/feed.xml" title="Quarkus">
+  <script src="/assets/javascript/hl.js" type="text/javascript"></script>
+  
+  
+  
+  
+  <link rel="alternate" hreflang="x-default" href="https://quarkus.io/" />  
+  <script src="/assets/javascript/tracking.js"></script>
+  
+  <script src="/assets/javascript/colormode.js" type="text/javascript"></script>
+
+</head>
+
+<body class="guides">
+
+  
+
+
+<div class="grid-wrapper communitysite">
+  <div class="grid__item width-12-12">The <a href="https://quarkus.io/guides/hibernate-search-standalone-elasticsearch">English version of quarkus.io</a> is the official project site. Translated sites are community supported on a best-effort basis.</div>
+</div>
+
+
+  <div class="nav-wrapper">
+  <div class="grid-wrapper">
+    <div class="width-12-12">
+      <input type="checkbox" id="checkbox" />
+      <nav id="main-nav" class="main-nav">
+        <div class="logo-wrapper">
+           <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_600px_reverse.png" class="project-logo" title="Quarkus"></a>
+        </div>
+    <label class="nav-toggle" for="checkbox"> <i class="fa fa-bars"></i>
+</label>
+    <ul id="menu" class="menu">
+      <li class="dropdown">
+        <span href="/about/">Why<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/about" class="">QUARKUSとは何か?</a></li>
+          <li><a href="/developer-joy" class="">開発者満足</a></li>
+          <li><a href="/performance" class="">PERFORMANCE</a></li>
+          <li><a href="/kubernetes-native" class="">KUBERNETES NATIVE</a></li>
+          <li><a href="/standards" class="">標準</a></li>
+          <li><a href="/versatility" class="">VERSATILITY</a></li>
+          <li><a href="/container-first" class="">コンテナ・ファースト</a></li>
+
+          
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/learn/">Learn<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/get-started" class="">入門</a></li>
+          <li><a href="/guides" class="active">ドキュメント</a></li>
+          <li><a href="/qtips" class="">"Q" Tipsビデオ</a></li>          
+          <li><a href="/books" class="">書籍</a></li>
+          </ul>
+      </li>
+      <li class="dropdown">
+        <span href="https://quarkus.io/extensions/">Extensions<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          
+          <!-- Note that quarkus.io is hardcoded here, because it is the only url which supports extensions -->
+<li><a href="https://quarkus.io/extensions/" class="">エクステンションを探す</a></li>
+          <li><a href="/faq/#what-is-a-quarkus-extension" class="">エクステンションの使用</a></li>
+          <li><a href="/guides/writing-extensions" class="">エクステンションの作成</a></li>
+          <li><a href="https://hub.quarkiverse.io" class="">SHARE EXTENSIONS</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <span href="/community/">Community<i class="fas
+fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="/support/" class="">サポート</a></li>
+          <li><a href="/blog" class="">ブログ</a></li>
+          <li><a href="/discussion" class="">ディスカッション</a></li>
+          <li><a href="/working-groups" class="">WORKING GROUPS</a></li>
+          <li><a href="/insights" class="">ポッドキャスト</a></li>
+          <li><a href="/events" class="">イベント</a></li>
+          <li><a href="/newsletter" class="">ニュースレター</a></li>
+          <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" class="">ロードマップ</a></li>
+          </ul>
+      </li>
+      <li>
+        <a href="https://code.quarkus.io" class="button-cta secondary
+white">コーディングを開始</a>
+      </li>
+      <li class="dropdown">
+        <span href="/language/"><div class="fas fa-globe langicon"></div><i class="fas fa-chevron-down"></i></span>
+        <ul class="submenu">
+          <li><a href="https://quarkus.io/guides/hibernate-search-standalone-elasticsearch" >OFFICIAL (ENGLISH)</a></li>
+          <li><a href="https://pt.quarkus.io/guides/hibernate-search-standalone-elasticsearch">PORTUGUÊS (BR)</a></li>
+          <li><a href="https://es.quarkus.io/guides/hibernate-search-standalone-elasticsearch">ESPAÑOL</a></li>
+          <li><a href="https://cn.quarkus.io/guides/hibernate-search-standalone-elasticsearch">简体中文</a></li>
+          <li><a href="https://ja.quarkus.io/guides/hibernate-search-standalone-elasticsearch">日本語</a></li>
+          </ul>
+      </li>
+      <li>
+        <span href="#" class="modeswitcher" id='theme-toggle'><i class="fas
+fa-sun"></i><i class="fas fa-moon"></i><i class="fas fa-cog"></i></span>
+      </li>
+    </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+  <div class="content">
+    
+
+
+
+
+
+
+
+<section class="full-width-version-bg flexfilterbar guides">
+  <div class="guideflexcontainer">
+    <div class="docslink">
+      <a class="returnlink" href="/guides/"> Back to Guides</a>
+    </div>
+    <div class="flexlabel">
+      <label>バージョン:</label>
+    </div>
+    <div class="guidepulldown version">
+    <select id="guide-version-dropdown">
+      
+        
+        
+        <option value="main" >Main - SNAPSHOT</option>
+        
+        
+        
+        <option value="latest" selected>3.17.6 - Latest</option>
+        
+        
+        
+        <option value="3.15" >3.15</option>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </select>
+    </div>
+  </div>
+</section>
+
+<div class="guide">
+  <div class="grid-wrapper">
+    <div class="grid__item width-8-12 width-12-12-m">
+      
+      <a class="editlink" href="https://github.com/quarkusio/quarkus/edit/main/docs/src/main/asciidoc/hibernate-search-standalone-elasticsearch.adoc">このページを編集</a>
+      
+      <h1 class="text-caps">Elasticsearch/OpenSearch を使用する Standalone モードでの Hibernate Search の使用 </h1>
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quarkus アプリケーションをお持ちですか? フル機能のフルテキスト検索をユーザーに提供したいとお考えですか? このガイドでは、最適な方法を提供しています。</p>
+</div>
+<div class="paragraph">
+<p>このガイドでは、Hibernate Search を使用して、エンティティーを Elasticsearch または OpenSearch クラスターに瞬時に同期させる方法を説明します。
+また、Hibernate Search API を使用して Elasticsearch または OpenSearch クラスターにクエリーを実行する方法についても説明します。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Hibernate ORM エンティティーのインデックスを作成したい場合は、
+代わりに、<a href="hibernate-search-orm-elasticsearch">こちらの専用ガイド</a> を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="prerequisites"><a class="anchor" href="#prerequisites"></a>要件</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドを完成させるには、以下が必要です:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ざっと 20 minutes</p>
+</li>
+<li>
+<p>IDE</p>
+</li>
+<li>
+<p>JDK 17+がインストールされ、 <code>JAVA_HOME</code> が適切に設定されていること</p>
+</li>
+<li>
+<p>Apache Maven 3.9.9</p>
+</li>
+<li>
+<p>動作するコンテナランタイム(Docker, <a href="podman">Podman</a>)</p>
+</li>
+<li>
+<p>使用したい場合は、 <a href="cli-tooling.html">Quarkus CLI</a></p>
+</li>
+<li>
+<p>ネイティブ実行可能ファイルをビルドしたい場合、MandrelまたはGraalVM（あるいはネイティブなコンテナビルドを使用する場合はDocker）をインストールし、 <a href="building-native-image.html#configuring-graalvm">適切に設定</a>していること</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="architecture"><a class="anchor" href="#architecture"></a>アーキテクチャー</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このガイドに記載されているアプリケーションにより、(シンプルな) ライブラリーを管理することができます。ユーザーは、author と book を管理するだけです。</p>
+</div>
+<div class="paragraph">
+<p>エンティティーは Elasticsearch クラスターに保存され、インデックスが作成されます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="solution"><a class="anchor" href="#solution"></a>ソリューション</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>次の章で紹介する手順に沿って、ステップを踏んでアプリケーションを作成することを推奨します。
+ただし、完成した例にそのまま進むこともできます。</p>
+</div>
+<div class="paragraph">
+<p>Clone the Git repository: <code>git clone <a href="https://github.com/quarkusio/quarkus-quickstarts.git" class="bare">https://github.com/quarkusio/quarkus-quickstarts.git</a></code>, or download an <a href="https://github.com/quarkusio/quarkus-quickstarts/archive/main.zip">archive</a>.</p>
+</div>
+<div class="paragraph">
+<p>ソリューションは、<code>hibernate-search-standalone-elasticsearch-quickstart</code> <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/main/hibernate-search-standalone-elasticsearch-quickstart">ディレクトリー</a> にあります。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>提供されるソリューションには、テストやテストのインフラストラクチャーなど、いくつかの追加要素が含まれています。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-maven-project"><a class="anchor" href="#creating-the-maven-project"></a>Maven プロジェクトの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、新しいプロジェクトが必要です。以下のコマンドで新規プロジェクトを作成します。</p>
+</div>
+<div class="sidebarblock primary asciidoc-tabs-sync-cli">
+<div class="content">
+<div class="title">コマンドラインインタフェース</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus create app org.acme:hibernate-search-standalone-elasticsearch-quickstart \
+    --extension='hibernate-search-standalone-elasticsearch,rest-jackson' \
+    --no-code
+cd hibernate-search-standalone-elasticsearch-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>--gradle</code> または <code>--gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus CLIのインストールと使用方法の詳細については、 <a href="cli-tooling">Quarkus CLI</a> ガイドを参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock secondary asciidoc-tabs-sync-maven">
+<div class="content">
+<div class="title">Maven</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mvn io.quarkus.platform:quarkus-maven-plugin:3.17.6:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=hibernate-search-standalone-elasticsearch-quickstart \
+    -Dextensions='hibernate-search-standalone-elasticsearch,rest-jackson' \
+    -DnoCode
+cd hibernate-search-standalone-elasticsearch-quickstart</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gradleプロジェクトを作成するには、 <code>-DbuildTool=gradle</code> または <code>-DbuildTool=gradle-kotlin-dsl</code> オプションを追加します。</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Windowsユーザーの場合:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>cmdを使用する場合、（バックスラッシュ <code>\</code> を使用せず、すべてを同じ行に書かないでください）。</p>
+</li>
+<li>
+<p>Powershellを使用する場合は、 <code>-D</code> パラメータを二重引用符で囲んでください。例: <code>"-DprojectArtifactId=hibernate-search-standalone-elasticsearch-quickstart"</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>このコマンドは、以下のエクステンションをインポートするMaven構造体を生成します:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Hibernate Search Standalone + Elasticsearch</p>
+</li>
+<li>
+<p>Quarkus REST (旧称 RESTEasy Reactive) と Jackson</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>すでにQuarkusプロジェクトが設定されている場合は、プロジェクトのベースディレクトリーで以下のコマンドを実行することで、
+プロジェクトに <code>hibernate-search-standalone-elasticsearch</code> エクステンションを追加できます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus extension add hibernate-search-standalone-elasticsearch</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:add-extension -Dextensions='hibernate-search-standalone-elasticsearch'</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew addExtension --extensions='hibernate-search-standalone-elasticsearch'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>これにより、 <code>pom.xml</code> に以下が追加されます:</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-target-sync-cli asciidoc-tabs-target-sync-maven">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.quarkus&lt;/groupId&gt;
+    &lt;artifactId&gt;quarkus-hibernate-search-standalone-elasticsearch&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-target-sync-gradle">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">implementation("io.quarkus:quarkus-hibernate-search-standalone-elasticsearch")</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-the-bare-classes"><a class="anchor" href="#creating-the-bare-classes"></a>ベアクラスの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>まず、<code>model</code> サブパッケージに <code>Book</code> クラスと <code>Author</code> クラスを作成します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.hibernate.search.elasticsearch.model;
+
+import java.util.List;
+import java.util.Objects;
+
+public class Author {
+
+    public UUID id; <i class="conum" data-value="1"></i><b>(1)</b>
+
+    public String firstName;
+
+    public String lastName;
+
+    public List&lt;Book&gt; books;
+
+    public Author(UUID id, String firstName, String lastName, List&lt;Book&gt; books) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.books = books;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>ここではパブリックフィールドを使用しています。
+なぜなら、より短く、本質的にデータクラスであるものに対してカプセル化が期待されていないからです。
+<div class="paragraph">
+<p>ただし、getter/setter 付きのプライベートフィールドを使用する場合は、
+getter/setter が JavaBeans の命名規則に従っている限りは、まったく問題はなく、完璧に動作します 
+(<code>getSomething()</code>/<code>isSomething()</code>/<code>setSomething(&#8230;&#8203;)</code>)。</p>
+</div></td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.hibernate.search.elasticsearch.model;
+
+import java.util.Objects;
+
+public class Book {
+
+    public UUID id;
+
+    public String title;
+
+    public Book(UUID id, String title) {
+        this.id = id;
+        this.title = title;
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="using-hibernate-search-annotations"><a class="anchor" href="#using-hibernate-search-annotations"></a>Hibernate Searchアノテーションの使用</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>クラスのフルテキスト検索機能の有効化は、アノテーションいくつか追加する場合と同様に、簡単にできます。</p>
+</div>
+<div class="paragraph">
+<p>この内容を含めるように <code>Author</code> エンティティーを編集してみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.hibernate.search.elasticsearch.model;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
+import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdProjection;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
+
+@SearchEntity <i class="conum" data-value="1"></i><b>(1)</b>
+@Indexed <i class="conum" data-value="2"></i><b>(2)</b>
+public class Author {
+
+    @DocumentId <i class="conum" data-value="3"></i><b>(3)</b>
+    public UUID id;
+
+    @FullTextField(analyzer = "name") <i class="conum" data-value="4"></i><b>(4)</b>
+    @KeywordField(name = "firstName_sort", sortable = Sortable.YES, normalizer = "sort") <i class="conum" data-value="5"></i><b>(5)</b>
+    public String firstName;
+
+    @FullTextField(analyzer = "name")
+    @KeywordField(name = "lastName_sort", sortable = Sortable.YES, normalizer = "sort")
+    public String lastName;
+
+    @IndexedEmbedded <i class="conum" data-value="6"></i><b>(6)</b>
+    public List&lt;Book&gt; books = new ArrayList&lt;&gt;();
+
+    public Author(UUID id, String firstName, String lastName) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
+    @ProjectionConstructor <i class="conum" data-value="7"></i><b>(7)</b>
+    public Author(@IdProjection UUID id, String firstName, String lastName, List&lt;Book&gt; books) {
+        this( id, firstName, lastName );
+        this.books = books;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>まず、<code>Author</code> タイプを <a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#concepts-entity">エンティティータイプ</a> とマークします。
+つまり、これは <code>Author</code> タイプが独自のライフサイクル (他のタイプに結びついていない) を持ち、
+すべての `BookAuthor インスタンスはイミュータブルな一意の識別子を持つことを意味します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>次に、<code>@Indexed</code> アノテーションを使用して、<code>Author</code> エンティティーをフルテキストインデックスの一部として登録します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>続いて、ドキュメント識別子を定義し、必須設定を終了します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>@FullTextField</code> アノテーションは、フルテキスト検索用に特別に調整されたインデックスのフィールドを宣言します。
+特に、トークン (~ 単語) を分割して分析するためのアナライザーを定義する必要があります。 - これについては後で説明します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>このように、同じプロパティーに複数のフィールドを定義することができます。
+ここでは、固有の名前を持つ <code>@KeywordField</code> を定義しています。
+主な違いは、キーワードフィールドはトークン化されません (文字列は 1 つのトークンとして保持)が、正規化 (すなわちフィルタリング) できるという点です。これについては後で説明します。
+このフィールドは author のソートに使用することを意図しているため、ソート可能とマークされています。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td><code>@IndexedEmbedded</code> の目的は、<code>Book</code> フィールドを <code>Author</code> インデックスに含めることです。
+この場合は、デフォルトの設定を使用します。つまり、関連付けられている <code>Book</code> インスタンスのすべてのフィールド (つまり <code>title</code> フィールド) がインデックスに含まれます。
+<code>@IndexedEmbedded</code> はネストされたドキュメントもサポート (<code>structure = NESTED</code> 属性を使用) しますが、ここでは必要ありません。
+また、すべてのフィールドを親インデックスに含める必要がない場合は、<code>includePaths</code>/<code>excludePaths</code> 属性を使用して含めるフィールドを指定することができます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>(単一の) コンストラクターを <code>@ProjectionConstructor</code> としてマークします。
+これにより、インデックスの内容から <code>Author</code> インスタンスを再構築できるようにします。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>author のインデックスが作成されたので、この <code>@IndexedEmbedded</code> アノテーションが
+実際に <em>何か</em> を含むように、book をマッピングします。</p>
+</div>
+<div class="paragraph">
+<p><code>Book</code> クラスを開き、以下の内容を含めます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.hibernate.search.elasticsearch.model;
+
+import java.util.Objects;
+import java.util.UUID;
+
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ProjectionConstructor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.SearchEntity;
+
+@SearchEntity <i class="conum" data-value="1"></i><b>(1)</b>
+public class Book {
+
+    @KeywordField <i class="conum" data-value="2"></i><b>(2)</b>
+    public UUID id;
+
+    @FullTextField(analyzer = "english") <i class="conum" data-value="3"></i><b>(3)</b>
+    public String title;
+
+    @ProjectionConstructor <i class="conum" data-value="4"></i><b>(4)</b>
+    public Book(UUID id, String title) {
+        this.id = id;
+        this.title = title;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>また、Book タイプを <a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#concepts-entity">エンティティータイプ</a> としてマークします。
+しかし、book 専用のインデックスは必要ないと判断したため、<code>@Indexed</code> は使用しません。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>book の ID のインデックスを作成して、ID が表示されるようにします (以下を参照)。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>Author</code> の場合と同様に <code>@FullTextField</code> を使用しますが、アナライザーが異なることに気付くでしょう。これについては後で詳しく説明します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>Author`と同様に、コンストラクターを</code>@ProjectionConstructor`としてマークします。
+これにより、インデックスの内容から <code>Book</code> インスタンスを再構築できるようにします。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="analyzers-and-normalizers"><a class="anchor" href="#analyzers-and-normalizers"></a>アナライザーとノーマライザー</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="introduction"><a class="anchor" href="#introduction"></a>はじめに</h3>
+<div class="paragraph">
+<p>分析はフルテキスト検索の大きな部分を占めています。インデックス作成や検索クエリー構築の際に、テキストがどのように処理されるかを定義します。</p>
+</div>
+<div class="paragraph">
+<p>アナライザーの役割は、テキストをトークン (~ 単語) に分割し、フィルターをかけることです (例: すべてを小文字にしたり、アクセントを削除したりなど）。</p>
+</div>
+<div class="paragraph">
+<p>ノーマライザーは入力を 1 つのトークンとして保持する特殊なアナライザーです。
+特に、キーワードのソートやインデックス作成に有効です。</p>
+</div>
+<div class="paragraph">
+<p>多くのバンドルされたアナライザーがありますが、自分の目的に合わせて独自に開発することもできます。</p>
+</div>
+<div class="paragraph">
+<p>Elasticsearch 分析フレームワークの詳細は、https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis.html[Elasticsearch ドキュメントの分析セクション] を参照してください。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="defining-the-analyzers-used"><a class="anchor" href="#defining-the-analyzers-used"></a>使用するアナライザーの定義</h3>
+<div class="paragraph">
+<p>エンティティーに Hibernate Search アノテーションを追加した際に、使用するアナライザーとノーマライザーを定義しました。
+通常は、以下のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@FullTextField(analyzer = "english")</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@FullTextField(analyzer = "name")</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@KeywordField(name = "lastName_sort", sortable = Sortable.YES, normalizer = "sort")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>以下を使用しています。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>人名用の <code>name</code> というアナライザー</p>
+</li>
+<li>
+<p>book タイトル用の <code>english</code> というアナライザー</p>
+</li>
+<li>
+<p>ソートフィールド用の <code>sort</code> というノーマライザー</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>ただし、まだセットアップされていません。</p>
+</div>
+<div class="paragraph">
+<p>それでは、Hibernate Search を使ってどのように設定できるのか見てみましょう。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="analysis-configurer"><a class="anchor" href="#analysis-configurer"></a>アナライザーのセットアップ</h3>
+<div class="paragraph">
+<p>これは簡単な作業で、<code>ElasticsearchAnalysisConfigurer</code> の実装を作成するだけになります
+ (そして、これを使用するように Quarkus を設定しますが、詳細は後述します）。</p>
+</div>
+<div class="paragraph">
+<p>要件を満たすために、次のような実装を作ってみましょう:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.hibernate.search.elasticsearch.config;
+
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
+
+import io.quarkus.hibernate.search.standalone.elasticsearch.SearchExtension;
+
+@SearchExtension <i class="conum" data-value="1"></i><b>(1)</b>
+public class AnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
+
+    @Override
+    public void configure(ElasticsearchAnalysisConfigurationContext context) {
+        context.analyzer("name").custom() <i class="conum" data-value="2"></i><b>(2)</b>
+                .tokenizer("standard")
+                .tokenFilters("asciifolding", "lowercase");
+
+        context.analyzer("english").custom() <i class="conum" data-value="3"></i><b>(3)</b>
+                .tokenizer("standard")
+                .tokenFilters("asciifolding", "lowercase", "porter_stem");
+
+        context.normalizer("sort").custom() <i class="conum" data-value="4"></i><b>(4)</b>
+                .tokenFilters("asciifolding", "lowercase");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Configurer の実装に <code>@SearchExtension</code> 修飾子のアノテーションを付けて、
+すべての Elasticsearch インデックスに対して (デフォルトで) Hibernate Search Standalone で使用するように Quarkus に指示します。
+<div class="paragraph">
+<p>アノテーションは、特定の永続ユニット (<code>@SearchExtension(persistenceUnit = "nameOfYourPU")</code>)、
+バックエンド (<code>@SearchExtension(backend = "nameOfYourBackend")</code>)、インデックス (<code>@SearchExtension(index = "nameOfYourIndex")</code>)、
+またはそれらの組み合わせ
+(<code>@SearchExtension(persistenceUnit = "nameOfYourPU", backend = "nameOfYourBackend", index = "nameOfYourIndex")</code>) をターゲットにすることもできます。</p>
+</div></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>これは、スペースで単語を分離し、ASCII 以外の文字をそれに対応する ASCII 文字に置き換えて (つまり、アクセントを除去)、すべてを小文字にするシンプルなアナライザーです。
+これは、例では author 名に使用されています。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>これはもう少し積極的で、ステミングも含まれています。作成されたインデックスの入力に <code>mysteries</code> が含まれていても、<code>mystery</code> を検索して結果を得ることができます。
+人名に対しては確かに無理がありますが、book のタイトルに関しては完璧です。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>ここではソートに使われるノーマライザーを紹介します。最初のアナライザーと非常によく似ていますが、1つだけのトークンが欲しいので、単語をトークン化しないことを除けば同じです。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>アナライザーの設定の詳細は、
+<a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#backend-elasticsearch-analysis">参照ドキュメントのこちらのセクション</a> を参照してください。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="implementing-the-rest-service"><a class="anchor" href="#implementing-the-rest-service"></a>REST サービスの実装</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>org.acme.hibernate.search.elasticsearch.LibraryResource</code> クラスを作成します:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.hibernate.search.elasticsearch;
+
+import java.util.ArrayList;
+import java.util.UUID;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.MediaType;
+
+import org.acme.hibernate.search.elasticsearch.model.Author;
+import org.acme.hibernate.search.elasticsearch.model.Book;
+
+import org.hibernate.search.mapper.pojo.standalone.mapping.SearchMapping;
+import org.hibernate.search.mapper.pojo.standalone.session.SearchSession;
+
+import org.jboss.resteasy.reactive.RestForm;
+import org.jboss.resteasy.reactive.RestPath;
+
+@Path("/library")
+public class LibraryResource {
+
+    @Inject
+    SearchMapping searchMapping; <i class="conum" data-value="1"></i><b>(1)</b>
+
+    @PUT
+    @Path("author")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public void addAuthor(@RestForm String firstName, @RestForm String lastName) {
+        try (var searchSession = searchMapping.createSession()) { <i class="conum" data-value="2"></i><b>(2)</b>
+            Author author = new Author(UUID.randomUUID(), firstName, lastName, new ArrayList&lt;&gt;());
+            searchSession.indexingPlan().add(author); <i class="conum" data-value="3"></i><b>(3)</b>
+        }
+    }
+
+    @GET
+    @Path("author/{id}")
+    public Author getAuthor(@RestPath UUID id) {
+        try (var searchSession = searchMapping.createSession()) {
+            return getAuthor(searchSession, id);
+        }
+    }
+
+    private Author getAuthor(SearchSession searchSession, UUID id) {
+        return searchSession.search(Author.class) <i class="conum" data-value="4"></i><b>(4)</b>
+                .where(f -&gt; f.id().matching(id))
+                .fetchSingleHit()
+                .orElseThrow(NotFoundException::new);
+    }
+
+    @POST
+    @Path("author/{id}")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public void updateAuthor(@RestPath UUID id, @RestForm String firstName, @RestForm String lastName) {
+        try (var searchSession = searchMapping.createSession()) {
+            Author author = getAuthor(searchSession, id); <i class="conum" data-value="5"></i><b>(5)</b>
+            author.firstName = firstName;
+            author.lastName = lastName;
+            searchSession.indexingPlan().addOrUpdate(author); <i class="conum" data-value="5"></i><b>(5)</b>
+        }
+    }
+
+    @DELETE
+    @Path("author/{id}")
+    public void deleteAuthor(@RestPath UUID id) {
+        try (var searchSession = searchMapping.createSession()) {
+            searchSession.indexingPlan().purge(Author.class, id, null); <i class="conum" data-value="6"></i><b>(6)</b>
+        }
+    }
+
+    @PUT
+    @Path("author/{authorId}/book/")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public void addBook(@RestPath UUID authorId, @RestForm String title) {
+        try (var searchSession = searchMapping.createSession()) {
+            Author author = getAuthor(searchSession, authorId); <i class="conum" data-value="7"></i><b>(7)</b>
+            author.books.add(new Book(authorId, title));
+            searchSession.indexingPlan().addOrUpdate(author);
+        }
+    }
+
+    @DELETE
+    @Path("author/{authorId}/book/{bookId}")
+    public void deleteBook(@RestPath UUID authorId, @RestPath UUID bookId) {
+        try (var searchSession = searchMapping.createSession()) {
+            Author author = getAuthor(searchSession, authorId); <i class="conum" data-value="7"></i><b>(7)</b>
+            author.books.removeIf(book -&gt; book.id.equals(bookId));
+            searchSession.indexingPlan().addOrUpdate(author);
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Hibernate Search API へのメインエントリーポイントである Hibernate Search マッピングを注入します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>インデックスに対する操作を実行できる Hibernate Search セッションを作成します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>新しい Authorのインデックスを作成するには、セッションのインデックスプランを取得し、author のインスタンスを引数に渡して <code>add</code> を呼び出します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>インデックスから Author を取得するには、識別子による簡単な検索 を実行します (検索については後ほど詳しく説明します)。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Author を更新するには、インデックスから Author を取得し、変更を適用し、
+セッションのインデックスプランを取得して、author インスタンスを引数に渡して <code>addOrUpdate</code> を呼び出します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>識別子で Author を削除するには、セッションのインデックスプランを取得し、
+author クラスと識別子を引数に渡して <code>purge</code> を呼び出します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>book は author によって "所有" されるため ( author ごとに複製され、そのライフサイクルは author のライフサイクルにバインドされます)、
+book の追加/削除は、単なる author への更新になります。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>画期的なことは何もありません。REST サービスで CRUD 操作をいくつか行うだけ、
+その際に、Hibernate Search API を使用します。</p>
+</div>
+<div class="paragraph">
+<p>興味深いのは、検索エンドポイントが追加された点です。
+<code>LibraryResource</code> では、次のメソッド (およびいくつかの <code>import</code>) を追加する必要があるだけです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    @GET
+    @Path("author/search")
+    public List&lt;Author&gt; searchAuthors(@RestQuery String pattern, <i class="conum" data-value="1"></i><b>(1)</b>
+            @RestQuery Optional&lt;Integer&gt; size) {
+        try (var searchSession = searchMapping.createSession()) { <i class="conum" data-value="2"></i><b>(2)</b>
+            return searchSession.search(Author.class) <i class="conum" data-value="3"></i><b>(3)</b>
+                    .where(f -&gt; pattern == null || pattern.isBlank()
+                            ? f.matchAll() <i class="conum" data-value="4"></i><b>(4)</b>
+                            : f.simpleQueryString()
+                                    .fields("firstName", "lastName", "books.title").matching(pattern)) <i class="conum" data-value="5"></i><b>(5)</b>
+                    .sort(f -&gt; f.field("lastName_sort").then().field("firstName_sort")) <i class="conum" data-value="6"></i><b>(6)</b>
+                    .fetchHits(size.orElse(20)); <i class="conum" data-value="7"></i><b>(7)</b>
+        }
+    }</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>パラメーター名の繰り返しを避けるために <code>org.jboss.resteasy.annotations.jaxrs.QueryParam</code> アノテーションを使用します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>インデックスに対する操作を実行できる Hibernate Search セッションを作成します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>Author</code> を検索していることを示しています。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>述語を作成します。パターンが空の場合は <code>matchAll()</code> 述語を使用します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>有効なパターンがあれば、パターンにマッチする <code>firstName</code> 、 <code>lastName</code> 、 <code>books.title</code> フィールドに対する <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html"><code>simpleQueryString()</code></a> 述語を作成します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>結果のソート順を定義します。ここでは、姓でソートし、次に名でソートしています。ソートには作成した特定のフィールドを使用していることに注意してください。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td><code>size</code> で指定した数の一致度が高いものをフェッチします。デフォルトでは <code>20</code> です。もちろんページングもサポートしています。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Hibernate Search DSLは Elasticsearch の述語 (match、range、nested、phrase、spatial&#8230;&#8203;) の重要なサブセットをサポートしています。
+オートコンプリートを使って DSL をご自由にお試しください。</p>
+</div>
+<div class="paragraph">
+<p>それでも十分でない場合は、いつでも
+<a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#search-dsl-predicate-extensions-elasticsearch-from-json">JSONを直接使う述語の定義</a> にフォールバックできます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="automatic-data-initialization"><a class="anchor" href="#automatic-data-initialization"></a>データの自動初期化</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>このデモの目的のために、初期データセットをインポートしてみましょう。</p>
+</div>
+<div class="paragraph">
+<p><code>LibraryResource</code> にいくつかのメソッドを追加してみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">    void onStart(@Observes StartupEvent ev) { <i class="conum" data-value="1"></i><b>(1)</b>
+        // Index some test data if nothing exists
+        try (var searchSession = searchMapping.createSession()) {
+            if (0 &lt; searchSession.search(Author.class) <i class="conum" data-value="2"></i><b>(2)</b>
+                    .where(f -&gt; f.matchAll())
+                    .fetchTotalHitCount()) {
+                return;
+            }
+            for (Author author : initialDataSet()) { <i class="conum" data-value="3"></i><b>(3)</b>
+                searchSession.indexingPlan().add(author); <i class="conum" data-value="4"></i><b>(4)</b>
+            }
+        }
+    }
+
+    private List&lt;Author&gt; initialDataSet() {
+        return List.of(
+                new Author(UUID.randomUUID(), "John", "Irving",
+                        List.of(
+                                new Book(UUID.randomUUID(), "The World According to Garp"),
+                                new Book(UUID.randomUUID(), "The Hotel New Hampshire"),
+                                new Book(UUID.randomUUID(), "The Cider House Rules"),
+                                new Book(UUID.randomUUID(), "A Prayer for Owen Meany"),
+                                new Book(UUID.randomUUID(), "Last Night in Twisted River"),
+                                new Book(UUID.randomUUID(), "In One Person"),
+                                new Book(UUID.randomUUID(), "Avenue of Mysteries"))),
+                new Author(UUID.randomUUID(), "Paul", "Auster",
+                        List.of(
+                                new Book(UUID.randomUUID(), "The New York Trilogy"),
+                                new Book(UUID.randomUUID(), "Mr. Vertigo"),
+                                new Book(UUID.randomUUID(), "The Brooklyn Follies"),
+                                new Book(UUID.randomUUID(), "Invisible"),
+                                new Book(UUID.randomUUID(), "Sunset Park"),
+                                new Book(UUID.randomUUID(), "4 3 2 1"))));
+    }</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>アプリケーションの起動時に実行されるメソッドを追加します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>インデックスにすでにデータがあるか確認します。ない場合は終了します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>初期データセットを生成します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>author ごとに、これをインデックスに追加します。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuring-the-application"><a class="anchor" href="#configuring-the-application"></a>アプリケーションの設定</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>いつものように、Quarkusの設定ファイル（ <code>application.properties</code> ）ですべての設定を行うことができます。</p>
+</div>
+<div class="paragraph">
+<p>以下の内容の <code>src/main/resources/import.sql</code> ファイルを作成してみましょう:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.hibernate-search-standalone.mapping.structure=document <i class="conum" data-value="1"></i><b>(1)</b>
+quarkus.hibernate-search-standalone.elasticsearch.version=8 <i class="conum" data-value="2"></i><b>(2)</b>
+quarkus.hibernate-search-standalone.indexing.plan.synchronization.strategy=sync <i class="conum" data-value="3"></i><b>(3)</b>
+
+%prod.quarkus.hibernate-search-standalone.elasticsearch.hosts=localhost:9200 <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Hibernate Search にエンティティーの構造を伝える必要があります。
+<div class="paragraph">
+<p>このアプリケーションでは、インデックスが作成されたエンティティー (author) が "ドキュメント" のルートであるとみなされます。
+author は、関連性を通じて参照する book を "所有” します。
+つまり、author のみを更新することは <strong>できません</strong>。</p>
+</div>
+<div class="paragraph">
+<p>その他のオプションと詳細は、<a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-mapping-structure"><code>quarkus.hibernate-search-standalone.mapping.structure</code></a> を参照してください。</p>
+</div></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>使用する Elasticsearch のバージョンを Hibernate Search に伝える必要があります。
+<div class="paragraph">
+<p>Elasticsearch のマッピング構文はバージョンによって大きく異なるため、これは重要です。
+起動時間を短縮するためにマッピングはビルド時に作成されるため、Hibernate Search はクラスターに接続して自動的にバージョンを検出することができません。
+OpenSearch の場合、バージョンの前に <code>opensearch:</code> を付ける必要がある点に注意してください。<a href="#opensearch">OpenSearch 互換性</a> を参照してください。</p>
+</div></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>これは、エンティティーが検索可能になるのを待ってから書き込みが完了したとみなすことを意味します。
+実稼働環境では、デフォルトの <code>write-sync</code> の方がパフォーマンスが高くなります。
+テスト時には、エンティティーがすぐに検索可能になる必要があるため、<code>sync</code> を使用することが特に重要です。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>開発とテストの場合は、<a href="#dev-services">Dev Services</a> に依存します。
+つまり、Quarkus は Elasticsearch クラスターを自動的に起動します。
+しかし、実稼働モードの場合は、
+Elasticsearch クラスターを手動で起動したいと考えています。
+そのため、<code>prod</code> プロファイルで Quarkus にこの接続情報を提供します (<code>%prod.</code> 接頭辞)。</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><a href="#dev-services">Dev Services</a> に依存していることから、Elasticsearch スキーマは、
+(<a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-schema-management-strategy"><code>quarkus.hibernate-search-standalone.schema-management.strategy</code></a> 
+が明示的に設定されていない限り) テストと開発モードで
+アプリケーションの起動ごとに自動的に削除され、再作成されます。</p>
+</div>
+<div class="paragraph">
+<p>何らかの理由で Dev Services を利用できない場合は、
+以下のプロパティーを設定することで、同様の動作をさせることができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">%dev,test.quarkus.hibernate-search-standalone.schema-management.strategy=drop-and-create</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-schema-management-strategy"><code>quarkus.hibernate-search-standalone.schema-management.strategy</code></a> も参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Hibernate Search Standalone エクステンションの設定に関する詳細は、<a href="#configuration-reference">Configuration Reference</a> を参照してください。
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-a-frontend"><a class="anchor" href="#creating-a-frontend"></a>フロントエンドの作成</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>それでは、<code>LibraryResource</code> と対話するための簡単なWebページを追加してみましょう。
+Quarkus は、<code>META-INF/resources</code> ディレクトリの下にある静的リソースを自動的に提供します。
+<code>src/main/resources/META-INF/resources</code> ディレクトリーで、既存の <code>index.html</code> ファイルを、この
+ <a href="https://github.com/quarkusio/quarkus-quickstarts/blob/main/hibernate-search-standalone-elasticsearch-quickstart/src/main/resources/META-INF/resources/index.html">index.html</a> ファイルの内容で上書きしてください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="time-to-play-with-your-application"><a class="anchor" href="#time-to-play-with-your-application"></a>アプリケーションの使用</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>これで、REST サービスと対話できるようになりました。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Quarkus アプリケーションを次のように起動します。</p>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">CLI</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw quarkus:dev</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew --console=plain quarkusDev</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>ブラウザーで <code><a href="http://localhost:8080/" class="bare">http://localhost:8080/</a></code> を開きます。</p>
+</li>
+<li>
+<p>author または book タイトルを検索します (一部のデータは初期化されています)。</p>
+</li>
+<li>
+<p>新しい author や book を作成し、それらを検索することもできます</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>ご覧のように、すべての更新が自動的に Elasticsearch クラスターに同期されます。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="building-a-native-executable"><a class="anchor" href="#building-a-native-executable"></a>ネイティブ実行可能ファイルのビルド</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>以下のコマンドでネイティブの実行可能ファイルをビルドすることができます。</p>
+</div>
+<div class="listingblock primary asciidoc-tabs-sync-cli">
+<div class="title">コマンドラインインタフェース</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">quarkus build --native</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-maven">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./mvnw install -Dnative</code></pre>
+</div>
+</div>
+<div class="listingblock secondary asciidoc-tabs-sync-gradle">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">./gradlew build -Dquarkus.native.enabled=true</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルのコンパイルと同様に、この操作は大量のメモリーを消費します。</p>
+</div>
+<div class="paragraph">
+<p>ネイティブ実行可能ファイルをビルドしている間は 2 つのコンテナーを停止して、ビルドが終わったら再度起動した方が安全かもしれません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>この実行は、<code>./target/hibernate-search-standalone-elasticsearch-quickstart-1.0.0-SNAPSHOT-runner</code> の実行と同じくらい簡単です。</p>
+</div>
+<div class="paragraph">
+<p>その後、ブラウザーで <code><a href="http://localhost:8080/" class="bare">http://localhost:8080/</a></code> を開き、アプリケーションを使用します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>起動は通常より少し遅くなります。これは主に、起動時に毎回 Elasticsearch マッピングを削除して再作成するためです。
+いくつかの初期データのインデックスも作成します。</p>
+</div>
+<div class="paragraph">
+<p>実際のアプリケーションでは、これは明らかに、起動時に毎回行うものではありません。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="dev-services"><a class="anchor" href="#dev-services"></a>開発サービス (設定不要のデータストア)</h3>
+<div class="paragraph">
+<p>Quarkus は、設定なしでさまざまなコンテナーを起動できる <a href="dev-services">開発サービス</a> と呼ばれる機能をサポートしています。</p>
+</div>
+<div class="paragraph">
+<p>Elasticsearch の場合、このサポートはデフォルトの Elasticsearch 接続にも及んでいます。
+つまり、<code>quarkus.hibernate-search-standalone.elasticsearch.hosts</code> を設定していない場合は、
+Quarkus はテストの実行時または <a href="dev-mode-differences">dev モード</a> で Elasticsearch コンテナーを自動的に起動し、
+接続を自動的に設定します。</p>
+</div>
+<div class="paragraph">
+<p>アプリケーションの実稼働バージョンを実行する場合、Elasticsearch 接続は通常通り設定する必要があります。
+したがって、<code>application.properties</code> に実稼働バージョンのデータベース設定を含め、Dev Services を引き続き使用したい場合は、
+<code>%prod.</code> プロファイルを使用して、Elasticsearch 設定を定義することを推奨します。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Dev Services for Elasticsearch は現時点では複数のクラスターを同時に起動することができず、デフォルトの永続化ユニットのデフォルトのバックエンドでのみ動作します。名前付き永続化ユニットや名前付きバックエンドは Dev Services for Elasticsearch を利用することができません。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>詳細については、 <a href="elasticsearch-dev-services">Dev Services for Elasticsearch ガイド</a> をご覧ください。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="programmatic-mapping"><a class="anchor" href="#programmatic-mapping"></a>プログラムによるマッピング</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>何らかの理由で Hibernate Search アノテーションをエンティティーに追加できない場合は、
+代わりにプログラムでマッピングを適用することができます。
+プログラムによるマッピングは、<code>ProgrammaticMappingConfigurationContext</code> を通じて設定され、
+マッピング Configurer (<code>HibernateOrmSearchMappingConfigurer</code>) を介して公開されます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>マッピング Configurer (<code>StandalonePojoMappingConfigurer</code>) を使用すると、単なるプログラムによるマッピング機能以上のものを実現できます。
+<a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#mapper-pojo-standalone-mapping-configurer">アノテーションマッピング、ブリッジなどの設定</a> も実現されます。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>以下は、プログラムによるマッピングを適用するマッピング Configurer の例です。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package org.acme.hibernate.search.elasticsearch.config;
+
+import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
+
+import io.quarkus.hibernate.search.standalone.elasticsearch.SearchExtension;
+
+@SearchExtension <i class="conum" data-value="1"></i><b>(1)</b>
+public class CustomMappingConfigurer implements StandalonePojoMappingConfigurer {
+
+	@Override
+    public void configure(StandalonePojoMappingConfigurationContext context) {
+        TypeMappingStep type = context.programmaticMapping()    <i class="conum" data-value="2"></i><b>(2)</b>
+                .type(SomeIndexedEntity.class);                 <i class="conum" data-value="3"></i><b>(3)</b>
+        type.searchEntity();                                    <i class="conum" data-value="4"></i><b>(4)</b>
+        type.indexed()                                          <i class="conum" data-value="5"></i><b>(5)</b>
+                .index(SomeIndexedEntity.INDEX_NAME);           <i class="conum" data-value="6"></i><b>(6)</b>
+        type.property("id").documentId();                       <i class="conum" data-value="7"></i><b>(7)</b>
+        type.property("text").fullTextField();                  <i class="conum" data-value="8"></i><b>(8)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Configurer の実装に <code>@SearchExtension</code> 修飾子のアノテーションを付けて、
+Hibernate Search Standalone で使用するように Quarkus に指示します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>プログラムによるマッピングコンテキストにアクセスします。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>SomeIndexedEntity</code> タイプのマッピングステップを作成します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Hibernate Search のエンティティータイプとして <code>SomeIndexedEntity</code> を定義します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td><code>SomeIndexedEntity</code> エンティティーをインデックスが作成されたと定義します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td><code>SomeIndexedEntity</code> エンティティーに使用するインデックス名を指定します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>ドキュメント ID プロパティーを定義します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td><code>text</code> プロパティーのフルテキスト検索フィールドを定義します。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="opensearch"><a class="anchor" href="#opensearch"></a>OpenSearch 互換性</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Hibernate Search は <a href="https://www.elastic.co/elasticsearch">Elasticsearch</a> と 
+<a href="https://www.opensearch.org/">OpenSearch</a> 
+の両方に対応していますが、デフォルトでは Elasticsearch クラスターとの連携を前提としています。</p>
+</div>
+<div class="paragraph">
+<p>代わりに Hibernate Search を OpenSearch クラスターで動作させるには、
+<a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#backend-elasticsearch-configuration-version">設定されたバージョンに`opensearch:`を接頭辞として付けます</a>。
+以下に例を示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.hibernate-search-standalone.elasticsearch.version=opensearch:2.16</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>その他の設定オプションや API は、Elasticsearch の場合とまったく同じです。</p>
+</div>
+<div class="paragraph">
+<p>Elasticsearch の互換性のあるディストリビューションとバージョンの詳細は、
+<a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#compatibility">Hibernate Search の参照ドキュメントのこちらのセクション</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cdi"><a class="anchor" href="#cdi"></a>CDI インテグレーション</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="injecting-entry-points"><a class="anchor" href="#injecting-entry-points"></a>エントリーポイントの注入</h3>
+<div class="paragraph">
+<p>CDI を使用して、Hibernate Search のメインエントリーポイントである <code>SearchMapping</code> を注入できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Inject
+SearchMapping searchMapping;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="plugging-in-custom-components"><a class="anchor" href="#plugging-in-custom-components"></a>カスタムコンポーネントのプラグイン</h3>
+<div class="paragraph">
+<p>Hibernate Search Standalone の Quarkus エクステンションは自動的に
+<code>@SearchExtension</code> アノテーションが付けられたコンポーネントを Hibernate Search に注入します。</p>
+</div>
+<div class="paragraph">
+<p>アノテーションは、注入されるコンポーネントのタイプに適している場合に、
+オプションで特定の
+バックエンド (<code>@SearchExtension(backend = "nameOfYourBackend")</code>)、インデックス (<code>@SearchExtension(index = "nameOfYourIndex")</code>)、
+またはそれらの組み合わせ
+(<code>@SearchExtension(backend = "nameOfYourBackend", index = "nameOfYourIndex")</code>) をターゲットにできます。</p>
+</div>
+<div class="paragraph">
+<p>この機能は、次のコンポーネントタイプで使用できます。</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.search.engine.reporting.FailureHandler</code></dt>
+<dd>
+<p>バックグラウンドプロセスで発生した障害が通知されるコンポーネント
+(主にインデックス操作)。</p>
+<div class="paragraph">
+<p>スコープ: アプリケーションごとに 1 つ。</p>
+</div>
+<div class="paragraph">
+<p>詳細は、<a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#configuration-background-failure-handling">参照ドキュメントのこちらのセクション</a> 
+を参照してください。</p>
+</div>
+</dd>
+<dt class="hdlist1"><code>org.hibernate.search.mapper.pojo.standalone.mapping.StandalonePojoMappingConfigurer</code></dt>
+<dd>
+<p>特にプログラムによって Hibernate Search マッピングを設定するために使用されるコンポーネント。</p>
+<div class="paragraph">
+<p>スコープ: 永続性ユニットごとに 1 つ以上。</p>
+</div>
+<div class="paragraph">
+<p>詳細は、<a href="#programmatic-mapping">this section of this guide</a> を参照してください。</p>
+</div>
+</dd>
+<dt class="hdlist1"><code>org.hibernate.search.mapper.pojo.work.IndexingPlanSynchronizationStrategy</code></dt>
+<dd>
+<p>アプリケーションスレッドとインデックスの作成を同期する方法を設定するために使用されるコンポーネント。</p>
+<div class="paragraph">
+<p>スコープ: アプリケーションごとに 1 つ。</p>
+</div>
+<div class="paragraph">
+<p><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-indexing-plan-synchronization-strategy"><code>quarkus.hibernate-search-standalone.indexing.plan.synchronization.strategy</code></a> 
+を介して組み込み実装に設定することもできます。</p>
+</div>
+<div class="paragraph">
+<p>詳細は、<a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#indexing-plan-synchronization">参照ドキュメントのこちらのセクション</a> 
+を参照してください。</p>
+</div>
+</dd>
+<dt class="hdlist1"><code>org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer</code></dt>
+<dd>
+<p>フルテキスト分析 (アナライザー、ノーマライザーなど) を設定するために使用されるコンポーネント。</p>
+<div class="paragraph">
+<p>スコープ: バックエンドごとに 1 つ以上。</p>
+</div>
+<div class="paragraph">
+<p>詳細は、<a href="#analysis-configurer">this section of this guide</a> を参照してください。</p>
+</div>
+</dd>
+<dt class="hdlist1"><code>org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy</code></dt>
+<dd>
+<p>Elasticsearch レイアウト (インデックス名、インデックスエイリアスなど) を設定するために使用されるコンポーネント。</p>
+<div class="paragraph">
+<p>スコープ: バックエンドごとに 1 つ。</p>
+</div>
+<div class="paragraph">
+<p><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-layout-strategy"><code>quarkus.hibernate-search-standalone.elasticsearch.layout.strategy</code></a> 
+を介して組み込み実装に設定することもできます。</p>
+</div>
+<div class="paragraph">
+<p>詳細は、<a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#backend-elasticsearch-indexlayout">参照ドキュメントのこちらのセクション</a> 
+を参照してください。</p>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="offline-startup"><a class="anchor" href="#offline-startup"></a>オフライン起動</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>デフォルトでは、Hibernate Search は起動時に Elasticsearch クラスターにいくつかのリクエストを送信します。
+Hibernate Search の起動時に Elasticsearch クラスターが稼働していない場合は、
+起動失敗の原因となります。</p>
+</div>
+<div class="paragraph">
+<p>これに対処するためには起動時にリクエストを送信しないようにHibernate Searchを設定します:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>設定プロパティー
+ <a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-version-check-enabled"><code>quarkus.hibernate-search-standalone.elasticsearch.version-check.enabled</code></a> を <code>false</code> に設定して、
+起動時の Elasticsearch バージョンチェックを無効にします。</p>
+</li>
+<li>
+<p>設定プロパティー
+ <a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-schema-management-strategy"><code>quarkus.hibernate-search-standalone.schema-management.strategy</code></a> を`none` に設定して、
+起動時にスキーマ管理を無効にします。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>もちろん、この構成でも、Elasticsearch クラスターにアクセスできるようになるまでは、
+Hibernate Search はインデックスを作成したり、検索クエリーを実行したりすることはできません。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.schema-management.strategy</code> を <code>none</code> に設定してスキーマの自動作成を無効にした場合、
+アプリケーションが、エンティティーの永続化/更新や検索リクエストの実行を開始する前に、
+手動でスキーマを作成する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>詳細は、<a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#schema-management-manager">参照ドキュメントのこちらのセクション</a>
+を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="loading"><a class="anchor" href="#loading"></a>ロード中</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Elasticsearch をプライマリーデータストアとして使用する代わりとして、
+このエクステンションは、別のデータストアから取得したエンティティーのインデックスを作成するためにも使用できます。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>このようなシナリオでは、
+<a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-mapping-structure"><code>quarkus.hibernate-search-standalone.mapping.structure</code></a> を
+プライマリーデータストアの構造に一致する値に設定する必要があります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>これを実行するには、エンティティーを他のデータストアからロードする必要があります。
+このようなロードは、明示的に実装する必要があります。</p>
+</div>
+<div class="paragraph">
+<p>ロードの設定に関する詳細は、Hibernate Search のリファレンスドキュメントを参照してください。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>外部データソースからエンティティーをロードして再インデックスする場合は、
+<a href="https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/#mapping-entitydefinition-loading-mass">一括ローディングストラテジー</a> を参照してください。</p>
+</li>
+<li>
+<p>検索ヒットを返すときに外部データソースからエンティティーをロードするには、
+<a href="https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/#mapping-entitydefinition-loading-selection">選択ロードストラテジー</a> を参照してください。</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Quarkus では、Hibernate Search の参照ドキュメントに記載されているエンティティーローダーは、
+<a href="#plugging-in-custom-components">CDI bean</a> のように定義できますが、
+<code>@SearchEntity(loadingBinder = &#8230;&#8203;)</code> を使用して特定のエンティティーにアタッチする必要があります。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="management"><a class="anchor" href="#management"></a>管理エンドポイント</h2>
+<div class="sectionbody">
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Hibernate Search の管理エンドポイントは、プレビュー機能とされています。</p>
+</div>
+<div class="paragraph">
+<p><em>プレビュー版</em> では、後方互換性やエコシステムでの存在は保証されていません。
+具体的な改善のためには、設定や API、あるいはストレージのフォーマットを変更する必要があるかもしれませんが、
+<em>安定化</em> に向けた計画は進行中です。
+ご意見およびご感想は、https://groups.google.com/d/forum/quarkus-dev[メーリングリスト] や
+ <a href="https://github.com/quarkusio/quarkus/issues">GitHub の issue トラッカー</a> までお寄せください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Hibernate Search エクステンションは、<a href="./management-interface-reference">管理インターフェイス</a> を通じてデータを再インデックスするための HTTP エンドポイントを提供します。
+デフォルトでは、このエンドポイントは使用できません。以下に示すように、設定プロパティーを通じて有効にできます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.management.enabled=true <i class="conum" data-value="1"></i><b>(1)</b>
+quarkus.hibernate-search-standalone.management.enabled=true <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><a href="./management-interface-reference">管理インターフェイス</a> を有効にします。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Hibernate Search Standalone 固有の管理エンドポイントを有効にします。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>管理エンドポイントが有効になると、<code>/q/hibernate-search/standalone/reindex</code> 経由でデータのインデックスの再作成が可能になります。ここで、<code>/q</code> はデフォルトの管理ルートパスで、
+<code>/hibernate-search/standalone/</code> はデフォルトの Hibernate Search ルート管理パスになります。
+以下に示すように、(<code>/hibernate-search/standalone/</code>) は、設定プロパティーを介して変更できます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">quarkus.hibernate-search-standalone.management.root-path=custom-root-path <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Hibernate Search の管理エンドポイントにカスタムの <code>custom-root-path</code> パスを使用します。
+デフォルトの管理ルートパスが使用される場合は、インデックスが再作成されたパスは <code>/q/custom-root-path/reindex</code> になります。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>このエンドポイントは、<code>application/json</code> コンテンツタイプのみの <code>POST</code> リクエストを受け入れます。
+空のリクエスト本文が送信された場合、インデックスが作成されたすべてのエンティティーはインデックスが再作成されます。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>エンティティータイプのインデックスを再作成するには、
+<a href="#loading">configured for loading from an external source</a> である必要があります。</p>
+</div>
+<div class="paragraph">
+<p>この設定がない場合、管理エンドポイント (または他の API) を介してインデックスの再作成を行うと、
+失敗します。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>エンティティーのサブセットのみのインデックスを再作成する必要がある場合、または
+基礎となる一括インデクサーのカスタム設定が必要な場合は、
+以下に示すように、この情報をリクエスト本体を通じて渡すことができます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "filter": {
+    "types": ["EntityName1", "EntityName2", "EntityName3", ...], <i class="conum" data-value="1"></i><b>(1)</b>
+  },
+  "massIndexer":{
+    "typesToIndexInParallel": 1, <i class="conum" data-value="2"></i><b>(2)</b>
+  }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>インデックスを再作成する必要があるエンティティー名の配列。指定されていないか空の場合は、すべてのエンティティータイプのインデックスが再作成されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>インデックスを並列に作成するエンティティータイプの数を設定します。</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>使用可能なフィルターと利用可能な一括インデクサー設定の完全なリストを以下の例に示します。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "filter": { <i class="conum" data-value="1"></i><b>(1)</b>
+    "types": ["EntityName1", "EntityName2", "EntityName3", ...], <i class="conum" data-value="2"></i><b>(2)</b>
+    "tenants": ["tenant1", "tenant2", ...] <i class="conum" data-value="3"></i><b>(3)</b>
+  },
+  "massIndexer":{ <i class="conum" data-value="4"></i><b>(4)</b>
+    "typesToIndexInParallel": 1, <i class="conum" data-value="5"></i><b>(5)</b>
+    "threadsToLoadObjects": 6,  <i class="conum" data-value="6"></i><b>(6)</b>
+    "batchSizeToLoadObjects": 10, <i class="conum" data-value="7"></i><b>(7)</b>
+    "cacheMode": "IGNORE", <i class="conum" data-value="8"></i><b>(8)</b>
+    "mergeSegmentsOnFinish": false, <i class="conum" data-value="9"></i><b>(9)</b>
+    "mergeSegmentsAfterPurge": true, <i class="conum" data-value="10"></i><b>(10)</b>
+    "dropAndCreateSchemaOnStart": false, <i class="conum" data-value="11"></i><b>(11)</b>
+    "purgeAllOnStart": true, <i class="conum" data-value="12"></i><b>(12)</b>
+    "idFetchSize": 100, <i class="conum" data-value="13"></i><b>(13)</b>
+    "transactionTimeout": 100000, <i class="conum" data-value="14"></i><b>(14)</b>
+  }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>インデックスの再作成範囲を制限できるフィルターオブジェクト。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>インデックスを再作成する必要があるエンティティー名の配列。指定されていないか空の場合は、すべてのエンティティータイプのインデックスが再作成されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>マルチテナンシーの場合のテナント ID の配列。指定されていないか空の場合、すべてのテナントのインデックスが再作成されます。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>一括インデクサー設定オブジェクト。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>インデックスを並列に作成するエンティティータイプの数を設定します。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>ルートエンティティーをロードするために使用されるスレッドの数の設定。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>ルートエンティティーをロードするために使用されるバッチサイズの設定。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>データロードタスクのキャッシュ対話モードの設定。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>インデックスの作成後に各インデックスが 1 つのセグメントにマージされるかどうか。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="10"></i><b>10</b></td>
+<td>インデックスの作成直前に、最初のインデックスのパージ後に各インデックスが 1 つのセグメントにマージされるかどうか。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="11"></i><b>11</b></td>
+<td>インデックスの作成前に、インデックスとそのスキーマ (存在する場合) を削除して再作成するかどうか。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="12"></i><b>12</b></td>
+<td>インデックスの作成前に、すべてのエンティティーがインデックスから削除されるかどうか。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="13"></i><b>13</b></td>
+<td>プライマリーキーをロードする際に使用するフェッチサイズの指定 (インデックスを作成するオブジェクトの場合)。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="14"></i><b>14</b></td>
+<td>インデックスを再作成する ID とエンティティーをロードするためのトランザクションのタイムアウトの指定。
+<div class="paragraph">
+<p>JSON 内のすべてのプロパティーはオプションであり、使用できるのは必要なものだけである点に注意してください。</p>
+</div></td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>一括インデクサーの設定に関する詳細は、
+<a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#indexing-massindexer-parameters">Hibernate Search リファレンスドキュメントの対応するセクション</a> を参照してください。</p>
+</div>
+<div class="paragraph">
+<p>インデックスの再作成要求を送信すると、バックグラウンドでインデックスの作成がトリガーされます。インデックスの一括作成の進行状況はアプリケーションログに表示されます。
+テスト目的の場合、インデックスの作成がいつ終了したかを知ることは役に立つかもしれません。URL に <code>wait_for=finished</code> クエリーパラメーターを追加すると、
+管理エンドポイントが、インデックス作成の開始時と終了時を報告するチャンク化された応答を返します。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="limitations"><a class="anchor" href="#limitations"></a>制限</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Hibernate Search Standalone エクステンションは、
+<a href="hibernate-search-orm-elasticsearch">Hibernate ORM を使用した Hibernate Search エクステンション</a> と同じアプリケーションでは使用できません。</p>
+<div class="paragraph">
+<p>進捗状況を追跡するには、https://github.com/quarkusio/quarkus/issues/39517[#39517] を参照してください。</p>
+</div>
+</li>
+<li>
+<p><a href="hibernate-search-orm-elasticsearch#aws-request-signing">Hibernate ORM を使用した Hibernate Search エクステンション</a> とは異なり、
+AWS リクエスト署名は現在利用できません。</p>
+<div class="paragraph">
+<p>進捗状況を追跡するには、https://github.com/quarkusio/quarkus/issues/26991[#26991] を参照してください。</p>
+</div>
+</li>
+<li>
+<p>楽観的並行性制御は現在利用できません。</p>
+<div class="paragraph">
+<p>進捗状況を追跡するには、https://hibernate.atlassian.net/browse/HSEARCH-5105[HSEARCH-5105] を参照してください。</p>
+</div>
+</li>
+<li>
+<p>Elasticsearch/OpenSearch はトランザクションをサポートしていません。
+そのため、複数のドキュメントの更新が部分的に失敗し、インデックスが不整合な状態になる可能性があります。</p>
+<div class="paragraph">
+<p>これは、<a href="hibernate-search-orm-elasticsearch#coordination">送信トレイポーリングによる調整</a> により、
+<a href="hibernate-search-orm-elasticsearch">Hibernate ORM を使用した Hibernate Search エクステンション</a> のように回避することはできません。
+なぜなら、その調整には Hibernate ORM が必要であり、
+そのデータが (トランザクション) リレーショナルデータベースのデータから取得されるという事実に依存しているからです。</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="further-reading"><a class="anchor" href="#further-reading"></a>さらに詳しく</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Hibernate Search の詳細については、
+Hibernate チームが公開している <a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/">多数の参照ドキュメント</a> 
+および <a href="https://hibernate.org/search/more-resources/">その他の関連ドキュメント</a> を参照してください。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="faq"><a class="anchor" href="#faq"></a>FAQ</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="why-elasticsearch-only"><a class="anchor" href="#why-elasticsearch-only"></a>なぜ Elasticsearch だけなのですか?</h3>
+<div class="paragraph">
+<p>Hibernate Search は Lucene バックエンドと Elasticsearch バックエンドの両方をサポートしています。</p>
+</div>
+<div class="paragraph">
+<p>Quarkus のコンテキストおよびスケーラブルなアプリケーションの構築において、Elasticsearch バックエンドの方適しています。
+そこで、Elasticsearch バックエンドに重点を置いています。</p>
+</div>
+<div class="paragraph">
+<p>現時点では Quarkus で Lucene バックエンドをサポートする予定はありません。
+ただし、Quarkiverse (<a href="https://github.com/quarkiverse/quarkus-hibernate-search-extras/issues/180">quarkiverse/quarkus-hibernate-search-extras#180</a>) では、
+このような実装の進捗状況が追跡されています。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration-reference"><a class="anchor" href="#configuration-reference"></a>Hibernate Search Standalone の設定リファレンス</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> ビルド時に固定された設定プロパティー。その他の設定プロパティーはすべてランタイム時にオーバーライド可能です。<input type="search" id="config-search-0" placeholder="FILTER CONFIGURATION" disabled></p>
+</div>
+<table class="tableblock frame-all grid-all stretch configuration-reference searchable configuration-reference-all-rows">
+<colgroup>
+<col style="width: 80%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><span class="header-title">Configuration property</span></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-enabled"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-enabled"><code>quarkus.hibernate-search-standalone.enabled</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-1" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Whether Hibernate Search Standalone is enabled <strong>during the build</strong>.</p>
+</div>
+<div class="paragraph">
+<p>If Hibernate Search is disabled during the build, all processing related to Hibernate Search will be skipped,
+but it will not be possible to activate Hibernate Search at runtime:
+<code>quarkus.hibernate-search-standalone.active</code> will default to <code>false</code> and setting it to <code>true</code> will lead to an error.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6318">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6318" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-background-failure-handler"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-background-failure-handler"><code>quarkus.hibernate-search-standalone.background-failure-handler</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-2" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>A <a href="hibernate-search-stqndqlone-elasticsearch#bean-reference-note-anchor">bean reference</a> to a component
+that should be notified of any failure occurring in a background process
+(mainly index operations).</p>
+</div>
+<div class="paragraph">
+<p>The referenced bean must implement <code>FailureHandler</code>.</p>
+</div>
+<div class="paragraph">
+<p>See
+<a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#configuration-background-failure-handling">this section of the reference documentation</a>
+for more information.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Instead of setting this configuration property,
+you can simply annotate your custom <code>FailureHandler</code> implementation with <code>@SearchExtension</code>
+and leave the configuration property unset: Hibernate Search will use the annotated implementation automatically.
+See <a href="hibernate-search-stqndqlone-elasticsearch#plugging-in-custom-components">this section</a>
+for more information.</p>
+</div>
+<div class="paragraph">
+<p>If this configuration property is set, it takes precedence over any <code>@SearchExtension</code> annotation.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6319">QUARKUS_HIBERNATE_SEARCH_STANDALONE_BACKGROUND_FAILURE_HANDLER</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6319" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-mapping-configurer"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-mapping-configurer"><code>quarkus.hibernate-search-standalone.mapping.configurer</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-3" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>One or more <a href="#bean-reference-note-anchor">bean references</a>
+to the component(s) used to configure the Hibernate Search mapping,
+in particular programmatically.</p>
+</div>
+<div class="paragraph">
+<p>The referenced beans must implement <code>StandalonePojoMappingConfigurer</code>.</p>
+</div>
+<div class="paragraph">
+<p>See <a href="#programmatic-mapping">Programmatic mapping</a> for an example
+on how mapping configurers can be used to apply programmatic mappings.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Instead of setting this configuration property,
+you can simply annotate your custom <code>StandalonePojoMappingConfigurer</code> implementations with <code>@SearchExtension</code>
+and leave the configuration property unset: Hibernate Search will use the annotated implementation automatically.
+See <a href="#plugging-in-custom-components">this section</a>
+for more information.</p>
+</div>
+<div class="paragraph">
+<p>If this configuration property is set, it takes precedence over any <code>@SearchExtension</code> annotation.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6320">QUARKUS_HIBERNATE_SEARCH_STANDALONE_MAPPING_CONFIGURER</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6320" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-mapping-structure"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-mapping-structure"><code>quarkus.hibernate-search-standalone.mapping.structure</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-4" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The structure of the Hibernate Search entity mapping.</p>
+</div>
+<div class="paragraph">
+<p>This must match the structure of the application model being indexed with Hibernate Search:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>graph</code> (default)</dt>
+<dd>
+<p>Entities indexed through Hibernate Search are nodes in an entity graph,
+i.e. an indexed entity is independent of other entities it references through associations,
+which <strong>can</strong> be updated independently of the indexed entity.</p>
+<div class="paragraph">
+<p>Associations between entities must be bi-directional:
+specifying the inverse side of associations through <code>@AssociationInverseSide</code> <strong>is required</strong>,
+unless reindexing is disabled for that association through <code>@IndexingDependency(reindexOnUpdate = &#8230;&#8203;)</code>.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code>document</code></dt>
+<dd>
+<p>Entities indexed through Hibernate Search are the root of a document,
+i.e. an indexed entity "owns" other entities it references through associations,
+which <strong>cannot</strong> be updated independently of the indexed entity.</p>
+<div class="paragraph">
+<p>Associations between entities can be uni-directional:
+specifying the inverse side of associations through <code>@AssociationInverseSide</code> <strong>is not required</strong>.</p>
+</div>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>See also <a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#mapping-reindexing-associationinverseside"><code>@AssociationInverseSide</code></a>
+<a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#mapping-reindexing-reindexonupdate"><code>@IndexingDependency(reindexOnUpdate = &#8230;&#8203;)</code></a>.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6321">QUARKUS_HIBERNATE_SEARCH_STANDALONE_MAPPING_STRUCTURE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6321" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><span class="asciidoc-tooltip-wrapper"><code>graph</code><span class="asciidoc-tooltip">Entities indexed through Hibernate Search are nodes in an entity graph.  With this structure\: * An indexed entity is independent of other entities it references through associations, which <strong>can</strong> be updated independently of the indexed entity; in particular they may be passed to {@link org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan#addOrUpdate(Object)}. * Therefore, when an entity changes, Hibernate Search may need to resolve other entities to reindex, which means in particular that associations between entities must be bi-directional\: specifying the inverse side of associations through <code>@AssociationInverseSide</code> <strong>is required</strong>, unless reindexing is disabled for that association through <code>@IndexingDependency(reindexOnUpdate = &#8230;&#8203;)</code>.  See also link\:https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#mapping-reindexing-associationinverseside\]<code>@AssociationInverseSide</code>] link\:https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#mapping-reindexing-reindexonupdate\]<code>@IndexingDependency(reindexOnUpdate = &#8230;&#8203;)</code>].</span></span>, <span class="asciidoc-tooltip-wrapper"><code>document</code><span class="asciidoc-tooltip">Entities indexed through Hibernate Search are the root of a document.  With this structure\: * An indexed entity "owns" other entities it references through associations, which <strong>cannot</strong> be updated independently of the indexed entity; in particular they cannot be passed to {@link org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan#addOrUpdate(Object)}. * Therefore, when an entity changes, Hibernate Search doesn&#8217;t need to resolve other entities to reindex, which means in particular that associations between entities can be uni-directional\: specifying the inverse side of associations through <code>@AssociationInverseSide</code> <strong>is not required</strong>.  See also link\:https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#mapping-reindexing-associationinverseside\]<code>@AssociationInverseSide</code>].</span></span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><span class="asciidoc-tooltip-wrapper"><code>graph</code><span class="asciidoc-tooltip">Entities indexed through Hibernate Search are nodes in an entity graph.  With this structure\: * An indexed entity is independent of other entities it references through associations, which <strong>can</strong> be updated independently of the indexed entity; in particular they may be passed to {@link org.hibernate.search.mapper.pojo.standalone.work.SearchIndexingPlan#addOrUpdate(Object)}. * Therefore, when an entity changes, Hibernate Search may need to resolve other entities to reindex, which means in particular that associations between entities must be bi-directional\: specifying the inverse side of associations through <code>@AssociationInverseSide</code> <strong>is required</strong>, unless reindexing is disabled for that association through <code>@IndexingDependency(reindexOnUpdate = &#8230;&#8203;)</code>.  See also link\:https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#mapping-reindexing-associationinverseside\]<code>@AssociationInverseSide</code>] link\:https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#mapping-reindexing-reindexonupdate\]<code>@IndexingDependency(reindexOnUpdate = &#8230;&#8203;)</code>].</span></span></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-active"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-active"><code>quarkus.hibernate-search-standalone.active</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-5" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Whether Hibernate Search Standalone should be active at runtime.</p>
+</div>
+<div class="paragraph">
+<p>If Hibernate Search Standalone is not active, it won&#8217;t start with the application,
+and accessing the SearchMapping for search or other operations will not be possible.</p>
+</div>
+<div class="paragraph">
+<p>Note that if Hibernate Search Standalone is disabled
+(i.e. <code>quarkus.hibernate-search-standalone.enabled</code> is set to <code>false</code>),
+it won&#8217;t be active, and setting this property to <code>true</code> will fail.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6322">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ACTIVE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6322" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>'true' if Hibernate Search Standalone is enabled; 'false' otherwise</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-schema-management-strategy"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-schema-management-strategy"><code>quarkus.hibernate-search-standalone.schema-management.strategy</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-6" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The schema management strategy, controlling how indexes and their schema
+are created, updated, validated or dropped on startup and shutdown.</p>
+</div>
+<div class="paragraph">
+<p>Available values:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Strategy</p></th>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Definition</p></th>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">none</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Do nothing: assume that indexes already exist and that their schema matches Hibernate Search&#8217;s expectations.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">validate</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Validate that indexes exist and that their schema matches Hibernate Search&#8217;s expectations.</p>
+<p class="tableblock">If it does not, throw an exception, but make no attempt to fix the problem.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">create</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">For indexes that do not exist, create them along with their schema.</p>
+<p class="tableblock">For indexes that already exist, do nothing: assume that their schema matches Hibernate Search&#8217;s expectations.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">create-or-validate (<strong>default</strong> unless using Dev Services)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">For indexes that do not exist, create them along with their schema.</p>
+<p class="tableblock">For indexes that already exist, validate that their schema matches Hibernate Search&#8217;s expectations.</p>
+<p class="tableblock">If it does not, throw an exception, but make no attempt to fix the problem.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">create-or-update</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">For indexes that do not exist, create them along with their schema.</p>
+<p class="tableblock">For indexes that already exist, validate that their schema matches Hibernate Search&#8217;s expectations;
+if it does not match expectations, try to update it.</p>
+<p class="tableblock"><strong>This strategy is unfit for production environments</strong>,
+due to several important limitations,
+but can be useful when developing.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">drop-and-create</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">For indexes that do not exist, create them along with their schema.</p>
+<p class="tableblock">For indexes that already exist, drop them, then create them along with their schema.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">drop-and-create-and-drop (<strong>default</strong> when using Dev Services)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">For indexes that do not exist, create them along with their schema.</p>
+<p class="tableblock">For indexes that already exist, drop them, then create them along with their schema.</p>
+<p class="tableblock">Also, drop indexes and their schema on shutdown.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>See <a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#schema-management-strategy">this section of the reference documentation</a>
+for more information.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6323">QUARKUS_HIBERNATE_SEARCH_STANDALONE_SCHEMA_MANAGEMENT_STRATEGY</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6323" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><code>none</code>, <code>validate</code>, <code>create</code>, <code>create-or-validate</code>, <code>create-or-update</code>, <code>drop-and-create</code>, <code>drop-and-create-and-drop</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>drop-and-create-and-drop when using Dev Services; create-or-validate otherwise</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-indexing-plan-synchronization-strategy"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-indexing-plan-synchronization-strategy"><code>quarkus.hibernate-search-standalone.indexing.plan.synchronization.strategy</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-7" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>How to synchronize between application threads and indexing,
+in particular when relying on (implicit) listener-triggered indexing on entity change,
+but also when using a <code>SearchIndexingPlan</code> explicitly.</p>
+</div>
+<div class="paragraph">
+<p>Defines how complete indexing should be before resuming the application thread
+after a <code>SearchSession</code> is closed.</p>
+</div>
+<div class="paragraph">
+<p>Available values:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top" rowspan="2"><p class="tableblock">Strategy</p></th>
+<th class="tableblock halign-left valign-top" rowspan="2"><p class="tableblock">Throughput</p></th>
+<th class="tableblock halign-center valign-top" colspan="3"><p class="tableblock">Guarantees when the application thread resumes</p></th>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Changes applied</p></th>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Changes safe from crash/power loss</p></th>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Changes visible on search</p></th>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">async</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Best</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="icon red"><i class="fa fa-times"></i></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="icon red"><i class="fa fa-times"></i></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="icon red"><i class="fa fa-times"></i></span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">write-sync (<strong>default</strong>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Medium</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="icon lime"><i class="fa fa-check"></i></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="icon lime"><i class="fa fa-check"></i></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="icon red"><i class="fa fa-times"></i></span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">read-sync</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Medium to worst</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="icon lime"><i class="fa fa-check"></i></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="icon red"><i class="fa fa-times"></i></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="icon lime"><i class="fa fa-check"></i></span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">sync</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Worst</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="icon lime"><i class="fa fa-check"></i></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="icon lime"><i class="fa fa-check"></i></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="icon lime"><i class="fa fa-check"></i></span></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>This property also accepts a <a href="hibernate-search-orm-elasticsearch#bean-reference-note-anchor">bean reference</a>
+to a custom implementations of <code>IndexingPlanSynchronizationStrategy</code>.</p>
+</div>
+<div class="paragraph">
+<p>See
+<a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#indexing-plan-synchronization">this section of the reference documentation</a>
+for more information.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Instead of setting this configuration property,
+you can simply annotate your custom <code>IndexingPlanSynchronizationStrategy</code> implementation with <code>@SearchExtension</code>
+and leave the configuration property unset: Hibernate Search will use the annotated implementation automatically.
+If this configuration property is set, it takes precedence over any <code>@SearchExtension</code> annotation.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6324">QUARKUS_HIBERNATE_SEARCH_STANDALONE_INDEXING_PLAN_SYNCHRONIZATION_STRATEGY</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6324" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>write-sync</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-hibernate-search-standalone-elasticsearch_section_quarkus-hibernate-search-standalone-elasticsearch"></a> <span class="section-name section-level0"><a href="#quarkus-hibernate-search-standalone-elasticsearch_section_quarkus-hibernate-search-standalone-elasticsearch">Configuration for backends</a></span></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-version"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-version"><code>quarkus.hibernate-search-standalone.elasticsearch.version</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".version</code></p>
+</div>
+<div id="conf-collapsible-desc-8" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The version of Elasticsearch used in the cluster.</p>
+</div>
+<div class="paragraph">
+<p>As the schema is generated without a connection to the server, this item is mandatory.</p>
+</div>
+<div class="paragraph">
+<p>It doesn&#8217;t have to be the exact version (it can be <code>7</code> or <code>7.1</code> for instance) but it has to be sufficiently precise
+to choose a model dialect (the one used to generate the schema) compatible with the protocol dialect (the one used
+to communicate with Elasticsearch).</p>
+</div>
+<div class="paragraph">
+<p>There&#8217;s no rule of thumb here as it depends on the schema incompatibilities introduced by Elasticsearch versions. In
+any case, if there is a problem, you will have an error when Hibernate Search tries to connect to the cluster.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6325">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_VERSION</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6325" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">ElasticsearchVersion</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-schema-management-settings-file"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-schema-management-settings-file"><code>quarkus.hibernate-search-standalone.elasticsearch.schema-management.settings-file</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".schema-management.settings-file</code></p>
+</div>
+<div id="conf-collapsible-desc-9" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Path to a file in the classpath holding custom index settings to be included in the index definition
+when creating an Elasticsearch index.</p>
+</div>
+<div class="paragraph">
+<p>The provided settings will be merged with those generated by Hibernate Search, including analyzer definitions.
+When analysis is configured both through an analysis configurer and these custom settings, the behavior is undefined;
+it should not be relied upon.</p>
+</div>
+<div class="paragraph">
+<p>See <a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#backend-elasticsearch-configuration-index-settings">this section of the reference documentation</a>
+for more information.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6326">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_SCHEMA_MANAGEMENT_SETTINGS_FILE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6326" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-schema-management-mapping-file"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-schema-management-mapping-file"><code>quarkus.hibernate-search-standalone.elasticsearch.schema-management.mapping-file</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".schema-management.mapping-file</code></p>
+</div>
+<div id="conf-collapsible-desc-10" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Path to a file in the classpath holding a custom index mapping to be included in the index definition
+when creating an Elasticsearch index.</p>
+</div>
+<div class="paragraph">
+<p>The file does not need to (and generally shouldn&#8217;t) contain the full mapping:
+Hibernate Search will automatically inject missing properties (index fields) in the given mapping.</p>
+</div>
+<div class="paragraph">
+<p>See <a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#backend-elasticsearch-mapping-custom">this section of the reference documentation</a>
+for more information.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6327">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_SCHEMA_MANAGEMENT_MAPPING_FILE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6327" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-analysis-configurer"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-analysis-configurer"><code>quarkus.hibernate-search-standalone.elasticsearch.analysis.configurer</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".analysis.configurer</code></p>
+</div>
+<div id="conf-collapsible-desc-11" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>One or more <a href="#bean-reference-note-anchor">bean references</a>
+to the component(s) used to configure full text analysis (e.g. analyzers, normalizers).</p>
+</div>
+<div class="paragraph">
+<p>The referenced beans must implement <code>ElasticsearchAnalysisConfigurer</code>.</p>
+</div>
+<div class="paragraph">
+<p>See <a href="#analysis-configurer">Setting up the analyzers</a> for more
+information.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Instead of setting this configuration property,
+you can simply annotate your custom <code>ElasticsearchAnalysisConfigurer</code> implementations with <code>@SearchExtension</code>
+and leave the configuration property unset: Hibernate Search will use the annotated implementation automatically.
+See <a href="#plugging-in-custom-components">this section</a>
+for more information.</p>
+</div>
+<div class="paragraph">
+<p>If this configuration property is set, it takes precedence over any <code>@SearchExtension</code> annotation.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6328">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_ANALYSIS_CONFIGURER</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6328" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-hosts"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-hosts"><code>quarkus.hibernate-search-standalone.elasticsearch.hosts</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".hosts</code></p>
+</div>
+<div id="conf-collapsible-desc-12" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The list of hosts of the Elasticsearch servers.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6329">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_HOSTS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6329" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>localhost:9200</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-protocol"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-protocol"><code>quarkus.hibernate-search-standalone.elasticsearch.protocol</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".protocol</code></p>
+</div>
+<div id="conf-collapsible-desc-13" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The protocol to use when contacting Elasticsearch servers. Set to "https" to enable SSL/TLS.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6330">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_PROTOCOL</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6330" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><span class="asciidoc-tooltip-wrapper"><code>http</code><span class="asciidoc-tooltip">Use clear-text HTTP, with SSL/TLS disabled.</span></span>, <span class="asciidoc-tooltip-wrapper"><code>https</code><span class="asciidoc-tooltip">Use HTTPS, with SSL/TLS enabled.</span></span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><span class="asciidoc-tooltip-wrapper"><code>http</code><span class="asciidoc-tooltip">Use clear-text HTTP, with SSL/TLS disabled.</span></span></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-username"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-username"><code>quarkus.hibernate-search-standalone.elasticsearch.username</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".username</code></p>
+</div>
+<div id="conf-collapsible-desc-14" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The username used for authentication.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6331">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_USERNAME</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6331" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-password"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-password"><code>quarkus.hibernate-search-standalone.elasticsearch.password</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".password</code></p>
+</div>
+<div id="conf-collapsible-desc-15" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The password used for authentication.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6332">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_PASSWORD</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6332" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-connection-timeout"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-connection-timeout"><code>quarkus.hibernate-search-standalone.elasticsearch.connection-timeout</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".connection-timeout</code></p>
+</div>
+<div id="conf-collapsible-desc-16" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The timeout when establishing a connection to an Elasticsearch server.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6333">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_CONNECTION_TIMEOUT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6333" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>1S</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-read-timeout"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-read-timeout"><code>quarkus.hibernate-search-standalone.elasticsearch.read-timeout</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".read-timeout</code></p>
+</div>
+<div id="conf-collapsible-desc-17" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The timeout when reading responses from an Elasticsearch server.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6334">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_READ_TIMEOUT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6334" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>30S</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-request-timeout"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-request-timeout"><code>quarkus.hibernate-search-standalone.elasticsearch.request-timeout</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".request-timeout</code></p>
+</div>
+<div id="conf-collapsible-desc-18" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The timeout when executing a request to an Elasticsearch server.</p>
+</div>
+<div class="paragraph">
+<p>This includes the time needed to wait for a connection to be available,
+send the request and read the response.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6335">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_REQUEST_TIMEOUT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6335" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-max-connections"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-max-connections"><code>quarkus.hibernate-search-standalone.elasticsearch.max-connections</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".max-connections</code></p>
+</div>
+<div id="conf-collapsible-desc-19" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The maximum number of connections to all the Elasticsearch servers.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6336">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_MAX_CONNECTIONS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6336" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>20</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-max-connections-per-route"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-max-connections-per-route"><code>quarkus.hibernate-search-standalone.elasticsearch.max-connections-per-route</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".max-connections-per-route</code></p>
+</div>
+<div id="conf-collapsible-desc-20" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The maximum number of connections per Elasticsearch server.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6337">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_MAX_CONNECTIONS_PER_ROUTE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6337" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>10</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-discovery-enabled"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-discovery-enabled"><code>quarkus.hibernate-search-standalone.elasticsearch.discovery.enabled</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".discovery.enabled</code></p>
+</div>
+<div id="conf-collapsible-desc-21" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Defines if automatic discovery is enabled.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6338">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_DISCOVERY_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6338" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-discovery-refresh-interval"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-discovery-refresh-interval"><code>quarkus.hibernate-search-standalone.elasticsearch.discovery.refresh-interval</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".discovery.refresh-interval</code></p>
+</div>
+<div id="conf-collapsible-desc-22" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Refresh interval of the node list.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6339">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_DISCOVERY_REFRESH_INTERVAL</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6339" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>10S</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-thread-pool-size"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-thread-pool-size"><code>quarkus.hibernate-search-standalone.elasticsearch.thread-pool.size</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".thread-pool.size</code></p>
+</div>
+<div id="conf-collapsible-desc-23" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The size of the thread pool assigned to the backend.</p>
+</div>
+<div class="paragraph">
+<p>Note that number is <strong>per backend</strong>, not per index.
+Adding more indexes will not add more threads.</p>
+</div>
+<div class="paragraph">
+<p>As all operations happening in this thread-pool are non-blocking,
+raising its size above the number of processor cores available to the JVM will not bring noticeable performance
+benefit.
+The only reason to alter this setting would be to reduce the number of threads;
+for example, in an application with a single index with a single indexing queue,
+running on a machine with 64 processor cores,
+you might want to bring down the number of threads.</p>
+</div>
+<div class="paragraph">
+<p>Defaults to the number of processor cores available to the JVM on startup.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6340">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_THREAD_POOL_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6340" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-query-shard-failure-ignore"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-query-shard-failure-ignore"><code>quarkus.hibernate-search-standalone.elasticsearch.query.shard-failure.ignore</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".query.shard-failure.ignore</code></p>
+</div>
+<div id="conf-collapsible-desc-24" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Whether partial shard failures are ignored (<code>true</code>) or lead to Hibernate Search throwing an exception (<code>false</code>).</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6341">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_QUERY_SHARD_FAILURE_IGNORE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6341" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-version-check-enabled"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-version-check-enabled"><code>quarkus.hibernate-search-standalone.elasticsearch.version-check.enabled</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".version-check.enabled</code></p>
+</div>
+<div id="conf-collapsible-desc-25" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Whether Hibernate Search should check the version of the Elasticsearch cluster on startup.</p>
+</div>
+<div class="paragraph">
+<p>Set to <code>false</code> if the Elasticsearch cluster may not be available on startup.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6342">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_VERSION_CHECK_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6342" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>true</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-schema-management-required-status"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-schema-management-required-status"><code>quarkus.hibernate-search-standalone.elasticsearch.schema-management.required-status</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".schema-management.required-status</code></p>
+</div>
+<div id="conf-collapsible-desc-26" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The minimal <a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.17/cluster-health.html">Elasticsearch cluster
+status</a> required on startup.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6343">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_SCHEMA_MANAGEMENT_REQUIRED_STATUS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6343" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><code>green</code>, <code>yellow</code>, <code>red</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>yellow</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-schema-management-required-status-wait-timeout"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-schema-management-required-status-wait-timeout"><code>quarkus.hibernate-search-standalone.elasticsearch.schema-management.required-status-wait-timeout</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".schema-management.required-status-wait-timeout</code></p>
+</div>
+<div id="conf-collapsible-desc-27" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>How long we should wait for the status before failing the bootstrap.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6344">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_SCHEMA_MANAGEMENT_REQUIRED_STATUS_WAIT_TIMEOUT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6344" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>10S</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexing-queue-count"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexing-queue-count"><code>quarkus.hibernate-search-standalone.elasticsearch.indexing.queue-count</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".indexing.queue-count</code></p>
+</div>
+<div id="conf-collapsible-desc-28" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The number of indexing queues assigned to each index.</p>
+</div>
+<div class="paragraph">
+<p>Higher values will lead to more connections being used in parallel,
+which may lead to higher indexing throughput,
+but incurs a risk of overloading Elasticsearch,
+i.e. of overflowing its HTTP request buffers and tripping
+<a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.9/circuit-breaker.html">circuit breakers</a>,
+leading to Elasticsearch giving up on some request and resulting in indexing failures.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6345">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_INDEXING_QUEUE_COUNT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6345" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>10</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexing-queue-size"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexing-queue-size"><code>quarkus.hibernate-search-standalone.elasticsearch.indexing.queue-size</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".indexing.queue-size</code></p>
+</div>
+<div id="conf-collapsible-desc-29" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The size of indexing queues.</p>
+</div>
+<div class="paragraph">
+<p>Lower values may lead to lower memory usage, especially if there are many queues,
+but values that are too low will reduce the likeliness of reaching the max bulk size
+and increase the likeliness of application threads blocking because the queue is full,
+which may lead to lower indexing throughput.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6346">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_INDEXING_QUEUE_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6346" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>1000</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexing-max-bulk-size"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexing-max-bulk-size"><code>quarkus.hibernate-search-standalone.elasticsearch.indexing.max-bulk-size</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".indexing.max-bulk-size</code></p>
+</div>
+<div id="conf-collapsible-desc-30" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The maximum size of bulk requests created when processing indexing queues.</p>
+</div>
+<div class="paragraph">
+<p>Higher values will lead to more documents being sent in each HTTP request sent to Elasticsearch,
+which may lead to higher indexing throughput,
+but incurs a risk of overloading Elasticsearch,
+i.e. of overflowing its HTTP request buffers and tripping
+<a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.9/circuit-breaker.html">circuit breakers</a>,
+leading to Elasticsearch giving up on some request and resulting in indexing failures.</p>
+</div>
+<div class="paragraph">
+<p>Note that raising this number above the queue size has no effect,
+as bulks cannot include more requests than are contained in the queue.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6347">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_INDEXING_MAX_BULK_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6347" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>100</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-layout-strategy"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-layout-strategy"><code>quarkus.hibernate-search-standalone.elasticsearch.layout.strategy</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".layout.strategy</code></p>
+</div>
+<div id="conf-collapsible-desc-31" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>A <a href="#bean-reference-note-anchor">bean reference</a> to the component
+used to configure the Elasticsearch layout: index names, index aliases, &#8230;&#8203;</p>
+</div>
+<div class="paragraph">
+<p>The referenced bean must implement <code>IndexLayoutStrategy</code>.</p>
+</div>
+<div class="paragraph">
+<p>Available built-in implementations:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>simple</code></dt>
+<dd>
+<p>The default, future-proof strategy: if the index name in Hibernate Search is <code>myIndex</code>,
+this strategy will create an index named <code>myindex-000001</code>, an alias for write operations named <code>myindex-write</code>,
+and an alias for read operations named <code>myindex-read</code>.</p>
+</dd>
+<dt class="hdlist1"><code>no-alias</code></dt>
+<dd>
+<p>A strategy without index aliases, mostly useful on legacy clusters:
+if the index name in Hibernate Search is <code>myIndex</code>,
+this strategy will create an index named <code>myindex</code>, and will not use any alias.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>See
+<a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#backend-elasticsearch-indexlayout">this section of the reference documentation</a>
+for more information.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Instead of setting this configuration property,
+you can simply annotate your custom <code>IndexLayoutStrategy</code> implementation with <code>@SearchExtension</code>
+and leave the configuration property unset: Hibernate Search will use the annotated implementation automatically.
+See <a href="#plugging-in-custom-components">this section</a>
+for more information.</p>
+</div>
+<div class="paragraph">
+<p>If this configuration property is set, it takes precedence over any <code>@SearchExtension</code> annotation.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6348">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_LAYOUT_STRATEGY</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6348" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-hibernate-search-standalone-elasticsearch_section_quarkus-hibernate-search-standalone-elasticsearch-indexes"></a> <span class="section-name section-level1"><a href="#quarkus-hibernate-search-standalone-elasticsearch_section_quarkus-hibernate-search-standalone-elasticsearch-indexes">Per-index configuration overrides</a></span></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexes-index-name-schema-management-settings-file"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexes-index-name-schema-management-settings-file"><code>quarkus.hibernate-search-standalone.elasticsearch.indexes."index-name".schema-management.settings-file</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".indexes."index-name".schema-management.settings-file</code></p>
+</div>
+<div id="conf-collapsible-desc-32" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Path to a file in the classpath holding custom index settings to be included in the index definition
+when creating an Elasticsearch index.</p>
+</div>
+<div class="paragraph">
+<p>The provided settings will be merged with those generated by Hibernate Search, including analyzer definitions.
+When analysis is configured both through an analysis configurer and these custom settings, the behavior is undefined;
+it should not be relied upon.</p>
+</div>
+<div class="paragraph">
+<p>See <a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#backend-elasticsearch-configuration-index-settings">this section of the reference documentation</a>
+for more information.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6349">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_INDEXES__INDEX_NAME__SCHEMA_MANAGEMENT_SETTINGS_FILE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6349" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexes-index-name-schema-management-mapping-file"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexes-index-name-schema-management-mapping-file"><code>quarkus.hibernate-search-standalone.elasticsearch.indexes."index-name".schema-management.mapping-file</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".indexes."index-name".schema-management.mapping-file</code></p>
+</div>
+<div id="conf-collapsible-desc-33" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Path to a file in the classpath holding a custom index mapping to be included in the index definition
+when creating an Elasticsearch index.</p>
+</div>
+<div class="paragraph">
+<p>The file does not need to (and generally shouldn&#8217;t) contain the full mapping:
+Hibernate Search will automatically inject missing properties (index fields) in the given mapping.</p>
+</div>
+<div class="paragraph">
+<p>See <a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#backend-elasticsearch-mapping-custom">this section of the reference documentation</a>
+for more information.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6350">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_INDEXES__INDEX_NAME__SCHEMA_MANAGEMENT_MAPPING_FILE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6350" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexes-index-name-analysis-configurer"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexes-index-name-analysis-configurer"><code>quarkus.hibernate-search-standalone.elasticsearch.indexes."index-name".analysis.configurer</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".indexes."index-name".analysis.configurer</code></p>
+</div>
+<div id="conf-collapsible-desc-34" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>One or more <a href="#bean-reference-note-anchor">bean references</a>
+to the component(s) used to configure full text analysis (e.g. analyzers, normalizers).</p>
+</div>
+<div class="paragraph">
+<p>The referenced beans must implement <code>ElasticsearchAnalysisConfigurer</code>.</p>
+</div>
+<div class="paragraph">
+<p>See <a href="#analysis-configurer">Setting up the analyzers</a> for more
+information.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Instead of setting this configuration property,
+you can simply annotate your custom <code>ElasticsearchAnalysisConfigurer</code> implementations with <code>@SearchExtension</code>
+and leave the configuration property unset: Hibernate Search will use the annotated implementation automatically.
+See <a href="#plugging-in-custom-components">this section</a>
+for more information.</p>
+</div>
+<div class="paragraph">
+<p>If this configuration property is set, it takes precedence over any <code>@SearchExtension</code> annotation.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6351">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_INDEXES__INDEX_NAME__ANALYSIS_CONFIGURER</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6351" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">list of string</p></td>
+<td class="tableblock halign-left valign-middle"></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexes-index-name-schema-management-required-status"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexes-index-name-schema-management-required-status"><code>quarkus.hibernate-search-standalone.elasticsearch.indexes."index-name".schema-management.required-status</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".indexes."index-name".schema-management.required-status</code></p>
+</div>
+<div id="conf-collapsible-desc-35" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The minimal <a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.17/cluster-health.html">Elasticsearch cluster
+status</a> required on startup.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6352">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_INDEXES__INDEX_NAME__SCHEMA_MANAGEMENT_REQUIRED_STATUS</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6352" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><code>green</code>, <code>yellow</code>, <code>red</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>yellow</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexes-index-name-schema-management-required-status-wait-timeout"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexes-index-name-schema-management-required-status-wait-timeout"><code>quarkus.hibernate-search-standalone.elasticsearch.indexes."index-name".schema-management.required-status-wait-timeout</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".indexes."index-name".schema-management.required-status-wait-timeout</code></p>
+</div>
+<div id="conf-collapsible-desc-36" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>How long we should wait for the status before failing the bootstrap.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6353">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_INDEXES__INDEX_NAME__SCHEMA_MANAGEMENT_REQUIRED_STATUS_WAIT_TIMEOUT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6353" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html">Duration</a> <a href="#duration-note-anchor-quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone"><span class="icon"><i class="fa fa-question-circle" title="More information about the Duration format"></i></span></a></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>10S</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexes-index-name-indexing-queue-count"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexes-index-name-indexing-queue-count"><code>quarkus.hibernate-search-standalone.elasticsearch.indexes."index-name".indexing.queue-count</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".indexes."index-name".indexing.queue-count</code></p>
+</div>
+<div id="conf-collapsible-desc-37" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The number of indexing queues assigned to each index.</p>
+</div>
+<div class="paragraph">
+<p>Higher values will lead to more connections being used in parallel,
+which may lead to higher indexing throughput,
+but incurs a risk of overloading Elasticsearch,
+i.e. of overflowing its HTTP request buffers and tripping
+<a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.9/circuit-breaker.html">circuit breakers</a>,
+leading to Elasticsearch giving up on some request and resulting in indexing failures.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6354">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_INDEXES__INDEX_NAME__INDEXING_QUEUE_COUNT</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6354" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>10</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexes-index-name-indexing-queue-size"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexes-index-name-indexing-queue-size"><code>quarkus.hibernate-search-standalone.elasticsearch.indexes."index-name".indexing.queue-size</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".indexes."index-name".indexing.queue-size</code></p>
+</div>
+<div id="conf-collapsible-desc-38" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The size of indexing queues.</p>
+</div>
+<div class="paragraph">
+<p>Lower values may lead to lower memory usage, especially if there are many queues,
+but values that are too low will reduce the likeliness of reaching the max bulk size
+and increase the likeliness of application threads blocking because the queue is full,
+which may lead to lower indexing throughput.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6355">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_INDEXES__INDEX_NAME__INDEXING_QUEUE_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6355" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>1000</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexes-index-name-indexing-max-bulk-size"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-elasticsearch-indexes-index-name-indexing-max-bulk-size"><code>quarkus.hibernate-search-standalone.elasticsearch.indexes."index-name".indexing.max-bulk-size</code></a></span></p>
+</div>
+<div class="paragraph">
+<p><code>quarkus.hibernate-search-standalone.elasticsearch."backend-name".indexes."index-name".indexing.max-bulk-size</code></p>
+</div>
+<div id="conf-collapsible-desc-39" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>The maximum size of bulk requests created when processing indexing queues.</p>
+</div>
+<div class="paragraph">
+<p>Higher values will lead to more documents being sent in each HTTP request sent to Elasticsearch,
+which may lead to higher indexing throughput,
+but incurs a risk of overloading Elasticsearch,
+i.e. of overflowing its HTTP request buffers and tripping
+<a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.9/circuit-breaker.html">circuit breakers</a>,
+leading to Elasticsearch giving up on some request and resulting in indexing failures.</p>
+</div>
+<div class="paragraph">
+<p>Note that raising this number above the queue size has no effect,
+as bulks cannot include more requests than are contained in the queue.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6356">QUARKUS_HIBERNATE_SEARCH_STANDALONE_ELASTICSEARCH_INDEXES__INDEX_NAME__INDEXING_MAX_BULK_SIZE</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6356" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>100</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock"><a id="quarkus-hibernate-search-standalone-elasticsearch_section_quarkus-hibernate-search-standalone-management"></a> <span class="section-name section-level0"><a href="#quarkus-hibernate-search-standalone-elasticsearch_section_quarkus-hibernate-search-standalone-management">Management interface</a></span></p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">タイプ</p></th>
+<th class="tableblock halign-left valign-middle"><p class="tableblock">デフォルト</p></th>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-management-root-path"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-management-root-path"><code>quarkus.hibernate-search-standalone.management.root-path</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-40" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>Root path for reindexing endpoints.
+This value will be resolved as a path relative to <code>${quarkus.management.root-path}</code>.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6357">QUARKUS_HIBERNATE_SEARCH_STANDALONE_MANAGEMENT_ROOT_PATH</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6357" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>hibernate-search/standalone/</code></p></td>
+</tr>
+<tr class="row-collapsible row-collapsed row-with-desc row-hidden odd">
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="icon"><i class="fa fa-lock" title="Fixed at build time"></i></span> <a id="quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-management-enabled"></a> <span class="property-path"><a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-management-enabled"><code>quarkus.hibernate-search-standalone.management.enabled</code></a></span></p>
+</div>
+<div id="conf-collapsible-desc-41" class="openblock description description-collapsed">
+<div class="content">
+<div class="paragraph">
+<p>If management interface is turned on the reindexing endpoints will be published under the management interface.
+This property allows to enable this functionality by setting it to <code>`true</code>.</p>
+</div>
+<div class="paragraph">
+<p>Environment variable: <code id="env-var-6358">QUARKUS_HIBERNATE_SEARCH_STANDALONE_MANAGEMENT_ENABLED</code><button class="btn-copy fa fa-clipboard inline-btn-copy" data-clipboard-action="copy" data-clipboard-target="#env-var-6358" title="Copy to clipboard" do-not-collapse="true"></button></p>
+</div>
+</div>
+</div>
+<div class="paragraph description-decoration">
+<p><i class="fa fa-chevron-down"></i><span>Show more</span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">boolean</p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock"><code>false</code></p></td>
+</tr>
+</tbody>
+</table>
+<div id="duration-note-anchor-quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone" class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">期間フォーマットについて</div>
+<div class="paragraph">
+<p>To write duration values, use the standard <code>java.time.Duration</code> format.
+See the <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Duration.html#parse(java.lang.CharSequence)">Duration#parse() Java API documentation</a> for more information.</p>
+</div>
+<div class="paragraph">
+<p>数字で始まる簡略化した書式を使うこともできます:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値のみの場合は、秒単位の時間を表します。</p>
+</li>
+<li>
+<p>数値の後に <code>ms</code> が続く場合は、ミリ秒単位の時間を表します。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>その他の場合は、簡略化されたフォーマットが解析のために <code>java.time.Duration</code> フォーマットに変換されます：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数値の後に <code>h</code> 、 <code>m</code> 、 <code>s</code> が続く場合は、その前に <code>PT</code> が付けられます。</p>
+</li>
+<li>
+<p>数値の後に <code>d</code> が続く場合は、その前に <code>P</code> が付けられます。</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="bean-reference-note-anchor" class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">Bean 参照について</div>
+<div class="paragraph">
+<p>まず、設定プロパティーで Bean を参照することはオプションであり、実際には推奨されていないことに注意してください。
+Bean に <code>@SearchExtension</code> アノテーションを付けることによって、同じ結果を得ることができます。
+詳細は <a href="#plugging-in-custom-components">this section</a> を参照してください。</p>
+</div>
+<div class="paragraph">
+<p>設定プロパティーで文字列値を使用して Bean を参照したい場合は、
+文字列が解析されることを確認します。最も一般的な形式は次のとおりです。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>bean:</code> の後に <code>@Named</code> CDI Bean の名前が続きます。
+たとえば <code>bean:myBean</code> のようになります。</p>
+</li>
+<li>
+<p><code>class:</code> の後にクラスの完全修飾名を付けて、CDI Bean の場合は CDI を通して、
+そうでない場合はパブリックで引数なしのコンストラクターを通してインスタンス化されます。
+たとえば <code>class:com.mycompany.MyClass</code> のようになります。</p>
+</li>
+<li>
+<p>組み込み実装を参照する任意の文字列。
+利用可能な値については、各設定プロパティーのドキュメントに詳細が記載されています 
+(<a href="#quarkus-hibernate-search-standalone-elasticsearch_quarkus-hibernate-search-standalone-indexing-plan-synchronization-strategy"><code>quarkus.hibernate-search-standalone.indexing.plan.synchronization.strategy</code></a>
+ の <code>async</code>/<code>read-sync</code>/<code>write-sync</code>/<code>sync</code> など)。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>他の形式も認められていますが、高度なユースケースでのみ有用です。
+詳細は、<a href="https://docs.jboss.org/hibernate/search/7.2/reference/en-US/html_single/#configuration-bean-reference-parsing">Hibernate Searchの参照ドキュメントのこちらのセクション</a> 
+を参照してください。</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+    </div>
+    <div class="grid__item width-4-12 width-12-12-m tocwrapper">
+      <div class="hide-mobile toc"><ul class="sectlevel1">
+<li><a href="#prerequisites">要件</a></li>
+<li><a href="#architecture">アーキテクチャー</a></li>
+<li><a href="#solution">ソリューション</a></li>
+<li><a href="#creating-the-maven-project">Maven プロジェクトの作成</a></li>
+<li><a href="#creating-the-bare-classes">ベアクラスの作成</a></li>
+<li><a href="#using-hibernate-search-annotations">Hibernate Searchアノテーションの使用</a></li>
+<li><a href="#analyzers-and-normalizers">アナライザーとノーマライザー</a>
+<ul class="sectlevel2">
+<li><a href="#introduction">はじめに</a></li>
+<li><a href="#defining-the-analyzers-used">使用するアナライザーの定義</a></li>
+<li><a href="#analysis-configurer">アナライザーのセットアップ</a></li>
+</ul>
+</li>
+<li><a href="#implementing-the-rest-service">REST サービスの実装</a></li>
+<li><a href="#automatic-data-initialization">データの自動初期化</a></li>
+<li><a href="#configuring-the-application">アプリケーションの設定</a></li>
+<li><a href="#creating-a-frontend">フロントエンドの作成</a></li>
+<li><a href="#time-to-play-with-your-application">アプリケーションの使用</a></li>
+<li><a href="#building-a-native-executable">ネイティブ実行可能ファイルのビルド</a>
+<ul class="sectlevel2">
+<li><a href="#dev-services">開発サービス (設定不要のデータストア)</a></li>
+</ul>
+</li>
+<li><a href="#programmatic-mapping">プログラムによるマッピング</a></li>
+<li><a href="#opensearch">OpenSearch 互換性</a></li>
+<li><a href="#cdi">CDI インテグレーション</a>
+<ul class="sectlevel2">
+<li><a href="#injecting-entry-points">エントリーポイントの注入</a></li>
+<li><a href="#plugging-in-custom-components">カスタムコンポーネントのプラグイン</a></li>
+</ul>
+</li>
+<li><a href="#offline-startup">オフライン起動</a></li>
+<li><a href="#loading">ロード中</a></li>
+<li><a href="#management">管理エンドポイント</a></li>
+<li><a href="#limitations">制限</a></li>
+<li><a href="#further-reading">さらに詳しく</a></li>
+<li><a href="#faq">FAQ</a>
+<ul class="sectlevel2">
+<li><a href="#why-elasticsearch-only">なぜ Elasticsearch だけなのですか?</a></li>
+</ul>
+</li>
+<li><a href="#configuration-reference">Hibernate Search Standalone の設定リファレンス</a></li>
+</ul></div>
+    </div>
+  </div>
+  <h2>関連コンテンツ</h2>
+  <div class="grid-wrapper relations">
+    <div class="grid__item width-6-12 width-12-12-m">
+      <h3>On the same topics</h3>
+      <ul class="related-content">
+      
+        
+        <li class="guide"><a href="/guides/hibernate-search-orm-elasticsearch">Hibernate ORMとElasticsearch/OpenSearchでHibernate Searchを使用</a></li>
+      
+        
+        <li class="guide"><a href="/guides/elasticsearch">Elasticsearchクラスターの実行</a></li>
+      
+        
+        <li class="guide"><a href="/guides/elasticsearch-dev-services">Dev Services for Elasticsearch</a></li>
+      
+        
+        <li class="guide"><a href="/guides/redis-dev-services">Dev Services for Redis</a></li>
+      
+        
+        <li class="reference"><a href="/guides/redis-reference">Redis エクステンションのリファレンスガイド</a></li>
+      
+        
+        <li class="guide"><a href="/guides/mongodb-panache">シンプルになったMongoDB with Panache</a></li>
+      
+        
+        <li class="guide"><a href="/guides/mongodb-panache-kotlin">シンプルになったMongoDB with PanacheとKotlin</a></li>
+      
+        
+        <li class="guide"><a href="/guides/mongodb">MongoDB クライアントの利用</a></li>
+      
+        
+        <li class="guide"><a href="/guides/redis">Redisクライアントの使用</a></li>
+      
+        
+        <li class="guide"><a href="/guides/cache">アプリケーションデータのキャッシング</a></li>
+      
+        
+        <li class="reference"><a href="/guides/datasource">Quarkusでデータソースを設定</a></li>
+      
+        
+        <li class="guide"><a href="/guides/databases-dev-services">Dev Services for Databases</a></li>
+      
+        
+        <li class="guide"><a href="/guides/infinispan-dev-services">Infinispanの開発サービス</a></li>
+      
+        
+        <li class="guide"><a href="/guides/rest-data-panache">PanacheでJakarta RESTリソースを生成する</a></li>
+      
+        
+        <li class="reference"><a href="/guides/cache-infinispan-reference">Infinispan Cache</a></li>
+      
+        
+        <li class="reference"><a href="/guides/infinispan-client-reference">Infinispanクライアントエクステンションリファレンスガイド</a></li>
+      
+        
+        <li class="guide"><a href="/guides/lra">Narayana LRA 参加者サポート</a></li>
+      
+        
+        <li class="guide"><a href="/guides/reactive-sql-clients">リアクティブ SQL クライアント</a></li>
+      
+        
+        <li class="reference"><a href="/guides/cache-redis-reference">Redisキャッシュ</a></li>
+      
+        
+        <li class="guide"><a href="/guides/hibernate-orm-panache">シンプルになったHibernate ORM with Panache</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="content project-footer">
+  <div class="footer-section">
+    <div class="logo-wrapper">
+      <a href="/"><img src="/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" class="project-logo" title="Quarkus"></a>
+    </div>
+  </div>
+  <div class="grid-wrapper">
+    <p class="grid__item width-3-12">Quarkusはオープンです。このプロジェクトのすべての依存関係は、<a href='https://www.apache.org/licenses/LICENSE-2.0' target='_blank'>Apache Software License 2.0</a> または互換性のあるライセンスのもとで利用可能です。<br /><br />このウェブサイトは<a href='https://jekyllrb.com/' target='_blank'>Jekyll</a> で構築され、<a href='https://pages.github.com/' target='_blank'>GitHub Pages</a> にホストされ、完全にオープンソースです。改善したい場合は、<a href='https://github.com/quarkusio/quarkusio.github.io' target='_blank'>ウェブサイトをフォーク</a>し、修正してみせてください。</p>
+
+    
+      <div class="width-1-12 project-links">
+        <span>ナビゲーション</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/" target="_blank">ホーム</a></li>
+          
+          
+          
+            <li><a href="/about" target="_blank">Quarkusについて</a></li>
+          
+          
+          
+            <li><a href="/blog" target="_blank">ブログ</a></li>
+          
+          
+          
+            <li><a href="/insights" target="_blank">ポッドキャスト</a></li>
+          
+          
+          
+            <li><a href="/events" target="_blank">イベント</a></li>
+          
+          
+          
+            <li><a href="/newsletter" target="_blank">ニュースレター</a></li>
+          
+          
+          
+            <li><a href="https://github.com/orgs/quarkusio/projects/13/views/1" target="_blank">ロードマップ</a></li>
+          
+          
+          
+            <li><a href="/security" target="_blank">セキュリティ&nbsp;ポリシー</a></li>
+          
+          
+          
+            <li><a href="/usage" target="_blank">使用方法</a></li>
+          
+          
+          
+            <li><a href="/brand" target="_blank">Brand</a></li>
+          
+          
+          
+            <li><a href="/desktopwallpapers" target="_blank">Wallpapers</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>フォローする</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="https://x.com/quarkusio" target="_blank">X</a></li>
+          
+          
+          
+            <li><a href="https://bsky.app/profile/quarkus.io" target="_blank">Bluesky</a></li>
+          
+          
+          
+            <li><a rel="me" href="https://fosstodon.org/@quarkusio" target="_blank">Mastodon</a></li>
+            
+          
+          
+            <li><a href="https://www.facebook.com/quarkusio" target="_blank">Facebook</a></li>
+          
+          
+          
+            <li><a href="https://www.linkedin.com/company/quarkusio/" target="_blank">Linkedin</a></li>
+          
+          
+          
+            <li><a href="https://www.youtube.com/channel/UCaW8QG_QoIk_FnjLgr5eOqg" target="_blank">Youtube</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio" target="_blank">GitHub</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-2-12 project-links">
+        <span>ヘルプ</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href="/support" target="_blank">サポート</a></li>
+          
+          
+          
+            <li><a href="/guides" target="_blank">ガイド</a></li>
+          
+          
+          
+            <li><a href="/faq" target="_blank">FAQ</a></li>
+          
+          
+          
+            <li><a href="/get-started" target="_blank">入門</a></li>
+          
+          
+          
+            <li><a href="https://stackoverflow.com/questions/tagged/quarkus" target="_blank">Stack Overflow</a></li>
+          
+          
+          
+            <li><a href="https://github.com/quarkusio/quarkus/discussions" target="_blank">ディスカッション</a></li>
+          
+          
+          
+            <li><a href="https://groups.google.com/forum/#!forum/quarkus-dev" target="_blank">開発メーリングリスト</a></li>
+          
+          
+        </ul>
+      </div>
+    
+      <div class="width-1-12 project-links">
+        <span>言語</span>
+        <ul class="footer-links">
+          
+          
+            <li><a href=" https://quarkus.io/ " target="_blank">English</a></li>
+          
+          
+          
+            <li><a href="https://pt.quarkus.io/" target="_blank">Português&nbsp;(Brasileiro)</a></li>
+          
+          
+          
+            <li><a href=" https://es.quarkus.io/ " target="_blank">Español</a></li>
+          
+          
+          
+            <li><a href="https://cn.quarkus.io/" target="_blank">简体中文</a></li>
+          
+          
+          
+            <li><a href=" https://ja.quarkus.io/ " target="_blank">日本語</a></li>
+          
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="width-4-12 more-links">
+        <span>Quarkusはコミュニティプロジェクトで構成されています</span>
+        <ul class="footer-links">
+          
+            <li><a blah href="https://vertx.io/" target="_blank">Eclipse Vert.x</a></li>
+          
+            <li><a blah href="https://smallrye.io" target="_blank">SmallRye</a></li>
+          
+            <li><a blah href="https://hibernate.org" target="_blank">Hibernate ORM</a></li>
+          
+            <li><a blah href="https://netty.io" target="_blank">Netty</a></li>
+          
+            <li><a blah href="https://resteasy.github.io" target="_blank">RESTEasy</a></li>
+          
+            <li><a blah href="https://camel.apache.org" target="_blank">Apache Camel</a></li>
+          
+            <li><a blah href="https://microprofile.io" target="_blank">Eclipse MicroProfile</a></li>
+          
+            <li><a blah href="https://code.quarkus.io/" target="_blank">その他多数...</a></li>
+          
+        </ul>
+      </div>
+    
+  </div>
+</div>
+
+  <div class="content redhat-footer">
+  <div class="grid-wrapper">
+    <span class="licence">
+      <i class="fab fa-creative-commons"></i><i class="fab fa-creative-commons-by"></i> <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank">CC by 3.0</a> | <a href="https://www.redhat.com/en/about/privacy-policy">Privacy Policy</a>
+    </span>
+    <span class="redhat">
+      Sponsored by
+    </span>
+    <span class="redhat-logo">
+      <a href="https://www.redhat.com/" target="_blank"><img src="/assets/images/redhat_reversed.svg"></a>
+    </span>
+  </div>
+</div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/assets/javascript/mobile-nav.js"></script>
+  <script type="text/javascript" src="/assets/javascript/scroll-down.js"></script>
+  <script src="/assets/javascript/satellite.js" type="text/javascript"></script>
+  <script src="/guides/javascript/config.js" type="text/javascript"></script>
+  <script src="/assets/javascript/guides-version-dropdown.js" type="text/javascript"></script>
+  <script src="/assets/javascript/back-to-top.js" type="text/javascript"></script>
+  <script src="/assets/javascript/clipboard.min.js" type="text/javascript"></script>
+  <script src="/assets/javascript/copy.js" type="text/javascript"></script>
+  <script src="/assets/javascript/asciidoc-tabs.js" type="text/javascript"></script>
+  <script src="/assets/javascript/future-date.js" type="text/javascript"></script>
+</body>
+
+</html>
